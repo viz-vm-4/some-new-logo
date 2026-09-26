@@ -855,7 +855,8 @@ ${top}
     const ts = 28, tg = 8, bx = M - 6, by = belt + (ground - belt - ts) / 2;
     keyOut += p(rectD(bx, by, ts, ts));
     tones.forEach((t, q) => { f1out += tile(bx + (q + 1) * (ts + tg), by, ts, t, 5); });
-    keyOut += T(bx + 17 * (ts + tg) + 2, by + 19, '→', mono(15, 500, 0));
+    const ax = bx + 17 * (ts + tg) + 4, ay = by + ts / 2;   // drawn, not a glyph: DM Mono has no arrow
+    keyOut += p(rectD(ax, ay - 1.75, 12, 3.5)) + p(polyD([[ax + 20, ay], [ax + 10, ay - 7], [ax + 10, ay + 7]]));
     // rollers under the belt
     for (let x = 14; x < W; x += 36) keyOut += p(circ(x, ground - 2, 3.2));
     keyOut += T(bx, belt - 8, 'CLS', mono(11.5, 500, 0.12));
