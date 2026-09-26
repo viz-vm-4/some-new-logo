@@ -14,31 +14,31 @@ html,body{margin:0;background:#DEDAD0;color:#16181B}
 body{font-family:Overpass, system-ui, sans-serif;-webkit-font-smoothing:antialiased}
 
 /* ───────── COVER ───────── */
-.cover{position:relative;width:720px;height:888px;overflow:hidden;background:var(--paper);color:var(--ink);flex:0 0 720px}
-.cover.night{--paper:#15181D;--ink:#EEEAE0;--ink2:#A6A8AB;--tint:#21262D;--tint2:#2A3038;--water:#1C2B34;--grey:#3A4049}
-.cover .map{position:absolute;left:0;top:0;width:720px;height:888px;overflow:visible}
-.cover .hdr{position:absolute;left:40px;right:40px;top:33px;height:20px;display:flex;justify-content:space-between;align-items:center;
+.cv{position:relative;width:720px;height:888px;overflow:hidden;background:var(--paper);color:var(--ink);flex:0 0 720px}
+.cv.night{--paper:#15181D;--ink:#EEEAE0;--ink2:#A6A8AB;--tint:#21262D;--tint2:#2A3038;--water:#1C2B34;--grey:#3A4049}
+.cv .map{position:absolute;left:0;top:0;width:720px;height:888px;overflow:visible}
+.cv .hdr{position:absolute;left:40px;right:40px;top:33px;height:20px;display:flex;justify-content:space-between;align-items:center;
   font:700 10.5px/1 Overpass;letter-spacing:.13em;text-transform:uppercase}
-.cover .hdr .lvl{display:flex;align-items:center;gap:8px}
-.cover .hdr .lvl svg{display:block;margin-top:-2px}
-.cover .hrule{position:absolute;left:40px;right:40px;top:58px;height:3px;background:var(--ink)}
-.cover .title{position:absolute;left:37px;right:36px;top:84px;font-weight:800;letter-spacing:-.024em;line-height:.955;
+.cv .hdr .lvl{display:flex;align-items:center;gap:8px}
+.cv .hdr .lvl svg{display:block;margin-top:-2px}
+.cv .hrule{position:absolute;left:40px;right:40px;top:58px;height:3px;background:var(--ink)}
+.cv .title{position:absolute;left:37px;right:36px;top:84px;font-weight:800;letter-spacing:-.024em;line-height:.955;
   font-size:var(--ts,60px);font-kerning:normal}
-.cover .tag{font-family:Newsreader, Georgia, serif;font-style:italic;font-weight:400;font-size:19.5px;line-height:1.28;letter-spacing:0;
+.cv .tag{font-family:Newsreader, Georgia, serif;font-style:italic;font-weight:400;font-size:19.5px;line-height:1.28;letter-spacing:0;
   margin:15px 0 0 3px;max-width:540px}
-.cover .foot{position:absolute;left:40px;right:40px;bottom:30px}
-.cover .frule{height:1.5px;background:var(--ink);margin-bottom:11px}
-.cover .key{display:grid;grid-template-columns:1fr 1fr;column-gap:30px;row-gap:5px;
+.cv .foot{position:absolute;left:40px;right:40px;bottom:30px}
+.cv .frule{height:1.5px;background:var(--ink);margin-bottom:11px}
+.cv .key{display:grid;grid-template-columns:1fr 1fr;column-gap:30px;row-gap:5px;
   font:700 8.8px/1.1 Overpass;letter-spacing:.05em;text-transform:uppercase}
-.cover .key .k{display:flex;align-items:center;gap:7px;min-width:0}
-.cover .key .k b{flex:0 0 15px;height:15px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;
+.cv .key .k{display:flex;align-items:center;gap:7px;min-width:0}
+.cv .key .k b{flex:0 0 15px;height:15px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;
   font:800 9px/1 Overpass;letter-spacing:0;padding-top:1.5px}
-.cover .key .k span{white-space:nowrap;overflow:hidden}
-.cover .key .k i{font-style:normal;font-weight:600;margin-left:auto;padding-left:6px;color:var(--ink2);letter-spacing:.04em}
-.cover .imprint{display:flex;justify-content:space-between;align-items:center;margin-top:13px}
-.cover .stats{font:700 10px/1 Overpass;letter-spacing:.12em;text-transform:uppercase}
-.cover .brand{display:flex;align-items:center;gap:9px;font:800 12px/1 Overpass;letter-spacing:.17em;text-transform:uppercase}
-.cover .brand svg{display:block}
+.cv .key .k span{white-space:nowrap;overflow:hidden}
+.cv .key .k i{font-style:normal;font-weight:600;margin-left:auto;padding-left:6px;color:var(--ink2);letter-spacing:.04em}
+.cv .imprint{display:flex;justify-content:space-between;align-items:center;margin-top:13px}
+.cv .stats{font:700 10px/1 Overpass;letter-spacing:.12em;text-transform:uppercase}
+.cv .brand{display:flex;align-items:center;gap:9px;font:800 12px/1 Overpass;letter-spacing:.17em;text-transform:uppercase}
+.cv .brand svg{display:block}
 
 /* map text */
 .sn{font:700 8.4px Overpass;fill:var(--ink)}
@@ -50,19 +50,125 @@ body{font-family:Overpass, system-ui, sans-serif;-webkit-font-smoothing:antialia
 .mt{font:italic 400 22px Newsreader;fill:var(--ink)}
 .stn{font:800 9.5px Overpass;fill:var(--ink);letter-spacing:.1em}
 .cell{opacity:.75}
-.cover .sbul{position:absolute;right:40px;top:86px;width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+.cv .sbul{position:absolute;right:40px;top:86px;width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;
   color:#fff;font:800 23px/1 Overpass;letter-spacing:.02em;padding-top:3px}
-.cover .key .k b.hollow{background:transparent !important;border:2.6px solid var(--kc);}
+.cv .key .k b.hollow{background:transparent !important;border:2.6px solid var(--kc);}
 
 /* ───────── PAGE ───────── */
-.page{width:1560px;margin:0 auto;padding:70px 60px 120px}
-.covers{display:grid;grid-template-columns:720px 720px;gap:80px 0;justify-content:space-between}
-.cap{font:400 13px/1.45 Newsreader, Georgia, serif;margin-top:14px;color:#2a2c30;max-width:700px}
+.page{width:1640px;margin:0 auto;padding:0 60px 140px}
+.intro{padding:84px 0 70px;display:grid;grid-template-columns:1fr 1fr;column-gap:80px;row-gap:34px;margin-bottom:10px}
+.kicker{grid-column:1/-1;display:flex;justify-content:space-between;font:700 11px/1 Overpass;letter-spacing:.14em;text-transform:uppercase;padding-bottom:14px;border-bottom:3px solid #16181B}
+.intro h1{grid-column:1/2;margin:6px 0 0;font:800 132px/.86 Overpass;letter-spacing:-.035em}
+.intro h1 small{display:block;font:italic 400 28px/1.2 Newsreader;letter-spacing:0;margin-top:22px}
+.lede{grid-column:2/3;margin:10px 0 0;font:400 21px/1.42 Newsreader;color:#1c1e22}
+.lede p{margin:0 0 14px}
+.lede em{font-style:italic}
+.panel{border-top:1.5px solid #16181B;padding-top:14px}
+.panel h3{margin:0 0 14px;font:800 11px/1 Overpass;letter-spacing:.14em;text-transform:uppercase}
+.legend{display:grid;grid-template-columns:78px 1fr;row-gap:12px;column-gap:14px;align-items:center;font:400 15px/1.3 Newsreader}
+.legend b{font:800 10.5px/1 Overpass;letter-spacing:.1em;text-transform:uppercase;margin-right:6px}
+.legend svg{display:block}
+.chips{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.chip{font:700 9.5px/1.25 Overpass;letter-spacing:.06em;text-transform:uppercase}
+.chip i{display:block;height:34px;border-radius:2px;margin-bottom:6px;position:relative}
+.chip i::after{content:"";position:absolute;right:0;top:0;bottom:0;width:34%;background:var(--n);border-radius:0 2px 2px 0}
+.chip span{font-weight:600;color:#55575b}
+.grounds{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+.grounds .chip i::after{display:none}
+.types{display:grid;grid-template-columns:1fr;gap:16px}
+.types .t1{font:800 44px/1 Overpass;letter-spacing:-.024em}
+.types .t2{font:700 11px/1.4 Overpass;letter-spacing:.13em;text-transform:uppercase}
+.types .t3{font:italic 400 22px/1.2 Newsreader}
+.types small{display:block;font:600 10px/1.3 Overpass;letter-spacing:.1em;text-transform:uppercase;color:#55575b;margin-top:5px}
+.levels{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.lv{height:92px;border-radius:2px;padding:12px;display:flex;flex-direction:column;justify-content:space-between;font:800 10.5px/1 Overpass;letter-spacing:.12em;text-transform:uppercase}
+.lv span{font:italic 400 14px/1.2 Newsreader;letter-spacing:0;text-transform:none}
+.sec{display:flex;justify-content:space-between;align-items:baseline;border-top:3px solid #16181B;padding-top:12px;margin:0 0 34px;font:700 11px/1 Overpass;letter-spacing:.14em;text-transform:uppercase}
+.sec b{font:800 30px/1 Overpass;letter-spacing:-.01em;text-transform:none}
+.covers{display:grid;grid-template-columns:720px 720px;gap:84px 80px;justify-content:space-between;margin-bottom:90px}
+.cap{font:400 15px/22px Newsreader, Georgia, serif;margin-top:16px;color:#1f2125;max-width:700px;height:88px;overflow:hidden}
 .cap b{font:800 10.5px/1 Overpass;letter-spacing:.12em;text-transform:uppercase;margin-right:8px}
+.shelf{display:flex;flex-wrap:wrap;gap:22px 20px;margin-bottom:90px}
+.thumb{width:180px;height:222px;overflow:hidden;position:relative;box-shadow:0 1px 0 rgba(0,0,0,.08),0 6px 14px -8px rgba(0,0,0,.35)}
+.thumb > .cv{transform:scale(.25);transform-origin:0 0;position:absolute;left:0;top:0}
+.wrapbox{margin-bottom:40px}
+.wrap{display:flex;width:1512px;height:888px;box-shadow:0 2px 0 rgba(0,0,0,.06),0 18px 40px -22px rgba(0,0,0,.45)}
+.wrap .back,.wrap .spine{position:relative;height:888px;overflow:hidden}
+.wrap .back{width:720px;flex:0 0 720px}
+.wrap .spine{width:72px;flex:0 0 72px;border-left:1px dashed rgba(0,0,0,.18);border-right:1px dashed rgba(0,0,0,.18)}
+.back .blurb{position:absolute;left:40px;right:52px;top:86px;font:400 22px/1.36 Newsreader}
+.back .blurb em{font-style:italic}
+.back .bstats{position:absolute;left:40px;right:40px;bottom:30px;display:flex;justify-content:space-between;align-items:center;border-top:1.5px solid var(--ink);padding-top:14px}
+.spine .stitle{position:absolute;left:50%;top:268px;transform:translateX(-50%) rotate(90deg);transform-origin:50% 50%;white-space:nowrap}
+.note{font:400 14px/1.5 Newsreader;color:#34363a;max-width:900px;margin-top:22px}
 </style>
 </head>
 <body>
-<div class="page"><div class="covers" id="covers"></div>
+<div class="page">
+<header class="intro">
+  <div class="kicker"><span>Vizuara Books — cover system proposal</span><span>Direction 09</span></div>
+  <h1>Interchange<small>Every book is a map of its own territory.</small></h1>
+  <div class="lede">
+    <p>Each Vizuara book is drawn as a transit diagram of its subject. The book’s <em>parts</em> are the lines, every <em>capsule</em> is a station — one tick, one capsule, counted from the live library, so a 69-capsule book visibly runs longer than a 9-capsule one — and the subject’s own architecture is the geography: a transformer’s residual stream, a tree’s splits, the five axes of a GPU cluster.</p>
+    <p>One strict frame holds fifty different maps together, the way Beck’s grammar holds a city together: a signage-grade title that is always the loudest thing, a key that doubles as the table of contents, and the imprint as a quiet signature. Level is read from across the room — beginner and intermediate books are day maps, advanced books are night maps, and a trail grade (● ■ ◆) repeats it in print.</p>
+  </div>
+
+  <div class="panel">
+    <h3>Map legend — the same on every cover</h3>
+    <div class="legend">
+      <svg width="78" height="20"><path d="M2 10H76" stroke="#D8432E" stroke-width="8"/></svg><div><b>Line</b>a part of the book; colour follows part order, so every book sets off on the red line.</div>
+      <svg width="78" height="20"><path d="M2 12H76" stroke="#1F4E9C" stroke-width="8"/><path d="M22 12V2.5M40 12V2.5M58 12V2.5" stroke="#1F4E9C" stroke-width="3.6"/></svg><div><b>Tick</b>one capsule. Counted, not drawn for effect: every map is audited in code against the catalogue.</div>
+      <svg width="78" height="20"><path d="M2 10H76" stroke="#12875A" stroke-width="8"/><circle cx="39" cy="10" r="6.6" fill="#F3EFE6" stroke="#16181B" stroke-width="2.7"/></svg><div><b>Ring</b>a capsule where lines meet — where one part hands you to the next.</div>
+      <svg width="78" height="24"><path d="M2 6H76M2 18H76" stroke="#E9A31B" stroke-width="8"/><line x1="39" y1="6" x2="39" y2="18" stroke="#16181B" stroke-width="17.7" stroke-linecap="round"/><line x1="39" y1="6" x2="39" y2="18" stroke="#F3EFE6" stroke-width="12.3" stroke-linecap="round"/></svg><div><b>Pill</b>an interchange across a bundle: a layer, a gate, the capstone.</div>
+      <svg width="78" height="22"><path d="M2 11H56" stroke="#6C3F99" stroke-width="8"/><circle cx="66" cy="11" r="9.2" fill="#6C3F99"/><text x="66" y="14.7" text-anchor="middle" style="font:800 10px Overpass;fill:#fff">4</text></svg><div><b>Bullet</b>the part number at a terminus; it matches the key.</div>
+      <svg width="78" height="26"><rect x="2" y="2" width="74" height="22" rx="8" fill="#E3DDCF"/><text x="39" y="17" text-anchor="middle" style="font:italic 400 13px Newsreader;fill:#4B4D51;letter-spacing:.06em">territory</text></svg><div><b>Territory</b>the subject’s geography, in tint, named in italic the way maps name rivers and hills.</div>
+      <svg width="78" height="20"><path d="M2 10H52" stroke="#D8432E" stroke-width="10"/><path d="M2 10H52" stroke="#F3EFE6" stroke-width="5.8"/><path d="M54 10H76" stroke="#D8432E" stroke-width="4" stroke-dasharray="8 6"/></svg><div><b>Hollow</b>a line under construction: the coming-soon cover.</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>Level — day map, night map</h3>
+    <div class="levels">
+      <div class="lv" style="background:#F3EFE6;color:#16181B;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)"><div><svg width="12" height="12" viewBox="0 0 14 14" style="vertical-align:-1px;margin-right:6px"><circle cx="7" cy="7" r="6.3" fill="#16181B"/></svg>Beginner</div><span>Day map · paper ground</span></div>
+      <div class="lv" style="background:#F3EFE6;color:#16181B;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)"><div><svg width="11" height="11" viewBox="0 0 12 12" style="vertical-align:-1px;margin-right:6px"><rect x=".5" y=".5" width="11" height="11" fill="#16181B"/></svg>Intermediate</div><span>Day map · paper ground</span></div>
+      <div class="lv" style="background:#15181D;color:#EEEAE0"><div><svg width="13" height="13" viewBox="0 0 16 16" style="vertical-align:-2px;margin-right:6px"><path d="M8 .4 15.6 8 8 15.6.4 8Z" fill="#EEEAE0"/></svg>Advanced</div><span>Night map · ink ground</span></div>
+    </div>
+    <h3 style="margin-top:26px">Line inks — part 0 to 9 <span style="font-weight:600;color:#55575b">(day / night)</span></h3>
+    <div class="chips" id="chips"></div>
+    <div class="grounds">
+      <div class="chip"><i style="background:#F3EFE6;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)"></i>Paper<br><span>#F3EFE6</span></div>
+      <div class="chip"><i style="background:#16181B"></i>Ink<br><span>#16181B</span></div>
+      <div class="chip"><i style="background:#15181D;box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)"></i>Night ground<br><span>#15181D</span></div>
+      <div class="chip"><i style="background:#E3DDCF"></i>Territory<br><span>#E3DDCF / #21262D</span></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>Type</h3>
+    <div class="types">
+      <div><div class="t1">Neural Networks from Scratch</div><small>Overpass ExtraBold — titles. Highway-sign DNA: the title is the station name.</small></div>
+      <div><div class="t2">Stage 3 · Neural networks&emsp;■ Intermediate&emsp;43 stations · 8 lines</div><small>Overpass Bold caps — header, key, map labels</small></div>
+      <div><div class="t3">Engineer the context window like a system.</div><small>Newsreader Italic — taglines and territory names (the cartographer’s italic for natural features)</small></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>Imprint</h3>
+    <div style="display:flex;align-items:center;gap:26px">
+      <svg width="112" height="76" viewBox="0 0 28 19"><path d="M2.5 1.5 L14 13" stroke="#D8432E" stroke-width="4.4" fill="none"/><path d="M25.5 1.5 L14 13" stroke="#1F4E9C" stroke-width="4.4" fill="none"/><circle cx="14" cy="13" r="4.5" fill="#F3EFE6" stroke="#16181B" stroke-width="2.3"/></svg>
+      <div style="font:400 15px/1.45 Newsreader">A <em>V</em> made of the first two lines of every book — part 0 in red, part 1 in blue — meeting at an interchange. Vizuara as the place where your routes connect. Always bottom-right, always smaller than the title.</div>
+    </div>
+  </div>
+</header>
+<div class="sec"><b>The covers</b><span>Six core titles, then eight from across the catalogue</span></div>
+<div class="covers" id="covers"></div>
+<div class="sec"><b>The shelf at 180 px</b><span>How the library grid will see them</span></div>
+<div class="shelf" id="shelf"></div>
+
+<div class="sec"><b>Print wrap</b><span>Back · spine · front — AI Context Engineering</span></div>
+<div class="wrapbox"><div class="wrap" id="wrap"></div></div>
+<p class="note">The back cover is the whole library drawn as one network — the six stages of the Vizuara roadmap, one tick per book, with this volume ringed: <em>you are here</em>. The spine carries the book’s line colours as a strip, each part as tall as its capsule count, so a shelf of fifty spines is fifty different bar codes.</p>
+<p class="note">Data: part names, capsule counts, hours, stages and taglines scraped from books.vizuara.ai on 2026-09-26. Every tick on every map corresponds to one real capsule (hover a tick to see which). Everything is SVG/HTML — no raster images — and prints as vector.</p>
 </div>
 <script>
 const DATA = {"ai-context-engineering": {"level": "intermediate","capsules": 43,"hours": 10,"name": "AI Context Engineering","stage": "Stage 5 · Ship something","tagline": "Engineer the context window like a system.","parts": [[0,"Context Foundations",6],[1,"The Instructional Layer",5],[2,"Write and Select: RAG",7],[3,"Tools and MCP",6],[4,"Compress and Isolate",5],[5,"Memory Architectures",5],[6,"Setting Up the Build Workflow",4],[7,"Capstone Builds",5]],"caps": ["Why Context Engineering, Not Prompt Engineering","Software 1.0, 2.0, and 3.0","Anatomy of the Context Window","The Four Strategies: Write, Select, Compress, Isolate","Context Failure Modes: Poisoning, Distraction, Confusion, Clash","Your First Context Lab: Measuring Tokens and Effects","System Prompts as Programs","Instructions, Examples, and Guardrails","Designing Roles and Personas","Structured Output and Formatting Contracts","Instructional Layer Lab","Write vs Select: Two Halves of Knowledge Injection","Why RAG Exists: Grounding, Freshness, and Cost","Chunking and Embeddings","Vector Search and Retrieval","Reranking and Hybrid Search","Building a RAG Pipeline End-to-End","RAG Lab and Interactive Quiz","Tools as Context: Giving the Model Hands","Tool-Calling Mechanics","What Is MCP? The Model Context Protocol","MCP Servers and Clients","Building a Useful MCP Server and Client","Tool-Context Hygiene","Why Compress: The Token Budget Is Finite","Summarization and Pruning Strategies","Isolation: Quarantining Context Across Sub-Agents","Multi-Agent Context Boundaries","Compress and Isolate Lab","The Stateless LLM Problem","Short-Term vs Long-Term Memory","Episodic, Semantic, and Procedural Memory","Building Memory with Retrieval","Memory Architectures Lab","A Coding-Agent Build Workflow","Claude Code and OpenClaw","Context Files and Repo Hygiene","Workflow Setup Lab","Capstone: Building an Email Agent","Mega Build: Driving Claude Code End-to-End","OpenClaw and RL Agents","Building Conversational Voice Agents for Bharat","Putting It All Together: A Context-Engineering Playbook"]},"mathematical-foundations-for-ml": {"level": "beginner","capsules": 43,"hours": 10,"name": "Mathematical Foundations for Machine Learning","stage": "Stage 1 · The ground floor","tagline": "The linear algebra, probability, and calculus that make ML work.","parts": [[0,"Why Math for Machine Learning",3],[1,"Linear Algebra as Transformations",7],[2,"Determinants and the Shape of Space",5],[3,"Probability and Statistics Foundations",5],[4,"Probability Distributions",5],[5,"Python and Numerical Computing",7],[6,"Calculus and the Engine of Learning",7],[7,"Putting It Together",4]],"caps": ["The Math Under the Model","How to Read This Book","Vectors as Arrows and as Lists","Linear Combinations and Span","The Dot Product, Two Ways","The Dot Product as a Linear Transformation","A Matrix Is a Transformation","Matrix Multiplication as Composition","The Identity and the Inverse","Transformations in 3D","What the Determinant Measures","Computing 2x2 and 3x3 Determinants","Zero Determinant and Collapse","Eigenvalues and Eigenvectors","Eigen-Intuition and Why It Matters for ML","Reasoning Under Uncertainty","Conditional Probability and Bayes' Rule","Random Variables and Expectation","Variance, Standard Deviation, and Spread","Covariance and Correlation","Distributions as Shapes of Chance","Bernoulli and Binomial Distributions","The Normal Distribution","Likelihood and Maximum Likelihood","From Likelihood to Loss Functions","Python for Math: A Fast Start","Objects, Classes, and Building Blocks","NumPy Arrays and Vectorization","Linear Algebra in NumPy","Pandas for Data","Visualizing Data and Distributions","Python for Machine Learning","Derivatives as Rates of Change","Integrals and the Area Under a Curve","Partial Derivatives and the Gradient","The Chain Rule and Backpropagation","Gradient Descent","Momentum and RMSProp","The Adam Optimizer","Deep Learning Libraries in Python","A Neuron from Scratch","A Neural Network from Scratch","The Math You Now Own"]},"neural-networks-from-scratch": {"level": "beginner","capsules": 33,"hours": 7,"name": "Neural Networks from Scratch","stage": "Stage 3 · Neural networks","tagline": "Build a working neural network from an empty file.","parts": [[0,"The Ten Questions",4],[1,"Turning Scores into Probabilities",3],[2,"Weights and Wiring",4],[3,"How a Network Learns",6],[4,"Context and Review",3],[5,"Coding the Layers",7],[6,"Loss, Optimizer, and Training",6]],"caps": ["Introduction and the Ten Questions","What a Neural Network Must Actually Do","A Mathematical Function to Switch a Neuron On or Off","Matrix Multiplication as a Classifier","From Raw Scores to a Probability Distribution","The Softmax Function","Tensors: The Data Containers","The Logic for Calculating Weight Values","Setting Up the Neural Network","Activation Functions","The Network as One Big Function","Teaching, or Training, a Neural Network","The Forward Pass and Cross-Entropy Loss","The Backward Pass: The Intuition","The Backward Pass: Gradients by Hand","Weight Updation with Gradient Descent","Hyperparameter Tuning","A Glimpse of Convolutional Neural Networks","Relooking at the Ten Questions","Masterclass: Building the Whole Thing in Code","The Problem: A Spiral Dataset","Designing the Dense Layer Class","Coding the Layer Forward Pass","Coding the Layer Backward Pass","Adding Activation Functions","ReLU: Forward and Backward Pass","Softmax: The Forward Pass in Code","Cross-Entropy Loss: The Forward Pass","The Combined Softmax + Loss Backward Pass","Optimizers: Beyond Plain Gradient Descent","Coding the Optimizer","Training the Entire Network","Visualizing the Results"]},"build-llms-from-scratch": {"level": "intermediate","capsules": 20,"hours": 6,"name": "Build Large Language Models (LLMs) from Scratch","stage": "Stage 4 · Attention, and your own LLM","tagline": "Build a GPT-style LLM from an empty file.","parts": [[0,"LLM Basics",6],[1,"LLM Attention Mechanism",6],[2,"LLM Data Pre-processing",2],[3,"LLM Architecture",3],[4,"LLM Pretraining",2],[5,"LLM Finetuning",1]],"caps": ["Course Introduction","What are LLMs?","Pretraining vs Finetuning LLMs","What are transformers?","How does GPT-3 really work?","Stages of building an LLM from scratch","Introduction to the Attention Mechanism","Simplified Attention Mechanism - Code from Scratch","The self attention mechanism with keys, query and values: coded form scratch","Causal Self Attention - Coded from scratch","Multi-head Attention - Part 1","Multi-head Attention - Part 2","The GPT Tokenizer: Byte Pair Encoding and Input-Target Pairs","Token and Positional Embeddings","Bird's-eye View of the LLM Architecture","Layer Norm, GELU, and Shortcut Connections","Coding the Transformer Block and the 124M GPT-2","Measuring Loss and Coding the Pretraining Loop","Temperature, Top-k Sampling, and Loading OpenAI's Weights","Finetuning: From Spam Classifier to Instruction Following"]},"5d-parallelism": {"level": "advanced","capsules": 40,"hours": 9,"name": "5D Parallelism for Large Model Training","stage": "Systems and scale","tagline": "Scale a model across a cluster of GPUs.","parts": [[0,"GPU Foundations",6],[1,"Data Parallelism",7],[2,"ZeRO and Sharded Data Parallelism",4],[3,"Tensor Parallelism",5],[4,"Sequence and Context Parallelism",5],[5,"Pipeline Parallelism",5],[6,"Expert Parallelism and MoE",4],[7,"Putting It All Together",4]],"caps": ["Why One GPU Is Not Enough","GPU Primer: Anatomy of an Accelerator","The Five Axes of Parallelism","The Four Buckets of GPU Memory","Floating Point and Mixed Precision","Memory Math for a 1B Llama","Activation Recomputation","Gradient Accumulation","Data Parallelism from Scratch","The Ring-All-Reduce Algorithm","Choosing the Batch Size","Profiling with TensorBoard","Overlapping Communication and Compute","The Redundancy Problem in Data Parallelism","ZeRO-1: Sharding Optimizer States","ZeRO-2 and ZeRO-3","Implementing ZeRO from Scratch","Why Split a Single Layer","Column- and Row-Parallel Linear Layers","Tensor Parallelism for the Transformer Block","Tensor Parallelism from Scratch","TP vs ZeRO for Inference","The Long-Sequence Memory Wall","Sequence Parallelism Explained","Sequence Parallelism from Scratch","Context Parallelism and Ring Attention","Naive Context Parallelism from Scratch","Why Pipeline Parallelism","The Pipeline Bubble","Advanced Pipeline Schedules","Pipeline Parallelism from Scratch","Megatron 3D Parallelism","Mixture-of-Experts Basics","Expert Parallelism Explained","Load Balancing and Token Routing","Build an MoE SLM from Scratch","Composing 5D Parallelism","Distributing GPT-2 Across a Cluster","Build an SLM with 5D Parallelism","Capstone Projects and Next Steps"]},"pi-vs-hermes-vs-codex": {"level": "advanced","capsules": 9,"hours": 1,"name": "Pi vs Hermes vs Codex: Context Compaction and Memory","stage": "Stage 5 · Ship something","tagline": "Three open-source coding harnesses, read out of their source: where each one cuts the conversation, what it writes down, and what it remembers tomorrow.","parts": [[1,"Compaction",4],[2,"A session, traced",1],[3,"Memory",4]],"caps": ["How Pi compacts","How Hermes compacts","How Codex compacts","Compaction, side by side","Pi compaction, walked through one session","Pi: memory is a file you write","Hermes: the agent writes its own memory","Codex: memory the agent writes when asked","Memory, side by side"]},"dsa-in-python": {"level": "intermediate","capsules": 69,"hours": 15,"name": "Data Structures & Algorithms in Python","stage": "Stage 1 · The ground floor","tagline": "The interview-grade DSA toolkit, coded from scratch in Python.","parts": [[0,"Foundations & Python Refresher",7],[1,"Arrays & Matrices",9],[2,"Strings, Sets & Dictionaries",8],[3,"Two Pointers & Sliding Window",6],[4,"Searching, Sorting & Bit Manipulation",8],[5,"Stacks & Queues",10],[6,"Linked Lists",7],[7,"Recursion & Backtracking",6],[8,"Greedy Algorithms & Capstone",8]],"caps": ["Why Data Structures & Algorithms?","Setting Up Python: Interpreter & REPL","A Fast Tour of the Python Language","Variables, Data Types, Casting & Operators","Control Flow: Conditionals, Loops & Functions","Object-Oriented Python for Data Structures","Big-O: Time & Space Complexity","Introduction to Python Arrays","Reverse an Array & Rotate by D Places","Generate All Subarrays & Search Unsorted","Max, Min & K-th Smallest/Largest","Two Sum & Contains Duplicate","Introduction to 2D Arrays","Transpose & Rotate a Matrix","Print a Matrix in Snake Pattern","Spiral Traversal of a Matrix","Introduction to Strings","All Substrings & Reverse a String","Palindrome String & Palindromic Substrings","Remove Occurrences & Camel-Case a Sentence","Introduction to Sets","Unique Characters & Pangram with Sets","Introduction to Python Dictionaries","Frequency Counting: Vowels, Uniques & Pangram","The Two-Pointers Technique","Remove Duplicates from a Sorted Array","Boats to Save People (Leetcode 881)","The Sliding-Window Technique","Contains Duplicate II (Leetcode 219)","Longest Substring Without Repeating Characters","Linear Search","Binary Search on a Sorted Array","Bubble Sort","Selection Sort","Introduction to Bit Manipulation","Single Element Among Doubles","Counting Bits","Power of Two","Introduction to the Stack","Previous Smaller & Greater Element","Valid Parentheses","Daily Temperatures","Use Side Lane","Introduction to the Queue","Implement a Stack Using Queues","Implement a Queue Using Stacks","Reverse First K Elements of a Queue","Sliding Window Maximum","Introduction to the Linked List","Remove the N-th Node from the End","Rotate a Linked List","Reverse a Linked List","Find the Middle of a Linked List","Detect a Cycle (Floyd's Algorithm)","Merge Two Sorted Linked Lists","Introduction to Recursion","Recursive Traversal, Fibonacci & Factorial","Climbing Stairs","Generate All Subsequences","Follow the Knight: The Knight's Tour","Find All Permutations","Introduction to Greedy: Chocolate Distribution","Minimum Platforms","N Meetings in One Room","Maximum Units on a Truck","Minimum Arrows to Burst Balloons","Gas Station","Choosing the Right Pattern","Capstone: The Interview Playbook"]},"decision-trees-from-scratch": {"level": "beginner","capsules": 23,"hours": 5,"name": "Build Decision Trees from Scratch","stage": "Stage 2 · Learning from data","tagline": "Grow classification and regression trees by hand.","parts": [[0,"Foundations",4],[1,"Classification Trees",9],[2,"Regression Trees",7],[3,"Wrap-Up and Interview Prep",3]],"caps": ["Why Decision Trees?","The Anatomy of a Decision Tree","Classification vs Regression Trees","The Toy Dataset We Will Split by Hand","Starting to Build a Classification Tree","What is Gini Impurity?","Gini Impurity: A Worked Example","Gini Impurity for Numerical Features","Choosing the Best Split","Recursion and Stopping Rules","Finishing the Classification Tree","Pruning to Fight Overfitting","Code an Entire Classification Tree in Python","What are Regression Trees?","Variance and SSR as the Split Criterion","Building the First Regression Split","Finishing the Regression Tree","Regression Trees with Multiple Features","Code an Entire Regression Tree in Python","Capstone: Fit and Read a Regression Tree","Recap: Two Trees, One Algorithm","Interview Prep: Decision Trees","From One Tree to Forests and Boosting"]},"charlie-language-room": {"level": "advanced","capsules": 22,"hours": 5,"series": "Charlie and the Intelligence Factory","series_no": "I","subtitle": "Language — Inference Engineering","name": "Charlie and the Language Room","parts": [[0,"The Golden Ticket",3],[1,"The Cache Room",4],[2,"The Attention Wing",2],[3,"The Engine Room",3],[4,"The Squeezing Room",4],[5,"The Scaling Room",3],[6,"Out of the Factory",3]],"caps": ["The Golden Ticket","Prefill and decode","The memory wall","The good and evil of the KV cache","Paged attention","MQA, GQA and latent attention","Sparse and sliding-window attention","State-space models and Mamba","FlashAttention 1, 2 and 3","The anatomy of a vLLM step","Continuous batching","Radix attention and prefix caching","Quantization, from FP16 to FP4","GPTQ, AWQ and the outlier problem","Speculative decoding","Multi-token prediction","Parallelism for inference","Disaggregated serving","Distillation and finetuning for inference","Guardrails, guided decoding and evals","The million-user system","Inference at the edge"]},"charlie-vision-room": {"level": "intermediate","capsules": 20,"hours": 6,"series": "Charlie and the Intelligence Factory","series_no": "II","subtitle": "Vision — Vision Transformers","name": "Charlie and the Vision Room","parts": [[0,"Into the Vision Room",3],[1,"The Attention Bench",4],[2,"Building the Vision Transformer",3],[3,"The Hierarchy Room",2],[4,"Finding Things",3],[5,"Time and Language",3],[6,"Generating Pictures",2]],"caps": ["The Vision Room","Why convolution hits a wall","The journey of a token","Simplified self-attention","Self-attention with trainable weights","Masked and multi-head attention","Counting the parameters","Patches are tokens","Coding ViT from scratch","DeiT and the distillation token","Swin: windows that shift","Coding Swin from scratch","DETR: detection as set prediction","Coding DETR, and running it","Segment Anything","TimeSformer and video","NanoVLM from scratch","Flamingo and LLaVA","Autoencoders and VAEs","Diffusion models"]},"charlie-sound-room": {"level": "intermediate","capsules": 20,"hours": 6,"series": "Charlie and the Intelligence Factory","series_no": "III","subtitle": "Audio — Voice Agents","name": "Charlie and the Sound Room","parts": [[0,"Into the Sound Room",3],[1,"Listening",4],[2,"Speaking",3],[3,"The Brain",4],[4,"The Wire",3],[5,"Shipping",3]],"caps": ["The Sound Room","The cascaded pipeline","What sound actually is","Voice activity detection","How Whisper works","Streaming ASR and faster-whisper","Measuring transcription quality","How text-to-speech works","Piper, Coqui and neural vocoders","Prosody and streaming TTS","The LLM as an interlocutor","Prompting for speech","Tool calling for voice agents","Memory for voice agents","Streaming, buffers and chunking","Barge-in and turn-taking","WebSockets and real-time transport","Building Nimbus, end to end","The latency budget","Speech-to-speech, telephony and frameworks"]},"charlie-reasoning-room": {"level": "advanced","capsules": 21,"hours": 6,"series": "Charlie and the Intelligence Factory","series_no": "IV","subtitle": "Reason — Reinforcement Learning, from bandits to reasoning models","name": "Charlie and the Reasoning Room","parts": [[0,"Into the Reasoning Room",3],[1,"The Three Horsemen",3],[2,"Value Machines",3],[3,"Policy Machines",3],[4,"Aligning Language Models",4],[5,"Production RL",5]],"caps": ["The Reasoning Room","The agent-environment loop","A short history of RL","Dynamic programming","Monte Carlo methods","Temporal-difference learning","SARSA and Q-learning","Deep Q-networks","Replay buffers and target networks","Policy gradients and REINFORCE","Baselines, advantage and actor-critic","TRPO and PPO","RLHF from scratch","Reward models and their failure modes","GRPO and reasoning models","DPO and the direct methods","Agentic RL","The Socratic tutor","World models and dreaming","RL for robotics and driving","RL for software, and RL infrastructure"]},"inference-engineering": {"level": "advanced","subtitle": "Serve LLMs fast — batching, KV-cache, paged attention, speculative decoding.","coming_soon": true,"name": "Inference Engineering"},"git-github-masterclass": {"level": "beginner","capsules": 40,"hours": 9,"name": "Git & GitHub Masterclass","stage": "Stage 1 · The ground floor","tagline": "Version control, from an empty folder to a merged pull request.","parts": [[0,"Getting Oriented",6],[1,"Version Control Foundations",5],[2,"Meet the Team & the Plan",2],[3,"All About Git",10],[4,"All About GitHub",3],[5,"GitHub Desktop, Step by Step",5],[6,"For Students, Researchers & Pros",3],[7,"The Real World & Open Source",6]],"caps": ["Why this masterclass?","Why should you care about Git & GitHub?","How this book is structured","Git vs GitHub — the crucial distinction","Is Git/GitHub only for code?","What is a terminal, and do I need it?","What do we mean by version control?","How long can you go without learning Git?","Common rookie mistakes to avoid","Git/GitHub alternatives","GitHub Desktop — the easy way in","About Team Vizuara","What we'll cover in the rest of the course","What is Git?","How Git version control works","The repository — where history lives","Installing Git","Git basic commands: init, add, commit, status","Pushing a local repo to GitHub","What are Git branches?","Merging branches","Git pull — staying in sync","Git fork — your own copy of someone's repo","What is GitHub?","Anatomy of a GitHub repository page","Pull requests — how change gets reviewed","GitHub Desktop — install and sign in","Committing changes in GitHub Desktop","Pushing and pulling with GitHub Desktop","Branching and merging in GitHub Desktop","Resolving conflicts in GitHub Desktop","GitHub for students","CI/CD with GitHub Actions — Part 1","CI/CD with GitHub Actions — Part 2","GitLab and the wider ecosystem","Cool GitHub repos worth exploring","Do all companies use GitHub?","Do all professionals use GitHub?","Making your first open-source contribution","Capstone: putting it all together"]},"reinforcement-learning": {"level": "intermediate","capsules": 38,"hours": 8,"name": "Reinforcement Learning","stage": "Reinforcement learning and robotics","tagline": "Build every RL algorithm by hand.","parts": [[0,"Foundations of Reinforcement Learning",5],[1,"The Three Pillars of Classical RL",6],[2,"Deep Q-Networks",5],[3,"Policy Gradient Methods from Scratch",6],[4,"RLHF from Scratch",7],[5,"Build a Reasoning Model with GRPO",4],[6,"Agentic Reinforcement Learning",3],[7,"From Learner to Researcher",2]],"caps": ["What Is Reinforcement Learning?","The Agent-Environment Interface","The Markov Property and MDPs","Rewards, Returns and Discounting","OpenAI Gymnasium: Your First Environment","Value Functions and the Bellman Equations","Dynamic Programming: Policy and Value Iteration","Monte Carlo Methods: Learning from Episodes","Temporal Difference Learning","Q-Learning and SARSA","Project: Landing a Lunar Lander","The Birth of Deep RL: From Pong to Atari","From Q-Tables to Q-Networks","Experience Replay and Target Networks","The DQN Training Loop","Project: Build a DQN from Scratch","Why Optimize the Policy Directly?","The Policy Gradient Theorem","The REINFORCE Algorithm","REINFORCE with a Baseline","Advantage Functions and Actor-Critic","Generalized Advantage Estimation","Why Language Models Need Alignment","The Three-Stage RLHF Pipeline","Training a Reward Model from Preferences","Project: An SLM That Writes Positive Stories","The PPO Algorithm Explained","The PPO Training Loop for Language Models","Project: A Reddit Post Summarizer","From PPO to GRPO","How GRPO Works","GRPO and the DeepSeek-R1 Revolution","Project: Turn an SLM into a Reasoning Model","What Is Agentic RL?","The Agentic RL Landscape","Project: An Agentic RAG App Trained with RL","Putting It All Together","Doing Impactful RL Research"]},"rag-in-production": {"level": "intermediate","capsules": 42,"hours": 10,"name": "RAG in Production","stage": "Stage 5 · Ship something","tagline": "Build RAG systems that survive real users.","parts": [[0,"RAG Foundations",5],[1,"Data Ingestion",4],[2,"Chunking",5],[3,"Embeddings & Indexing",6],[4,"Retrieval & Generation",5],[5,"Advanced RAG",6],[6,"Evaluating RAG",6],[7,"Agentic & Graph RAG",5]],"caps": ["Why RAG Exists","What Is Retrieval-Augmented Generation?","The RAG Pipeline End to End","Your First Minimal RAG","RAG vs Fine-tuning vs Long Context","Ingestion Is the Hard Part","Loading Documents: PDF, HTML, and Beyond","Cleaning, Normalizing, and Metadata","Building a Robust Ingestion Pipeline","Why Chunking Decides Retrieval Quality","Fixed-Size and Overlap Chunking","Recursive and Structure-Aware Chunking","Semantic Chunking","Choosing Chunk Size and Overlap","What Embeddings Actually Encode","Choosing an Embedding Model","Similarity Metrics: Cosine, Dot, Euclidean","Vector Indexes and ANN Search","Vector Databases in Practice","Building the Index","The Retrieval Step","Prompt Augmentation and Context Assembly","Generation, Grounding, and Citations","Building a Naive RAG Chatbot","Where Naive RAG Breaks","The Advanced RAG Playbook","Query Transformation and Expansion","Hybrid Search: Dense plus Sparse","Re-ranking with Cross-Encoders","Context Compression and Filtering","Building an Advanced RAG Pipeline","You Cannot Improve What You Cannot Measure","Retrieval Metrics: Recall, Precision, MRR","Generation Metrics: Faithfulness and Relevance","RAGAS and LLM-as-Judge","Building an Evaluation Dataset","Closing the Evaluation Loop","Beyond Single-Shot Retrieval","Agentic RAG with Tools and Routing","Graph RAG: Knowledge as a Graph","Building Agentic and Graph RAG","Shipping RAG to Production"]},"kernel-engineering": {"level": "advanced","subtitle": "From silicon to speculative decoding — GPU kernels for modern LLMs.","coming_soon": true,"name": "Kernel Engineering"},"transformers-from-scratch": {"level": "intermediate","capsules": 20,"hours": 5,"name": "Transformers: Theory, Intuition, and Building from Scratch","stage": "Stage 4 · Attention, and your own LLM","tagline": "The transformer, from intuition to code.","parts": [[0,"Introduction and Motivation",2],[1,"Foundations of Attention",2],[2,"Challenges with Traditional Models",1],[3,"Introduction to Transformers",2],[4,"Positional Encoding",4],[5,"Attention Mechanisms in Transformers",3],[6,"Piecing It All Together",2],[7,"Implementation & Code Walkthrough",3],[8,"Extensions and Advanced Topics",1]],"caps": ["Example/Motivation","Course Introduction","Understanding Attention","Attention Example","Shortcomings of Sequence-to-Sequence Models","Word Embeddings","Transformer Model Intro","Why Do We Need Positional Encoding?","Approaching Positional Encoding","Sinusoidal Encoding","Other Positional Encodings","Intro to Attention in Transformers","Scaled Dot-Product Attention","Multi-Head Attention","The Encoder Block","The Decoder and Final Output","Tokenization and the Dataset","Coding the Input and Attention Layers","Assembling and Training the Transformer","Other Transformer-Based Architectures"]}};
@@ -404,8 +510,8 @@ MAPS['mathematical-foundations-for-ml'] = { h:392, draw(M){
 MAPS['build-llms-from-scratch'] = { h:376, draw(M){
   const X=292, top=26, base=350, b0=56, b1=308, lx=X+44;
   M.rect(X-122,b0,272,b1-b0,22);
-  M.tlabel('transformer block',X+136,b1-16,{anchor:'end'});
-  M.tlabel('residual',X-18,b0+116,{anchor:'end'}); M.tlabel('stream',X-18,b0+134,{anchor:'end'});
+  M.tlabel('transformer block',X+150,b1+22,{anchor:'end'});
+  M.tlabel('residual',X-28,b0+116,{anchor:'end'}); M.tlabel('stream',X-28,b0+134,{anchor:'end'});
   const bx=X+170; M.zone(`M${bx},${b0} h9 v${b1-b0} h-9`,{fill:'none',stroke:'var(--ink)',sw:2.2});
   M.math('× 12',bx+22,(b0+b1)/2+8,{anchor:'start'});
   M.line(0,[[-60,base],[172,base]],{avoid:[OUT],ends:'end',ring:'end',side:1,bullet:66});
@@ -422,7 +528,7 @@ MAPS['build-llms-from-scratch'] = { h:376, draw(M){
   M.line(3,[[X,base],[X,top]],{avoid:[[0,base-16,1e3,1e3],[0,y1-8,1e3,y0+24],[0,y7-24,1e3,y6+8]],side:1,ends:'end',ring:'end',at:[0.07,0.5,1]});
   M.line(4,[[X,top],[590,top]],{avoid:[[0,0,X+22,1e3]],side:1,term:'end'});
   M.line(5,[[X,top],[150,top]],{avoid:[[X-22,0,1e3,1e3]],side:1,term:'end',at:[0.55]});
-  M.bullet(1,lx+22,y2+34); M.bullet(2,230,base+24); M.bullet(3,X-24,base-46); M.bullet(4,614,top); M.bullet(5,126,top);
+  M.bullet(1,lx+62,y2+6); M.bullet(2,230,base+24); M.bullet(3,X-24,base-46); M.bullet(4,614,top); M.bullet(5,126,top);
   M.label('TOKENS IN',24,base-17,{cls:'dest'}); M.label('NEXT TOKEN',590,top-17,{cls:'dest',anchor:'end'});
 }};
 
@@ -456,7 +562,7 @@ MAPS['dsa-in-python'] = { h:372, draw(M){
    bridges the two trees (one algorithm) and runs on to forests and boosting. */
 MAPS['decision-trees-from-scratch'] = { h:372, draw(M){
   const r=[300,100], A=[170,230], B=[430,230], yl=350;
-  [[82,yl],[258,yl],[342,yl],[518,yl]].forEach(p=>M.rect(p[0]-40,p[1]-26,80,44,6));
+  [[82,yl],[258,yl],[342,yl],[518,yl]].forEach(p=>M.rect(p[0]-34,p[1]-26,68,44,6));
   M.tlabel('leaves',600,yl+6,{anchor:'start'});
   M.line(0,[[300,-14],r],{ends:'end',ring:'end',side:1,avoid:[[0,-100,1e3,8]],bullet:'start',bulletGap:12});
   M.line(1,[r,A],{n:3,ends:'end',ring:'end',side:1,span:[18,0]});
@@ -471,6 +577,29 @@ MAPS['decision-trees-from-scratch'] = { h:372, draw(M){
   M.tlabel('root',332,104,{anchor:'start'});
   M.tlabel('classification',118,196,{anchor:'end'}); M.tlabel('regression',482,196,{anchor:'start'});
   M.bullet(1,56,318); M.bullet(2,544,318); M.bullet(3,300,254);
+}};
+
+/* ---------- Git & GitHub Masterclass ----------
+   A commit graph is already a transit map: the first four parts run down `main`;
+   the rest branch off it and merge back, alternating above and below. */
+MAPS['git-github-masterclass'] = { h:300, draw(M){
+  const y=108, D=52, yf=y+140;
+  M.rect(286,y-D-24,440,48,0);
+  M.tlabel('github.com',278,y-D+5,{anchor:'end'});
+  M.tlabel('main',24,y+30,{anchor:'start'});
+  M.tlabel('your fork',118,yf-16,{anchor:'start'});
+  // branches first, so main runs over their departure stubs
+  const bub=(k,x0,x1,dir)=>{ const yy=y+dir*D; const pts=[[x0-26,y],[x0,y],[x0+D,yy],[x1-D,yy],[x1,y],[x1+26,y]];
+    return M.line(k,pts,{side:dir<0?1:-1,span:[40,40],r:24,layer:'ctx'}); };
+  bub(4,300,476,-1); bub(5,386,566,1); bub(6,520,690,-1);
+  M.line(7,[[572,y],[598,y],[636,y+38],[636,yf-38],[598,yf],[100,yf]],{side:-1,span:[150,0],r:30,layer:'ctx',term:'end'});
+  M.line(0,[[-60,y],[148,y]],{avoid:[OUT],ends:'end',ring:'end',side:1,bullet:66});
+  M.line(1,[[148,y],[262,y]],{ends:'end',ring:'end',side:1,span:[16,0]});
+  M.line(2,[[262,y],[300,y]],{ends:'end',ring:'end',side:1,span:[14,0]});
+  const J=[300,476,386,566,520,690,598].map(x=>[x-16,-1e4,x+16,1e4]);
+  M.line(3,[[300,y],[700,y]],{side:1,span:[16,0],avoid:[OUTR,...J]});
+  M.bullet(4,390,y-D-38); M.bullet(6,605,y-D-38); M.bullet(5,476,y+D+24); M.bullet(7,76,yf);
+  M.label('TO OPEN SOURCE',100,yf+28,{cls:'dest',anchor:'start'});
 }};
 
 /* ---------- Charlie and the Intelligence Factory (sub-series) ----------
@@ -523,7 +652,7 @@ MAPS['inference-engineering'] = { h:260, draw(M){
   M.line(0,pts,{hollow:true,at:[0.12,0.47,0.62,0.93],avoid:[OUT],r:26,w:11});
   M.line(0,[[580,28],[700,28]],{ctx:true,dash:'10 8',w:4,color:M.col(0)});
   const names=['BATCHING','KV-CACHE','PAGED ATTENTION','SPECULATIVE DECODING'];
-  const off=[[0,40],[0,-30],[0,40],[-8,40]], anc=['middle','middle','middle','middle'];
+  const off=[[0,40],[0,-30],[0,40],[0,-30]], anc=['middle','middle','middle','middle'];
   M.stations.forEach((st,i)=>{ const [x,y]=st.p; M.label(names[i],x+off[i][0],y+off[i][1],{cls:'stn',anchor:anc[i]}); });
   M.tlabel('line under construction',452,206,{anchor:'middle'});
 }};
@@ -540,6 +669,7 @@ const META = {
  'pi-vs-hermes-vs-codex':         {title:'Pi vs Hermes vs Codex:<br>Context Compaction<br>and Memory', ts:53, tag:'Three open-source coding harnesses, read out of their source.'},
  'dsa-in-python':                 {title:'Data Structures<br>&amp; Algorithms<br>in Python', ts:60},
  'decision-trees-from-scratch':   {title:'Build Decision<br>Trees from Scratch', ts:64},
+ 'git-github-masterclass':  {title:'Git &amp; GitHub<br>Masterclass', ts:74},
  'charlie-language-room':  {title:'Charlie and the<br>Language Room', ts:64, series:0, hdr:'Charlie and the Intelligence Factory&ensp;·&ensp;Book I'},
  'charlie-vision-room':    {title:'Charlie and the<br>Vision Room', ts:64, series:1, hdr:'Charlie and the Intelligence Factory&ensp;·&ensp;Book II'},
  'charlie-sound-room':     {title:'Charlie and the<br>Sound Room', ts:64, series:2, hdr:'Charlie and the Intelligence Factory&ensp;·&ensp;Book III'},
@@ -561,7 +691,7 @@ function vmark(night){ // the Vizuara mark: two lines meeting at an interchange
 const pad=n=>String(n).padStart(2,'0');
 const ROMAN=['I','II','III','IV'];
 
-function buildCover(slug, host){
+function buildCover(slug, host, opts={}){
   const m=META[slug]||{};
   const d=JSON.parse(JSON.stringify(DATA[slug]));
   const night = d.level==='advanced';
@@ -573,7 +703,7 @@ function buildCover(slug, host){
   else if(night) d.colors=LINES_NIGHT;
   const colors = d.colors || LINES;
   const c=document.createElement('div');
-  c.className='cover'+(night?' night':''); c.dataset.slug=slug;
+  c.className=(opts.face?'cv':'cover cv')+(night?' night':''); if(!opts.face) c.dataset.slug=slug;
   host.appendChild(c);
   const parts=d.parts||[]; let acc=1;
   let keyHTML;
@@ -612,14 +742,101 @@ function placeMap(o){
   M.frame.setAttribute('transform',`translate(40 ${ty})`);
 }
 
+const CAPS = {
+ 'ai-context-engineering':"Eight parts fan in from the left and run as one bundle through the context window to a single interchange — the capstone, where everything the model sees is put together. Instructions, retrieval and tools arrive from above; compression, memory and the build workflow from below.",
+ 'mathematical-foundations-for-ml':"Three axes of one space: linear algebra runs along x, probability climbs y, calculus drops down z; Python is the unit circle round the origin, and ‘Putting It Together’ is the resultant vector. The tinted plane carries the name of the book’s stage on the roadmap: the ground floor.",
+ 'neural-networks-from-scratch':"Input, hidden and output layers are interchange bars. The seven parts are lines that change order between layers, so their crossings draw the weights of a fully connected network.",
+ 'build-llms-from-scratch':"The GPT diagram as a network. Tokens come in bottom-left and climb the residual stream; attention loops out of it and splits into query, key and value tracks inside the repeated block (×12, as in the 124M model the book builds); pretraining and finetuning fork at the top.",
+ '5d-parallelism':"Foundations arrive from the west at the hub; five parallelism axes fan out over a grid of GPU blocks (data and ZeRO share one corridor); the circle line — Putting It All Together — composes them. Advanced, so it is a night map.",
+ 'pi-vs-hermes-vs-codex':"Three harness tracks — Pi, Hermes, Codex — funnel through the context window into one interchange (compaction), ride one traced session, then split into three memories and meet again. Nine stations: the smallest map in the set, because it is the shortest book.",
+ 'dsa-in-python':"Sixty-nine stations — the longest line in the library — coiled through a matrix as a spiral traversal, which is capsule 16’s actual title. Length is honest: compare it with Pi vs Hermes vs Codex.",
+ 'decision-trees-from-scratch':"A binary tree, root at the top, split nodes as interchanges and leaves as the regions they carve. The wrap-up line bridges the two trees (‘two trees, one algorithm’) and runs on towards forests and boosting.",
+ 'git-github-masterclass':"A commit graph is already a transit map. The first four parts run straight down main; GitHub, GitHub Desktop and CI/CD branch off it and merge back; the last part forks away towards open source. The tinted band is the remote.",
+ 'charlie-language-room':"Sub-series treatment: one factory, four lines leaving one gate. Each volume lights its own line and its parts become rooms along it; the other three volumes stay grey. Book I heads for the north-west wing.",
+ 'charlie-vision-room':"The same factory plan, Book II lit: the Vision line to the north-east wing. Across the four Charlie books only the lit line, the numeral and day/night change — the series reads as a set at thumbnail size.",
+ 'charlie-sound-room':"Book III: the Sound line to the west wing — Listening, Speaking, The Brain, The Wire, Shipping — as rooms along one corridor.",
+ 'charlie-reasoning-room':"Book IV: the Reasoning line to the east wing. Advanced, so the factory is drawn as a night map even inside an otherwise mixed series.",
+ 'inference-engineering':"Coming soon: a line under construction — hollow, inside a hatched works corridor, stopping at the four stops the announcement names. The dashed track is the extension not yet built.",
+};
 const built=[];
 const host=document.getElementById('covers');
 ORDER.forEach(slug=>{
   const cell=document.createElement('div'); host.appendChild(cell);
   built.push(buildCover(slug,cell));
+  const cap=document.createElement('div'); cap.className='cap'; cap.innerHTML=`<b>Emblem</b>${CAPS[slug]||''}`; cell.appendChild(cap);
 });
-built.forEach(placeMap);
-document.fonts.ready.then(()=>built.forEach(placeMap));
+document.getElementById('chips').innerHTML = LINES.map((c,i)=>`<div class="chip"><i style="background:${c};--n:${LINES_NIGHT[i]}"></i>Line ${i}<br><span>${c}</span></div>`).join('');
+
+/* ---------------- print wrap ---------------- */
+const NET = [
+ [1,'The ground floor',['Mathematical Foundations for Machine Learning','Python for Data Science','Foundations for AI & ML','Generative AI Fundamentals','Git & GitHub Masterclass','SQL Masterclass','R Masterclass','Data Structures & Algorithms in Python','The Modern Software Developer']],
+ [2,'Learning from data',['Machine Learning Fundamentals','Build Decision Trees from Scratch','Machine Learning & Deep Learning Mastery']],
+ [3,'Neural networks',['Neural Networks from Scratch','Deep Learning Fundamentals','Convolutional Neural Networks Fundamentals']],
+ [4,'Attention, and your own LLM',['Transformers: Theory, Intuition, and Building from Scratch','Build Large Language Models (LLMs) from Scratch','LLM Finetuning','Prompt Engineering','RLHF from Scratch']],
+ [5,'Ship something',['RAG in Production','AI Agents Bootcamp','LLM Production & Deployment','AI Context Engineering','Memory in AI Systems','Pi vs Hermes vs Codex: Context Compaction and Memory','Build a Mini ClawdBot from Scratch','Claude Certified Architect (CCAF)']],
+ [6,'Vision & multimodal',['Build a Vision Transformer (ViT) from Scratch','Build a Data-Efficient Image Transformer (DeiT) from Scratch','Computer Vision Bootcamp','Transformers for Vision & Multimodal LLMs','Build a NanoVLM from Scratch','NLP & Computer Vision Mastery']],
+ [6,'RL & robotics',['Reinforcement Learning','Modern Robot Learning','Vision-Language-Action & World Models for Robotics']],
+ [6,'Systems & scale',['5D Parallelism for Large Model Training','Build a Diffusion Language Model from Scratch','Build Kimi K3 from Scratch','Pretraining a Mini Kimi K3','How to Host Kimi K3']],
+ [6,'Science & craft',['Scientific Machine Learning (SciML)','Writing Journal & Conference Papers']],
+];
+function buildWrap(slug){
+  const w=document.getElementById('wrap'); const d=DATA[slug];
+  const back=document.createElement('div'); back.className='back cv';
+  const spine=document.createElement('div'); spine.className='spine cv';
+  const front=document.createElement('div');
+  w.append(back,spine,front);
+  const fr=buildCover(slug,front,{face:true});
+  const desc='Move past prompt engineering to treat everything an LLM sees — instructions, tools, retrieved knowledge, and memory — as one engineered system. Learn the four strategies (write, select, compress, isolate), then build RAG, MCP tools, memory, and agents from scratch.';
+  back.innerHTML=`<svg class="map" viewBox="0 0 720 888" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div class="hdr"><span>The Vizuara network</span><span>books.vizuara.ai</span></div><div class="hrule"></div>
+    <div class="blurb"><em>${d.tagline}</em> ${desc}</div>
+    <div class="bstats"><div class="stats">${d.capsules} capsules&ensp;·&ensp;200 figures&ensp;·&ensp;about ${d.hours} hours</div><div class="brand">${vmark(false)}Vizuara Books</div></div>`;
+  const nb={parts:NET.map(s=>[s[0],s[1],s[2].length]), caps:NET.flatMap(s=>s[2]), colors:['#D8432E','#1F4E9C','#12875A','#E9A31B','#6C3F99','#0D7F89','#8C5A2E','#8DAA2A','#C2577A']};
+  const M=makeMap(back.querySelector('svg'),nb,'net');
+  M.frame.setAttribute('transform','translate(40 376)');
+  const yA=36, yB=146, P=[40,236], lanes=[236,270,304,338];
+  M.tlabel('the library, as one network — one tick per book',0,-22,{anchor:'start'});
+  M.line(0,[[-60,yA],[268,yA]],{avoid:[OUT],side:1,span:[0,6]});
+  M.line(1,[[268,yA],[410,yA]],{side:1,span:[12,6]});
+  M.line(2,[[410,yA],[604,yA],[604,yB],[540,yB]],{side:1,avoid:[[566,-1e4,1e4,1e4]],span:[12,0],r:55});
+  M.line(3,[[540,yB],[300,yB]],{side:1,span:[10,6]});
+  M.line(4,[[300,yB],[P[0],yB],[P[0],P[1]-8]],{side:1,span:[10,0],where:'h',ring:[3],ringR:8.5,r:26});
+  [5,6,7,8].forEach((k,i)=>{ const n=NET[k][2].length; const x2=P[0]+30+n*34; M.line(k,[[P[0],lanes[i]],[x2,lanes[i]]],{side:1,span:[18,4],term:'end'});
+    M.label(NET[k][1].toUpperCase(),x2+16,lanes[i]+3.6,{cls:'dest'}); });
+  M.pill(P[0],lanes[0],P[0],lanes[3],9);
+  const stageLbl=(n,t,x,y,anchor)=>{ M.bulletText(String(n),x,y,'var(--ink)','var(--paper)',9); M.label(t.toUpperCase(),x+15,y+3.4,{cls:'dest'}); };
+  stageLbl(1,'The ground floor',12,yA-26); stageLbl(2,'Learning from data',282,yA-26); stageLbl(3,'Neural networks',424,yA-26);
+  stageLbl(4,'Attention, and your own LLM',318,yB+30); stageLbl(5,'Ship something',64,yB+30);
+  stageLbl(6,'Pick a frontier',64,P[1]-30);
+  // you are here
+  const me=M.stations.find(s=>nb.caps[s.num-1]==='AI Context Engineering');
+  const [hx,hy]=me.p;
+  M.zone(`M${hx},${hy-12} V${yB-44}`,{fill:'none',stroke:'var(--ink)',sw:1.6});
+  M.label('YOU ARE HERE',hx+8,yB-50,{cls:'dest'});
+  M.tlabel('AI Context Engineering',hx+8,yB-34,{anchor:'start',fill:'var(--ink)',size:15,ls:'0'});
+  // spine
+  const parts=d.parts; const tot=parts.reduce((a,p)=>a+p[2],0);
+  let y=74, strip=''; parts.forEach((p,i)=>{ const h=p[2]/tot*176; strip+=`<rect x="25" y="${y.toFixed(1)}" width="22" height="${(h-2).toFixed(1)}" fill="${LINES[i]}"/>`; y+=h; });
+  spine.innerHTML=`<svg width="72" height="888" viewBox="0 0 72 888">
+    <rect x="30" y="34" width="12" height="12" fill="var(--ink)"/>
+    ${strip}
+    <text transform="translate(28 286) rotate(90)" style="font:800 27px Overpass;letter-spacing:-.02em;fill:var(--ink)">AI Context Engineering</text>
+    <g transform="translate(22 800)"><path d="M2.5 1.5 L14 13" stroke="${LINES[0]}" stroke-width="4.4" fill="none"/><path d="M25.5 1.5 L14 13" stroke="${LINES[1]}" stroke-width="4.4" fill="none"/><circle cx="14" cy="13" r="4.5" fill="var(--paper)" stroke="var(--ink)" stroke-width="2.3"/></g>
+    <text x="36" y="846" text-anchor="middle" style="font:800 8.5px Overpass;letter-spacing:.16em;fill:var(--ink)">VIZUARA</text>
+  </svg>`;
+  return fr;
+}
+const wrapFront = buildWrap('ai-context-engineering');
+
+function buildShelf(){
+  const sh=document.getElementById('shelf'); sh.innerHTML='';
+  built.forEach(({c})=>{ const t=document.createElement('div'); t.className='thumb'; const cl=c.cloneNode(true); cl.classList.remove('cover'); cl.removeAttribute('data-slug'); t.appendChild(cl); sh.appendChild(t); });
+}
+function snap(){ const cv=document.getElementById('covers'); cv.style.paddingTop='0px';
+  const t=cv.getBoundingClientRect().top+window.scrollY; const d=Math.ceil(t)-t; cv.style.paddingTop=d.toFixed(3)+'px'; }
+function layoutAll(){ snap(); built.forEach(placeMap); placeMap(wrapFront); buildShelf(); }
+layoutAll();
+document.fonts.ready.then(layoutAll);
 </script>
 </body>
 </html>

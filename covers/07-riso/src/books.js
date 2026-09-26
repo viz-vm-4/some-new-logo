@@ -159,26 +159,25 @@
     const xs = [132, 300, 468, 612];
     const top = title.bottom + 62, bot = 770, sp = (bot - top) / 4, rN = 31;
     const nodes = layers.map((n, li) => Array.from({ length: n }, (_, i) => ({ x: xs[li], y: (top + bot) / 2 + (i - (n - 1) / 2) * sp, a: R() })));
-    let pos = '', neg = '', maskHoles = '';
+    let pos = '', neg = '';
     for (let li = 0; li < layers.length - 1; li++) {
       for (const a of nodes[li]) for (const b of nodes[li + 1]) {
         const w = R() * 2 - 1;
-        const d = bar([a.x, a.y], [b.x, b.y], 1.8 + 7.5 * Math.pow(Math.abs(w), 1.5));
+        const L = Math.hypot(b.x - a.x, b.y - a.y), ux = (b.x - a.x) / L, uy = (b.y - a.y) / L, tr = w >= 0 ? rN + 1 : 0;
+        const d = bar([a.x + ux * tr, a.y + uy * tr], [b.x - ux * tr, b.y - uy * tr], 1.8 + 7.5 * Math.pow(Math.abs(w), 1.5));
         if (w >= 0) pos += d; else neg += d;
       }
     }
     let disks = '', rings = '', act = '';
-    nodes.flat().forEach((n) => { disks += circ(n.x, n.y, rN); rings += ring(n.x, n.y, rN, 5); maskHoles += circ(n.x, n.y, rN + 1); });
+    nodes.flat().forEach((n) => { disks += circ(n.x, n.y, rN); rings += ring(n.x, n.y, rN, 5); });
     // hidden activations as key-ink halftone inside the units (overprint)
     nodes.slice(1, 3).flat().forEach((n) => {
       act += halftone({ box: [n.x - rN, n.y - rN, n.x + rN, n.y + rN], cell: 7, angle: 15, tone: (x, y) => Math.hypot(x - n.x, y - n.y) < rN - 5 ? 0.12 + n.a * 0.6 : 0 });
     });
-    const mid = `nn-mask-${book.slug}`;
-    const defs = `<mask id="${mid}" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}" height="${H}"><rect width="${W}" height="${H}" fill="#fff"/><path d="${maskHoles}" fill="#000"/></mask>`;
-    let key = `<g mask="url(#${mid})">${p(pos)}</g>` + pe(rings) + p(act);
+    let key = p(pos) + pe(rings) + p(act);
     nodes[0].forEach((n, i) => { key += serifSub(n.x - rN - 16, n.y + 10, 'x', String(i + 1), 36, 'end'); });
     nodes[3].forEach((n, i) => { key += serifSub(n.x + rN + 14, n.y + 10, 'ŷ', String(i + 1), 36); });
-    return { flash: [p(neg) + p(disks)], key, defs };
+    return { flash: [p(neg) + p(disks)], key };
   };
 
   // ================================================================ Build LLMs from Scratch
@@ -283,9 +282,7 @@
       knock += T(c.x + 12, bot - 14, 'MEMORY', mono(14, 500, 0.16));
       key += T(c.x, top - 20, c.name, mono(13, 500, 0.16));
     });
-    const id = `pm-${book.slug}`;
-    const defs = `<mask id="${id}" maskUnits="userSpaceOnUse" x="-20" y="-20" width="${W + 40}" height="${H + 40}"><rect x="-20" y="-20" width="${W + 40}" height="${H + 40}" fill="#fff"/><g fill="#000">${knock}</g></mask>`;
-    return { flash: outs.map((o) => `<g mask="url(#${id})">${o}</g>`), key, defs };
+    return { flash: outs, key, top: `<g fill="${window.RISO.PAPER}">${knock}</g>` };
   };
 
   // ================================================================ Charlie and the Intelligence Factory (sub-series)
@@ -302,18 +299,17 @@
     const doorD = `M${door.cx - r} ${ground}V${door.top + r}A${r} ${r} 0 0 1 ${door.cx + r} ${door.top + r}V${ground}Z`;
     const id = book.slug;
     const chim = { x: 600, w: 40, top: 300 };
-    const defs = `<mask id="door-${id}" maskUnits="userSpaceOnUse" x="-20" y="-20" width="${W + 40}" height="${H + 40}"><rect x="-20" y="-20" width="${W + 40}" height="${H + 40}" fill="#fff"/><path d="${doorD}" fill="#000"/></mask>
-      <clipPath id="doorclip-${id}"><path d="${doorD}"/></clipPath>
-      <mask id="sign-${id}" maskUnits="userSpaceOnUse" x="-20" y="-20" width="${W + 40}" height="${H + 40}"><rect x="-20" y="-20" width="${W + 40}" height="${H + 40}" fill="#fff"/>
-        <g fill="#000">${T(M, roofBase + 29, 'CHARLIE AND THE INTELLIGENCE FACTORY', mono(13, 500, 0.2))}${T(W - M, roofBase + 29, 'ROOM ' + book.series, { ...mono(13, 500, 0.2), anchor: 'end' })}</g></mask>`;
+    const defs = `<clipPath id="doorclip-${id}"><path d="${doorD}"/></clipPath>`;
+    const signInk = '#F4AA0F'; // Sunflower as it prints on this stock: the reversed letters show the facade ink
+    const sign = `<g fill="${signInk}">${T(M, roofBase + 29, 'CHARLIE AND THE INTELLIGENCE FACTORY', mono(13, 500, 0.2))}${T(W - M, roofBase + 29, 'ROOM ' + book.series, { ...mono(13, 500, 0.2), anchor: 'end' })}</g>`;
     // facade + chimney in the series ink, door knocked out
-    let sun = `<g mask="url(#door-${id})"><path d="${polyD(pts)}"/><path d="${rectD(chim.x, chim.top, chim.w, roofBase - chim.top)}"/></g>`;
+    let sun = `<path fill-rule="evenodd" d="${polyD(pts)}${doorD}"/><path d="${rectD(chim.x, chim.top, chim.w, roofBase - chim.top)}"/>`;
     // smoke: halftone puffs drifting off the page
     const puffs = [[chim.x + 22, chim.top - 34, 26], [chim.x + 58, chim.top - 92, 36], [chim.x + 110, chim.top - 160, 46]];
     sun += p(halftone({ box: [chim.x - 40, 60, W + 10, chim.top - 4], cell: 7, angle: 45, tone: (x, y) => {
       let t = 0; puffs.forEach(([px, py, pr], i) => { const d = Math.hypot(x - px, y - py) / pr; if (d < 1) t = Math.max(t, (0.75 - i * 0.16) * (1 - d * d * 0.55)); }); return t; } }));
     let key = '';
-    key += `<g mask="url(#sign-${id})"><path d="${rectD(-10, roofBase + 8, W + 20, 30)}"/></g>`;
+    key += p(rectD(-10, roofBase + 8, W + 20, 30));
     for (let x = -10; x < W + 10; x += tooth) key += p(rectD(x - 3, roofBase - th, 6, th + 8));
     key += p(rectD(chim.x - 5, chim.top - 8, chim.w + 10, 10));
     key += p(rectD(-10, ground, W + 20, 6));
@@ -325,6 +321,7 @@
       flash: [sun + (room.f0 || ''), `<g clip-path="url(#doorclip-${id})">${room.f1 || ''}</g>`],
       key: key + `<g clip-path="url(#doorclip-${id})">${room.key || ''}</g>`,
       defs: defs + (room.defs || ''),
+      top: sign,
     };
   }
 

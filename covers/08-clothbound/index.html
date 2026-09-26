@@ -61,7 +61,7 @@ figcaption b{color:var(--ink);font-weight:600}
 .print div{border-top:1px solid var(--rule);padding-top:12px}
 .print b{display:block;font-weight:600;letter-spacing:.16em;text-transform:uppercase;font-size:12.5px;margin-bottom:4px}
 @media screen{.po{display:none}}
-@media print{.so{display:none!important}.fx{filter:none!important}}
+@media print{.so{display:none!important}.fx{filter:none!important}.cover{box-shadow:none!important}}
 footer{color:var(--mute);font-size:15px;border-top:1px solid var(--rule);padding-top:20px}
 </style>
 </head>
@@ -566,26 +566,37 @@ function noiseLayer(w, h, sc, fx, fy, oct, rnd){
   for (let i = 0; i < out.length; i++) out[i] /= tot;
   return out;
 }
-function toURL(cv){ return new Promise(res => cv.toBlob(bl => res(URL.createObjectURL(bl)), 'image/png')); }
+/* Encode RGBA pixels as a 32-bit BMP blob: no compression step, so it costs a few milliseconds. */
+function bmpURL(w, h, px){
+  const hdr = 122, size = hdr + w*h*4, buf = new ArrayBuffer(size), dv = new DataView(buf);
+  dv.setUint16(0, 0x4D42, true); dv.setUint32(2, size, true); dv.setUint32(10, hdr, true);
+  dv.setUint32(14, 108, true); dv.setInt32(18, w, true); dv.setInt32(22, -h, true); dv.setUint16(26, 1, true); dv.setUint16(28, 32, true);
+  dv.setUint32(30, 3, true); dv.setUint32(34, w*h*4, true); dv.setInt32(38, 2835, true); dv.setInt32(42, 2835, true);
+  dv.setUint32(54, 0x00FF0000, true); dv.setUint32(58, 0x0000FF00, true); dv.setUint32(62, 0x000000FF, true); dv.setUint32(66, 0xFF000000, true);
+  dv.setUint32(70, 0x73524742, true);
+  const out = new Uint8Array(buf, hdr);
+  for (let i = 0, n = w*h*4; i < n; i += 4){ out[i] = px[i+2]; out[i+1] = px[i+1]; out[i+2] = px[i]; out[i+3] = px[i+3]; }
+  return URL.createObjectURL(new Blob([buf], { type:'image/bmp' }));
+}
 function lightDark(px, i, d, k){ const a = Math.min(255, Math.abs(d) * k * 255); const v = d > 0 ? 255 : 0; px[i*4] = px[i*4+1] = px[i*4+2] = v; px[i*4+3] = a; }
-async function makeTextures(){
-  const sc = 2, w = W*sc, h = H*sc, rnd = rng(20260926);
+function makeTextures(){
+  const sc = 1, w = W*sc, h = H*sc, rnd = rng(20260926);
   // cloth: weft slubs + warp slubs + slow mottle, as light/dark alpha over the flat cloth colour
   const hN = noiseLayer(w, h, sc, .012, .75, 2, rnd), vN = noiseLayer(w, h, sc, .75, .012, 2, rnd), mN = noiseLayer(w, h, sc, .0045, .0045, 3, rnd);
-  let cv = document.createElement('canvas'); cv.width = w; cv.height = h; let c2 = cv.getContext('2d'), im = c2.createImageData(w, h), px = im.data;
-  for (let i = 0; i < w*h; i++) lightDark(px, i, 2.6*(.39*(hN[i]-.5) + .39*(vN[i]-.5) + .22*(mN[i]-.5)), .62);
-  c2.putImageData(im, 0, 0); TEX.cloth = await toURL(cv);
+  let px = new Uint8ClampedArray(w*h*4);
+  for (let i = 0; i < w*h; i++) lightDark(px, i, 2.2*(.3*(hN[i]-.5) + .3*(vN[i]-.5) + .4*(mN[i]-.5)), .3);
+  TEX.cloth = bmpURL(w, h, px);
   // leather grain (house cloth): a bump field lit from the top left
-  const lw = 180*sc, hF = noiseLayer(lw, h, sc, .2, .2, 3, rnd);
-  cv = document.createElement('canvas'); cv.width = lw; cv.height = h; c2 = cv.getContext('2d'); im = c2.createImageData(lw, h); px = im.data;
-  for (let y = 0; y < h; y++) for (let x = 0; x < lw; x++){ const i = y*lw + x;
-    const gx = hF[y*lw + Math.min(lw-1, x+1)] - hF[y*lw + Math.max(0, x-1)], gy = hF[Math.min(h-1, y+1)*lw + x] - hF[Math.max(0, y-1)*lw + x];
-    const lit = -(gx + gy) * 9; lightDark(px, i, Math.max(-.5, Math.min(.5, lit)), .5); }
-  c2.putImageData(im, 0, 0); TEX.leather = await toURL(cv);
+  const ls = 2, lw = 180*ls, lh = H*ls, hF = noiseLayer(lw, lh, ls, .2, .2, 3, rnd);
+  px = new Uint8ClampedArray(lw*lh*4);
+  for (let y = 0; y < lh; y++) for (let x = 0; x < lw; x++){ const i = y*lw + x;
+    const gx = hF[y*lw + Math.min(lw-1, x+1)] - hF[y*lw + Math.max(0, x-1)], gy = hF[Math.min(lh-1, y+1)*lw + x] - hF[Math.max(0, y-1)*lw + x];
+    lightDark(px, i, Math.max(-.5, Math.min(.5, -(gx + gy) * 7)), .3); }
+  TEX.leather = bmpURL(lw, lh, px);
   // speck: the grain a foil picks up from the cloth under the die
-  const sw = 240, sp = document.createElement('canvas'); sp.width = sp.height = sw; const sx = sp.getContext('2d'), si = sx.createImageData(sw, sw), sd = si.data;
-  for (let i = 0; i < sw*sw; i++){ const r = rnd(); const a = r > .8 ? (r - .8) / .2 : 0; sd[i*4] = sd[i*4+1] = sd[i*4+2] = 0; sd[i*4+3] = Math.round(a*a*200); }
-  sx.putImageData(si, 0, 0); TEX.speck = await toURL(sp);
+  const sw = 240; px = new Uint8ClampedArray(sw*sw*4);
+  for (let i = 0; i < sw*sw; i++){ const r = rnd(); const a = r > .8 ? (r - .8) / .2 : 0; px[i*4+3] = Math.round(a*a*200); }
+  TEX.speck = bmpURL(sw, sw, px);
 }
 
 /* ============================================================
@@ -944,8 +955,12 @@ function render(){
   buildWrap();
 }
 
+/* Build at once (so the covers always exist), then rebuild the moment the fonts have landed,
+   since every title is measured and fitted with the real Cormorant metrics. */
+function boot(){ if (!TEX.cloth) makeTextures(); render(); }
+boot();
 Promise.all([`700 80px ${FACE}`, `600 italic 40px ${FACE}`, `700 14px ${FACE}`, `400 18px "EB Garamond"`].map(s => document.fonts.load(s)))
-  .catch(() => {}).then(() => document.fonts.ready).then(makeTextures).then(render);
+  .catch(() => {}).then(() => document.fonts.ready).then(boot);
 </script>
 </body>
 </html>

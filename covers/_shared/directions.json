@@ -10,5 +10,25 @@
   "10-wildcard": {
     "name": "Some Assembly Required",
     "pitch": "Vizuara is a library for building things, and half its titles end in “from Scratch”, so every book is a model kit. Each emblem is an injection-moulded parts tree (a sprue) built from the book's own mechanism: an H-tree runner feeding 32 GPUs for 5D Parallelism, weights as runners for Neural Networks. Card colour and skill-level pips show level, plastic colour shows series, and kit numbers VZ-001 to VZ-052 make the shelf collectable."
+  },
+  "01-grid": {
+    "name": "Figure/Ground",
+    "pitch": "One 12 × 15 module grid, one typeface and three inks for every book. Level picks the ground (paper, signal red, black), so a shelf reads as a gradient of difficulty. Each book stands one figure built from squares, circles and bars on that grid, taken from its own mechanism: a GPT's causal mask, a 5D device mesh, an ODE direction field. A notched bookmark ribbon is the imprint, and its length also encodes level."
+  },
+  "04-drafting": {
+    "name": "Drawing Office",
+    "pitch": "Every book is issued as an engineering drawing of the machine it teaches you to build. The brand lives in the title block: drawing number, level stamped in ink squares, capsules and hours as the extent, units (“Tokens”, “GPUs”), and Vizuara as the issuing office. Each cover uses a different real drafting view (section, isometric, detail, break) on one paper, one graphite and one engineering-red ink."
+  },
+  "05-algorithmic": {
+    "name": "Figure 0",
+    "pitch": "Every cover is one run of the book's own algorithm, computed in the page from a seed. Gradient descent draws the maths book, a network trained in the browser draws Neural Networks, and a simulated pipeline schedule draws 5D Parallelism. The FIG. 0 caption states exactly what ran, with numbers read back from that run. Ground darkens with level: paper, signal red, carbon."
+  },
+  "07-riso": {
+    "name": "Overprint",
+    "pitch": "Every book looks pulled off a risograph: natural paper, two or three real riso inks that overprint, halftone screens made in code, and drums slightly out of register. The idea usually lives where the inks cross: the overprint is the GEMM output tile, the SQL join, the part of the context the model actually sees. Level is a ski-run mark (circle, square, diamond) in the key ink."
+  },
+  "09-atlas": {
+    "name": "Interchange",
+    "pitch": "Each book is a Beck/Vignelli transit map of its own subject. Its parts are the lines and each capsule is one tick, checked against the real capsule counts, so the 69-capsule DSA book coils into a long spiral while the 9-capsule book is tiny. The key at the foot doubles as a table of contents. Beginner and intermediate books are pale day maps, advanced books are dark night maps."
   }
 }

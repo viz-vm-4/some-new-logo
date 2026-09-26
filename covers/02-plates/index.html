@@ -14,40 +14,94 @@
   --sage:#9fb7a4;
   --ingres:#9eb1c7;
   --madder:#c68d79;
+  --page:#16181c;
+  --pageInk:#e8e4da;
+  --pageDim:#a9a597;
 }
 *{box-sizing:border-box}
-html,body{margin:0;background:#2a2c30;color:#e9e6de}
-body{font-family:'Bodoni Moda',serif;font-optical-sizing:auto}
+html,body{margin:0;background:var(--page);color:var(--pageInk)}
+body{font-family:'Bodoni Moda',serif;font-optical-sizing:auto;min-width:1600px}
 
-.covers{display:flex;flex-wrap:wrap;gap:56px;padding:56px;justify-content:center}
+/* ---------------- presentation ---------------- */
+.intro{max-width:1496px;margin:0 auto;padding:88px 0 40px;display:grid;grid-template-columns:1.25fr 1fr;gap:72px;align-items:start}
+.kicker{font-size:12px;font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:var(--pageDim);font-variation-settings:'opsz' 8;margin:0 0 26px}
+.intro h1{font-weight:600;font-size:112px;line-height:.92;letter-spacing:-.025em;margin:0 0 22px;font-variation-settings:'opsz' 18}
+.intro .tag{font-style:italic;font-size:30px;line-height:1.2;margin:0 0 36px;color:var(--pageInk);font-variation-settings:'opsz' 14;font-weight:500}
+.intro p{font-size:18.5px;line-height:1.55;margin:0 0 16px;max-width:760px;font-variation-settings:'opsz' 11;color:#d9d5ca}
+.intro p b{font-weight:700;color:var(--pageInk)}
+.spec{border-top:1.5px solid #4a4c50;padding-top:22px}
+.spec h3{font-size:12px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;margin:0 0 16px;color:var(--pageDim);font-variation-settings:'opsz' 8}
+.spec section{margin-bottom:34px}
+.sw{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.sw div{height:86px;border-radius:2px;padding:9px 10px;display:flex;flex-direction:column;justify-content:flex-end;font-size:11.5px;line-height:1.3;font-variation-settings:'opsz' 9;font-weight:600}
+.sw small{display:block;font-weight:500;font-style:italic;opacity:.85}
+.typ .big{font-size:46px;font-weight:600;line-height:1;letter-spacing:-.02em;font-variation-settings:'opsz' 14}
+.typ .it{font-size:22px;font-style:italic;font-weight:500;margin-top:8px;font-variation-settings:'opsz' 12}
+.typ .caps{font-size:11px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;margin-top:12px;font-variation-settings:'opsz' 8}
+.typ .note{font-size:14px;color:var(--pageDim);margin-top:12px;line-height:1.5;font-variation-settings:'opsz' 10}
+.lvkey{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.lvkey div{padding:12px 12px 11px;border-radius:2px;color:var(--ink);font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;font-variation-settings:'opsz' 8;display:flex;justify-content:space-between;align-items:center}
+.rules{font-size:15px;line-height:1.5;color:#d9d5ca;margin:0;padding-left:0;list-style:none;font-variation-settings:'opsz' 10}
+.rules li{margin-bottom:7px;padding-left:22px;position:relative}
+.rules li i{color:var(--pageInk)}
+.rules li::before{content:attr(data-k);position:absolute;left:0;font-style:italic;font-weight:700;color:var(--pageDim)}
 
-/* ---------------- the cover ---------------- */
-.cover{position:relative;width:720px;height:888px;overflow:hidden;flex:none;
+.group{max-width:1496px;margin:0 auto;padding:56px 0 8px}
+.group > h2{font-size:12px;font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:var(--pageDim);margin:0 0 6px;font-variation-settings:'opsz' 8}
+.group .gl{font-style:italic;font-size:22px;margin:0 0 30px;color:var(--pageInk);font-variation-settings:'opsz' 12;font-weight:500}
+.covers{display:flex;flex-wrap:wrap;gap:56px}
+.item{width:720px}
+.item .note{margin-top:16px;font-size:14.5px;line-height:1.5;color:#cfcbc0;font-variation-settings:'opsz' 10;max-width:680px}
+.item .note b{color:var(--pageInk);font-weight:700;letter-spacing:.04em}
+.wrapbox{max-width:1600px;margin:0 auto;padding:48px 0 30px;display:flex;flex-direction:column;align-items:center}
+.wrapbox .inner{width:1496px}
+.foot-note{max-width:1496px;margin:0 auto;padding:40px 0 100px;font-size:14px;color:var(--pageDim);font-style:italic;font-variation-settings:'opsz' 10}
+
+/* ---------------- the cover (and the faces of the wrap) ---------------- */
+.face{position:relative;width:720px;height:888px;overflow:hidden;flex:none;
   background:var(--ground);color:var(--ink);font-family:'Bodoni Moda',serif;font-optical-sizing:auto}
-.cover.beginner{--ground:var(--sage)}
-.cover.intermediate{--ground:var(--ingres)}
-.cover.advanced{--ground:var(--madder)}
-.cover .art{position:absolute;left:0;top:0;width:720px;height:888px;display:block}
-.cover .head{position:absolute;left:40px;right:40px;top:32px;display:flex;justify-content:space-between;align-items:center;
+.beginner{--ground:var(--sage)}
+.intermediate{--ground:var(--ingres)}
+.advanced{--ground:var(--madder)}
+.face .art{position:absolute;left:0;top:0;width:720px;height:888px;display:block}
+.face .head{position:absolute;left:40px;right:40px;top:32px;display:flex;justify-content:space-between;align-items:center;
   font-size:11px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;font-variation-settings:'opsz' 8}
-.cover .head .lv{display:flex;align-items:center;gap:10px}
-.cover .head .lv svg{display:block}
-.cover .title{position:absolute;left:37px;right:36px;top:58px;margin:0;font-weight:600;font-size:64px;line-height:1.0;letter-spacing:-.022em;
+.face .head .lv{display:flex;align-items:center;gap:10px}
+.face .head .lv svg{display:block}
+.face .title{position:absolute;left:37px;right:36px;top:58px;margin:0;font-weight:600;font-size:64px;line-height:1.0;letter-spacing:-.022em;
   font-variation-settings:'opsz' 14}
-.cover .title .l{display:block;white-space:nowrap}
-.cover .title .series{display:block;font-size:11px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;margin:4px 0 12px;
+.face .title .l{display:block;white-space:nowrap}
+.face .title .series{display:block;font-size:11px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;margin:4px 0 12px;
   font-variation-settings:'opsz' 8;line-height:1.2}
-.cover .title .sub{display:block;font-style:italic;font-weight:500;font-size:27px;line-height:1.14;letter-spacing:0;margin-top:12px;max-width:560px;
+.face .title .sub{display:block;font-style:italic;font-weight:500;font-size:27px;line-height:1.14;letter-spacing:0;margin-top:12px;max-width:560px;
   font-variation-settings:'opsz' 12}
-.cover .rule{position:absolute;left:40px;right:40px;height:0;border-top:1.2px solid var(--ink)}
-.cover .legend{position:absolute;left:40px;right:40px;font-style:italic;font-size:13.5px;line-height:1.36;font-weight:500;
+.face .rule{position:absolute;left:40px;right:40px;height:0;border-top:1.2px solid var(--ink)}
+.face .legend{position:absolute;left:40px;right:40px;font-style:italic;font-size:13.5px;line-height:1.36;font-weight:500;
   font-variation-settings:'opsz' 11}
-.cover .legend b{font-weight:700}
-.cover .foot{position:absolute;left:40px;right:40px;bottom:28px;display:flex;justify-content:space-between;align-items:center;
+.face .legend b{font-weight:700}
+.face .foot{position:absolute;left:40px;right:40px;bottom:28px;display:flex;justify-content:space-between;align-items:center;
   font-size:11px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;font-variation-settings:'opsz' 8}
-.cover .imprint{display:flex;align-items:center;gap:9px}
-.cover .imprint svg{width:19px;height:19px;display:block}
-.cover .foot .meta{letter-spacing:.16em}
+.face .imprint{display:flex;align-items:center;gap:9px}
+.face .imprint svg{width:19px;height:19px;display:block}
+.face .foot .meta{letter-spacing:.16em}
+
+/* print wrap: back · spine · front, one sheet */
+.wrap{display:flex;width:1498px;height:888px;flex:none;box-shadow:0 30px 60px rgba(0,0,0,.35)}
+.wrap .spine{position:relative;width:58px;height:888px;background:var(--ground);color:var(--ink);flex:none;
+  border-left:1px dashed rgba(21,23,28,.35);border-right:1px dashed rgba(21,23,28,.35)}
+.wrap .spine .no{position:absolute;top:34px;left:0;right:0;text-align:center;font-size:13px;font-weight:700;letter-spacing:.12em;font-variation-settings:'opsz' 8}
+.wrap .spine .t{position:absolute;left:50%;top:92px;transform-origin:0 0;transform:rotate(90deg) translate(0,-50%);white-space:nowrap;
+  font-size:24px;font-weight:600;letter-spacing:-.01em;font-variation-settings:'opsz' 14;line-height:1}
+.wrap .spine .mk{position:absolute;bottom:30px;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:14px}
+.wrap .spine .mk svg{display:block}
+.face.back .blurb{position:absolute;left:40px;right:52px;top:92px;font-size:25px;line-height:1.3;font-weight:500;font-variation-settings:'opsz' 14;letter-spacing:-.005em}
+.face.back .blurb em{font-weight:500}
+.face.back .facts{position:absolute;left:40px;right:40px;top:300px;display:flex;gap:26px;font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;font-variation-settings:'opsz' 8;
+  border-top:1.2px solid var(--ink);border-bottom:1.2px solid var(--ink);padding:10px 0}
+.face.back .cat{position:absolute;left:40px;right:40px;top:690px;font-size:13.5px;line-height:1.55;font-variation-settings:'opsz' 11}
+.face.back .cat h4{margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;font-variation-settings:'opsz' 8}
+.face.back .cat span{white-space:nowrap}
+.face.back .cat i{font-weight:700;font-style:normal;letter-spacing:.06em;margin-right:6px}
 
 /* svg classes */
 .i{fill:var(--ink)} .h{fill:var(--hi)} .g{fill:var(--ground)}
@@ -64,7 +118,55 @@ body{font-family:'Bodoni Moda',serif;font-optical-sizing:auto}
 </head>
 <body>
 
-<main class="covers" id="covers"></main>
+<header class="intro">
+  <div>
+    <p class="kicker">Vizuara Books &nbsp;·&nbsp; a cover system &nbsp;·&nbsp; proposal 02</p>
+    <h1>Specimen Plates</h1>
+    <p class="tag">Machine learning, documented the way a nineteenth-century scientific atlas would have documented it.</p>
+    <p>Every Vizuara book becomes a numbered plate in one atlas: a single specimen of the book’s actual mechanism, engraved in line, lettered <i>a, b, c</i> and keyed in a legend at the foot, the way Gray or Haeckel documented theirs. The drawings are computed, not decorated: the descent paths are integrated on the real surface, the penteract is the real 2<sup>5</sup> device mesh, and the arches are real softmax weights.</p>
+    <p>The frame is strict so the specimens can be free: paper toned by level, one serif, a plate number, a scale bar, the title large at top left and the imprint small at the foot. Only two inks ever touch a figure, <b>black that swells into shadow</b> and <b>paper-white that swells into light</b>, so every plate prints as one spot tint plus black and still reads in greyscale and at thumbnail size.</p>
+    <p>No images, no animals, no people: the specimens are machines and mathematics, all vector, all generated by the page’s own script.</p>
+  </div>
+  <div class="spec">
+    <section>
+      <h3>Palette: one key ink, one knock-out, three toned papers</h3>
+      <div class="sw">
+        <div style="background:#15171c;color:#e8e4da">Ink<small>#15171C · key plate</small></div>
+        <div style="background:#fbf8f0;color:#15171c">Paper white<small>#FBF8F0 · highlights</small></div>
+        <div style="background:#9fb7a4;color:#15171c">Sage<small>#9FB7A4 · beginner</small></div>
+        <div style="background:#9eb1c7;color:#15171c">Ingres<small>#9EB1C7 · intermediate</small></div>
+        <div style="background:#c68d79;color:#15171c">Sanguine<small>#C68D79 · advanced</small></div>
+      </div>
+    </section>
+    <section class="typ">
+      <h3>Type: Bodoni Moda, one family throughout</h3>
+      <div class="big">Neural Networks from Scratch</div>
+      <div class="it">Fig. 1. A single unit, dissected; a inputs, b weights.</div>
+      <div class="caps">Plate III &nbsp;·&nbsp; Beginner &nbsp;·&nbsp; Vizuara Books</div>
+      <div class="note">Titles are set at a text optical size (opsz 14, weight 600), so the Didone behaves like a sturdy Victorian scientific Modern with print-safe hairlines, not a fashion face. Legends and lettering are in italic. The plate apparatus is in letterspaced capitals.</div>
+    </section>
+    <section>
+      <h3>Level: the paper, and a micrograph scale bar</h3>
+      <div class="lvkey" id="lvkey"></div>
+    </section>
+    <section>
+      <h3>Anatomy of a plate</h3>
+      <ul class="rules">
+        <li data-k="a"><i>Plate number:</i> the book’s place in the catalogue, in roman numerals, top left.</li>
+        <li data-k="b"><i>Level:</i> the paper colour plus a scale bar of one, two or three filled bars, top right.</li>
+        <li data-k="c"><i>Title:</i> the hero, top left, broken by hand. Subtitles are italic, and a series line sits above.</li>
+        <li data-k="d"><i>Specimen:</i> one mechanism, engraved and lettered. Occasionally a Fig. 2 gives its section.</li>
+        <li data-k="e"><i>Legend:</i> the key to the letters, two lines of italic under a rule.</li>
+        <li data-k="f"><i>Imprint:</i> the V-in-a-lens mark (two converging rays; <i>viz</i>, to see) and the name, small, at the foot.</li>
+      </ul>
+    </section>
+  </div>
+</header>
+<div id="groups"></div>
+<div class="wrapbox"><div class="inner">
+  <div class="group" style="padding-top:0"><h2>Print wrap</h2><p class="gl">Plate III as a full jacket: back, spine and front on one sheet, with a second specimen and the start of the catalogue on the back.</p></div>
+</div><div id="wrap"></div></div>
+<p class="foot-note">All figures are drawn procedurally in SVG by the script on this page. There are no raster images, and fonts load from Google Fonts. Minimum ink line 0.6 px (≈0.45 pt) at trim; minimum knocked-out line 0.9 px.</p>
 
 <script>
 /* =====================================================================
@@ -467,28 +569,26 @@ FIG['5d-parallelism'] = (P) => {
   const front = verts.reduce((a, b) => (b.z > a.z ? b : a));
   const items = [];
   for (const v of verts) {
-    items.push({ z: v.z, draw: () => sphere(P, v.x, v.y, 9 + 7 * dn(v.z), { spacing: 2.4, cross: dn(v.z) > 0.5 }) });
+    items.push({ z: v.z, draw: () => sphere(P, v.x, v.y, 10 + 8 * dn(v.z), { spacing: 2.4, cross: dn(v.z) > 0.5 }) });
     for (let k = 0; k < 5; k++) if (!((v.m >> k) & 1)) {
       const u = verts[v.m | (1 << k)];
       const hi = v === front || u === front;
       items.push({ z: (v.z + u.z) / 2 - 0.02, draw: () => {
         const pts = sample((t) => [lerp(v.x, u.x, t), lerp(v.y, u.y, t)], 12);
-        const w = 2.6 + 3.6 * dn((v.z + u.z) / 2);
+        const w = 3.0 + 4.2 * dn((v.z + u.z) / 2);
         if (hi) { P.fill('g', ribbon(pts, pts.map(() => w + 7))); P.fill('i', ribbon(pts, pts.map(() => w + 3.4))); P.fill('h', ribbon(pts, pts.map(() => w))); }
         else rod(P, pts, w, w, { halo: 3.2 });
       } });
     }
   }
   items.sort((a, b) => a.z - b.z).forEach((it) => it.draw());
-  // the five axes of one device, lettered
+  // the five axes of one device, lettered in roundels set on the white rods
   const L = ['a', 'b', 'c', 'd', 'e'];
   for (let k = 0; k < 5; k++) {
     const u = verts[front.m ^ (1 << k)];
-    const mx = lerp(front.x, u.x, 0.66), my = lerp(front.y, u.y, 0.66);
-    const ang = Math.atan2(u.y - front.y, u.x - front.x) + Math.PI / 2;
-    const flip = ((mx - front.x) * Math.cos(ang) + (my - front.y) * Math.sin(ang)) < 0 ? 1 : 1;
-    const lx = mx + Math.cos(ang) * 17 * flip, ly = my + Math.sin(ang) * 17 * flip;
-    P.text(lx, ly + 6, L[k], 'lab', 'middle');
+    const mx = lerp(front.x, u.x, 0.6), my = lerp(front.y, u.y, 0.6);
+    P.fill('g', circ(mx, my, 12.5)); P.fill('i', circ(mx, my, 11.5)); P.fill('g', circ(mx, my, 10.2));
+    P.text(mx, my + 5, L[k], 'lab', 'middle', 'style="stroke-width:0"');
   }
 };
 
@@ -616,19 +716,19 @@ FIG['decision-trees-from-scratch'] = (P) => {
   };
   const depth = { r: 0, L: 1, Rn: 1, LL: 2, LR: 2, RL: 2, RR: 2, RLL: 3, RLR: 3 };
   // stem below the root
-  rod(P, sample(bez([300, 772], [300, 752], [302, 730], [300, 700]), 20), 9, 8);
+  rod(P, sample(bez([300, 772], [300, 752], [302, 730], [300, 700]), 20), 11, 10);
   const stems = [];
   for (const [k, n] of Object.entries(nodes)) if (n.kids) n.kids.forEach((c) => {
     const a = n.p, b = nodes[c].p; const mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2;
     const bend = (b[0] - a[0]) * 0.18;
     const pts = sample(bez(a, [a[0] + (b[0] - a[0]) * 0.1, a[1] - 40], [b[0] - bend, b[1] + 44], b), 40);
-    const w0 = 8 - depth[k] * 1.8, w1 = Math.max(2.8, w0 - 2.2);
+    const w0 = 10 - depth[k] * 2, w1 = Math.max(3.4, w0 - 2.4);
     stems.push(() => rod(P, pts, w0, w1));
   });
   stems.forEach((d) => d());
   // leaves: ovate blades with midrib and veins; class A in white, class B engraved dark
   const leaf = (x, y, ang, cls) => {
-    const Lg = 64, Wd = 23;
+    const Lg = 76, Wd = 27;
     const ca = Math.cos(ang), sa = Math.sin(ang);
     const T = (u, v) => [x + ca * u - sa * v, y + sa * u + ca * v];
     const edge = (side) => sample((t) => { const u = t * Lg; const v = side * Wd * Math.sin(Math.PI * Math.pow(t, 0.8)) * (1 - 0.25 * t); return T(u, v); }, 40);
@@ -729,21 +829,21 @@ FIG['build-llms-from-scratch'] = (P) => {
     swell(P, 'i', frontArc(yBot, rB), (i) => 1.3 + 1.2 * i / 80, { taper: 1 });
   };
   // b — plinth: the embedding
-  isoBox(P, pr, -112, -112, 0, 112, 112, 26, { lw: 0.8, rw: 1.9, cross: true, tw: 1, tsp: 4.2 });
+  isoBox(P, pr, -124, -124, 0, 124, 124, 26, { lw: 0.8, rw: 1.9, cross: true, tw: 1, tsp: 4.2 });
   // drums on the dowel
   const zs = [30, 112, 194, 276], H = 42;
   let prevTop = pr(0, 0, 26)[1];
   zs.forEach((z, i) => {
     const yb = pr(0, 0, z)[1], yt = pr(0, 0, z + H)[1];
     dowel(prevTop, yb + 6);
-    drum(yt, yb, 82 - i * 2.5 - 2.5, 82 - i * 2.5);
+    drum(yt, yb, 92 - i * 2.5 - 2.5, 92 - i * 2.5);
     prevTop = yt;
   });
   // e — the head as capital: echinus flaring into an abacus
   const zE = 322, yE0 = pr(0, 0, zE)[1], yE1 = pr(0, 0, zE + 20)[1];
   dowel(prevTop, yE0 + 6);
   {
-    const rB = 70, rT = 94;
+    const rB = 78, rT = 106;
     const body = [[cx - rB, yE0]].concat(frontArc(yE0, rB)).concat([[cx + rT, yE1]]).concat(sample((t) => { const th = t * Math.PI; return [cx + rT * Math.cos(th), yE1 - rT * k * Math.sin(th)]; }, 60));
     P.fill('g', poly(body));
     for (let q = 1; q < 7; q++) {
@@ -754,30 +854,30 @@ FIG['build-llms-from-scratch'] = (P) => {
     P.fill('i', ribbon([[cx + rT, yE1], [cx + rB, yE0]], [2.2, 2.2]));
     swell(P, 'i', frontArc(yE0, rB), (i) => 1.3 + 1.2 * i / 80, { taper: 1 });
   }
-  isoBox(P, pr, -104, -104, zE + 20, 104, 104, zE + 36, { lw: 0.8, rw: 1.9, cross: true });
+  isoBox(P, pr, -116, -116, zE + 20, 116, 116, zE + 36, { lw: 0.8, rw: 1.9, cross: true });
   // a — tokens laid on the plinth, in front of the column
   for (let q = 0; q < 8; q++) {
-    const x = -104 + q * 26;
-    isoBox(P, pr, x, 90, 26, x + 19, 109, 45, { lw: 0.75, rw: 1.6, sp: 2.4, ow: 1, tw: 1, tsp: 3 });
+    const x = -116 + q * 29;
+    isoBox(P, pr, x, 100, 26, x + 21, 121, 47, { lw: 0.75, rw: 1.6, sp: 2.4, ow: 1, tw: 1, tsp: 3 });
   }
   // f — the next-token distribution standing on the abacus
   const probs = [0.04, 0.09, 0.05, 0.13, 0.52, 0.08, 0.03, 0.06];
   probs.forEach((p, q) => {
-    const x = -86 + q * 22, big = p > 0.4, h = 8 + p * 150;
-    isoBox(P, pr, x, -6, zE + 36, x + 13, 7, zE + 36 + h, { lw: big ? 0 : 0.7, rw: big ? 1.3 : 1.6, sp: 2.3, ow: 1, tw: big ? 1.2 : 0, tsp: 2.6 });
-    if (big) { const Q = [pr(x, 7, zE + 36 + h), pr(x + 13, 7, zE + 36 + h), pr(x + 13, 7, zE + 36), pr(x, 7, zE + 36)]; quad(P, Q, { sp: 2.4, w: 1.2, cls: 'h', ow: 1 }); }
+    const x = -96 + q * 24, big = p > 0.4, h = 8 + p * 150;
+    isoBox(P, pr, x, -7, zE + 36, x + 14, 7, zE + 36 + h, { lw: big ? 0 : 0.7, rw: big ? 1.3 : 1.6, sp: 2.3, ow: 1, tw: big ? 1.2 : 0, tsp: 2.6 });
+    if (big) { const Q = [pr(x, 7, zE + 36 + h), pr(x + 14, 7, zE + 36 + h), pr(x + 14, 7, zE + 36), pr(x, 7, zE + 36)]; quad(P, Q, { sp: 2.4, w: 1.2, cls: 'h', ow: 1 }); }
   });
   // labels
-  const tk = pr(-104 + 9, 109, 36); label(P, tk[0] - 4, tk[1] + 2, 84, 742, 'a');
-  const pl = pr(-112, 40, 13); label(P, pl[0] + 2, pl[1], 84, 680, 'b');
-  const d2 = pr(0, 0, 194 + H / 2); label(P, d2[0] + 76, d2[1] + 8, 560, d2[1] + 8, 'c');
-  const dw = pr(0, 0, 90); label(P, dw[0] + 8, dw[1] - 6, 560, dw[1] - 22, 'd');
-  const ec = pr(0, 0, zE + 10); label(P, ec[0] + 84, ec[1] + 10, 560, ec[1] + 4, 'e');
-  const tb = pr(-86 + 4 * 22 + 13, 7, zE + 36 + 60); label(P, tb[0] + 2, tb[1], 560, tb[1] - 50, 'f');
+  const tk = pr(-116 + 10, 110, 47); label(P, tk[0], tk[1], 96, 640, 'a');
+  const pl = pr(-100, 124, 12); label(P, pl[0], pl[1], 84, 704, 'b');
+  const d2 = pr(0, 0, 194 + H / 2); label(P, d2[0] + 86, d2[1] + 8, 570, d2[1] + 8, 'c');
+  const dw = pr(0, 0, 90); label(P, dw[0] + 8, dw[1] - 6, 570, dw[1] - 22, 'd');
+  const ec = pr(0, 0, zE + 10); label(P, ec[0] + 94, ec[1] + 10, 570, ec[1] - 26, 'e');
+  const tb = pr(-96 + 4 * 24 + 14, 7, zE + 36 + 60); label(P, tb[0] + 2, tb[1], 570, tb[1] - 50, 'f');
   // bracket for ×N
   const yA = pr(0, 0, 30)[1] + 18, yB = pr(0, 0, 276 + H)[1] - 18;
-  P.line('si', 1.1, `M600 ${f1(yB)}h8v${f1(yA - yB)}h-8M608 ${f1((yA + yB) / 2)}h8`);
-  P.text(624, (yA + yB) / 2 + 6, '× N', 'lab', 'start');
+  P.line('si', 1.1, `M612 ${f1(yB)}h8v${f1(yA - yB)}h-8M620 ${f1((yA + yB) / 2)}h8`);
+  P.text(636, (yA + yB) / 2 + 6, '× N', 'lab', 'start');
 };
 
 /* Transformers — one attention head over a sentence of tokens, drawn as arches; Fig. 2, the same weights as a matrix */
@@ -799,7 +899,7 @@ FIG['transformers-from-scratch'] = (P) => {
     const w = W[i][j], last = i === n - 1;
     const a = X(j), b = X(i), h = (b - a) / 2 * 0.98;
     const pts = sample((t) => [lerp(a, b, t), base - 14 - Math.sin(t * Math.PI) * h], 90);
-    const ws = pts.map((_, q) => 0.7 + 6.5 * w * Math.pow(Math.sin(q / 90 * Math.PI), 0.6));
+    const ws = pts.map((_, q) => 0.9 + 8 * w * Math.pow(Math.sin(q / 90 * Math.PI), 0.6));
     P.fill('g', ribbon(pts, ws.map((v) => v + 4)));
     if (last) { P.fill('i', ribbon(pts, ws.map((v) => v + 2.2))); P.fill('h', ribbon(pts, ws.map((v) => Math.max(MINH, v)))); }
     else P.fill('i', ribbon(pts, ws));
@@ -989,7 +1089,8 @@ function obBox(P, pr, x0, y0, x1, y1, z0, z1, o = {}) {
   // front (z0) face, top face, right face
   const F = [pr(x0, y0, z0), pr(x1, y0, z0), pr(x1, y1, z0), pr(x0, y1, z0)];
   const T = [pr(x0, y0, z1), pr(x1, y0, z1), pr(x1, y0, z0), pr(x0, y0, z0)];
-  const Rt = [pr(x1, y0, z0), pr(x1, y0, z1), pr(x1, y1, z1), pr(x1, y1, z0)];
+  const xs = o.left ? x0 : x1;
+  const Rt = [pr(xs, y0, z0), pr(xs, y0, z1), pr(xs, y1, z1), pr(xs, y1, z0)];
   quad(P, [Rt[0], Rt[3], Rt[2], Rt[1]], { sp: o.sp || 3, w: o.rw ?? 1.6, ow: o.ow });
   if (o.tw) quad(P, T, { sp: o.tsp || 4, w: o.tw, cls: o.tcls || 'h', ow: o.ow }); else { P.fill('g', poly(T)); P.line('si', o.ow || 1.2, poly(T)); }
   if (o.fw === 0) { P.fill('g', poly(F)); P.line('si', o.ow || 1.2, poly(F)); }
@@ -1003,6 +1104,13 @@ function bevel(P, x0, y0, x1, y1, b = 3) {
   P.line('si', 0.9, poly([[x0, y0], [x1, y0], [x1, y1], [x0, y1]]));
 }
 
+function cupPull(P, cx, y) { // a bin pull: a shaded cup under a flat lip
+  const cup = [[cx - 12, y]].concat(sample((t) => [cx - 10 + 20 * t, y + 1 + 8 * Math.sin(t * Math.PI)], 16)).concat([[cx + 12, y]]);
+  P.fill('i', poly(cup));
+  P.fill('h', ribbon(sample((t) => [cx - 7 + 12 * t, y + 3 + 4 * Math.sin(t * Math.PI)], 8), sample(() => 1, 8)));
+  P.fill('i', poly([[cx - 14, y - 2], [cx + 14, y - 2], [cx + 14, y + 1], [cx - 14, y + 1]]));
+  P.fill('h', ribbon([[cx - 13, y - 1.6], [cx + 12, y - 1.6]], [0.9, 0.9]));
+}
 /* Charlie I — the Language Room: inference, where the KV cache is kept in pages, like a card catalogue */
 FIG['charlie-language-room'] = (P) => {
   const pr = OB(0.52, -0.36);
@@ -1032,9 +1140,7 @@ FIG['charlie-language-room'] = (P) => {
     P.fill(isFree ? 'g' : 'h', poly([[cx - 17, y0 + 13], [cx + 17, y0 + 13], [cx + 17, y0 + 27], [cx - 17, y0 + 27]]));
     P.line('si', 1.1, poly([[cx - 17, y0 + 13], [cx + 17, y0 + 13], [cx + 17, y0 + 27], [cx - 17, y0 + 27]]));
     if (!isFree) for (let q = 0; q < 2; q++) P.fill('i', ribbon([[cx - 12, y0 + 18 + q * 4.5], [cx + (q ? 4 : 11), y0 + 18 + q * 4.5]], [0.8, 0.8]));
-    const hp = sample((t) => [cx - 10 + 20 * t, y0 + 38 + 7 * Math.sin(t * Math.PI)], 20);
-    swell(P, 'i', hp, () => 2.2, { taper: 1 });
-    P.fill('h', ribbon(hp.slice(3, 12).map(([x, y]) => [x, y - 0.8]), hp.slice(3, 12).map(() => 0.9)));
+    cupPull(P, cx, y0 + 36);
   }
   // pulled drawers, drawn last, lowest first so the nearer ones overlap
   later.sort((a, b) => a[1] - b[1]).forEach(([x0, y0, x1, y1, out, seed]) => {
@@ -1060,7 +1166,7 @@ FIG['charlie-language-room'] = (P) => {
     P.fill('h', poly([[cx - 17, yy + 13], [cx + 17, yy + 13], [cx + 17, yy + 27], [cx - 17, yy + 27]]));
     P.line('si', 1.1, poly([[cx - 17, yy + 13], [cx + 17, yy + 13], [cx + 17, yy + 27], [cx - 17, yy + 27]]));
     for (let q = 0; q < 2; q++) P.fill('i', ribbon([[cx - 12, yy + 18 + q * 4.5], [cx + (q ? 4 : 11), yy + 18 + q * 4.5]], [0.8, 0.8]));
-    swell(P, 'i', sample((t) => [cx - 10 + 20 * t, yy + 38 + 7 * Math.sin(t * Math.PI)], 20), () => 2.2, { taper: 1 });
+    cupPull(P, cx, yy + 36);
   });
   // the page table: a ledger open on the cabinet top
   const lt = (x, z) => pr(x, Y0 - 1, z);
@@ -1073,100 +1179,106 @@ FIG['charlie-language-room'] = (P) => {
   // labels
   label(P, X1 + 40, Y0 + 180, 656, Y0 + 150, 'a');
   const pd = later.find((q) => q[4] === 104); const pf = pr(pd[2] - 10, pd[1] + 30, -104); label(P, pf[0], pf[1], 660, 640, 'b');
-  const cd = pr(pd[0] + 30, pd[1] - 6, -60); label(P, cd[0], cd[1] - 8, 470, 300, 'c');
+  const pc = later.find((q) => q[4] === 64); const cd = pr(pc[0] + 24, pc[1] - 4, -40); label(P, cd[0], cd[1] - 8, 96, 470, 'c');
   const fr = [X0 + 8 + 3 * dw + 4 + 38, Y0 + 8 + 0 * dh + 4 + 20]; label(P, fr[0], fr[1], 660, 330, 'd');
   const le = lt(290, 80); label(P, le[0], le[1] - 4, 180, 292, 'e');
 };
 
 /* Charlie II — the Vision Room: an image cast by a lens, cut into patches, read as a sentence */
 FIG['charlie-vision-room'] = (P) => {
-  // the subject: a sphere resting on a cube
-  const subj = (P2, ox, oy, s, flip) => {
-    const f = flip ? -1 : 1;
-    const cube = [[ox - 30 * s, oy + f * 0], [ox + 30 * s, oy + f * 0], [ox + 30 * s, oy + f * 58 * s], [ox - 30 * s, oy + f * 58 * s]];
-    return { cube, sphere: [ox, oy - f * 29 * s, 29 * s] };
-  };
-  // bench
   const pr = OB(0.45, -0.3);
-  obBox(P, pr, 76, 612, 660, 630, 0, 90, { rw: 1.8, fw: 1.1, fsp: 2.8, tw: 0, ow: 1.3 });
-  for (let x = 90; x < 640; x += 60) { const a = pr(x, 612, 8), b = pr(x + 34, 612, 82); }
-  // a — the subject, engraved
-  const S = subj(P, 150, 540, 1, false);
-  obBox(P, pr, 120, 540, 180, 598, 10, 60, { rw: 1.8, fw: 0.8, fsp: 3, tw: 1, tsp: 3.4, ow: 1.2 });
-  sphere(P, pr(150, 510, 35)[0], pr(150, 510, 35)[1] - 2, 30, { spacing: 2.6 });
-  // b — the lens in its ring, on a post
-  const lx = 300, ly = 470, lr = 70;
-  rod(P, [[lx, ly + lr + 6], [lx, 612]], 9, 11, { halo: 3 });
-  const lens = sample((t) => { const a = t * TAU; return [lx + 16 * Math.cos(a), ly + lr * Math.sin(a)]; }, 120);
-  P.fill('g', poly(lens));
-  for (let y = ly - lr + 3; y < ly + lr; y += 3) { const hw = 16 * Math.sqrt(Math.max(0, 1 - ((y - ly) / lr) ** 2)) - 1; if (hw > 1.5) P.fill(y < ly - 10 ? 'h' : 'i', ribbon([[lx - hw, y], [lx + hw, y]], [y < ly - 10 ? 1 : 0.7, y < ly - 10 ? 1 : 0.7])); }
-  swell(P, 'i', lens.concat([lens[0]]), (i) => 1.4 + 1.8 * sstep(0, 1, Math.cos(i / 120 * TAU)), { taper: 1 });
-  const ring = sample((t) => { const a = t * TAU; return [lx + 22 * Math.cos(a), ly + (lr + 7) * Math.sin(a)]; }, 120);
-  swell(P, 'i', ring.concat([ring[0]]), (i) => 2 + 2 * sstep(0, 1, Math.cos(i / 120 * TAU)), { taper: 1 });
-  // rays from the subject's extremities, crossing at the lens, to the screen
-  const top = [150, 478], bot = [150, 598], sx = 470;
-  const through = (p, q) => { const t = (sx - p[0]) / (q[0] - p[0]); return [sx, p[1] + (q[1] - p[1]) * t]; };
-  const imgTop = through(top, [lx, ly]), imgBot = through(bot, [lx, ly]);
-  for (const [p, c] of [[top, [lx, ly - 30]], [top, [lx, ly]], [top, [lx, ly + 30]], [bot, [lx, ly - 30]], [bot, [lx, ly]], [bot, [lx, ly + 30]]]) {
-    const target = p === top ? imgTop : imgBot;
-    P.line('si', 0.7, seg(p, c) + seg(c, target), 'stroke-dasharray="1 3"');
+  const benchY = 712, axisY = 616, lx = 306, lr = 78, sx = 512, W = 168;
+  // bench
+  obBox(P, pr, 70, benchY, 650, benchY + 20, 0, 70, { rw: 1.8, fw: 1.1, fsp: 2.6, tw: 0.9, tcls: 'i', tsp: 3.4, ow: 1.3 });
+  // backdrop behind the subject: a board ruled in diagonals
+  const bd = [[72, 520], [206, 520], [206, benchY], [72, benchY]];
+  P.fill('g', poly(bd));
+  for (let k = -40; k < 240; k += 7) { const a = [72 + k, 520], b2 = [72 + k - 192, benchY]; const pts = [a, b2].map(([x, y]) => [x, y]); const c0 = clampSeg(pts[0], pts[1], 72, 206); if (c0) P.fill('i', ribbon(c0, [0.8, 0.8])); }
+  P.line('si', 1.3, poly(bd));
+  // a — the subject: a sphere resting on a cube
+  obBox(P, pr, 102, benchY - 76, 178, benchY, 6, 60, { rw: 1.8, fw: 0.8, fsp: 3, tw: 1, tsp: 3.4, ow: 1.2 });
+  const sc = pr(140, benchY - 76 - 38, 33);
+  sphere(P, sc[0], sc[1], 38, { spacing: 2.8 });
+  const objTop = [140, sc[1] - 38], objBot = [140, benchY];
+  const m = (sx - lx) / (lx - 140);
+  const img = (p) => [sx, axisY - (p[1] - axisY) * m];
+  // rays through the lens, meeting on the screen
+  for (const p of [objTop, objBot]) for (const dy of [-50, 0, 50]) {
+    const c = [lx, axisY + dy], t = img(p);
+    P.line('si', 0.75, seg(p, c) + seg(c, t), 'stroke-dasharray="1.2 3.2"');
   }
-  // c — the screen with the inverted image, gridded into patches
-  const X0 = 470, Y0 = 380, W = 150, H = 150, n = 4;
-  const scr = pr;
-  obBox(P, pr, X0, Y0, X0 + W, Y0 + H, 0, 8, { rw: 1.6, fw: 0, tw: 0, ow: 1.4 });
-  rod(P, [[X0 + W / 2 + 2, Y0 + H + 2], [X0 + W / 2 + 2, 612]], 8, 10, { halo: 2 });
-  const drawImage = (P2, ox, oy, sc) => { // inverted: cube above, sphere below
-    const c = [[ox - 32 * sc, oy - 58 * sc], [ox + 32 * sc, oy - 58 * sc], [ox + 32 * sc, oy], [ox - 32 * sc, oy]];
-    quad(P2, c, { sp: 2.6 * sc + 0.4, w: 0.9, ow: 1.2 });
-    const r = 30 * sc, cy2 = oy + r;
-    P2.fill('g', circ(ox, cy2, r));
-    for (let y = cy2 - r + 2.6; y < cy2 + r; y += 2.8) { const hw = Math.sqrt(Math.max(0, r * r - (y - cy2) ** 2)); if (hw > 2) swell(P2, 'i', [[ox - hw, y], [ox + hw, y]], (i) => (i ? 0.5 : 1.8) * ((y - cy2) / r + 1) * 0.7 + 0.3, { taper: 1 }); }
-    P2.line('si', 1.2, circ(ox, cy2, r));
+  // b — the lens in its ring, on a post
+  rod(P, [[lx, axisY + lr + 6], [lx, benchY]], 9, 11, { halo: 3 });
+  const lens = sample((t) => { const a = t * TAU; return [lx + 17 * Math.cos(a), axisY + lr * Math.sin(a)]; }, 120);
+  P.fill('g', poly(lens));
+  for (let y = axisY - lr + 3; y < axisY + lr; y += 3) { const hw = 17 * Math.sqrt(Math.max(0, 1 - ((y - axisY) / lr) ** 2)) - 1; if (hw > 1.5) P.fill(y < axisY - 14 ? 'h' : 'i', ribbon([[lx - hw, y], [lx + hw, y]], [y < axisY - 14 ? 1 : 0.7, y < axisY - 14 ? 1 : 0.7])); }
+  swell(P, 'i', lens.concat([lens[0]]), (i) => 1.4 + 1.8 * sstep(0, 1, Math.cos(i / 120 * TAU)), { taper: 1 });
+  const ring = sample((t) => { const a = t * TAU; return [lx + 23 * Math.cos(a), axisY + (lr + 7) * Math.sin(a)]; }, 120);
+  swell(P, 'i', ring.concat([ring[0]]), (i) => 2 + 2 * sstep(0, 1, Math.cos(i / 120 * TAU)), { taper: 1 });
+  // c — the screen, standing on the bench, with the inverted image
+  const iTop = img(objBot)[1], iBot = img(objTop)[1];
+  const Y0 = Math.min(iTop - 10, benchY - 250), H = benchY - 2 - Y0, n = 4;
+  obBox(P, pr, sx, Y0, sx + W, Y0 + H, 0, 8, { rw: 1.6, fw: 0, tw: 0, ow: 1.4 });
+  const drawImage = (P2) => {
+    // the backdrop, inverted: diagonals in the other sense
+    for (let k = -H; k < W + H; k += 7 * m) { const a = [sx + k, Y0], b2 = [sx + k + H * 1.4, Y0 + H]; const c0 = clampSeg(a, b2, sx, sx + W); if (c0) P2.fill('i', ribbon(c0, [0.8, 0.8])); }
+    // the bench top, now above
+    P2.fill('g', poly([[sx, Y0], [sx + W, Y0], [sx + W, iTop], [sx, iTop]]));
+    for (let y = Y0 + 2.5; y < iTop - 1; y += 3) P2.fill('i', ribbon([[sx, y], [sx + W, y]], [1.3, 1.3]));
+    const cx2 = sx + W / 2, cw = 38 * m;
+    const cube = [[cx2 - cw, iTop], [cx2 + cw, iTop], [cx2 + cw, iTop + 76 * m], [cx2 - cw, iTop + 76 * m]];
+    quad(P2, [cube[0], cube[3], cube[2], cube[1]], { sp: 3, w: 1.0, ow: 1.2 });
+    const r = 38 * m, cy2 = iTop + 76 * m + r;
+    P2.fill('g', circ(cx2, cy2, r));
+    for (let y = cy2 - r + 2.6; y < cy2 + r; y += 2.8) { const hw = Math.sqrt(Math.max(0, r * r - (y - cy2) ** 2)); if (hw > 2) P2.fill('i', ribbon([[cx2 - hw, y], [cx2 + hw, y]], [0.6 + 1.4 * clamp((cy2 - y) / r * 0.5 + 0.5), 0.6])); }
+    P2.line('si', 1.2, circ(cx2, cy2, r));
   };
-  P.raw(`<clipPath id="vr-screen"><rect x="${X0}" y="${Y0}" width="${W}" height="${H}"/></clipPath>`);
-  const img = new Plate(); drawImage(img, X0 + W / 2, Y0 + 72, 1);
-  P.raw(`<g clip-path="url(#vr-screen)">${img}</g>`);
-  for (let k = 1; k < n; k++) { P.line('sh', 2.2, seg([X0 + k * W / n, Y0], [X0 + k * W / n, Y0 + H])); P.line('sh', 2.2, seg([X0, Y0 + k * H / n], [X0 + W, Y0 + k * H / n])); }
-  P.line('si', 1.6, `M${X0} ${Y0}h${W}v${H}h${-W}Z`);
-  // d — the patches, taken in reading order, laid out as a sequence
-  const tw = 30, gap = 6, rowY = 680, sx0 = 360 - (16 * tw + 15 * gap) / 2;
+  P.raw(`<clipPath id="vr-screen"><rect x="${sx}" y="${f1(Y0)}" width="${W}" height="${f1(H)}"/></clipPath>`);
+  const imP = new Plate(); drawImage(imP);
+  P.raw(`<g clip-path="url(#vr-screen)">${imP}</g>`);
+  for (let k = 1; k < n; k++) { P.line('sh', 2.6, seg([sx + k * W / n, Y0], [sx + k * W / n, Y0 + H])); P.line('sh', 2.6, seg([sx, Y0 + k * H / n], [sx + W, Y0 + k * H / n])); }
+  P.line('si', 1.6, `M${sx} ${f1(Y0)}h${W}v${f1(H)}h${-W}Z`);
+  // d — the patches, in reading order, laid out as a sentence
+  const tw = 30, th = tw * H / W, gap = 6, rowY = 318, sx0 = 360 - (16 * tw + 15 * gap) / 2;
   for (let k = 0; k < 16; k++) {
     const r = Math.floor(k / n), c = k % n;
-    const tx = sx0 + k * (tw + gap), ty = rowY;
-    const id = `vr-p${k}`;
-    P.raw(`<clipPath id="${id}"><rect x="${tx}" y="${ty}" width="${tw}" height="${tw}"/></clipPath>`);
-    const im = new Plate(); drawImage(im, X0 + W / 2, Y0 + 72, 1);
-    const dx = tx - (X0 + c * W / n) , dy = ty - (Y0 + r * H / n);
-    const s2 = tw / (W / n);
-    P.fill('g', poly([[tx, ty], [tx + tw, ty], [tx + tw, ty + tw], [tx, ty + tw]]));
-    P.raw(`<g clip-path="url(#${id})"><g transform="translate(${f1(tx)} ${f1(ty)}) scale(${f1(s2 * 100) / 100}) translate(${f1(-(X0 + c * W / n))} ${f1(-(Y0 + r * H / n))})">${im}</g></g>`);
-    P.line('si', 1.2, `M${f1(tx)} ${ty}h${tw}v${tw}h${-tw}Z`);
-    P.text(tx + tw / 2, ty + tw + 15, String(k + 1), 'labs', 'middle');
+    const tx = sx0 + k * (tw + gap), ty = rowY, id = `vr-p${k}`, s2 = tw / (W / n);
+    P.raw(`<clipPath id="${id}"><rect x="${f1(tx)}" y="${ty}" width="${tw}" height="${f1(th)}"/></clipPath>`);
+    const im = new Plate(); drawImage(im);
+    P.fill('g', poly([[tx, ty], [tx + tw, ty], [tx + tw, ty + th], [tx, ty + th]]));
+    P.raw(`<g clip-path="url(#${id})"><g transform="translate(${f1(tx)} ${ty}) scale(${s2.toFixed(3)}) translate(${f1(-(sx + c * W / n))} ${f1(-(Y0 + r * H / n))})">${im}</g></g>`);
+    P.line('si', 1.2, `M${f1(tx)} ${ty}h${tw}v${f1(th)}h${-tw}Z`);
+    P.text(tx + tw / 2, ty + th + 16, String(k + 1), 'labs', 'middle');
   }
-  // a guide from the screen down to the sequence
-  P.line('si', 0.8, seg([X0 + W + 14, Y0 + H * 0.5], [X0 + W + 30, Y0 + H * 0.5]) + seg([X0 + W + 30, Y0 + H * 0.5], [X0 + W + 30, rowY - 26]) + seg([X0 + W + 30, rowY - 26], [sx0 + 8, rowY - 26]) + seg([sx0 + 8, rowY - 26], [sx0 + 8, rowY - 12]));
-  arrowHead(P, sx0 + 8, rowY - 8, Math.PI / 2, 7);
-  label(P, 128, 560, 84, 470, 'a');
-  label(P, lx - 10, ly - 40, 250, 330, 'b');
-  label(P, X0 + 20, Y0 + 20, 420, 330, 'c', { dot: true });
-  label(P, sx0 + 3 * (tw + gap) + tw / 2, rowY + tw + 24, 170, 770, 'd');
+  P.text(sx0, rowY - 12, 'Fig. 2', 'fig', 'start');
+  label(P, 118, benchY - 40, 60, 560, 'a');
+  label(P, lx - 8, axisY - 44, 250, 470, 'b');
+  label(P, sx + W - 14, Y0 + 14, 650, Y0 - 30, 'c');
+  label(P, sx0 + 11 * (tw + gap) + tw / 2, rowY + th + 26, sx0 + 11 * (tw + gap) + tw / 2 + 36, rowY + th + 66, 'd');
 };
+function clampSeg(a, b, xmin, xmax) { // clip a segment to a vertical band
+  let [x0, y0] = a, [x1, y1] = b;
+  if (x0 > x1) { [x0, y0, x1, y1] = [x1, y1, x0, y0]; }
+  if (x1 < xmin || x0 > xmax) return null;
+  const at = (x) => y0 + (y1 - y0) * (x - x0) / (x1 - x0);
+  const s0 = x0 < xmin ? [xmin, at(xmin)] : [x0, y0], s1 = x1 > xmax ? [xmax, at(xmax)] : [x1, y1];
+  return [s0, s1];
+}
 
 /* Charlie III — the Sound Room: a phonautograph; the voice traced on a sooted drum, the trace unrolled and cut into frames */
 FIG['charlie-sound-room'] = (P) => {
-  const pr = OB(0.42, -0.28);
+  const pr = OB(-0.42, -0.28);
   // base board
-  obBox(P, pr, 70, 620, 640, 644, 0, 110, { rw: 1.8, fw: 1.1, fsp: 2.7, tw: 0.9, tcls: 'i', tsp: 3.4, ow: 1.3 });
+  obBox(P, pr, 110, 620, 670, 644, 0, 110, { left: true, rw: 1.8, fw: 1.1, fsp: 2.7, tw: 0.9, tcls: 'i', tsp: 3.4, ow: 1.3 });
   // drum geometry: horizontal axis, seen a little from the right
   const xa = 372, xb = 588, yc = 488, R = 76, e = 0.26;
   const Pd = (x, ph) => [x + e * R * Math.cos(ph), yc + R * Math.sin(ph)]; // ph: 0 faces us, −π/2 is the top
   // supports
-  obBox(P, pr, xa - 26, yc - 6, xa - 12, 624, 30, 44, { rw: 1.6, fw: 0.8, sp: 2.4, ow: 1 });
+  obBox(P, pr, xa - 26, yc - 6, xa - 12, 624, 30, 44, { left: true, rw: 1.6, fw: 0.8, sp: 2.4, ow: 1 });
   // axle, left part
-  rod(P, [[xa - 60, yc], [xa, yc]], 9, 9, { halo: 2.5 });
+  rod(P, [[xa - 40, yc], [xa, yc]], 9, 9, { halo: 2.5 });
   // drum body, sooted: dark engraving everywhere but the lit crest
-  const body = sample((t) => Pd(xa, lerp(-Math.PI / 2, Math.PI / 2, t)), 60).concat(sample((t) => Pd(xb, lerp(Math.PI / 2, -Math.PI / 2, t)), 60));
+  const body = [[xa, yc - R]].concat(sample((t) => Pd(xb, lerp(-Math.PI / 2, Math.PI / 2, t)), 60)).concat([[xa, yc + R]]);
   P.fill('g', poly(body));
   for (let ph = -Math.PI / 2 + 0.03; ph < Math.PI / 2; ph += 0.042) {
     const n = [0, Math.sin(ph), Math.cos(ph)];
@@ -1187,17 +1299,18 @@ FIG['charlie-sound-room'] = (P) => {
     }
     P.fill('h', ribbon(pts, ws.map((w) => Math.max(MINH, w))));
   }
-  // end cap
-  const cap = sample((t) => Pd(xb, t * TAU), 120);
-  P.fill('g', poly(cap));
-  for (let y = yc - R + 3; y < yc + R; y += 3.1) { const hw = e * R * Math.sqrt(Math.max(0, 1 - ((y - yc) / R) ** 2)); if (hw > 1.5) P.fill('i', ribbon([[xb - hw, y], [xb + hw, y]], [1.1, 1.1])); }
-  swell(P, 'i', cap.concat([cap[0]]), (i) => 1.3 + 1.2 * sstep(0, 1, Math.sin(i / 120 * TAU)), { taper: 1 });
-  swell(P, 'i', sample((t) => Pd(xa, lerp(-Math.PI / 2, Math.PI / 2, t)), 60), () => 1.4, { taper: 1 });
+  swell(P, 'i', sample((t) => Pd(xb, lerp(-Math.PI / 2, Math.PI / 2, t)), 60), (i) => 1.3 + 1.6 * i / 60, { taper: 1 });
   P.fill('i', ribbon([Pd(xa, -Math.PI / 2), Pd(xb, -Math.PI / 2)], [1.4, 1.4]));
   P.fill('i', ribbon([Pd(xa, Math.PI / 2), Pd(xb, Math.PI / 2)], [2.2, 2.2]));
+  // the near end cap, facing us and the horn
+  const cap = sample((t) => Pd(xa, t * TAU), 120);
+  P.fill('g', poly(cap));
+  for (let y = yc - R + 3; y < yc + R; y += 3.1) { const hw = e * R * Math.sqrt(Math.max(0, 1 - ((y - yc) / R) ** 2)); if (hw > 1.5) P.fill(y < yc - R * 0.35 ? 'h' : 'i', ribbon([[xa - hw + 1, y], [xa + hw - 1, y]], [y < yc - R * 0.35 ? 1 : 0.9, 1])); }
+  swell(P, 'i', cap.concat([cap[0]]), (i) => 1.3 + 1.2 * sstep(0, 1, Math.sin(i / 120 * TAU)), { taper: 1 });
+  sphere(P, xa, yc, 8, { spacing: 2.2, cross: false });
   // axle, right part and crank
-  rod(P, [[xb, yc], [xb + 54, yc]], 9, 9, { halo: 2.5 });
-  obBox(P, pr, xb + 22, yc - 6, xb + 36, 624, 30, 44, { rw: 1.6, fw: 0.8, sp: 2.4, ow: 1 });
+  rod(P, [[xb + e * R, yc], [xb + 54, yc]], 9, 9, { halo: 2.5 });
+  obBox(P, pr, xb + 22, yc - 6, xb + 36, 624, 30, 44, { left: true, rw: 1.6, fw: 0.8, sp: 2.4, ow: 1 });
   rod(P, [[xb + 54, yc], [xb + 54, yc + 58]], 7, 7, { halo: 2.5 });
   rod(P, [[xb + 54, yc + 58], [xb + 80, yc + 58]], 8, 8, { halo: 2.5 });
   sphere(P, xb + 84, yc + 58, 9, { spacing: 2.3, cross: false });
@@ -1208,7 +1321,7 @@ FIG['charlie-sound-room'] = (P) => {
   const hc = (u) => [lerp(m0[0], m1[0], u), lerp(m0[1], m1[1], u)];
   const Hp = (u, ph) => { const c = hc(u), r = hr(u); return [c[0] + 0.3 * r * Math.cos(ph), c[1] + r * Math.sin(ph)]; };
   // stand for the horn
-  obBox(P, pr, 262, 520, 276, 624, 34, 48, { rw: 1.6, fw: 0.8, sp: 2.4, ow: 1 });
+  obBox(P, pr, 262, 486, 276, 624, 34, 48, { left: true, rw: 1.6, fw: 0.8, sp: 2.4, ow: 1 });
   // mouth interior: dark
   const mouth = sample((t) => Hp(0, t * TAU), 140);
   P.fill('g', poly(mouth));
@@ -1232,7 +1345,7 @@ FIG['charlie-sound-room'] = (P) => {
   P.fill('g', poly(dcap)); swell(P, 'i', dcap.concat([dcap[0]]), () => 2, { taper: 1 });
   for (let y = dh[1] - 22; y < dh[1] + 24; y += 3) P.fill(y < dh[1] - 6 ? 'h' : 'i', ribbon([[dh[0] - 4, y], [dh[0] + 4, y]], [0.9, 0.9]));
   // stylus: a bristle from the membrane to the drum
-  const st = sample(bez([dh[0] + 4, dh[1] - 4], [360, 470], [372, 452], Pd(xa + 18, -0.55)), 20);
+  const st = sample(bez([dh[0] + 4, dh[1] - 4], [362, 462], [380, 432], Pd(xa + 30, -0.9)), 20);
   swell(P, 'i', st, (i) => 2.2 - i / 20 * 1.4, { taper: 1 });
   // Fig. 2 — the trace, unrolled and cut into frames
   const sy = 700, sx0 = 120, sx1 = 600, sh = 40;
@@ -1252,12 +1365,13 @@ FIG['charlie-sound-room'] = (P) => {
 /* Charlie IV — the Reasoning Room: the bandit's arms below, a tree of reasoning growing from the arm that paid */
 FIG['charlie-reasoning-room'] = (P) => {
   const pr = OB(0.46, -0.3);
-  const arms = 5, ax0 = 172, adx = 92, baseY = 660, best = 3;
+  const arms = 5, ax0 = 172, adx = 92, baseY = 660, best = 2;
   // cabinet of the bandit
   obBox(P, pr, 120, baseY, 600, baseY + 84, 0, 70, { rw: 1.8, fw: 0, tw: 1, tsp: 3.6, ow: 1.4 });
   for (let y = baseY + 3; y < baseY + 84; y += 3.2) P.fill('i', ribbon([[122, y], [598, y]], [0.65, 0.65]));
   // reward distributions, one per arm, as engraved hills standing on the cabinet's top edge
-  const means = [0.35, 0.52, 0.3, 0.78, 0.46], sds = [0.16, 0.12, 0.2, 0.1, 0.18];
+  const means = [0.35, 0.52, 0.7, 0.3, 0.46], sds = [0.16, 0.12, 0.1, 0.2, 0.18];
+  let rootX = 0, peakY = 0;
   for (let k = 0; k < arms; k++) {
     const x = ax0 + k * adx, y0 = baseY - 6;
     bevel(P, x - 32, baseY + 14, x + 32, baseY + 64, 3);
@@ -1269,6 +1383,7 @@ FIG['charlie-reasoning-room'] = (P) => {
       if (y0 - top > 2) P.fill(k === best ? 'h' : 'i', ribbon([[xx, top + 1], [xx, y0 - 1]], [k === best ? 1.2 : 0.9, k === best ? 1.2 : 0.9]));
     }
     swell(P, 'i', hill, () => 1.5, { taper: 1 });
+    if (k === best) { const pk = hill.reduce((a, b) => (b[1] < a[1] ? b : a)); rootX = pk[0]; peakY = pk[1]; }
     P.line('si', 1.2, seg([x - 40, y0], [x + 40, y0]));
     // the lever: pivot on the cabinet's face, arm up and out; the best one pulled down
     const pv = [x + 26, baseY + 40];
@@ -1278,56 +1393,35 @@ FIG['charlie-reasoning-room'] = (P) => {
     sphere(P, tip[0], tip[1], 8.5, { spacing: 2.3, cross: false });
     sphere(P, pv[0], pv[1], 6, { spacing: 2.2, cross: false });
   }
-  // the tree of reasoning, grown from the arm that paid
-  const R = rng(12);
-  const root = [ax0 + best * adx, 548];
-  const levels = [[root]];
-  const edges = [];
-  const chosen = new Set(['0-0']);
-  let chosenIdx = 0;
-  for (let L = 1; L <= 4; L++) {
-    const prev = levels[L - 1], cur = [];
-    prev.forEach((p, pi) => {
-      const kids = L === 1 ? 3 : (chosen.has(`${L - 1}-${pi}`) ? 3 : (R() < 0.6 ? 2 : 1));
-      for (let c = 0; c < kids; c++) {
-        const spread = 170 / Math.pow(1.7, L - 1);
-        const x = p[0] + (c - (kids - 1) / 2) * spread * (L === 1 ? 1.2 : 0.8) + (R() - 0.5) * 10;
-        const y = p[1] - 64 - (R() - 0.5) * 8;
-        cur.push([x, y]);
-        edges.push([L, pi, cur.length - 1]);
-      }
-    });
-    // pick the reinforced child among the chosen parent's children
-    const parentIdx = chosenIdx;
-    const kidsOfChosen = edges.filter((e) => e[0] === L && e[1] === parentIdx).map((e) => e[2]);
-    chosenIdx = kidsOfChosen[L % kidsOfChosen.length];
-    chosen.add(`${L}-${chosenIdx}`);
-    levels.push(cur);
-  }
-  // clamp x inside the plate
-  levels.forEach((lv) => lv.forEach((p) => { p[0] = clamp(p[0], 110, 610); }));
-  const onPath = (L, i) => chosen.has(`${L}-${i}`);
-  // stem from the pulled arm
-  rod(P, [[root[0] + 26, baseY - 4], [root[0], root[1]]], 6, 6, { halo: 3, cls: 'i' });
-  edges.forEach(([L, pi, ci]) => {
-    const a = levels[L - 1][pi], b = levels[L][ci];
-    const pts = sample(bez(a, [a[0], a[1] - 30], [b[0], b[1] + 30], b), 30);
-    const hot = onPath(L - 1, pi) && onPath(L, ci);
-    const w = Math.max(2.4, 6 - L);
-    if (hot) { P.fill('g', ribbon(pts, pts.map(() => w + 7))); P.fill('i', ribbon(pts, pts.map(() => w + 3))); P.fill('h', ribbon(pts, pts.map(() => w))); }
+  // the tree of reasoning, laid out tidily and grown from the winning arm's distribution
+  const T = { k: [
+    { k: [{ k: [{}, {}] }, { k: [{}] }] },
+    { hot: 1, k: [{ k: [{}] }, { hot: 1, k: [{}, { hot: 1 }, {}] }, { k: [{}, {}] }] },
+    { k: [{ k: [{}, {}] }] },
+  ], hot: 1 };
+  const leaves = []; const walk = (nd, d) => { nd.d = d; if (!nd.k) leaves.push(nd); else nd.k.forEach((c) => walk(c, d + 1)); }; walk(T, 0);
+  leaves.forEach((nd, i) => { nd.x = 124 + i * (472 / (leaves.length - 1)); });
+  const place = (nd) => { if (nd.k) { nd.k.forEach(place); nd.x = nd.k.reduce((a, c) => a + c.x, 0) / nd.k.length; } nd.y = 548 - nd.d * 66; };
+  place(T);
+  const shift = rootX - T.x; const all = []; const collect = (nd) => { nd.x += shift; all.push(nd); nd.k?.forEach(collect); }; collect(T);
+  all.forEach((nd) => { nd.x = clamp(nd.x, 96, 624); });
+  rod(P, [[rootX, peakY + 4], [T.x, T.y]], 6, 6, { halo: 3 });
+  const edge = (a, b) => {
+    const pts = sample(bez([a.x, a.y], [a.x, a.y - 30], [b.x, b.y + 30], [b.x, b.y]), 30);
+    const w = Math.max(2.4, 6.2 - a.d * 1.2);
+    if (a.hot && b.hot) { P.fill('g', ribbon(pts, pts.map(() => w + 7))); P.fill('i', ribbon(pts, pts.map(() => w + 3))); P.fill('h', ribbon(pts, pts.map(() => w))); }
     else rod(P, pts, w, w * 0.85, { halo: 3 });
-  });
-  levels.forEach((lv, L) => lv.forEach((p, i) => {
-    const hot = onPath(L, i);
-    sphere(P, p[0], p[1], hot ? 10 - L * 0.8 : 8 - L * 0.9, { spacing: 2.3, cross: false });
-    if (hot && L === 4) { P.line('si', 1.4, circ(p[0], p[1], 16)); P.line('si', 0.9, circ(p[0], p[1], 21)); }
-  }));
+  };
+  all.forEach((a) => a.k?.forEach((b) => edge(a, b)));
+  all.forEach((nd) => { sphere(P, nd.x, nd.y, (nd.hot ? 10.5 : 8.5) - nd.d * 0.9, { spacing: 2.3, cross: false }); });
+  const ans = all.find((nd) => nd.hot && !nd.k);
+  P.line('si', 1.5, circ(ans.x, ans.y, 16)); P.line('si', 0.9, circ(ans.x, ans.y, 21.5));
   // labels
-  label(P, ax0 + 26 + 58 * Math.cos(-1.05), baseY + 40 + 58 * Math.sin(-1.05) - 8, 84, 560, 'a');
-  label(P, ax0 + adx - 10, baseY - 40, 84, 640, 'b');
-  label(P, root[0] + 26 + 58 * Math.cos(0.5) + 6, baseY + 40 + 58 * Math.sin(0.5) + 4, 650, 760, 'c');
-  const mid = levels[2][0]; label(P, mid[0] - 8, mid[1] - 2, 84, 400, 'd');
-  const top = levels[4][chosenIdx]; label(P, top[0] + 18, top[1] - 8, 650, 300, 'e');
+  label(P, ax0 + 26 + 58 * Math.cos(-1.05), baseY + 40 + 58 * Math.sin(-1.05) - 6, 84, 606, 'a');
+  label(P, ax0 - 10, baseY - 30, 84, 540, 'b');
+  label(P, ax0 + best * adx + 26 + 58 * Math.cos(0.5) + 6, baseY + 40 + 58 * Math.sin(0.5) + 4, 650, 770, 'c');
+  const dn = all.find((nd) => nd.d === 2 && !nd.hot && nd.x < 300); label(P, dn.x - 9, dn.y, 84, dn.y - 24, 'd');
+  label(P, ans.x + 16, ans.y - 10, ans.x + 70, ans.y - 30, 'e');
 };
 
 /* =====================================================================
@@ -1372,24 +1466,99 @@ function levelGlyph(n) { // a micrograph scale bar; one, two or three bars fille
   return s + '</svg>';
 }
 
-function build(b) {
-  const P = new Plate();
-  FIG[b.slug]?.(P);
+function faceHTML(b, P) {
   const pl = toRoman(ORDER.indexOf(b.slug) + 1);
-  const el = document.createElement('div');
-  el.className = `cover ${b.level}`; el.dataset.slug = b.slug;
   const lv = b.level[0].toUpperCase() + b.level.slice(1);
-  el.innerHTML = `
+  return `
     <svg class="art" viewBox="0 0 720 888" xmlns="http://www.w3.org/2000/svg"><g transform="translate(0 ${b.dy || 0})">${P}</g></svg>
     <div class="head"><span>Plate ${pl}</span><span class="lv">${lv}${levelGlyph(LEVEL[b.level])}</span></div>
     <h2 class="title" style="${b.size ? `font-size:${b.size}px` : ''}">${b.series ? `<span class="series">Charlie and the Intelligence Factory &nbsp;·&nbsp; Book ${b.series}</span>` : ''}${b.lines.map((l) => `<span class="l">${l}</span>`).join('')}${b.sub ? `<span class="sub">${b.sub}</span>` : ''}</h2>
     <div class="rule" style="top:792px"></div>
     <div class="legend" style="top:801px">${b.cap}</div>
     <div class="foot"><span class="imprint">${MARK}<span>Vizuara Books</span></span><span class="meta">${b.soon ? 'In preparation' : (b.meta || '')}</span></div>`;
+}
+function build(b) {
+  const P = new Plate();
+  FIG[b.slug]?.(P);
+  const el = document.createElement('div');
+  el.className = `cover face ${b.level}`; el.dataset.slug = b.slug;
+  el.innerHTML = faceHTML(b, P);
   return el;
 }
-const root = document.getElementById('covers');
-BOOKS.forEach((b) => root.appendChild(build(b)));
+const NOTES = {
+  'ai-context-engineering': 'The context window as a sediment core. Each component is a stratum, laid down in the order its tokens enter, with the system prompt as bedrock and the query on top, measured against a ruler of token positions up to the limit.',
+  'mathematical-foundations-for-ml': 'A two-basin loss function as an engraved block diagram. Both descent paths are integrated numerically from −∇L on the actual surface: one reaches the minimum, the other is caught in a local one.',
+  'neural-networks-from-scratch': 'One artificial unit, dissected like an anatomical specimen. Inputs arrive on filaments, and each weight is a bead sized by its magnitude. The core forms Σwx + b and the shell applies the activation.',
+  'build-llms-from-scratch': 'A decoder-only transformer raised as a classical column: a course of tokens, the embedding as plinth, N identical blocks as drums threaded on the dowel of the residual stream, and the output head as a capital bearing the next-token distribution.',
+  '5d-parallelism': 'The smallest five-dimensional device mesh (2<sup>5</sup> = 32 devices) is a penteract. Projected in its decagonal symmetry, it shows one device’s five edges as the five axes of parallelism.',
+  'pi-vs-hermes-vs-codex': 'A three-armed logarithmic spiral. Each agent’s history winds inward, with older spans sealed into ever smaller chambers, and a pale thread (memory) runs through all of them. The figure compares structure; it makes no claim about any one agent’s ratios.',
+  'decision-trees-from-scratch': 'A binary tree pressed like a herbarium sheet, with its split conditions at the nodes and the leaves coloured by class. Fig. 2 shows the same four splits partitioning the plane.',
+  'transformers-from-scratch': 'One causal attention head. Arches run from each query back to the keys it weighs, their width set by the softmax weight, and the last query is drawn in white. Below, the same weights appear as a Hinton diagram.',
+  'harness-engineering': 'The harness as an armillary sphere: the model at the centre, the rings of the agent loop, tools and memory around it, all held by the frame and horizon of permissions and sandbox. As a coming-soon title it carries “In preparation” at the foot.',
+  'charlie-language-room': 'Inference engineering’s paged KV cache as a library card catalogue. Drawers are pages, each card holds one token’s keys and values, some pages are free, and the ledger on top is the page table.',
+  'charlie-vision-room': 'A lens casts an image, the screen cuts it four by four, and the patches are read off as a numbered sentence: patch embedding as a piece of Victorian optics.',
+  'charlie-sound-room': 'Scott’s phonautograph (1857): horn, membrane, stylus and a sooted drum record a voice as a trace. Fig. 2 unrolls the trace and cuts it into frames, as a speech model does.',
+  'charlie-reasoning-room': 'From bandits to reasoning models. A five-armed bandit’s winning reward distribution sprouts a tree of reasoning steps, and the rewarded path is drawn in white.',
+};
+const GROUPS = [
+  { h: 'The core six', l: 'The six titles every system must carry: two beginner, two intermediate, two advanced.', slugs: ['ai-context-engineering', 'mathematical-foundations-for-ml', 'neural-networks-from-scratch', 'build-llms-from-scratch', '5d-parallelism', 'pi-vs-hermes-vs-codex'] },
+  { h: 'Range', l: 'A beginner title with a Fig. 2, a one-word title with a long subtitle, and a coming-soon title.', slugs: ['decision-trees-from-scratch', 'transformers-from-scratch', 'harness-engineering'] },
+  { h: 'A sub-series: Charlie and the Intelligence Factory', l: 'Four rooms, four machines. A series line sits above the title, the books keep their catalogue plate numbers, and level still sets the paper.', slugs: ['charlie-language-room', 'charlie-vision-room', 'charlie-sound-room', 'charlie-reasoning-room'] },
+];
+const groupsEl = document.getElementById('groups');
+GROUPS.forEach((g) => {
+  const sec = document.createElement('section'); sec.className = 'group';
+  sec.innerHTML = `<h2>${g.h}</h2><p class="gl">${g.l}</p><div class="covers"></div>`;
+  const row = sec.querySelector('.covers');
+  g.slugs.forEach((slug) => {
+    const b = BOOKS.find((q) => q.slug === slug);
+    const it = document.createElement('div'); it.className = 'item';
+    it.appendChild(build(b));
+    const n = document.createElement('p'); n.className = 'note';
+    n.innerHTML = `<b>Plate ${toRoman(ORDER.indexOf(slug) + 1)}.</b> ${NOTES[slug] || ''}`;
+    it.appendChild(n); row.appendChild(it);
+  });
+  groupsEl.appendChild(sec);
+});
+document.getElementById('lvkey').innerHTML = ['beginner', 'intermediate', 'advanced'].map((l, i) => `<div style="background:var(--${['sage', 'ingres', 'madder'][i]})"><span>${l}</span>${levelGlyph(i + 1)}</div>`).join('');
+
+/* ---------------- the print wrap for Plate III ---------------- */
+FIG['nn-back'] = (P) => {
+  const R = rng(31);
+  const layers = [3, 4, 4, 2];
+  const X = [150, 290, 430, 570], cy = 496, gapY = 64;
+  const nodes = layers.map((n, li) => Array.from({ length: n }, (_, k) => [X[li], cy + (k - (n - 1) / 2) * gapY]));
+  for (let li = 0; li < layers.length - 1; li++) for (const a of nodes[li]) for (const b of nodes[li + 1]) {
+    const wv = R() * 2 - 1, pts = sample((t) => [lerp(a[0], b[0], t), lerp(a[1], b[1], t)], 20), wd = 1 + Math.abs(wv) * 3.2;
+    P.fill('g', ribbon(pts, pts.map(() => wd + 3.2)));
+    if (wv > 0) P.fill('i', ribbon(pts, pts.map(() => wd)));
+    else { P.fill('i', ribbon(pts, pts.map(() => wd + 1.6))); P.fill('h', ribbon(pts, pts.map(() => Math.max(MINH, wd)))); }
+  }
+  nodes.forEach((col, li) => col.forEach(([x, y]) => sphere(P, x, y, li === 0 || li === 3 ? 19 : 22, { spacing: 2.6 })));
+};
+(function buildWrap() {
+  const b = BOOKS.find((q) => q.slug === 'neural-networks-from-scratch');
+  const wrap = document.createElement('div'); wrap.className = 'wrap beginner';
+  const back = document.createElement('div'); back.className = 'face back beginner';
+  const PB = new Plate(); FIG['nn-back'](PB);
+  const cat = ORDER.slice(0, 6).map((sl, i) => { const bk = BOOKS.find((q) => q.slug === sl); return `<span><i>${toRoman(i + 1)}</i>${bk.lines.join(' ').replace(/<br>/g, ' ')}${bk.sub && bk.slug === 'pi-vs-hermes-vs-codex' ? ': ' + bk.sub : ''}</span>`; }).join(' &nbsp;·&nbsp; ');
+  back.innerHTML = `
+    <svg class="art" viewBox="0 0 720 888" xmlns="http://www.w3.org/2000/svg">${PB}</svg>
+    <div class="head"><span>Plate III</span><span class="lv">Beginner${levelGlyph(1)}</span></div>
+    <div class="blurb">Build a neural network the way an anatomist learns a body: one part at a time. Take a single unit apart (its inputs, its weights, the sum it forms, the curve that decides what it passes on), then wire the units into layers and teach them, <em>from scratch</em>.</div>
+    <div class="facts"><span>Beginner</span><span>33 capsules</span><span>About 7 hours</span><span>Free to read online</span></div>
+    <div class="legend" style="top:622px"><b>Fig. 2.</b> The unit of Plate III, repeated and wired into a small network. Ink rods carry positive weights, white rods negative, and each rod’s thickness is the weight’s magnitude.</div>
+    <div class="cat"><h4>From the atlas</h4>${cat}</div>
+    <div class="foot"><span class="imprint">${MARK}<span>Vizuara Books</span></span><span class="meta">books.vizuara.ai</span></div>`;
+  const spine = document.createElement('div'); spine.className = 'spine';
+  spine.innerHTML = `<div class="no">III</div><div class="t">Neural Networks from Scratch</div>
+    <div class="mk"><svg width="12" height="40" viewBox="0 0 12 40">${[0, 1, 2].map((i) => `<rect x="0.75" y="${0.75 + i * 13.5}" width="10.5" height="12" ${i < 1 ? 'fill="currentColor"' : 'fill="none"'} stroke="currentColor" stroke-width="1.5"/>`).join('')}</svg><svg width="22" height="22" viewBox="0 0 20 20">${MARK.replace(/^<svg[^>]*>|<\/svg>$/g, '')}</svg></div>`;
+  const front = document.createElement('div'); front.className = 'face beginner';
+  const PF = new Plate(); FIG[b.slug](PF);
+  front.innerHTML = faceHTML(b, PF);
+  wrap.append(back, spine, front);
+  document.getElementById('wrap').appendChild(wrap);
+})();
 </script>
 </body>
 </html>

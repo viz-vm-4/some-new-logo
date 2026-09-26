@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maquette — Vizuara Books</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&family=Instrument+Sans:ital,wdth,wght@0,75..100,400..700;1,75..100,400..700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --chalk:#E7E3DB; --stone:#A7A095; --soot:#232120;
+  --ink:#171614; --bone:#EEE9E0;
+  --page:#F3F0EA; --pageInk:#1d1c1a; --rule:#c9c3b8;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--page);color:var(--pageInk)}
+body{font-family:"Instrument Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+
+/* ---------------- cover ---------------- */
+.cover{position:relative;width:720px;height:888px;overflow:hidden;background:var(--chalk);color:var(--ink);flex:none}
+.cover canvas{position:absolute;left:0;top:0;width:720px;height:888px;display:block}
+.cover.k2{background:var(--soot);color:var(--bone)}
+.cover.k1{background:var(--stone)}
+.cover .t{position:absolute;inset:0}
+
+.imprint{position:absolute;left:44px;top:40px;display:flex;align-items:center;gap:9px;
+  font:600 11.5px/1 "Instrument Sans";letter-spacing:.2em;text-transform:uppercase}
+.imprint svg{width:13px;height:19px;display:block;fill:currentColor}
+.catno{position:absolute;right:44px;top:40px;font:500 11.5px/1 "Instrument Sans";letter-spacing:.14em;text-transform:uppercase;
+  font-variant-numeric:tabular-nums}
+.series{position:absolute;left:44px;top:74px;font:italic 400 17px/1.2 "Newsreader";letter-spacing:.005em;opacity:.92}
+
+h2.title{position:absolute;left:40px;right:40px;top:78px;margin:0;
+  font-family:"Newsreader";font-optical-sizing:auto;font-variation-settings:"opsz" 72;
+  font-weight:430;font-size:78px;line-height:.98;letter-spacing:-.018em;text-wrap:balance}
+h2.title .sub{display:block;font-style:italic;font-weight:360;font-size:.56em;line-height:1.08;letter-spacing:-.005em;margin-top:.28em}
+h2.title.s1{font-size:70px}
+h2.title.s2{font-size:62px}
+.has-series h2.title{top:112px}
+
+.label{position:absolute;left:44px;bottom:40px;width:430px}
+.label .obj{font:italic 400 19px/1.2 "Newsreader";margin:0 0 7px;letter-spacing:.003em}
+.label .med,.label .dim{font:500 11.5px/1.5 "Instrument Sans";letter-spacing:.12em;text-transform:uppercase;margin:0}
+
+.level{position:absolute;right:44px;bottom:40px;display:flex;flex-direction:column;align-items:flex-end;gap:9px}
+.level .scale{display:flex;border:1px solid currentColor}
+.level .scale i{display:block;width:17px;height:17px;position:relative}
+.level .scale i:nth-child(1){background:var(--chalk)}
+.level .scale i:nth-child(2){background:var(--stone)}
+.level .scale i:nth-child(3){background:var(--soot)}
+.level .scale i.on::after{content:"";position:absolute;left:50%;top:50%;width:7px;height:7px;margin:-3.5px 0 0 -3.5px;border-radius:50%}
+.level .scale i:nth-child(1).on::after,.level .scale i:nth-child(2).on::after{background:var(--ink)}
+.level .scale i:nth-child(3).on::after{background:var(--bone)}
+.level span{font:600 11.5px/1 "Instrument Sans";letter-spacing:.2em;text-transform:uppercase}
+
+/* ---------------- presentation page ---------------- */
+.page{max-width:1560px;margin:0 auto;padding:72px 60px 120px}
+.shelf{display:flex;flex-wrap:wrap;gap:64px 56px;justify-content:center;margin-top:40px}
+figure.plate{margin:0}
+figure.plate .cover{box-shadow:0 1px 2px rgba(0,0,0,.18),0 18px 40px -18px rgba(0,0,0,.35)}
+figure.plate figcaption{margin-top:14px;font:500 12px/1.4 "Instrument Sans";letter-spacing:.08em;text-transform:uppercase;color:#6b665e}
+</style>
+</head>
+<body>
+<main class="page">
+  <section class="shelf" id="shelf"></section>
+</main>
+
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="vmark" viewBox="0 0 26 38"><path d="M0 0h7.2L13 17.4 18.8 0H26L16.6 26h-7.2z"/><rect x="5" y="28.5" width="16" height="9.5"/></symbol>
+</svg>
+
+<script>
+/* =====================================================================
+   MAQUETTE — a raymarched studio for Vizuara Books.
+   Every cover is rendered procedurally at print resolution (2250 x 2775)
+   into a canvas: one sculpted object on seamless paper, lit like a
+   catalogue photograph. Paper key = level. Object = the book.
+   ===================================================================== */
+const W = 2250, H = 2775;
+
+const PRELUDE = `#version 300 es
+precision highp float;
+out vec4 fragColor;
+uniform vec2 uRes; uniform vec3 uRo, uTa; uniform float uFocal; uniform vec2 uShift;
+uniform vec3 uPaper; uniform vec3 uKeyPos; uniform float uKeyPow; uniform float uKeySoft;
+uniform vec3 uSpotDir; uniform vec2 uSpotCone;
+uniform vec3 uGlowPos; uniform float uGlow; uniform float uGlowRad;
+uniform float uFill; uniform float uBoxLum; uniform vec2 uBoxSize; uniform float uEnvDark;
+uniform vec3 uRimDir; uniform float uRim; uniform float uScrim; uniform float uCard;
+uniform vec4 uBound; uniform float uWallZ, uCoveR; uniform float uExpo; uniform float uVig;
+
+struct Mat { vec3 alb; float rough; float metal; float coat; float wrap; };
+#define PI 3.14159265
+mat2 rot(float a){ float c=cos(a), s=sin(a); return mat2(c,-s,s,c); }
+float hash1(vec3 p){ p=fract(p*0.3183099+vec3(.1,.2,.3)); p*=17.0; return fract(p.x*p.y*p.z*(p.x+p.y+p.z)); }
+float hash2(vec2 p){ vec3 p3=fract(vec3(p.xyx)*.1031); p3+=dot(p3,p3.yzx+33.33); return fract((p3.x+p3.y)*p3.z); }
+float noise(vec3 x){ vec3 i=floor(x), f=fract(x); f=f*f*(3.-2.*f);
+  return mix(mix(mix(hash1(i),hash1(i+vec3(1,0,0)),f.x),mix(hash1(i+vec3(0,1,0)),hash1(i+vec3(1,1,0)),f.x),f.y),
+             mix(mix(hash1(i+vec3(0,0,1)),hash1(i+vec3(1,0,1)),f.x),mix(hash1(i+vec3(0,1,1)),hash1(i+vec3(1,1,1)),f.x),f.y),f.z); }
+float fbm(vec3 p){ float a=.5,s=0.; for(int i=0;i<4;i++){ s+=a*noise(p); p=p*2.03+vec3(1.7,9.2,3.1); a*=.5; } return s; }
+float sdBox(vec3 p, vec3 b){ vec3 q=abs(p)-b; return length(max(q,0.))+min(max(q.x,max(q.y,q.z)),0.); }
+float sdRBox(vec3 p, vec3 b, float r){ return sdBox(p,b-r)-r; }
+float sdBox2(vec2 p, vec2 b){ vec2 q=abs(p)-b; return length(max(q,0.))+min(max(q.x,q.y),0.); }
+float sdCapsule(vec3 p, vec3 a, vec3 b, float r){ vec3 pa=p-a, ba=b-a; float h=clamp(dot(pa,ba)/dot(ba,ba),0.,1.); return length(pa-ba*h)-r; }
+float sdCylY(vec3 p, float h, float r){ vec2 d=abs(vec2(length(p.xz),p.y))-vec2(r,h); return min(max(d.x,d.y),0.)+length(max(d,0.)); }
+float sdCylZ(vec3 p, float h, float r){ vec2 d=abs(vec2(length(p.xy),p.z))-vec2(r,h); return min(max(d.x,d.y),0.)+length(max(d,0.)); }
+float sdTorus(vec3 p, vec2 t){ vec2 q=vec2(length(p.xz)-t.x,p.y); return length(q)-t.y; }
+float smin(float a, float b, float k){ float h=clamp(.5+.5*(b-a)/k,0.,1.); return mix(b,a,h)-k*h*(1.-h); }
+float smax(float a, float b, float k){ return -smin(-a,-b,k); }
+`;
+
+const MAIN = `
+float map(vec3 p){ return scene(p).x; }
+vec3 calcNormal(vec3 p){ const float e=0.0006; vec2 k=vec2(1,-1);
+  return normalize(k.xyy*map(p+k.xyy*e)+k.yyx*map(p+k.yyx*e)+k.yxy*map(p+k.yxy*e)+k.xxx*map(p+k.xxx*e)); }
+
+bool sphereSpan(vec3 ro, vec3 rd, float rad, out float t0, out float t1){
+  vec3 oc=ro-uBound.xyz; float b=dot(oc,rd); float c=dot(oc,oc)-rad*rad; float h=b*b-c;
+  if(h<0.) return false; h=sqrt(h); t0=-b-h; t1=-b+h; return true; }
+
+float marchObj(vec3 ro, vec3 rd, float tmax){
+  float t0,t1; if(!sphereSpan(ro,rd,uBound.w,t0,t1)) return -1.;
+  float t=max(t0,0.); t1=min(t1,tmax);
+  for(int i=0;i<STEPS;i++){ if(t>t1) break; float d=map(ro+rd*t); if(d<0.00012*t) return t; t+=d*STEPK; }
+  return -1.; }
+
+float softShadow(vec3 ro, vec3 rd, float tmax, float k){
+  float t0,t1; if(!sphereSpan(ro,rd,uBound.w+0.9,t0,t1)) return 1.;
+  if(t1<0.) return 1.;
+  float t=max(t0,0.004); t1=min(t1,tmax);
+  float res=1.;
+  for(int i=0;i<SSTEPS;i++){ if(t>t1) break; float h=map(ro+rd*t); res=min(res,k*h/t); if(res<0.002) break; t+=clamp(h,0.006,0.22); }
+  res=clamp(res,0.,1.); return res*res*(3.-2.*res); }
+
+float calcAO(vec3 p, vec3 n, float s){ float occ=0., sca=1.;
+  for(int i=0;i<5;i++){ float h=0.01+s*float(i)/4.; float d=map(p+h*n); occ+=(h-d)*sca; sca*=.85; }
+  return clamp(1.-1.6*occ/s,0.,1.); }
+
+float traceBackdrop(vec3 ro, vec3 rd, out vec3 n){
+  float tb=1e9; n=vec3(0,1,0); float zc=uWallZ-uCoveR, yc=uCoveR;
+  if(rd.y<0.){ float t=-ro.y/rd.y; vec3 p=ro+rd*t; if(p.z<=zc){ tb=t; n=vec3(0,1,0);} }
+  if(rd.z>0.){ float t=(uWallZ-ro.z)/rd.z; vec3 p=ro+rd*t; if(p.y>=yc && t<tb){ tb=t; n=vec3(0,0,-1);} }
+  vec2 o=vec2(ro.y-yc,ro.z-zc), d=rd.yz; float a=dot(d,d), b=dot(o,d), c=dot(o,o)-uCoveR*uCoveR; float h=b*b-a*c;
+  if(h>0. && a>1e-9){ float t=(-b+sqrt(h))/a; vec3 p=ro+rd*t; if(p.y<yc && p.z>zc && t>0. && t<tb){ tb=t; n=normalize(vec3(0,yc-p.y,zc-p.z)); } }
+  return tb; }
+
+float keyAtten(vec3 p, out vec3 L, out float dist){
+  vec3 d=uKeyPos-p; float r2=dot(d,d); dist=sqrt(r2); L=d/dist; float a=uKeyPow/r2;
+  if(uSpotCone.y>0.){ float c=dot(-L,uSpotDir); a*=smoothstep(uSpotCone.x,uSpotCone.y,c); }
+  return a; }
+
+vec3 envMap(vec3 r, float rough){
+  vec3 kd=uKeyPos-uBound.xyz; float kf=uKeyPow/dot(kd,kd);
+  vec3 floorC=uPaper*(kf*0.9+uFill);
+  vec3 wallC=uPaper*(uFill+uGlow*0.8+kf*0.35);
+  vec3 c=mix(floorC,wallC,smoothstep(-0.22,0.1,r.y));
+  c=mix(c,vec3(uEnvDark),smoothstep(0.3,0.85,r.y));
+  c*=mix(1.,0.35,smoothstep(0.0,-0.8,r.z));
+  vec3 Ld=normalize(kd); vec3 bu=normalize(cross(vec3(0,1,0),Ld)); vec3 bv=cross(Ld,bu);
+  float cz=dot(r,Ld);
+  if(cz>0.05){ vec2 q=vec2(dot(r,bu),dot(r,bv))/cz; float soft=0.015+rough*0.9;
+    vec2 dd=abs(q)-uBoxSize; float db=length(max(dd,0.))+min(max(dd.x,dd.y),0.);
+    float pan=1.-smoothstep(-soft,soft,db);
+    c+=uBoxLum*pan*mix(1.,0.2,sqrt(rough))*(0.8+0.2*smoothstep(0.,-0.25,db)); }
+  float sr=rough*0.35;
+  c+=uScrim*smoothstep(0.6-sr,0.9,dot(r,normalize(vec3(-0.25,1.,0.45))))*mix(1.,0.5,rough);
+  c+=uCard*smoothstep(0.72-sr,0.93,dot(r,normalize(vec3(1.,0.1,-0.25))))*mix(1.,0.5,rough);
+  if(uRim>0.){ float cr=dot(r,uRimDir); c+=uRim*smoothstep(0.93-sr*0.8,0.975,cr)*mix(1.,0.3,rough); }
+  return c; }
+
+vec3 shadeObj(vec3 p, vec3 rd){
+  vec3 n=calcNormal(p);
+  float id=scene(p).y;
+  Mat m=material(id,p,n);
+  vec3 L; float dist; float ka=keyAtten(p,L,dist);
+  float sh=softShadow(p+n*0.003,L,dist,uKeySoft);
+  float ao=calcAO(p,n,0.35);
+  float ndl=dot(n,L);
+  float diff=max((ndl+m.wrap)/(1.+m.wrap),0.);
+  float up=0.5+0.5*n.y;
+  vec3 amb=uFill*(mix(uPaper*0.9+0.08, vec3(1.0), up)*(0.55+0.45*up));
+  vec3 bounce=uPaper*ka*0.35*clamp(-n.y*0.8+0.2,0.,1.);
+  vec3 dif=m.alb*(ka*diff*sh + (amb+bounce)*ao);
+  vec3 F0=mix(vec3(0.04),m.alb,m.metal);
+  float nv=max(dot(n,-rd),0.);
+  vec3 F=F0+(1.-F0)*pow(1.-nv,5.)*(1.-m.rough*0.7);
+  vec3 r=reflect(rd,n);
+  float so=clamp(ao*1.2,0.,1.)*mix(0.35,1.,sh);
+  vec3 spec=envMap(r,m.rough)*F*so;
+  float specW=max(m.metal,m.coat);
+  vec3 hv=normalize(L-rd); float nh=max(dot(n,hv),0.); float nl=max(ndl,0.);
+  float a=max(m.rough*m.rough,0.002); a=clamp(a+0.35/dist,0.,1.); float a2=a*a;
+  float dd=nh*nh*(a2-1.)+1.; float D=a2/(PI*dd*dd);
+  float lh=max(dot(L,hv),0.05); vec3 Fk=F0+(1.-F0)*pow(1.-lh,5.);
+  vec3 kspec=ka*sh*nl*D*Fk/(4.*lh*lh)*PI*0.25;
+  vec3 col=dif*(1.-m.metal)+(spec+kspec)*mix(0.35*(1.-m.rough),1.,specW);
+  return col; }
+
+vec3 shadeBackdrop(vec3 p, vec3 n){
+  vec3 L; float dist; float ka=keyAtten(p,L,dist);
+  float ndl=max(dot(n,L),0.);
+  float sh=softShadow(p+n*0.002,L,dist,uKeySoft);
+  float near=length(p-uBound.xyz)-uBound.w;
+  float ao=1.;
+  if(near<1.2){ ao=mix(calcAO(p,n,0.6),1.,smoothstep(0.,1.2,near)); ao=ao*ao; }
+  float g=exp(-dot(p-uGlowPos,p-uGlowPos)/(uGlowRad*uGlowRad));
+  return uPaper*(ka*ndl*sh*mix(0.72,1.,ao) + uFill*ao + uGlow*g*mix(0.6,1.,sh)); }
+
+vec3 tone(vec3 x){ vec3 a=min(x,vec3(0.8)); vec3 b=0.8+0.2*(1.-exp(-(max(x-0.8,0.))/0.2)); return mix(a,b,step(0.8,x)); }
+
+void main(){
+  vec2 uv=(gl_FragCoord.xy-0.5*uRes)/uRes.y+uShift;
+  vec3 ro=uRo; vec3 fw=normalize(uTa-ro); vec3 rt=normalize(cross(vec3(0,1,0),fw)); vec3 up=cross(fw,rt);
+  vec3 rd=normalize(uv.x*rt+uv.y*up+uFocal*fw);
+  vec3 nb; float tb=traceBackdrop(ro,rd,nb);
+  float to=marchObj(ro,rd,tb);
+  vec3 col;
+  if(to>0.) col=shadeObj(ro+rd*to,rd);
+  else if(tb<1e8) col=shadeBackdrop(ro+rd*tb,nb);
+  else col=vec3(0.);
+  vec2 q=gl_FragCoord.xy/uRes;
+  col*=mix(1.,pow(clamp(16.*q.x*q.y*(1.-q.x)*(1.-q.y),0.,1.),0.22),uVig);
+  col=tone(col*uExpo);
+  col=pow(max(col,0.),vec3(1./2.2));
+  col+=(hash2(gl_FragCoord.xy)+hash2(gl_FragCoord.yx+17.3)-1.)*0.012;
+  fragColor=vec4(col,1.);
+}`;
+
+/* ------------------------------------------------------------------ */
+/* lighting presets = level. key 0 high (beginner), 1 mid, 2 low       */
+const KEYS = {
+  0:{ paper:'#ECE8E0', keyPos:[-7,10,-7], keyPow:230, keySoft:5, spot:null, glow:.30, glowRad:6, fill:.32, boxLum:3.2, boxSize:[.55,.42], envDark:.35, scrim:.9, card:.5, rim:0, expo:1.0, vig:.35 },
+  1:{ paper:'#ABA498', keyPos:[-7,9,-6],  keyPow:230, keySoft:6, spot:null, glow:.28, glowRad:5, fill:.22, boxLum:3.0, boxSize:[.5,.4], envDark:.14, scrim:.6, card:.3, rim:0, expo:1.0, vig:.45 },
+  2:{ paper:'#46423E', keyPos:[-5,9,-5],  keyPow:250, keySoft:7, spot:[.88,.975], glow:.55, glowRad:2.8, fill:.03, boxLum:4.0, boxSize:[.45,.34], envDark:.012, scrim:.35, card:.12, rim:1.4, expo:1.0, vig:.6 },
+};
+const srgb2lin = (h)=>[1,3,5].map(i=>Math.pow(parseInt(h.substr(i,2),16)/255,2.2));
+
+/* ------------------------------------------------------------------ */
+const BOOKS = [];
+function book(o){ BOOKS.push(o); }
+
+/* ============ 5D PARALLELISM ============ */
+book({ slug:'5d-parallelism', key:2, no:'05',
+  title:'5D Parallelism<span class="sub">for Large Model Training</span>', size:'',
+  obj:'Cube, cut five ways', med:'Machined aluminium', dim:'40 capsules · 9 hours',
+  cam:{ look:[0,0.9,0], dist:19, el:14, yaw:-6, frame:[0.5,0.63] }, bound:[0,0.9,0,1.6], steps:130,
+  glsl:`
+const float HS=0.9; const float G=0.05;
+float cuts(vec3 q){
+  float c=abs(q.x-0.12);
+  c=min(c,abs(q.y+0.1));
+  c=min(c,abs(q.z+0.08));
+  c=min(c,abs(dot(q,vec3(0.8,0,0.6))-0.45));
+  c=min(c,abs(dot(q,vec3(0.6,0,-0.8))+0.4));
+  return c;
+}
+vec2 scene(vec3 p){
+  p.y-=HS; p.xz=rot(0.55)*p.xz;
+  float d=sdRBox(p,vec3(HS),0.02);
+  float c=cuts(p)-G;
+  return vec2(max(d,-c), c<-d?2.:1.);
+}
+Mat material(float id, vec3 p, vec3 n){
+  vec3 q=p; q.y-=HS; q.xz=rot(0.55)*q.xz;
+  float gr=fbm(q*9.);
+  Mat m;
+  if(id>1.5){ m.alb=vec3(0.86,0.86,0.85); m.rough=0.14+0.05*gr; }
+  else { m.alb=vec3(0.78,0.77,0.75)*(0.9+0.15*gr); m.rough=0.42+0.1*gr; }
+  m.metal=1.; m.coat=0.; m.wrap=0.;
+  return m;
+}`});
+
+/* ============ MATHEMATICAL FOUNDATIONS ============ */
+book({ slug:'mathematical-foundations-for-ml', key:0, no:'02',
+  title:'Mathematical Foundations<span class="sub">for Machine Learning</span>', size:'',
+  obj:'Saddle surface <i>z = xy</i>, with its rulings', med:'Cast plaster, graphite', dim:'43 capsules · 10 hours',
+  cam:{ look:[0,0.62,0], dist:18, el:9, yaw:-14, frame:[0.5,0.64] }, bound:[0,0.65,0,1.75], steps:150,
+  glsl:`
+const float K=0.55; const float T=0.075;
+vec2 scene(vec3 p){
+  p.y-=K+T+0.005;
+  p.xz=rot(-0.785)*p.xz;
+  float u=p.x, v=p.z;
+  float h=K*u*v;
+  float cu=clamp(u,-1.1,1.1), cv=clamp(v,-1.1,1.1);
+  float d=0.8*(abs(p.y-h)/length(vec3(K*cv,1.,K*cu))-T);
+  float e=sdBox2(p.xz,vec2(1.1))-0.0;
+  d=smax(d,e,0.02);
+  return vec2(d,1.);
+}
+Mat material(float id, vec3 p, vec3 n){
+  vec3 q=p; q.y-=K+T+0.005; q.xz=rot(-0.785)*q.xz;
+  float u=q.x, v=q.z; float h=K*u*v;
+  float top=step(h,q.y);
+  float N=5.5; float lw=0.0045;
+  float lu=abs(fract(u*N+0.5)-0.5)/N; float lv=abs(fract(v*N+0.5)-0.5)/N;
+  float line=(1.-smoothstep(lw*0.6,lw,min(lu,lv)))*step(max(abs(u),abs(v)),1.08);
+  Mat m; float f=fbm(p*14.);
+  m.alb=vec3(0.87,0.86,0.83)*(0.95+0.07*f);
+  m.alb=mix(m.alb,vec3(0.26,0.25,0.25),line*0.85);
+  m.rough=0.85; m.metal=0.; m.coat=0.; m.wrap=0.4; return m;
+}`});
+
+/* ------------------------------------------------------------------ */
+function buildCover(b, idx){
+  const fig=document.createElement('figure'); fig.className='plate';
+  const c=document.createElement('div'); c.className='cover k'+b.key+(b.series?' has-series':''); c.dataset.slug=b.slug;
+  const lv=['Beginner','Intermediate','Advanced'][b.key];
+  c.innerHTML=`<canvas width="${W}" height="${H}"></canvas><div class="t">
+    <div class="imprint"><svg viewBox="0 0 26 38"><use href="#vmark"/></svg>Vizuara Books</div>
+    <div class="catno">No.&thinsp;${b.no}</div>
+    ${b.series?`<div class="series">${b.series}</div>`:''}
+    <h2 class="title ${b.size||''}">${b.title}</h2>
+    <div class="label"><p class="obj">${b.obj}</p><p class="med">${b.med}</p><p class="dim">${b.dim}</p></div>
+    <div class="level"><div class="scale"><i class="${b.key==0?'on':''}"></i><i class="${b.key==1?'on':''}"></i><i class="${b.key==2?'on':''}"></i></div><span>${lv}</span></div>
+  </div>`;
+  fig.appendChild(c);
+  const cap=document.createElement('figcaption'); cap.textContent=b.slug; fig.appendChild(cap);
+  document.getElementById('shelf').appendChild(fig);
+  return c.querySelector('canvas');
+}
+
+let GL=null, glCanvas=null, VBO=null;
+function initGL(){
+  glCanvas=document.createElement('canvas'); glCanvas.width=W; glCanvas.height=H;
+  GL=glCanvas.getContext('webgl2',{preserveDrawingBuffer:true,antialias:false,alpha:false});
+  if(!GL) throw new Error('no webgl2');
+  VBO=GL.createBuffer(); GL.bindBuffer(GL.ARRAY_BUFFER,VBO);
+  GL.bufferData(GL.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),GL.STATIC_DRAW);
+}
+function compile(type,src){ const s=GL.createShader(type); GL.shaderSource(s,src); GL.compileShader(s);
+  if(!GL.getShaderParameter(s,GL.COMPILE_STATUS)){ const log=GL.getShaderInfoLog(s); console.error(log); throw new Error(log);} return s; }
+
+function camFrom(c){
+  if(c.ro) return c;
+  const d=c.dist, el=c.el*Math.PI/180, yw=c.yaw*Math.PI/180, t=c.look;
+  const ro=[t[0]-Math.sin(yw)*Math.cos(el)*d, t[1]+Math.sin(el)*d, t[2]-Math.cos(yw)*Math.cos(el)*d];
+  const asp=W/H; const shift=[(0.5-c.frame[0])*asp, c.frame[1]-0.5];
+  return {ro, ta:t, focal:c.focal||3.2, shift};
+}
+function renderBook(b, canvas){
+  const gl=GL; const k=Object.assign({},KEYS[b.key],b.light||{});
+  const fs=PRELUDE+`#define STEPS ${b.steps||140}\n#define SSTEPS ${b.ssteps||40}\n#define STEPK ${b.stepk||0.9}\n`+b.glsl+MAIN;
+  const pr=gl.createProgram();
+  const vs=compile(gl.VERTEX_SHADER,`#version 300 es\nin vec2 p;void main(){gl_Position=vec4(p,0,1);}`);
+  const f=compile(gl.FRAGMENT_SHADER,fs);
+  gl.attachShader(pr,vs); gl.attachShader(pr,f); gl.linkProgram(pr);
+  if(!gl.getProgramParameter(pr,gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(pr));
+  gl.useProgram(pr);
+  const loc=gl.getAttribLocation(pr,'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
+  const U=(n)=>gl.getUniformLocation(pr,n);
+  const cam=camFrom(b.cam);
+  gl.uniform2f(U('uRes'),W,H);
+  gl.uniform3fv(U('uRo'),cam.ro); gl.uniform3fv(U('uTa'),cam.ta); gl.uniform1f(U('uFocal'),cam.focal); gl.uniform2fv(U('uShift'),cam.shift);
+  gl.uniform3fv(U('uPaper'),srgb2lin(k.paper));
+  gl.uniform3fv(U('uKeyPos'),k.keyPos); gl.uniform1f(U('uKeyPow'),k.keyPow); gl.uniform1f(U('uKeySoft'),k.keySoft);
+  const bc=b.bound;
+  if(k.spot){ const d=[bc[0]-k.keyPos[0],bc[1]-k.keyPos[1],bc[2]-k.keyPos[2]]; const l=Math.hypot(...d);
+    gl.uniform3f(U('uSpotDir'),d[0]/l,d[1]/l,d[2]/l); gl.uniform2fv(U('uSpotCone'),k.spot); }
+  else gl.uniform2f(U('uSpotCone'),0,0);
+  const gp=k.glowPos||[bc[0]+0.4,bc[1]+1.6,(b.wallZ||5)];
+  gl.uniform3fv(U('uGlowPos'),gp); gl.uniform1f(U('uGlow'),k.glow); gl.uniform1f(U('uGlowRad'),k.glowRad);
+  gl.uniform1f(U('uFill'),k.fill); gl.uniform1f(U('uBoxLum'),k.boxLum); gl.uniform2fv(U('uBoxSize'),k.boxSize); gl.uniform1f(U('uEnvDark'),k.envDark);
+  const rd=k.rimDir||[0.75,0.35,0.55]; const rl=Math.hypot(...rd); gl.uniform3f(U('uRimDir'),rd[0]/rl,rd[1]/rl,rd[2]/rl); gl.uniform1f(U('uRim'),k.rim); gl.uniform1f(U('uScrim'),k.scrim); gl.uniform1f(U('uCard'),k.card);
+  gl.uniform4fv(U('uBound'),bc); gl.uniform1f(U('uWallZ'),b.wallZ||5); gl.uniform1f(U('uCoveR'),b.coveR||2.6);
+  gl.uniform1f(U('uExpo'),k.expo); gl.uniform1f(U('uVig'),k.vig);
+  gl.viewport(0,0,W,H); gl.enable(gl.SCISSOR_TEST);
+  const T=480; const px=new Uint8Array(4);
+  for(let y=0;y<H;y+=T) for(let x=0;x<W;x+=T){ gl.scissor(x,y,T,T); gl.drawArrays(gl.TRIANGLES,0,3); gl.readPixels(x,y,1,1,gl.RGBA,gl.UNSIGNED_BYTE,px); }
+  gl.disable(gl.SCISSOR_TEST);
+  const ctx=canvas.getContext('2d'); ctx.drawImage(glCanvas,0,0);
+  gl.deleteProgram(pr); gl.deleteShader(vs); gl.deleteShader(f);
+}
+
+(function(){
+  const only=window.ONLY||null;
+  const list=only?BOOKS.filter(b=>only.includes(b.slug)):BOOKS;
+  const canvases=list.map((b,i)=>buildCover(b,i));
+  try{ initGL(); }catch(e){ console.error('WebGL unavailable',e); return; }
+  const times=[];
+  list.forEach((b,i)=>{ const t0=performance.now(); try{ renderBook(b,canvases[i]); }catch(e){ console.error('render fail '+b.slug+': '+e.message); } times.push(b.slug+':'+Math.round(performance.now()-t0)); });
+  console.log('TIMES '+times.join(' '));
+  window.RENDER_TIMES=times;
+})();
+</script>
+</body>
+</html>

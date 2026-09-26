@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Interference — Vizuara Books</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#121212; --paper:#F4F2EC;
+  --page:#161614; --page-2:#22221F; --page-text:#E9E6DE; --page-dim:#A9A59B;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--page);color:var(--page-text)}
+body{font-family:'Archivo',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+
+/* ---------- presentation ---------- */
+.wrapall{width:1488px;margin:0 auto;padding:72px 0 120px}
+.intro{display:grid;grid-template-columns:720px 1fr;gap:48px;align-items:end;margin-bottom:64px}
+.intro h1{font-size:132px;line-height:.86;font-weight:850;font-stretch:100%;letter-spacing:-.045em;margin:0}
+.intro .kick{font-size:13px;letter-spacing:.2em;text-transform:uppercase;font-weight:600;color:var(--page-dim);margin:0 0 22px;font-stretch:115%}
+.intro p.lede{font-size:21px;line-height:1.45;margin:0;max-width:680px;color:var(--page-text)}
+.intro p.lede + p.lede{margin-top:14px;color:var(--page-dim);font-size:17px}
+.specs{display:grid;grid-template-columns:720px 1fr;gap:48px;margin-bottom:88px;padding-top:28px;border-top:1px solid #3a3934}
+.specs h3{font-size:12px;letter-spacing:.2em;text-transform:uppercase;font-weight:600;color:var(--page-dim);margin:0 0 16px;font-stretch:115%}
+.swatches{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.sw{height:118px;border-radius:2px;padding:10px;display:flex;flex-direction:column;justify-content:flex-end;font-size:11px;line-height:1.35;letter-spacing:.04em}
+.sw b{font-weight:700;display:block;font-size:12px}
+.typespec{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.typespec .big{font-size:60px;font-weight:800;letter-spacing:-.025em;line-height:.95}
+.typespec .small{font-size:15px;line-height:1.5;color:var(--page-dim)}
+.levels{display:flex;gap:18px;margin-top:26px}
+.levels figure{margin:0;font-size:12px;color:var(--page-dim);letter-spacing:.06em}
+.levels figure svg{display:block;margin-bottom:8px}
+.section-h{display:flex;align-items:baseline;gap:18px;margin:0 0 26px}
+.section-h h2{font-size:34px;font-weight:750;letter-spacing:-.02em;margin:0}
+.section-h span{font-size:14px;color:var(--page-dim)}
+.shelf{display:flex;flex-wrap:wrap;gap:48px;margin-bottom:96px}
+.shelf figure{margin:0}
+.shelf figcaption{height:64px;overflow:hidden;margin-top:14px;font-size:14px;line-height:1.45;color:var(--page-dim);width:720px}
+.shelf figcaption b{color:var(--page-text);font-weight:650}
+
+/* ---------- the cover system ---------- */
+.cover{position:relative;width:720px;height:888px;background:var(--paper);color:var(--ink);overflow:hidden;
+  font-family:'Archivo',sans-serif;flex:none;font-kerning:normal;text-rendering:geometricPrecision}
+.cover .field{position:absolute;left:0;top:0;display:block}
+.cover .cap{position:absolute;left:48px;right:48px;top:562px;height:16px;display:flex;justify-content:space-between;align-items:center;
+  font-size:11.5px;font-weight:650;letter-spacing:.15em;text-transform:uppercase;font-stretch:112%}
+.cover .cap .lv{display:flex;align-items:center;gap:10px}
+.cover .tblock{position:absolute;left:48px;right:48px;top:608px}
+.cover .kick{font-size:13px;font-weight:650;letter-spacing:.14em;text-transform:uppercase;font-stretch:112%;margin:0 0 14px}
+.cover h2{margin:0;font-weight:800;font-stretch:100%;letter-spacing:-.028em;line-height:.95;font-feature-settings:"kern" 1}
+.cover h2.L{font-size:72px}
+.cover h2.M{font-size:58px;line-height:.97}
+.cover h2.S{font-size:50px;line-height:.98}
+.cover .tail{font-size:23px;font-weight:500;letter-spacing:-.01em;line-height:1.16;margin:14px 0 0;max-width:600px}
+.cover .foot{position:absolute;left:48px;right:48px;bottom:36px;display:flex;align-items:center;justify-content:space-between}
+.cover .imprint{display:flex;align-items:center;gap:11px;font-size:13px;font-weight:700;letter-spacing:.22em;font-stretch:125%}
+.cover .imprint i{font-style:normal;font-weight:400}
+.cover .foot .r{font-size:11.5px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;font-stretch:112%}
+</style>
+</head>
+<body>
+<div class="wrapall">
+  <section class="intro">
+    <div>
+      <p class="kick">Vizuara Books · cover system · direction 17</p>
+      <h1>Inter&shy;ference</h1>
+    </div>
+    <div>
+      <p class="lede">Every Vizuara book is one field of black lines and one spot colour. The book's idea is the force that bends the lines — a Gaussian swells them, a causal mask turns them, compaction squeezes them, attention makes them interfere.</p>
+      <p class="lede">Built like op art (Riley, Vasarely, Cruz-Diez): from across the room each field averages into a bold tonal emblem; in the hand it starts to move. Level is the grain of the line — beginner fields are cut coarse, advanced ones fine — so the shelf sorts itself by texture.</p>
+    </div>
+  </section>
+
+  <section class="specs">
+    <div>
+      <h3>Palette — two constants, eight spot inks</h3>
+      <div class="swatches" id="swatches"></div>
+    </div>
+    <div>
+      <h3>Type — Archivo, one family, width axis</h3>
+      <div class="typespec">
+        <div class="big">Aa Rr<br>5D</div>
+        <div class="small">Titles: Archivo ExtraBold 800, width 100, tracking −28, set 72/58/50 px by length.<br>Captions &amp; imprint: Archivo 650–700 at width 112–125, tracked caps.<br>Colour only ever lives inside the field, and only where the concept is.</div>
+      </div>
+      <div class="levels" id="levels"></div>
+    </div>
+  </section>
+
+  <div class="section-h"><h2>Core set</h2><span>The six titles every direction answers.</span></div>
+  <section class="shelf" id="core"></section>
+  <div class="section-h"><h2>Range</h2><span>A beginner title, a very long one, a forthcoming one.</span></div>
+  <section class="shelf" id="more"></section>
+  <div class="section-h"><h2>Charlie and the Intelligence Factory</h2><span>A sub-series: one corridor, four rooms. The vanishing point walks left to right across the four volumes.</span></div>
+  <section class="shelf" id="charlie"></section>
+</div>
+
+<script>
+/* =========================================================================
+   INTERFERENCE — a cover system for Vizuara Books
+   Everything below is vector: SVG paths generated from each book's concept.
+   ========================================================================= */
+const W = 720, FH = 544;
+const INK = '#121212', PAPER = '#F4F2EC';
+const INKS = {
+  vermilion: {hex:'#E2371D', name:'Vermilion'},
+  ultramarine:{hex:'#2A3BD4', name:'Ultramarine'},
+  viridian:  {hex:'#00906A', name:'Viridian'},
+  violet:    {hex:'#6A36CF', name:'Violet'},
+  cadmium:   {hex:'#F2BD00', name:'Cadmium'},
+  teal:      {hex:'#007F8C', name:'Deep Teal'},
+  carmine:   {hex:'#BE1238', name:'Carmine'},
+  chartreuse:{hex:'#7DAE12', name:'Chartreuse'},
+};
+const GRAIN = {beginner:16, intermediate:12, advanced:8};   // line pitch in px at trim
+
+const f1 = n => Math.round(n * 10) / 10;
+const range = (a, b, s) => { const r = []; for (let v = a; v <= b + 1e-9; v += s) r.push(v); return r; };
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const smooth = (e0, e1, x) => { const t = clamp((x - e0) / (e1 - e0), 0, 1); return t * t * (3 - 2 * t); };
+const XS = range(-12, 732, 3);
+const edgeWin = (b, m = 70) => smooth(-8, m, b) * (1 - smooth(FH - m, FH + 8, b));
+
+// variable-width ribbon along a polyline (offset along the normal)
+function ribbon(P, Wd) {
+  const n = P.length, T = [], B = [];
+  for (let i = 0; i < n; i++) {
+    const a = P[Math.max(0, i - 1)], b = P[Math.min(n - 1, i + 1)];
+    const dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy) || 1;
+    const nx = -dy / L, ny = dx / L, h = Wd[i] / 2;
+    T.push(f1(P[i][0] + nx * h) + ',' + f1(P[i][1] + ny * h));
+    B.push(f1(P[i][0] - nx * h) + ',' + f1(P[i][1] - ny * h));
+  }
+  return 'M' + T.join('L') + 'L' + B.reverse().join('L') + 'Z';
+}
+// split a ribbon into runs by a boolean mask
+function runs(P, Wd, m) {
+  let on = '', off = '', s = 0;
+  for (let i = 1; i <= P.length; i++) {
+    if (i === P.length || m[i] !== m[s]) {
+      const e = Math.min(P.length - 1, i);
+      if (e > s) { const seg = ribbon(P.slice(s, e + 1), Wd.slice(s, e + 1)); if (m[s]) on += seg; else off += seg; }
+      s = i;
+    }
+  }
+  return {on, off};
+}
+// a field of (roughly) horizontal lines: y(x,b), w(x,b), optional colour mask c(x,b)
+function hLines({bases, xs = XS, y, w, c}) {
+  let ink = '', col = '';
+  for (const b of bases) {
+    const P = xs.map(x => [x, y(x, b)]), Wd = xs.map(x => Math.max(1, w(x, b)));
+    if (c) { const r = runs(P, Wd, xs.map(x => !!c(x, b))); ink += r.off; col += r.on; }
+    else ink += ribbon(P, Wd);
+  }
+  return {ink, col};
+}
+const path = (d, fill, extra = '') => d ? `<path d="${d}" fill="${fill}" ${extra}/>` : '';
+const svg = (inner, h = FH) => `<svg class="field" xmlns="http://www.w3.org/2000/svg" width="720" height="${h}" viewBox="0 0 720 ${h}"><rect width="720" height="${h}" fill="${PAPER}"/>${inner}</svg>`;
+
+/* ---------------------------------------------------------------- fields */
+
+// Mathematical Foundations — the normal distribution as a swelling in a line field
+function fMath(bk) {
+  const p = GRAIN[bk.level], cx = 360, cy = 292, s = 140, A = 104;
+  const G = (x, b) => Math.exp(-((x - cx) ** 2 + (b - cy) ** 2) / (2 * s * s));
+  const r = hLines({ bases: range(-40, FH + 120, p),
+    y: (x, b) => b - A * G(x, b) * edgeWin(b, 90),
+    w: (x, b) => p * 0.5,
+    c: (x, b) => G(x, b) > 0.32 });
+  return svg(path(r.ink, INK) + path(r.col, bk.color));
+}
+
+// Neural Networks — a 12-18-18-12 fully-connected net drawn edge by edge across the whole field;
+// the all-to-all fans interfere into moiré. One hidden neuron's fan-in and fan-out in colour.
+function fNN(bk) {
+  const L = [{x: -2, n: 12}, {x: 240, n: 18}, {x: 480, n: 18}, {x: 722, n: 12}];
+  const y0 = 22, y1 = 522;
+  const ys = n => range(0, n - 1, 1).map(i => y0 + (y1 - y0) * i / (n - 1));
+  let d = '', c = '';
+  const hot = 11; // hidden neuron in layer 1
+  for (let l = 0; l < L.length - 1; l++) ys(L[l].n).forEach((a, ia) => ys(L[l + 1].n).forEach((b, ib) => {
+    const seg = `M${L[l].x},${f1(a)}L${L[l + 1].x},${f1(b)}`;
+    if ((l === 0 && ib === hot) || (l === 1 && ia === hot)) c += seg; else d += seg;
+  }));
+  return svg(`<path d="${d}" stroke="${INK}" stroke-width="1.15" fill="none"/>` +
+    `<path d="${c}" stroke="${bk.color}" stroke-width="2.4" fill="none"/>`);
+}
+
+// Build LLMs — the causal mask: attend-to region in heavy horizontals, the future in hairline verticals
+function fLLM(bk) {
+  const p = GRAIN[bk.level], c = 48, oy = -16, k = 4;
+  let ink = '', col = '', thin = '';
+  const wh = p * 0.58, wv = 2;
+  for (let i = 0; i < 12; i++) {
+    const top = oy + i * c, xe = Math.min(760, (i + k + 1) * c), xd = (i + k) * c;
+    for (let y = top + p / 2; y < top + c; y += p) {
+      ink += `M-10,${f1(y - wh / 2)}H${xd}V${f1(y + wh / 2)}H-10Z`;
+      if (xd < 740) col += `M${xd},${f1(y - wh / 2)}H${xe}V${f1(y + wh / 2)}H${xd}Z`;
+    }
+  }
+  for (let j = 0; j < 16; j++) {
+    const ye = oy + (j - k) * c; if (ye <= 0) continue;
+    for (let x = j * c + p / 2; x < (j + 1) * c; x += p) thin += `M${f1(x - wv / 2)},-10H${f1(x + wv / 2)}V${ye}H${f1(x - wv / 2)}Z`;
+  }
+  return svg(path(thin, INK) + path(ink, INK) + path(col, bk.color));
+}
+
+// AI Context Engineering — the context window as a lens: the relevant slice gets the room
+function fContext(bk) {
+  const p = GRAIN[bk.level];
+  const wx0 = 168, wx1 = 552, wy0 = 150, wy1 = 394, cy = 272, h1 = 48;
+  const ra = wy0 / (cy - h1), rb = (FH - wy1) / (FH - cy - h1), rm = (wy1 - wy0) / (2 * h1);
+  const M = b => b < cy - h1 ? b * ra : b > cy + h1 ? wy1 + (b - cy - h1) * rb : wy0 + (b - cy + h1) * rm;
+  const Md = b => b < cy - h1 ? ra : b > cy + h1 ? rb : rm;
+  const t = x => smooth(wx0 - 70, wx0, x) * (1 - smooth(wx1, wx1 + 70, x));
+  const bases = range(cy + p / 2 - p * 30, cy + p * 30, p);
+  const r = hLines({ bases,
+    y: (x, b) => b + t(x) * (M(b) - b),
+    w: (x, b) => p * 0.46 * (1 + t(x) * (Md(b) - 1)),
+    c: (x, b) => b > cy - h1 && b < cy + h1 && t(x) > 0.5 });
+  return svg(path(r.ink, INK) + path(r.col, bk.color));
+}
+
+// 5D Parallelism — de Bruijn's pentagrid: five families of parallel lines whose dual is a Penrose
+// tiling, i.e. the 2-D shadow of a 5-D lattice. One ribbon (one line of one family) is printed in colour.
+function f5D(bk) {
+  const p = GRAIN[bk.level], E = 54, cx = 360, cy = 272, gap = 1.6;
+  const e = [0, 1, 2, 3, 4].map(j => [Math.cos(2 * Math.PI * j / 5 + Math.PI / 2), Math.sin(2 * Math.PI * j / 5 + Math.PI / 2)]);
+  const gam = [0.13, 0.31, -0.07, 0.42, 0.21];
+  const K = 7, hot = 0;
+  let ink = '', col = '', solid = '', solidC = '';
+  for (let r = 0; r < 5; r++) for (let s = r + 1; s < 5; s++) for (let kr = -K; kr <= K; kr++) for (let ks = -K; ks <= K; ks++) {
+    const a = e[r], b = e[s], det = a[0] * b[1] - a[1] * b[0];
+    const cr = kr - gam[r], cs = ks - gam[s];
+    const x0 = (cr * b[1] - cs * a[1]) / det, y0 = (a[0] * cs - b[0] * cr) / det;
+    const Kj = e.map((ej, j) => j === r ? kr : j === s ? ks : Math.ceil(x0 * ej[0] + y0 * ej[1] + gam[j]));
+    let X = 0, Y = 0; for (let j = 0; j < 5; j++) { X += Kj[j] * e[j][0]; Y += Kj[j] * e[j][1]; }
+    const O = [cx + E * X, cy + E * Y], R = [E * a[0], E * a[1]], S = [E * b[0], E * b[1]];
+    const mx = O[0] + (R[0] + S[0]) / 2, my = O[1] + (R[1] + S[1]) / 2;
+    if (mx < -60 || mx > W + 60 || my < -60 || my > FH + 60) continue;
+    const thin = ((s - r) % 5 === 2 || (s - r) % 5 === 3);
+    const isHot = (r === hot && kr === 0) || (s === hot && ks === 0);
+    // inset the rhombus a hair so the tiling reads as a mosaic
+    const sin = Math.abs(det), gu = gap / (E * sin), gv = gap / (E * sin);
+    const pt = (u, v) => `${f1(O[0] + u * R[0] + v * S[0])},${f1(O[1] + u * R[1] + v * S[1])}`;
+    if (thin) {
+      const d = `M${pt(gu, gv)}L${pt(1 - gu, gv)}L${pt(1 - gu, 1 - gv)}L${pt(gu, 1 - gv)}Z`;
+      if (isHot) solidC += d; else solid += d;
+    } else {
+      const n = Math.max(2, Math.round(E * sin / p)), w = p * 0.5, dv = w / (2 * E * sin);
+      let d = '';
+      for (let k = 0; k < n; k++) {
+        const v = (k + 0.5) / n;
+        d += `M${pt(gu, v - dv)}L${pt(1 - gu, v - dv)}L${pt(1 - gu, v + dv)}L${pt(gu, v + dv)}Z`;
+      }
+      if (isHot) col += d; else ink += d;
+    }
+  }
+  return svg(path(ink, INK) + path(solid, INK) + path(col, bk.color) + path(solidC, bk.color));
+}
+
+// Pi vs Hermes vs Codex — one history of lines, three compaction profiles (top, middle, bottom band).
+// Older lines (left) are squeezed into memory; the lines bend where one profile hands over to the next.
+function fCompaction(bk) {
+  const p = GRAIN[bk.level], N = 88;
+  const bands = [{nc: 22, sc: 3.0}, {nc: 46, sc: 3.2}, {nc: 70, sc: 3.0}];
+  const b1 = 181, b2 = 363, tw = 46;
+  const par = y => {
+    const t1 = smooth(b1 - tw, b1 + tw, y), t2 = smooth(b2 - tw, b2 + tw, y);
+    const [A, B, C] = bands;
+    return { nc: A.nc + (B.nc - A.nc) * t1 + (C.nc - B.nc) * t2, sc: A.sc + (B.sc - A.sc) * t1 + (C.sc - B.sc) * t2 };
+  };
+  const YS = range(-8, FH + 8, 3);
+  const rows = YS.map(y => {
+    const {nc, sc} = par(y), sr = (744 - nc * sc) / (N - nc);
+    const xs = [], sp = []; let x = -12;
+    for (let j = 0; j < N; j++) {
+      const s = sc + (sr - sc) / (1 + Math.exp(-(j - nc) / 1.1));
+      xs.push(x + s / 2); sp.push(s); x += s;
+    }
+    return {xs, sp, sc, sr};
+  });
+  let ink = '', col = '';
+  for (let j = 0; j < N; j++) {
+    const P = YS.map((y, i) => [rows[i].xs[j], y]);
+    const Wd = YS.map((y, i) => clamp(rows[i].sp[j] * 0.46, 1.2, 6));
+    const m = YS.map((y, i) => rows[i].sp[j] < (rows[i].sc + rows[i].sr) / 2);
+    const r = runs(P, Wd, m); ink += r.off; col += r.on;
+  }
+  return svg(path(ink, INK) + path(col, bk.color));
+}
+
+// Transformers — attention as interference: a query ring-field overprints a key ring-field
+function fTransformer(bk) {
+  const p = GRAIN[bk.level], w = p * 0.34;
+  const ring = (cx, cy, color) => {
+    let s = ''; for (let r = p / 2; r < 900; r += p) s += `<circle cx="${cx}" cy="${cy}" r="${f1(r)}"/>`;
+    return `<g fill="none" stroke="${color}" stroke-width="${f1(w)}" style="mix-blend-mode:multiply">${s}</g>`;
+  };
+  return svg(ring(306, 292, INK) + ring(414, 252, bk.color));
+}
+
+// Prompt Engineering — one small input, and the ripple runs through every line downstream
+function fPrompt(bk) {
+  const p = GRAIN[bk.level], cx = 360, cy = 214, A = 15, lam = 100, Lr = 330;
+  const r = hLines({ bases: range(-32, FH + 32, p),
+    y: (x, b) => { const R = Math.hypot(x - cx, b - cy); return b + A * Math.sin(2 * Math.PI * R / lam) * Math.exp(-R / Lr) * edgeWin(b, 60); },
+    w: () => p * 0.5,
+    c: (x, b) => Math.hypot(x - cx, b - cy) < 62 });
+  return svg(path(r.ink, INK) + path(r.col, bk.color));
+}
+
+// Kernel Engineering — Movement in Squares: tiles compress as they move toward the chip
+function fKernel(bk) {
+  const rows = 17, h = FH / rows, N = 24, a = 0.94, u0 = 0.64;
+  const G = u => u - a / (2 * Math.PI) * Math.sin(2 * Math.PI * (u - u0));
+  const F = u => (G(u) - G(0)) / (G(1) - G(0));
+  const xs = range(0, N, 1).map(i => W * F(i / N));
+  let ink = '', col = '';
+  for (let i = 0; i < rows; i++) for (let j = 0; j < N; j++) {
+    if ((i + j) % 2) continue;
+    const d = `M${f1(xs[j])},${f1(i * h)}H${f1(xs[j + 1])}V${f1((i + 1) * h)}H${f1(xs[j])}Z`;
+    if (i >= 6 && i <= 9 && j >= 3 && j <= 6) col += d; else ink += d;
+  }
+  return svg(path(ink, INK) + path(col, bk.color));
+}
+
+// DeiT — distillation as moiré: a black teacher grating and a coloured student grating. Each 48px
+// patch shifts the student's phase by how much of an image (a disc) falls in that patch, so the
+// picture only exists where the two overlap — already cut into patches, the way a ViT sees it.
+function fDeiT(bk) {
+  const p = GRAIN[bk.level], P = 48, cols = 15, rows = 12, oy = (FH - rows * P) / 2, w = p * 0.46;
+  const cov = (X, Y) => { let n = 0; for (let a = 0; a < 6; a++) for (let b = 0; b < 6; b++) { const x = X + (a + .5) * P / 6, y = Y + (b + .5) * P / 6; if (Math.hypot(x - 360, y - 272) < 196) n++; } return n / 36; };
+  let t = '', st = '';
+  for (let x = p / 2; x < W; x += p) t += `M${f1(x - w / 2)},-2H${f1(x + w / 2)}V${FH + 2}H${f1(x - w / 2)}Z`;
+  for (let i = 0; i < rows; i++) for (let j = 0; j < cols; j++) {
+    const X = j * P, Y = oy + i * P, v = Math.round(cov(X, Y) * 2) / 2, ph = v * p / 2;
+    for (let x = X + p / 2 + ph - p; x < X + P + p; x += p) {
+      const a = Math.max(X, x - w / 2), b = Math.min(X + P, x + w / 2); if (b <= a) continue;
+      st += `M${f1(a)},${f1(Y)}H${f1(b)}V${f1(Y + P)}H${f1(a)}Z`;
+    }
+  }
+  return svg(path(t, INK) + `<path d="${st}" fill="${bk.color}" style="mix-blend-mode:multiply"/>`);
+}
+
+// Charlie and the Intelligence Factory — one corridor, four rooms
+function fRoom(bk) {
+  const vx = bk.vp, vy = 236, s = 0.4;
+  const P = z => ({x0: vx + (0 - vx) * z, x1: vx + (W - vx) * z, y0: vy + (0 - vy) * z, y1: vy + (FH - vy) * z});
+  const back = P(s);
+  let ink = '', walls = '';
+  // walls: vertical depth lines, perspective spaced
+  const dz = 0.1, zs = []; for (let k = 0; ; k++) { const z = 1 / (1 + k * dz); if (z < s) break; zs.push(z); }
+  zs.forEach(z => {
+    const r = P(z), w = 5.5 * z;
+    walls += `M${f1(r.x0 - w / 2)},${f1(r.y0)}H${f1(r.x0 + w / 2)}V${f1(r.y1)}H${f1(r.x0 - w / 2)}Z`;
+    walls += `M${f1(r.x1 - w / 2)},${f1(r.y0)}H${f1(r.x1 + w / 2)}V${f1(r.y1)}H${f1(r.x1 - w / 2)}Z`;
+  });
+  // floor & ceiling: lines converging to the vanishing point (as tapered wedges)
+  const n = 26;
+  for (let k = 0; k <= n; k++) {
+    const xf = -40 + (W + 80) * k / n, w0 = 7;
+    const xb = vx + (xf - vx) * s;
+    ink += `M${f1(xf - w0 / 2)},${FH + 2}L${f1(xf + w0 / 2)},${FH + 2}L${f1(xb + w0 * s / 2)},${f1(back.y1)}L${f1(xb - w0 * s / 2)},${f1(back.y1)}Z`;
+    ink += `M${f1(xf - w0 / 2)},-2L${f1(xf + w0 / 2)},-2L${f1(xb + w0 * s / 2)},${f1(back.y0)}L${f1(xb - w0 * s / 2)},${f1(back.y0)}Z`;
+  }
+  const clipId = bk.slug + '-walls';
+  const inner = `M${f1(back.x0)},${f1(back.y0)}H${f1(back.x1)}V${f1(back.y1)}H${f1(back.x0)}Z`;
+  const floorCeil = `M0,0H${W}V${FH}H0Z`;
+  // clip floor/ceiling wedges to their trapezoids, walls to theirs
+  const trapC = `M0,0H${W}L${f1(back.x1)},${f1(back.y0)}H${f1(back.x0)}Z`;
+  const trapF = `M0,${FH}H${W}L${f1(back.x1)},${f1(back.y1)}H${f1(back.x0)}Z`;
+  const content = bk.room(back, bk);
+  return svg(`<defs><clipPath id="${clipId}"><path d="${trapC}${trapF}"/></clipPath></defs>` +
+    `<path d="${walls}" fill="${INK}"/><path d="${ink}" fill="${INK}" clip-path="url(#${clipId})"/>` +
+    `<rect x="${f1(back.x0)}" y="${f1(back.y0)}" width="${f1(back.x1 - back.x0)}" height="${f1(back.y1 - back.y0)}" fill="${PAPER}"/>` +
+    `<path d="${inner}" fill="none" stroke="${INK}" stroke-width="3"/>` + content);
+}
+const rooms = {
+  language: (b, bk) => { // lines of text, ragged right
+    const p = GRAIN[bk.level] + 2; let d = ''; const lens = [.92,.78,.97,.66,.88,.94,.52,.9,.81,.97,.7,.86,.6,.93,.75,.4];
+    let k = 0; for (let y = b.y0 + 16; y < b.y1 - 12; y += p) { const L = (b.x1 - b.x0 - 32) * lens[k++ % lens.length]; d += `M${f1(b.x0 + 16)},${f1(y)}h${f1(L)}v${f1(p * .45)}h${-f1(L)}Z`; }
+    return path(d, bk.color);
+  },
+  vision: (b, bk) => {
+    const p = GRAIN[bk.level], cx = (b.x0 + b.x1) / 2, cy = (b.y0 + b.y1) / 2; let s = '';
+    for (let r = p / 2; r < (b.y1 - b.y0) / 2 - 8; r += p) s += `<circle cx="${f1(cx)}" cy="${f1(cy)}" r="${f1(r)}"/>`;
+    return `<g fill="none" stroke="${bk.color}" stroke-width="${p * .45}">${s}</g><circle cx="${f1(cx)}" cy="${f1(cy)}" r="${p}" fill="${INK}"/>`;
+  },
+  sound: (b, bk) => {
+    const p = GRAIN[bk.level]; const xs = range(b.x0 + 12, b.x1 - 12, 2); let d = '';
+    const cy = (b.y0 + b.y1) / 2, H = (b.y1 - b.y0);
+    for (let y = b.y0 + 14; y < b.y1 - 10; y += p) {
+      const P = xs.map(x => { const u = (x - b.x0) / (b.x1 - b.x0); return [x, y + 14 * Math.sin(u * Math.PI * 6 + (y - cy) / H * 2) * Math.sin(u * Math.PI)]; });
+      d += ribbon(P, P.map(() => p * .45));
+    }
+    return path(d, bk.color);
+  },
+  reasoning: (b, bk) => {
+    const D = 5, pad = 16, h = (b.y1 - b.y0 - 2 * pad) / (D + 0.6), bw = b.x1 - b.x0 - 2 * pad;
+    const node = (l, i) => [b.x0 + pad + (i + 0.5) * bw / 2 ** l, b.y1 - pad - l * h];
+    let d = '', hp = '';
+    const pathBits = [0, 1, 1, 0, 1];
+    let hi = 0;
+    for (let l = 0; l < D; l++) for (let i = 0; i < 2 ** l; i++) {
+      const [x, y] = node(l, i);
+      for (const c of [2 * i, 2 * i + 1]) { const [x2, y2] = node(l + 1, c); d += `M${f1(x)},${f1(y)}L${f1(x2)},${f1(y2)}`; }
+    }
+    for (let i = 0; i < 2 ** D; i++) { const [x, y] = node(D, i); d += `M${f1(x)},${f1(y)}V${f1(y - h * 0.55)}`; }
+    let [px, py] = node(0, 0); hp = `M${f1(px)},${f1(b.y1 - 4)}L${f1(px)},${f1(py)}`;
+    for (let l = 0; l < D; l++) { hi = 2 * hi + pathBits[l]; const [x, y] = node(l + 1, hi); hp += `L${f1(x)},${f1(y)}`; if (l === D - 1) hp += `V${f1(y - h * 0.55)}`; }
+    return `<path d="${d}" stroke="${INK}" stroke-width="2.2" fill="none"/><path d="${hp}" stroke="${bk.color}" stroke-width="6" fill="none" stroke-linejoin="round"/>`;
+  },
+};
+
+/* ---------------------------------------------------------------- books */
+const BOOKS = [
+  {group:'core', slug:'ai-context-engineering', t:'AI Context<br>Engineering', size:'L', level:'intermediate', cap:43, hrs:10, ink:'ultramarine', field:fContext,
+    why:'The context window as a lens: every line of the stream survives, but the relevant slice is magnified into the window while the rest is compressed around it.'},
+  {group:'core', slug:'mathematical-foundations-for-ml', t:'Mathematical<br>Foundations for<br>Machine Learning', size:'M', level:'beginner', cap:43, hrs:10, ink:'vermilion', field:fMath,
+    why:'A 2-D Gaussian lifts a field of lines — the normal distribution as a surface; the 1σ region is printed in colour.'},
+  {group:'core', slug:'neural-networks-from-scratch', t:'Neural Networks<br>from Scratch', size:'L', level:'beginner', cap:33, hrs:7, ink:'viridian', field:fNN,
+    why:'A 9-14-14-5 fully-connected network drawn edge by edge; the all-to-all fans interfere into moiré. One forward path in colour.'},
+  {group:'core', slug:'build-llms-from-scratch', t:'Build Large Language<br>Models (LLMs)<br>from Scratch', size:'M', level:'intermediate', cap:20, hrs:6, ink:'violet', field:fLLM,
+    why:'The causal attention mask: attended cells in heavy horizontals, the masked future in hairline verticals, the diagonal (each token attending to itself) in colour.'},
+  {group:'core', slug:'5d-parallelism', t:'5D Parallelism', tail:'for Large Model Training', size:'L', level:'advanced', cap:40, hrs:9, ink:'cadmium', field:f5D,
+    why:'Five families of parallel lines, one per axis of parallelism, crossing at one point.'},
+  {group:'core', slug:'pi-vs-hermes-vs-codex', t:'Pi vs Hermes<br>vs Codex', tail:'Context Compaction and Memory', size:'L', level:'advanced', cap:9, hrs:1, ink:'chartreuse', field:fCompaction,
+    why:'Three columns, three compaction profiles: the same history squeezed into memory gradually, in packets, and all at once.'},
+  {group:'more', slug:'transformers-from-scratch', t:'Transformers', tail:'Theory, Intuition, and Building from Scratch', size:'L', level:'intermediate', cap:20, hrs:5, ink:'carmine', field:fTransformer,
+    why:'Attention as interference: a query ring-field overprints a key ring-field and the fringes appear.'},
+  {group:'more', slug:'prompt-engineering', t:'Prompt<br>Engineering', size:'L', level:'beginner', cap:31, hrs:7, ink:'teal', field:fPrompt,
+    why:'One small input, and the ripple runs through every line downstream.'},
+  {group:'more', slug:'deit-from-scratch', t:'Build a Data-Efficient<br>Image Transformer<br>(DeiT) from Scratch', size:'M', level:'advanced', cap:42, hrs:10, ink:'ultramarine', field:fDeiT,
+    why:'Distillation as moiré: in each image patch a student grating turns toward the teacher\'s until the fringes vanish.'},
+  {group:'more', slug:'kernel-engineering', t:'Kernel<br>Engineering', tail:'From silicon to speculative decoding — GPU kernels for modern LLMs.', size:'L', level:'advanced', soon:true, ink:'cadmium', field:fKernel,
+    why:'Riley\'s Movement in Squares as a tiled matmul: tiles compress toward the chip, one tile in colour.'},
+  {group:'charlie', slug:'charlie-language-room', t:'Charlie and the<br>Language Room', kick:'Charlie and the Intelligence Factory · I', tail:'Language — Inference Engineering', size:'M', level:'advanced', cap:22, hrs:5, ink:'vermilion', field:fRoom, vp:250, room:rooms.language,
+    why:'Room I: the back wall holds lines of text.'},
+  {group:'charlie', slug:'charlie-vision-room', t:'Charlie and the<br>Vision Room', kick:'Charlie and the Intelligence Factory · II', tail:'Vision — Vision Transformers', size:'M', level:'intermediate', cap:20, hrs:6, ink:'ultramarine', field:fRoom, vp:320, room:rooms.vision,
+    why:'Room II: an iris of concentric rings.'},
+  {group:'charlie', slug:'charlie-sound-room', t:'Charlie and the<br>Sound Room', kick:'Charlie and the Intelligence Factory · III', tail:'Audio — Voice Agents', size:'M', level:'intermediate', cap:20, hrs:6, ink:'viridian', field:fRoom, vp:400, room:rooms.sound,
+    why:'Room III: modulated waveforms.'},
+  {group:'charlie', slug:'charlie-reasoning-room', t:'Charlie and the<br>Reasoning Room', kick:'Charlie and the Intelligence Factory · IV', tail:'Reason — Reinforcement Learning, from bandits to reasoning models', size:'M', level:'advanced', cap:21, hrs:6, ink:'violet', field:fRoom, vp:470, room:rooms.reasoning,
+    why:'Room IV: a branching search tree.'},
+];
+
+/* ---------------------------------------------------------------- chrome */
+const LEVELN = {beginner:0, intermediate:1, advanced:2};
+function grainMark(level, color = INK) {
+  // three 14px squares: coarse, medium, fine. the book's own grain is inked, the others are outlines.
+  const n = LEVELN[level], pitches = [14 / 3, 14 / 5, 14 / 8];
+  let s = '';
+  pitches.forEach((pt, i) => {
+    const x = i * 19;
+    if (i === n) { let d = ''; for (let y = pt / 2; y < 14; y += pt) d += `M${x},${f1(y - pt * .28)}h14v${f1(pt * .56)}h-14Z`; s += `<path d="${d}" fill="${color}"/>`; }
+    else s += `<rect x="${x + .75}" y=".75" width="12.5" height="12.5" fill="none" stroke="${color}" stroke-width="1.5"/>`;
+  });
+  return `<svg width="52" height="14" viewBox="0 0 52 14">${s}</svg>`;
+}
+function mark(size = 22, color = INK) {
+  // the Vizuara mark: five lines displaced into a V
+  let d = ''; const n = 4, p = 5.2;
+  for (let i = 0; i < n; i++) { const y = 2.6 + i * p; d += `M0,${f1(y)}L5,${f1(y)}L11,${f1(y + 6.4)}L17,${f1(y)}L22,${f1(y)}`; }
+  return `<svg width="${size}" height="${size}" viewBox="0 0 22 22"><path d="${d}" stroke="${color}" stroke-width="2.5" fill="none" stroke-linejoin="miter"/></svg>`;
+}
+function cover(bk) {
+  bk.color = INKS[bk.ink].hex;
+  const right = bk.soon ? 'Forthcoming' : `${bk.cap} capsules · ${bk.hrs} ${bk.hrs === 1 ? 'hour' : 'hours'}`;
+  return `<div class="cover" data-slug="${bk.slug}">
+    ${bk.field(bk)}
+    <div class="cap"><span class="lv">${grainMark(bk.level)}${bk.level}</span><span>${right}</span></div>
+    <div class="tblock">
+      <h2 class="${bk.size}">${bk.t}</h2>
+      ${bk.tail ? `<p class="tail">${bk.tail}</p>` : ''}
+    </div>
+    <div class="foot"><span class="imprint">${mark()}VIZUARA<i>BOOKS</i></span>${bk.kick ? `<span class="r">${bk.kick}</span>` : ''}</div>
+  </div>`;
+}
+for (const bk of BOOKS) {
+  const el = document.getElementById(bk.group);
+  el.insertAdjacentHTML('beforeend', `<figure>${cover(bk)}<figcaption><b>${bk.slug}</b> — ${bk.why}</figcaption></figure>`);
+}
+// palette swatches
+const sw = document.getElementById('swatches');
+sw.insertAdjacentHTML('beforeend', `<div class="sw" style="background:${INK};color:#eee;outline:1px solid #444"><b>Ink</b>${INK}</div><div class="sw" style="background:${PAPER};color:${INK}"><b>Paper</b>${PAPER}</div>`);
+for (const k in INKS) { const c = INKS[k]; sw.insertAdjacentHTML('beforeend', `<div class="sw" style="background:${c.hex};color:${k === 'cadmium' || k === 'chartreuse' ? INK : '#fff'}"><b>${c.name}</b>${c.hex}</div>`); }
+// snap every shelf to whole pixels so covers never straddle a device pixel
+function snap() { for (const sec of document.querySelectorAll('.shelf')) { sec.style.marginTop = '0px'; const t = sec.getBoundingClientRect().top + scrollY, fr = t - Math.floor(t); if (fr > 0.001) sec.style.marginTop = (1 - fr) + 'px'; } }
+snap(); document.fonts.ready.then(snap); addEventListener('load', snap);
+document.getElementById('levels').innerHTML = ['beginner', 'intermediate', 'advanced'].map(l => `<figure>${grainMark(l, '#E9E6DE')}${l} · ${GRAIN[l]} px pitch</figure>`).join('');
+</script>
+</body>
+</html>

@@ -84,7 +84,10 @@
       const el = RI.buildCover(b);
       built[slug] = el;
       const fig = document.createElement('figure');
-      fig.appendChild(el);
+      const cv = document.createElement('div');
+      cv.className = 'cv';
+      cv.appendChild(el);
+      fig.appendChild(cv);
       const lv = LEVELS[b.level];
       const inks = [...b.flash, lv.ink].map((k) => `<i style="background:${INK[k].hex}"></i>${INK[k].name}`).join(' &nbsp;');
       const cap = document.createElement('figcaption');

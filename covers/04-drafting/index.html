@@ -79,8 +79,8 @@ body{background:var(--table);color:var(--paper);font-family:'Instrument Sans',sy
 .reg td{padding:9px 14px 9px 0;border-bottom:1px solid #3E4144;vertical-align:top}
 .reg td.no{font:600 13px/20px 'Overpass Mono',monospace;color:var(--paper);white-space:nowrap}
 .reg td.t{color:var(--paper);font-weight:600;width:30%}
-.reg td.lv{white-space:nowrap}
-.reg td.lv svg{display:inline-block;vertical-align:-2px;margin-right:8px;background:var(--paper);padding:2px;box-sizing:content-box}
+.reg td.lvl{white-space:nowrap}
+.reg td.lvl svg{display:inline-block;vertical-align:-2px;margin-right:8px;background:var(--paper);padding:2px;box-sizing:content-box}
 .reg th{white-space:nowrap}
 .grp{margin-top:72px}
 .grp .note{font:400 16px/24px 'Instrument Sans',sans-serif;color:#C9CAC4;max-width:900px;margin:-4px 0 26px}
@@ -101,6 +101,11 @@ body{background:var(--table);color:var(--paper);font-family:'Instrument Sans',sy
 footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:500 12px/18px 'Overpass Mono',monospace;color:#8E908B;letter-spacing:.04em}
 @media (max-width:1200px){.hero{grid-template-columns:1fr}.spec{grid-template-columns:1fr 1fr}.hero h1{font-size:96px;line-height:92px}}
 @media (max-width:800px){.page{padding:0 16px 80px}.spec{grid-template-columns:1fr}.spec > div{border-right:0;padding-left:0!important}.hero h1{font-size:64px;line-height:64px}}
+@media print{
+  .page{padding:0!important;max-width:none!important;margin:0!important}
+  .hero,.spec,.reg,.wrapbox,.grp > h2,.grp > .note,footer.colo,.sheets figcaption{display:none!important}
+  .grp{margin:0!important}.sheets{display:block!important}.sheets figure{margin:0!important}
+}
 </style>
 </head>
 <body>
@@ -206,9 +211,16 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
       'font-weight': o.wt || 500, 'text-anchor': o.a || 'start', fill: o.c || C.g,
       'letter-spacing': o.ls, 'font-style': o.it ? 'italic' : undefined,
       'dominant-baseline': o.mid ? 'central' : undefined,
-      transform: o.rot ? `rotate(${f(o.rot)} ${f(x)} ${f(y)})` : undefined, opacity: o.op,
-      stroke: o.halo ? C.paper : undefined, 'stroke-width': o.halo ? (o.halo === true ? 4 : o.halo) : undefined,
-      'paint-order': o.halo ? 'stroke' : undefined, 'stroke-linejoin': o.halo ? 'round' : undefined })}>${esc}</text>`;
+      transform: o.rot ? `rotate(${f(o.rot)} ${f(x)} ${f(y)})` : undefined, opacity: o.op })}>${esc}</text>`;
+  }
+  // paper knock-out behind a label (prints reliably, unlike stroke halos)
+  function knock(x, y, label, size, o = {}) {
+    const n = [...String(label)].length, ls = o.ls || 0;
+    const w = n * size * (0.6 + ls) + 5, h = size * 1.02;
+    const a = o.a || 'middle';
+    const x0 = a === 'middle' ? x - w / 2 : a === 'end' ? x - w + 2.5 : x - 2.5;
+    return `<rect x="${f(x0)}" y="${f(y - size * 0.8)}" width="${f(w)}" height="${f(h)}" fill="${C.paper}"` +
+      (o.rot ? ` transform="rotate(${f(o.rot)} ${f(x)} ${f(y)})"` : '') + `/>`;
   }
   // filled arrowhead, tip at (x,y) pointing along angle (radians)
   function AH(x, y, ang, o = {}) {
@@ -243,8 +255,9 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
       const tn = 5 * side;
       // normal pointing "up" in the rotated text frame
       const upx = Math.sin(rot * Math.PI / 180), upy = -Math.cos(rot * Math.PI / 180);
-      out += Tx(mx + upx * tn, my + upy * tn + (o.below ? 8 : 0) * 1, label,
-        { a: 'middle', rot: Math.abs(rot) < 0.01 ? undefined : rot, c, s: o.s || 11, wt: o.wt || 500, halo: o.halo ?? true });
+      const tx = mx + upx * tn, ty = my + upy * tn + (o.below ? 8 : 0), rr = Math.abs(rot) < 0.01 ? undefined : rot;
+      if (o.knock !== false) out += knock(tx, ty, label, o.s || 11, { rot: rr });
+      out += Tx(tx, ty, label, { a: 'middle', rot: rr, c, s: o.s || 11, wt: o.wt || 500 });
     }
     return out;
   }
@@ -360,7 +373,9 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
     s += AH(cx + r * Math.cos(a1), cy + r * Math.sin(a1), t1, { c, l: 8, h: 2.4 });
     s += AH(cx + r * Math.cos(a2), cy + r * Math.sin(a2), t2, { c, l: 8, h: 2.4 });
     const am = (a1 + a2) / 2, rr = r + (o.tr || 12);
-    s += Tx(cx + rr * Math.cos(am) + (o.tx || 0), cy + rr * Math.sin(am) + 4 + (o.ty || 0), label, { a: o.a || 'middle', c, s: o.s || 10.5, wt: o.wt || 600, halo: true });
+    const lx = cx + rr * Math.cos(am) + (o.tx || 0), ly = cy + rr * Math.sin(am) + 4 + (o.ty || 0);
+    s += knock(lx, ly, label, o.s || 10.5, { a: o.a || 'middle' });
+    s += Tx(lx, ly, label, { a: o.a || 'middle', c, s: o.s || 10.5, wt: o.wt || 600 });
     return s;
   }
   // isometric dimension: P1,P2 3-D points, off 3-D offset vector (extension direction)
@@ -376,7 +391,8 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
     let rot = ang * 180 / Math.PI; if (rot > 90.1 || rot <= -90.1) rot += 180;
     const mx = (a1[0] + a2[0]) / 2, my = (a1[1] + a2[1]) / 2;
     const up = rot * Math.PI / 180, tn = o.below ? 13 : -5;
-    s += Tx(mx - Math.sin(up) * tn, my + Math.cos(up) * tn, label, { a: 'middle', rot, c, s: o.s || 10.5, wt: o.wt || 600, ls: '0.04em', halo: true });
+    s += knock(mx - Math.sin(up) * tn, my + Math.cos(up) * tn, label, o.s || 10.5, { rot, ls: 0.04 });
+    s += Tx(mx - Math.sin(up) * tn, my + Math.cos(up) * tn, label, { a: 'middle', rot, c, s: o.s || 10.5, wt: o.wt || 600, ls: '0.04em' });
     return s;
   }
   // a turned shaft in elevation. segs: [{l, r, fill}] from x0; returns {svg, x1}
@@ -427,7 +443,7 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
     return out;
   }
   window.DO = { C, K, M, T, F, f, A, L, P, R, Ci, PG, PL, Tx, AH, dim, leader, balloon, cmark, center,
-    breakZ, breakS, cutPlane, isoP, isoBox, hatchDefs, mark, DASH, arc, arcDim, isoDim, shaft };
+    breakZ, breakS, cutPlane, isoP, isoBox, hatchDefs, mark, DASH, knock, arc, arcDim, isoDim, shaft };
 })();
 
 </script>
@@ -458,7 +474,7 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
     s += L(26, 444, 40, 444, { w: M }) + L(680, 444, 694, 444, { w: M });
     // drawing number repeated upside-down, top-left (flat-file convention)
     s += R(40, 40, 116, 26, { w: T });
-    s += Tx(98, 57.5, 'VB·' + b.no, { a: 'middle', s: 11, wt: 600, rot: 180, ls: '0.08em' });
+    s += `<g transform="translate(98 53) rotate(179.9)">` + Tx(0, 4.5, 'VB·' + b.no, { a: 'middle', s: 11, wt: 600, ls: '0.08em' }) + `</g>`;
     return s;
   }
 
@@ -1386,7 +1402,7 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
   document.getElementById('register').innerHTML =
     `<thead><tr><th>Drg. no.</th><th>Title</th><th>Level</th><th>Drawing</th><th>Units</th></tr></thead><tbody>` +
     BOOKS.map((b) => `<tr><td class="no">VB·${b.no}</td><td class="t">${plain(b.title)}${b.series ? `<br><span style="font-weight:400;color:#A9AAA4;font-size:12.5px">${b.series} · Book ${b.seriesNo}</span>` : ''}${b.prelim ? `<br><span style="font-weight:600;color:var(--ink);font-size:12.5px">Coming soon — preliminary</span>` : ''}</td>` +
-      `<td class="lv">${levelMarks(b.level)}${LEVEL_NAME[b.level]}</td><td>${DRAWN[b.slug] || ''}</td><td class="no">${b.units}</td></tr>`).join('') + `</tbody>`;
+      `<td class="lvl">${levelMarks(b.level)}${LEVEL_NAME[b.level]}</td><td>${DRAWN[b.slug] || ''}</td><td class="no">${b.units}</td></tr>`).join('') + `</tbody>`;
   // groups
   const groups = [
     ['Core set', 'The six books every system has to get right. Each drawing is a different drafting type — section, geometric construction, schematic with detail view, general arrangement, isometric, elevation with conventional breaks — so the shelf never repeats itself.',

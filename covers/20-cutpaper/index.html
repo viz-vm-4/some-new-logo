@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Paperworks · Vizuara Books</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Fraunces:ital,opsz,wght,SOFT,WONK@1,9..144,300..700,0..100,0..1&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ivory:#F4EDDF; --ink:#1B1A22; --ultra:#2A3A92; --leaf:#22704B; --verm:#D93D2B; --saff:#EDB22C;
+  --night:#1C1E2C; --rose:#EE9C94; --kraft:#BD9061; --lemon:#F5D55A; --blush:#F7CDC2; --mist:#BCCCD8;
+  --mint:#9ED0B3; --lilac:#B6A6D6; --cobalt:#4C66C4;
+  --mat:#2C423C;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background-color:var(--mat);
+  background-image:
+    linear-gradient(rgba(255,255,255,.075) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.075) 1px, transparent 1px),
+    linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+  background-size:120px 120px,120px 120px,24px 24px,24px 24px;
+  color:var(--ivory);
+  font-family:'Bricolage Grotesque',system-ui,sans-serif;
+  font-optical-sizing:auto;
+  -webkit-font-smoothing:antialiased;
+}
+.page{width:1560px;margin:0 auto;padding:72px 36px 120px}
+
+/* ---------- presentation ---------- */
+.intro{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:end;margin-bottom:64px}
+.eyebrow{font-size:14px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;opacity:.85;margin:0 0 18px}
+.intro h1{font-size:168px;line-height:.86;letter-spacing:-.045em;font-weight:800;margin:0}
+.intro h1 em{font-family:'Fraunces',serif;font-style:italic;font-weight:400;letter-spacing:-.02em;font-variation-settings:'SOFT' 100,'WONK' 1}
+.intro .lede{font-size:22px;line-height:1.45;margin:0 0 18px;max-width:640px}
+.intro p{font-size:17px;line-height:1.55;margin:0 0 12px;max-width:640px;opacity:.92}
+.sys{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:28px;margin-bottom:84px}
+.card{background:var(--ivory);color:var(--ink);padding:26px 28px 28px;border-radius:2px;
+  box-shadow:0 1px 1px rgba(0,0,0,.25),0 8px 18px -6px rgba(0,0,0,.45)}
+.card h3{margin:0 0 16px;font-size:13px;letter-spacing:.16em;text-transform:uppercase;font-weight:700}
+.swatches{display:grid;grid-template-columns:repeat(4,1fr);gap:14px 12px}
+.sw{font-size:12px;line-height:1.25}
+.sw i{display:block;height:54px;border-radius:1px;margin-bottom:7px;
+  box-shadow:0 1px 1px rgba(0,0,0,.2),0 4px 8px -3px rgba(0,0,0,.35)}
+.sw b{display:block;font-weight:700;font-size:13px}
+.sw span{font-variant-numeric:tabular-nums;opacity:.8}
+.typespec .big{font-size:58px;font-weight:800;letter-spacing:-.03em;line-height:.95;margin:0 0 10px}
+.typespec .it{font-family:'Fraunces',serif;font-style:italic;font-size:26px;margin:0 0 14px;font-variation-settings:'SOFT' 100,'WONK' 1}
+.typespec p{font-size:14px;line-height:1.5;margin:0 0 8px}
+.plyrow{display:flex;gap:18px;margin:4px 0 18px}
+.plyrow figure{margin:0;flex:1;font-size:13px;font-weight:600}
+.plyrow svg{display:block;width:100%;height:auto;margin-bottom:8px}
+.card p.small{font-size:14px;line-height:1.5;margin:0 0 8px}
+.shelves{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;font-size:13px;margin-top:6px}
+.shelves div{display:flex;align-items:center;gap:8px}
+.shelves i{width:16px;height:16px;flex:none;box-shadow:0 1px 2px rgba(0,0,0,.3)}
+h2.section{font-size:15px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;margin:0 0 26px;display:flex;gap:16px;align-items:center}
+h2.section::after{content:"";flex:1;border-top:1.5px dashed rgba(244,237,223,.45)}
+.shelf{display:flex;flex-wrap:wrap;gap:64px 48px;margin-bottom:80px}
+.item{width:720px}
+.item .cap{margin:18px 0 0;font-size:15px;line-height:1.45;max-width:680px}
+.item .cap b{font-weight:700}
+
+/* ---------- the cover ---------- */
+.cover{position:relative;width:720px;height:888px;overflow:hidden;isolation:isolate;flex:none;
+  background:var(--board);box-shadow:0 2px 2px rgba(0,0,0,.3),0 24px 40px -18px rgba(0,0,0,.6);color:var(--ink)}
+.cover svg.art,.cover svg.grain{position:absolute;left:0;top:0;width:720px;height:888px;display:block}
+.cover svg.grain{pointer-events:none;z-index:3;mix-blend-mode:soft-light}
+.slip{position:absolute;left:66px;top:572px;width:588px;height:256px;z-index:2}
+.meta{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;line-height:1;height:16px;font-variation-settings:'opsz' 12}
+.meta .lvl{display:flex;align-items:center;gap:9px}
+.meta .lvl svg{width:22px;height:18px;display:block}
+.title{margin:18px 0 0;font-weight:800;letter-spacing:-.028em;line-height:.93;font-size:72px}
+.title span{display:block;width:max-content;white-space:nowrap}
+.sub{margin:12px 0 0;font-family:'Fraunces',serif;font-style:italic;font-weight:400;font-size:25px;line-height:1.15;
+  font-variation-settings:'SOFT' 100,'WONK' 0;letter-spacing:-.005em}
+.foot{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;align-items:flex-end;line-height:1}
+.imprint{display:flex;align-items:flex-end;gap:9px;font-size:17px;font-weight:500;letter-spacing:-.005em}
+.imprint b{font-weight:800}
+.imprint svg{width:25px;height:25px;display:block;margin-bottom:-1px}
+.stats{font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-variation-settings:'opsz' 12}
+.stats.soon{background:var(--ink);color:var(--ivory);padding:6px 9px 5px;letter-spacing:.14em}
+</style>
+</head>
+<body>
+<div class="page">
+  <section class="intro">
+    <div>
+      <p class="eyebrow">Vizuara Books · cover system proposal 20</p>
+      <h1>Paper<br>works<em>.</em></h1>
+    </div>
+    <div>
+      <p class="lede">Every Vizuara book is a small construction of cut, folded and layered coloured card, and the construction <i>is</i> the book's idea: a window you can only see part of the context through, neurons pinned together with brass fasteners, a context history pleated into a concertina.</p>
+      <p>The system is strict so the pictures can be free. Board colour tells you the shelf, the ivory title slip is always in the same place, and the number of sheets stacked under the slip (one, two or three ply) tells you how deep the book goes. Light always comes from the top left. Everything is vector SVG with procedural grain and computed shadows. On press it becomes real die-cuts and laminated board, so the shadows stop being printed and become real.</p>
+    </div>
+  </section>
+
+  <section class="sys" id="sys"></section>
+
+  <h2 class="section">The core set</h2>
+  <div class="shelf" id="core"></div>
+  <h2 class="section">Range: a sub-series, a coming-soon title, other shelves</h2>
+  <div class="shelf" id="more"></div>
+</div>
+
+<script>
+/* =====================================================================
+   PAPERWORKS: a cut-paper cover system for Vizuara Books
+   Everything below is geometry. Each "piece" is a flat shape of coloured
+   card; its elevation z sets the shadow it throws (light from top-left).
+   ===================================================================== */
+const C = {
+  ivory:'#F4EDDF', ink:'#1B1A22', ultra:'#2A3A92', leaf:'#22704B', verm:'#D93D2B', saff:'#EDB22C',
+  night:'#1C1E2C', rose:'#EE9C94', kraft:'#BD9061', lemon:'#F5D55A', blush:'#F7CDC2', mist:'#BCCCD8',
+  mint:'#9ED0B3', lilac:'#B6A6D6', cobalt:'#4C66C4', plum:'#55284A'
+};
+const SHELF = {
+  found:  {name:'Foundations',          board:C.ultra},
+  neural: {name:'Neural Nets & Vision', board:C.leaf},
+  lang:   {name:'Language Models',      board:C.verm},
+  agents: {name:'Context & Agents',     board:C.saff},
+  systems:{name:'Systems & Scale',      board:C.night},
+  world:  {name:'Reward & the World',   board:C.rose},
+  factory:{name:'Intelligence Factory', board:C.kraft}
+};
+const LEVEL = {beginner:1, intermediate:2, advanced:3};
+
+/* ---------- colour + number utils ---------- */
+const h2r = h => [1,3,5].map(i => parseInt(h.slice(i,i+2),16));
+const r2h = a => '#'+a.map(v => Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0')).join('');
+const mix = (a,b,t) => { const A=h2r(a),B=h2r(b); return r2h(A.map((v,i)=>v+(B[i]-v)*t)); };
+const shade = (c,t) => mix(c,'#000000',t), tint = (c,t) => mix(c,'#ffffff',t);
+const f = n => +(+n).toFixed(2);
+let rnd = mulberry(1);
+function mulberry(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+const rr = (a,b) => a + (b-a)*rnd();
+// every sheet of card is very slightly different: +/- 3% lightness
+const jit = c => rnd() < .5 ? tint(c, rnd()*.035) : shade(c, rnd()*.03);
+
+/* ---------- piece helpers ---------- */
+let PFX = 'x';
+const lift = (z, inner) => z > 0 ? `<g filter="url(#${PFX}-z${z})">${inner}</g>` : `<g>${inner}</g>`;
+const rot = (a,cx,cy) => a ? ` transform="rotate(${f(a)} ${f(cx)} ${f(cy)})"` : '';
+const rect = (x,y,w,h,fill,{rx=0,r=0}={}) =>
+  `<rect x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${f(h)}" rx="${rx}" fill="${fill}"${rot(r,x+w/2,y+h/2)}/>`;
+const circ = (cx,cy,r,fill) => `<circle cx="${f(cx)}" cy="${f(cy)}" r="${f(r)}" fill="${fill}"/>`;
+const path = (d,fill,extra='') => `<path d="${d}" fill="${fill}" ${extra}/>`;
+const poly = (pts,fill,extra='') => `<polygon points="${pts.map(p=>f(p[0])+','+f(p[1])).join(' ')}" fill="${fill}" ${extra}/>`;
+// a single piece of card, lifted to z
+const R = (x,y,w,h,fill,z,o={}) => lift(z, rect(x,y,w,h,jit(fill),o));
+const D = (cx,cy,r,fill,z) => lift(z, circ(cx,cy,r,jit(fill)));
+const rectD = (x,y,w,h) => `M${f(x)} ${f(y)}h${f(w)}v${f(h)}h${f(-w)}Z`;
+const circD = (cx,cy,r) => `M${f(cx-r)} ${f(cy)}a${r} ${r} 0 1 0 ${2*r} 0a${r} ${r} 0 1 0 ${-2*r} 0Z`;
+// a strip of card joining two points
+function strip(x1,y1,x2,y2,w,fill){
+  const L = Math.hypot(x2-x1,y2-y1), a = Math.atan2(y2-y1,x2-x1)*180/Math.PI;
+  const cx=(x1+x2)/2, cy=(y1+y2)/2;
+  return `<rect x="${f(cx-L/2)}" y="${f(cy-w/2)}" width="${f(L)}" height="${f(w)}" fill="${fill}" transform="rotate(${f(a)} ${f(cx)} ${f(cy)})"/>`;
+}
+// a brass paper fastener
+const brad = (cx,cy,r=7) => `<circle cx="${f(cx)}" cy="${f(cy)}" r="${r}" fill="url(#${PFX}-brass)"/><circle cx="${f(cx-r*.3)}" cy="${f(cy-r*.35)}" r="${f(r*.28)}" fill="#fff6d0" opacity=".7"/>`;
+
+/* ---------- per-cover defs: shadows by elevation, grain, light ---------- */
+function defs(){
+  let s = '<defs>';
+  for (let z=1; z<=12; z++){
+    const h = z*2.1;
+    s += `<filter id="${PFX}-z${z}" filterUnits="userSpaceOnUse" x="-120" y="-120" width="960" height="1130" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="${f(.45+.2*h)}"/>
+      <feOffset dx="${f(.22*h)}" dy="${f(.48*h)}" result="o1"/>
+      <feColorMatrix in="o1" type="matrix" values="0 0 0 0 .09  0 0 0 0 .05  0 0 0 0 .02  0 0 0 .42 0" result="s1"/>
+      <feGaussianBlur in="SourceAlpha" stdDeviation="${f(1.2+.85*h)}"/>
+      <feOffset dx="${f(.4*h)}" dy="${f(1.05*h)}" result="o2"/>
+      <feColorMatrix in="o2" type="matrix" values="0 0 0 0 .09  0 0 0 0 .05  0 0 0 0 .02  0 0 0 .30 0" result="s2"/>
+      <feMerge><feMergeNode in="s2"/><feMergeNode in="s1"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>`;
+  }
+  s += `<radialGradient id="${PFX}-brass" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#F3D98A"/><stop offset=".55" stop-color="#C89B3C"/><stop offset="1" stop-color="#7A5A1E"/></radialGradient>`;
+  return s + '</defs>';
+}
+function grainSVG(seed){
+  return `<svg class="grain" viewBox="0 0 720 888" aria-hidden="true"><defs>
+    <filter id="${PFX}-grain" filterUnits="userSpaceOnUse" x="0" y="0" width="720" height="888" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="3" seed="${seed}" result="fine"/>
+      <feTurbulence type="fractalNoise" baseFrequency=".012 .03" numOctaves="2" seed="${seed+7}" result="cloud"/>
+      <feComposite in="fine" in2="cloud" operator="arithmetic" k1="0" k2=".62" k3=".38" k4="0" result="n"/>
+      <feColorMatrix in="n" type="matrix" values=".33 .33 .33 0 0  .33 .33 .33 0 0  .33 .33 .33 0 0  0 0 0 0 1"/>
+    </filter>
+    <radialGradient id="${PFX}-light" cx=".22" cy=".12" r="1.15">
+      <stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".5" stop-color="#808080" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".5"/>
+    </radialGradient></defs>
+    <rect width="720" height="888" filter="url(#${PFX}-grain)" opacity=".8"/>
+    <rect width="720" height="888" fill="url(#${PFX}-light)" opacity=".6"/>
+  </svg>`;
+}
+
+/* ---------- system constants ---------- */
+const SX=36, SY=548, SW=648, SH=304;   // the ivory title slip
+function slipAndPly(book){
+  const n = LEVEL[book.level];
+  let s = '';
+  const ply = book.ply || [C.ink, C.ivory];
+  // under-sheets peek out above the slip: one per extra level
+  for (let k=n-1; k>=1; k--){
+    s += R(SX, SY-13*k, SW, SH+13*k, ply[k-1], 2+ (n-k));
+  }
+  s += R(SX, SY, SW, SH, C.ivory, 4+n);
+  return s;
+}
+
+/* =====================================================================
+   THE CONSTRUCTIONS: one per book, drawn in the 720 x 548 stage
+   ===================================================================== */
+const ART = {};
+
+/* AI Context Engineering: a die-cut window over a long run of tokens.
+   Only what fits in the window is context; new pieces are being placed in. */
+ART['ai-context-engineering'] = () => {
+  let s = '';
+  const W = {x:150, y:166, w:420, h:236};
+  s += R(112, 128, 496, 316, C.night, 1);
+  // lines of tokens, ragged like prose, running on under the frame
+  const cols = [C.ivory,C.ivory,C.ivory,C.ivory,C.blush,C.ivory,C.lemon,C.ivory,C.verm,C.ivory,C.cobalt];
+  let y = 128, line = 0;
+  const ends = [520, 600, 470, 640, 560, 610, 500];
+  while (y < 440){
+    let x = W.x + 18 + (line===2||line===5 ? 30 : 0);
+    const end = ends[line % ends.length];
+    let row = '';
+    while (x < end){
+      const w = [34,48,62,76,40,92,54][Math.floor(rnd()*7)];
+      row += rect(x, y, Math.min(w, end + 60 - x), 30, jit(cols[Math.floor(rnd()*cols.length)]), {rx:1});
+      x += w + 8;
+    }
+    s += lift(1, row);
+    y += 44; line++;
+  }
+  // the frame: a sheet with the window cut out
+  s += lift(4, path(rectD(84,94,552,380)+rectD(W.x,W.y,W.w,W.h), jit(C.ultra), 'fill-rule="evenodd"'));
+  // pieces arriving from outside
+  s += R(236, 138, 84, 30, C.blush, 6, {r:-4, rx:1});
+  s += R(318, 40, 118, 30, C.verm, 10, {r:-9, rx:1});
+  s += R(478, 78, 62, 30, C.ivory, 8, {r:7, rx:1});
+  s += R(566, 30, 44, 30, C.lemon, 11, {r:-15, rx:1});
+  // and one that did not make the cut
+  s += R(28, 476, 70, 30, C.ivory, 3, {r:22, rx:1});
+  return s;
+};
+
+/* Mathematical Foundations: graph paper, three normal distributions cut in card,
+   and the tangent at an inflection point: probability, calculus, the grid of linear algebra. */
+ART['mathematical-foundations-for-ml'] = () => {
+  let s = '';
+  // graph paper sheet
+  let gp = rect(70, 58, 580, 470, jit(C.ivory));
+  for (let x=70+20; x<650; x+=20) gp += `<rect x="${x}" y="58" width="${x%100===70%100+0? 1.4:1}" height="470" fill="#9DB0D8"/>`;
+  for (let y=58+20; y<528; y+=20) gp += `<rect x="70" y="${y}" width="580" height="1" fill="#9DB0D8"/>`;
+  s += lift(2, `<g transform="rotate(-2.2 360 293)">${gp}</g>`);
+  const base = 468;
+  const gauss = (mu,sig,A,x0,x1) => { let d=`M${x0} ${base+40}L${x0} ${base}`; for(let x=x0;x<=x1;x+=3) d+=`L${f(x)} ${f(base - A*Math.exp(-((x-mu)**2)/(2*sig*sig)))}`; return d+`L${x1} ${base}L${x1} ${base+40}Z`; };
+  s += lift(3, path(gauss(250,92,240,96,560), jit(C.lemon)));
+  s += lift(4, path(gauss(470,64,190,300,640), jit(C.leaf)));
+  s += lift(5, path(gauss(340,44,318,190,500), jit(C.verm)));
+  // baseline strip
+  s += R(84, base-2, 552, 9, C.ink, 6);
+  // tangent at the inflection point of the red curve
+  const mu=340, sg=44, A=318, px=mu+sg, py=base - A*Math.exp(-.5), m = A*Math.exp(-.5)/sg;
+  const L = 170, dx = L/Math.hypot(1,m);
+  s += lift(8, strip(px-dx, py-m*dx, px+dx, py+m*dx, 7, jit(C.ink)));
+  s += lift(9, circ(px,py,11,jit(C.ivory)) + brad(px,py,5));
+  return s;
+};
+
+/* Neural Networks from Scratch: a 3-4-2 network built like a paper toy.
+   Weights are strips (width = |w|, ivory = positive, ink = negative), pinned with brass brads. */
+ART['neural-networks-from-scratch'] = () => {
+  let s = '';
+  const L = [
+    {x:148, ys:[150,280,410]},
+    {x:360, ys:[96,226,356,486]},
+    {x:572, ys:[214,346]}
+  ];
+  let strips = [];
+  for (let l=0; l<2; l++) for (const y1 of L[l].ys) for (const y2 of L[l+1].ys){
+    const w = rr(-1,1);
+    strips.push({x1:L[l].x,y1,x2:L[l+1].x,y2,w,z:rnd()<.5?1:2});
+  }
+  for (const z of [1,2]){
+    s += strips.filter(t=>t.z===z).map(t => lift(z+1, strip(t.x1,t.y1,t.x2,t.y2, 7+17*Math.abs(t.w), jit(t.w>0?C.ivory:C.ink)))).join('');
+  }
+  const cols = [C.lemon, C.verm, C.ivory];
+  L.forEach((ly,li) => ly.ys.forEach(y => { s += lift(5, circ(ly.x,y,li===2?46:40,jit(cols[li])) + brad(ly.x,y,7)); }));
+  return s;
+};
+
+/* Build LLMs from Scratch: a line of tokens; paper loops of attention
+   (width = weight) all land on the next token, which is being lifted into place. */
+ART['build-llms-from-scratch'] = () => {
+  let s = '';
+  const base = 470, th = 64;
+  const ws = [70, 96, 58, 88, 76, 64];
+  let x = 44; const tiles = [];
+  ws.forEach(w => { tiles.push({x, w}); x += w + 14; });
+  const slot = {x, w:84};
+  // empty slot: a shallow pocket in the board
+  s += lift(0, rect(slot.x, base, slot.w, th, shade(C.verm,.28), {rx:2}));
+  // loops of attention
+  const att = [.55,.2,.35,.9,.3,.7];
+  const lc = [C.ivory, C.lemon, C.blush, C.ink, C.ivory, C.cobalt];
+  tiles.forEach((t,i) => {
+    const x1 = t.x + t.w/2, x2 = slot.x + 14 + i*(slot.w-28)/5;
+    const H = 70 + (x2-x1)*.78;
+    const w = 8 + 20*att[i];
+    s += lift(3 + (i%3), `<path d="M${f(x1)} ${base} C${f(x1)} ${f(base-H*1.33)} ${f(x2)} ${f(base-H*1.33)} ${f(x2)} ${base}" fill="none" stroke="${jit(lc[i])}" stroke-width="${f(w)}"/>`);
+  });
+  tiles.forEach(t => { s += R(t.x, base, t.w, th, C.ivory, 2, {rx:2}); });
+  // the new token, rising
+  s += R(slot.x+10, 72, slot.w, th, C.lemon, 12, {r:-7, rx:2});
+  return s;
+};
+
+/* 5D Parallelism: five parallel planes, each cut a different way:
+   tensor (columns), pipeline (bands), data (replica blocks), sequence (chunks), experts (sparse tiles). */
+ART['5d-parallelism'] = () => {
+  let s = '';
+  const W=236, H=276, gap=10;
+  const planes = [
+    {c:C.cobalt, cut:'experts'}, {c:C.mint, cut:'sequence'}, {c:C.rose, cut:'data'},
+    {c:C.verm, cut:'pipeline'}, {c:C.lemon, cut:'tensor'}
+  ];
+  planes.forEach((p,i) => {
+    // i = 0 is the back plane (top right), i = 4 the front plane (bottom left)
+    const L = 68 + (4-i)*66, T = 250 - (4-i)*50;
+    let g = '';
+    const c = p.c;
+    if (p.cut==='tensor'){ const w=(W-3*gap)/4; for(let j=0;j<4;j++) g += rect(L+j*(w+gap), T, w, H, jit(c)); }
+    if (p.cut==='pipeline'){ const h=(H-3*gap)/4; for(let j=0;j<4;j++) g += rect(L, T+j*(h+gap), W, h, jit(c)); }
+    if (p.cut==='data'){ const w=(W-gap)/2, h=(H-gap)/2; for(let a=0;a<2;a++)for(let b=0;b<2;b++) g += rect(L+a*(w+gap), T+b*(h+gap), w, h, jit(c)); }
+    if (p.cut==='sequence'){ const w=(W-5*6)/6; for(let j=0;j<6;j++) g += rect(L+j*(w+6), T, w, H, jit(c)); }
+    if (p.cut==='experts'){ const n=4, w=(W-(n-1)*gap)/n, h=(H-(n-1)*gap)/n; for(let a=0;a<n;a++)for(let b=0;b<n;b++){ if((a*7+b*3)%5===1) continue; g += rect(L+a*(w+gap), T+b*(h+gap), w, h, jit(c)); } }
+    s += lift(2 + i*2, g);
+  });
+  return s;
+};
+
+/* Pi vs Hermes vs Codex: the same long context, compacted three ways.
+   Recent turns stay flat; older history is pleated into a concertina. */
+ART['pi-vs-hermes-vs-codex'] = () => {
+  let s = '';
+  const floor = 520;
+  const strips = [
+    {x:84,  c:C.ultra, top:70,  pleats:7,  p:26},
+    {x:290, c:C.verm,  top:170, pleats:11, p:15},
+    {x:496, c:C.night, top:262, pleats:18, p:8}
+  ];
+  strips.forEach((st,i) => {
+    const w = 140;
+    const pl = st.pleats*st.p;
+    const flatEnd = floor - pl;
+    let g = rect(st.x, st.top, w, flatEnd - st.top, jit(st.c));
+    for (let j=0;j<st.pleats;j++){
+      const y0 = flatEnd + j*st.p, y1 = y0 + st.p;
+      const up = j%2===0;                 // faces alternately toward and away from the light
+      const e = 6;
+      const pts = up ? [[st.x,y0],[st.x+w,y0],[st.x+w+e,y1],[st.x-e,y1]] : [[st.x-e,y0],[st.x+w+e,y0],[st.x+w,y1],[st.x,y1]];
+      g += poly(pts, up ? tint(st.c,.14) : shade(st.c,.3));
+    }
+    s += lift(3, g);
+  });
+  return s;
+};
+
+/* ---------- The Intelligence Factory: each room is a pop-up box behind a
+   factory-shaped die-cut; the back wall is the room's shelf colour. ---------- */
+function room(back, inner){
+  let s = '';
+  const O = {l:56, r:664, t:66, b:524}, vp = {x:360, y:300}, k = .44;
+  const B = {l:vp.x+(O.l-vp.x)*k, r:vp.x+(O.r-vp.x)*k, t:vp.y+(O.t-vp.y)*k, b:vp.y+(O.b-vp.y)*k};
+  s += poly([[O.l,O.t],[O.r,O.t],[B.r,B.t],[B.l,B.t]], shade(C.kraft,.42));
+  s += poly([[O.l,O.t],[B.l,B.t],[B.l,B.b],[O.l,O.b]], tint(C.kraft,.12));
+  s += poly([[B.r,B.t],[O.r,O.t],[O.r,O.b],[B.r,B.b]], shade(C.kraft,.22));
+  s += poly([[B.l,B.b],[B.r,B.b],[O.r,O.b],[O.l,O.b]], shade(C.kraft,.08));
+  s += rect(B.l, B.t, B.r-B.l, B.b-B.t, jit(back));
+  s += inner(B, O);
+  // the board, with a factory-roof opening cut through it
+  const yR = 118, teeth = 5, tw = (O.r-O.l)/teeth;
+  let d = `M${O.l} ${O.b}L${O.l} ${yR}`;
+  for (let i=0;i<teeth;i++){ const x0 = O.l + i*tw; d += `L${f(x0)} ${yR-48}L${f(x0+tw)} ${yR}`; }
+  d += `L${O.r} ${O.b}Z`;
+  s += lift(5, path(`M-10 -10H730V900H-10Z` + d, jit(C.kraft), 'fill-rule="evenodd"'));
+  return s;
+}
+ART['charlie-language-room'] = () => room(C.verm, (B,O) => {
+  let s = '';
+  // speech bubble on the back wall
+  s += lift(2, path(`M${B.l+40} ${B.t+26}h150a14 14 0 0 1 14 14v58a14 14 0 0 1-14 14h-96l-26 24 4-24h-32a14 14 0 0 1-14-14v-58a14 14 0 0 1 14-14z`, jit(C.ivory)));
+  // conveyor belt with tokens
+  const y = 440;
+  s += lift(3, rect(92, y, 536, 26, jit(C.ink), {rx:13}) + [0,1,2,3,4,5,6,7,8].map(i=>circ(110+i*62, y+13, 7, shade(C.kraft,.1))).join(''));
+  let x = 104; const ws=[54,80,46,70,62,90,52];
+  ws.forEach((w,i) => { s += R(x, y-44, w, 40, [C.ivory,C.lemon,C.ivory,C.blush,C.ivory,C.ivory,C.lemon][i], 4, {rx:2}); x += w+10; });
+  return s;
+});
+ART['charlie-vision-room'] = () => room(C.leaf, (B,O) => {
+  let s = '';
+  // a picture cut into 3x3 patches; one patch travels forward
+  const S = 3, P = 58, g = 8, X = 360 - (S*P+(S-1)*g)/2, Y = B.t + 22;
+  let pic = '';
+  for (let a=0;a<S;a++) for (let b=0;b<S;b++){
+    if (a===2 && b===0) continue;
+    const x = X + a*(P+g), y = Y + b*(P+g);
+    pic += patchScene(x,y,a,b,P,g,X,Y);
+  }
+  s += lift(2, pic);
+  // the travelling patch
+  const tx = 470, ty = 300;
+  s += lift(9, `<g transform="rotate(8 ${tx+46} ${ty+46})"><g transform="translate(${tx} ${ty}) scale(1.6) translate(${-(X+2*(P+g))} ${-Y})">${patchScene(X+2*(P+g),Y,2,0,P,g,X,Y)}</g></g>`);
+  return s;
+});
+function patchScene(x,y,a,b,P,g,X,Y){
+  // the full scene, clipped to one patch
+  const id = `${PFX}-pc${a}${b}-${Math.round(x)}-${Math.round(y)}`;
+  const W = 3*P+2*g;
+  return `<defs><clipPath id="${id}"><rect x="${x}" y="${y}" width="${P}" height="${P}"/></clipPath></defs>
+  <g clip-path="url(#${id})">
+    <rect x="${X}" y="${Y}" width="${W}" height="${W}" fill="${C.mist}"/>
+    <circle cx="${X+W*.72}" cy="${Y+W*.3}" r="${W*.17}" fill="${C.lemon}"/>
+    <path d="M${X} ${Y+W*.72} Q${X+W*.3} ${Y+W*.42} ${X+W*.6} ${Y+W*.66} T${X+W} ${Y+W*.6} V${Y+W} H${X}Z" fill="${C.ivory}"/>
+    <path d="M${X} ${Y+W*.86} Q${X+W*.45} ${Y+W*.7} ${X+W} ${Y+W*.84} V${Y+W} H${X}Z" fill="${C.ink}"/>
+  </g>`;
+}
+ART['charlie-sound-room'] = () => room(C.saff, (B,O) => {
+  let s = '';
+  // a waveform of standing cards on the floor
+  const n = 15, x0 = 128, span = 464;
+  for (let i=0;i<n;i++){
+    const t = i/(n-1);
+    const h = 30 + 170*Math.abs(Math.sin(t*Math.PI*2.2+.4))*(0.35+0.65*Math.sin(t*Math.PI));
+    const x = x0 + t*span - 11;
+    s += R(x, 470 - h, 22, h, i%2 ? C.ink : C.ivory, 3, {rx:1});
+  }
+  // speaker on the back wall
+  s += lift(2, circ(360, B.t+62, 44, jit(C.ink)) + circ(360, B.t+62, 26, jit(C.ivory)) + circ(360, B.t+62, 10, jit(C.ink)));
+  return s;
+});
+ART['charlie-reasoning-room'] = () => room(C.rose, (B,O) => {
+  let s = '';
+  // a pop-up staircase: one step at a time
+  const steps = 6, sx = 130, sy = 482, dw = 62, dh = 44;
+  for (let i=0;i<steps;i++){
+    const x = sx + i*dw, y = sy - (i+1)*dh;
+    s += lift(3, rect(x, y, dw*(steps-i), 12, jit(tint(C.ivory,.2))) + rect(x, y+12, dw*(steps-i), dh-12, jit(shade(C.ivory,.12))));
+  }
+  // flag at the top
+  const fx = sx + steps*dw - 20, fy = sy - steps*dh;
+  s += lift(6, rect(fx, fy-86, 6, 86, jit(C.ink)) + poly([[fx+6,fy-86],[fx+60,fy-70],[fx+6,fy-52]], jit(C.verm)));
+  return s;
+});
+
+/* Inference Engineering (coming soon): the kit is still flat.
+   A punch-out sheet of KV-cache pages; a few are already pressed out. */
+ART['inference-engineering'] = () => {
+  let s = '';
+  const X=96, Y=72, W=528, H=440;
+  const cols=4, rows=4, pw=100, ph=76, gx=(W-cols*pw)/(cols+1), gy=(H-rows*ph)/(rows+1);
+  const out = new Set(['1,1','3,0','2,3','0,2']);
+  let holes = '', dies = '';
+  const pal = [C.lemon, C.cobalt, C.verm, C.mint];
+  for (let a=0;a<cols;a++) for (let b=0;b<rows;b++){
+    const x = X+gx+a*(pw+gx), y = Y+gy+b*(ph+gy);
+    if (out.has(a+','+b)) holes += rectD(x,y,pw,ph);
+    else dies += `<rect x="${x}" y="${y}" width="${pw}" height="${ph}" fill="${tint(pal[(a+b)%4],.35)}" stroke="${C.ink}" stroke-width="1.4" stroke-dasharray="7 4"/>`
+      + `<rect x="${x+10}" y="${y+10}" width="${pw-20}" height="${ph-20}" fill="none" stroke="${shade(pal[(a+b)%4],.1)}" stroke-width="1" stroke-dasharray="3 3"/>`;
+  }
+  s += lift(2, `<g transform="rotate(-2 360 292)">${path(rectD(X,Y,W,H)+holes, jit(C.ivory), 'fill-rule="evenodd"')}${dies}</g>`);
+  // pressed-out pages
+  s += R(470, 470, 100, 76, C.lemon, 7, {r:14});
+  s += R(560, 350, 100, 76, C.verm, 9, {r:-10});
+  s += R(40, 420, 100, 76, C.cobalt, 6, {r:-18});
+  return s;
+};
+
+/* Reinforcement Learning: a grid world where each tile is lifted by its value.
+   The closer to the goal, the higher the card stands. */
+ART['reinforcement-learning'] = () => {
+  let s = '';
+  const cols=5, rows=4, T=88, g=14, X=(720-(cols*T+(cols-1)*g))/2, Y=78;
+  const goal=[4,0], walls = new Set(['1,1','2,1','3,3']);
+  const cells = [];
+  for (let b=0;b<rows;b++) for (let a=0;a<cols;a++){
+    if (walls.has(a+','+b)) continue;
+    const d = Math.abs(a-goal[0]) + Math.abs(b-goal[1]);
+    cells.push({a,b,d});
+  }
+  cells.sort((p,q)=>q.d-p.d);
+  cells.forEach(c => {
+    const x = X + c.a*(T+g), y = Y + c.b*(T+g);
+    const z = Math.max(1, 9 - c.d);
+    const isGoal = c.d===0;
+    s += R(x, y, T, T, isGoal ? C.verm : mix(C.blush, C.ivory, Math.min(1,(7-c.d)/6)), z);
+    if (isGoal) s += lift(10, circ(x+T/2, y+T/2, 18, jit(C.ivory)));
+  });
+  // the agent
+  s += lift(4, circ(X + T/2, Y + 3*(T+g) + T/2, 26, jit(C.ink)));
+  return s;
+};
+
+/* =====================================================================
+   BOOK DATA
+   ===================================================================== */
+const BOOKS = [
+  {slug:'ai-context-engineering', shelf:'agents', level:'intermediate', lines:['AI Context','Engineering'], capsules:43, hours:10, ply:[C.ultra], core:true,
+    note:'A die-cut window over lines of tokens that run on beneath the frame. Only what fits in the window is context; new pieces are being dropped in, one did not make the cut.'},
+  {slug:'mathematical-foundations-for-ml', shelf:'found', level:'beginner', lines:['Mathematical','Foundations for','Machine Learning'], capsules:43, hours:10, core:true,
+    note:'Graph paper (the grid of linear algebra), three normal distributions cut in card (probability), and a tangent strip pinned at an inflection point (calculus).'},
+  {slug:'neural-networks-from-scratch', shelf:'neural', level:'beginner', lines:['Neural Networks','from Scratch'], capsules:33, hours:7, core:true,
+    note:'A 3-4-2 network built like a jointed paper toy. Each weight is a strip whose width is its magnitude (ivory positive, ink negative), pinned at the neurons with brass fasteners.'},
+  {slug:'build-llms-from-scratch', shelf:'lang', level:'intermediate', lines:['Build Large','Language Models','(LLMs) from Scratch'], capsules:20, hours:6, ply:[C.ink], core:true,
+    note:'A line of tokens. Paper loops of attention, width by weight, all land on the empty slot, and the next token is being lifted into place above it.'},
+  {slug:'5d-parallelism', shelf:'systems', level:'advanced', lines:['5D Parallelism','for Large','Model Training'], capsules:40, hours:9, ply:[C.lemon, C.verm], core:true,
+    note:'Five parallel planes of the same model, each cut a different way: tensor columns, pipeline bands, data blocks, sequence chunks, sparse expert tiles.'},
+  {slug:'pi-vs-hermes-vs-codex', shelf:'agents', level:'advanced', lines:['Pi vs Hermes','vs Codex'], sub:'Context Compaction and Memory', capsules:9, hours:1, ply:[C.ultra, C.verm], core:true,
+    note:'The same long context compacted three ways. Recent turns stay flat; older history is pleated into a concertina, tighter each time.'},
+
+  {slug:'charlie-language-room', shelf:'factory', level:'advanced', lines:['Charlie and the','Language Room'], sub:'Language: Inference Engineering', series:'I', capsules:22, hours:5, ply:[C.verm, C.ink],
+    note:'<b>Sub-series.</b> Every Intelligence Factory book is a pop-up room seen through a factory-roof die-cut in kraft board. Here tokens ride a conveyor under a speech bubble.'},
+  {slug:'charlie-vision-room', shelf:'factory', level:'intermediate', lines:['Charlie and the','Vision Room'], sub:'Vision: Vision Transformers', series:'II', capsules:20, hours:6, ply:[C.leaf],
+    note:'A picture cut into patches, as a vision transformer sees it; one patch travels forward to be embedded.'},
+  {slug:'charlie-sound-room', shelf:'factory', level:'intermediate', lines:['Charlie and the','Sound Room'], sub:'Audio: Voice Agents', series:'III', capsules:20, hours:6, ply:[C.saff],
+    note:'A waveform of standing cards on the floor, a paper speaker on the wall.'},
+  {slug:'charlie-reasoning-room', shelf:'factory', level:'advanced', lines:['Charlie and the','Reasoning Room'], sub:'Reason: Reinforcement Learning, from bandits to reasoning models', series:'IV', capsules:21, hours:6, ply:[C.rose, C.ink],
+    note:'A pop-up staircase, the oldest trick in paper engineering, for step-by-step reasoning toward a reward flag.'},
+  {slug:'inference-engineering', shelf:'systems', level:'advanced', lines:['Inference','Engineering'], sub:'Serve LLMs fast: batching, KV-cache, paged attention, speculative decoding.', soon:true, ply:[C.lemon, C.verm],
+    note:'<b>Coming soon</b> books show the kit before assembly: a punch-out sheet with die lines. Here the pieces are KV-cache pages; a few are already pressed out.'},
+  {slug:'reinforcement-learning', shelf:'world', level:'intermediate', lines:['Reinforcement','Learning'], capsules:38, hours:8, ply:[C.ink],
+    note:'A grid world where each tile is lifted by its value: the nearer the goal, the higher the card stands and the longer its shadow.'}
+];
+
+/* =====================================================================
+   ASSEMBLY
+   ===================================================================== */
+const plyIcon = n => `<svg viewBox="0 0 22 18" aria-hidden="true">${[0,1,2].map(i=>{
+  const on = i < n; const y = 12 - i*5, x = i*2;
+  return `<rect x="${x+.75}" y="${y+.75}" width="16.5" height="4.5" fill="${on?C.ink:'none'}" stroke="${C.ink}" stroke-width="1.5"/>`; }).join('')}</svg>`;
+const MARK = `<svg viewBox="0 0 40 40" aria-hidden="true"><polygon points="2,4 12,4 25,37 15,37" fill="${C.ink}"/><polygon points="28,4 38,4 25,37 15,37" fill="${C.verm}" style="filter:drop-shadow(1px 1.5px 0.6px rgba(0,0,0,.35))"/></svg>`;
+
+function coverHTML(b, i){
+  PFX = 'c' + i;
+  rnd = mulberry(1000 + i*97);
+  const shelf = SHELF[b.shelf];
+  const art = ART[b.slug]();
+  const n = LEVEL[b.level];
+  const lvl = b.level[0].toUpperCase() + b.level.slice(1);
+  const right = b.series ? `Intelligence Factory · ${b.series}` : shelf.name;
+  const stats = b.soon ? `<span class="stats soon">Coming soon</span>` : `<span class="stats">${b.capsules} capsules · ${b.hours} ${b.hours===1?'hour':'hours'}</span>`;
+  return `<div class="cover" data-slug="${b.slug}" style="--board:${shelf.board}">
+    <svg class="art" viewBox="0 0 720 888" aria-hidden="true">${defs()}
+      <rect width="720" height="888" fill="${shelf.board}"/>
+      ${art}
+      ${slipAndPly(b)}
+    </svg>
+    <div class="slip">
+      <div class="meta"><span class="lvl">${plyIcon(n)}${lvl}</span><span>${right}</span></div>
+      <h2 class="title">${b.lines.map(l=>`<span>${l}</span>`).join('')}</h2>
+      ${b.sub ? `<p class="sub">${b.sub}</p>` : ''}
+      <div class="foot"><span class="imprint">${MARK}<span><b>Vizuara</b> Books</span></span>${stats}</div>
+    </div>
+    ${grainSVG(11 + i)}
+  </div>`;
+}
+
+function build(){
+  const core = document.getElementById('core'), more = document.getElementById('more');
+  BOOKS.forEach((b,i) => {
+    const el = document.createElement('div');
+    el.className = 'item';
+    el.innerHTML = coverHTML(b,i) + `<p class="cap">${b.note}</p>`;
+    (b.core ? core : more).appendChild(el);
+  });
+  tightenFilters();
+  buildSystem();
+}
+
+function fitTitles(){
+  document.querySelectorAll('.cover').forEach(cv => {
+    const t = cv.querySelector('.title'), sub = cv.querySelector('.sub'), slip = cv.querySelector('.slip');
+    const foot = cv.querySelector('.foot');
+    let size = 76;
+    const fits = () => {
+      const wide = [...t.children].some(s => s.getBoundingClientRect().width > 588);
+      const bottom = (sub || t).getBoundingClientRect().bottom;
+      const tall = bottom > foot.getBoundingClientRect().top - 18;
+      return !wide && !tall;
+    };
+    t.style.fontSize = size + 'px';
+    while (size > 40 && !fits()){ size -= 1; t.style.fontSize = size + 'px'; }
+  });
+}
+
+/* shrink every shadow filter's region to its own piece: far cheaper to render */
+function tightenFilters(){
+  document.querySelectorAll('.cover svg.art').forEach(svg => {
+    const dfs = svg.querySelector('defs');
+    let n = 0;
+    svg.querySelectorAll('g[filter]').forEach(g => {
+      const id = g.getAttribute('filter').slice(5,-1);
+      const tpl = svg.querySelector('#'+CSS.escape(id));
+      if (!tpl) return;
+      const z = +id.split('-z')[1], h = z*2.1;
+      const b = g.getBBox();
+      const m = Math.ceil(3*(1.2+.85*h) + 1.05*h + 6);
+      const c = tpl.cloneNode(true);
+      c.id = id + '-' + (n++);
+      c.setAttribute('x', Math.floor(b.x - m)); c.setAttribute('y', Math.floor(b.y - m));
+      c.setAttribute('width', Math.ceil(b.width + 2*m)); c.setAttribute('height', Math.ceil(b.height + 2*m));
+      dfs.appendChild(c);
+      g.setAttribute('filter', `url(#${c.id})`);
+    });
+  });
+}
+
+function buildSystem(){
+  const sw = [
+    ['Ultramarine','ultra','Foundations'],['Leaf','leaf','Neural nets & vision'],['Vermilion','verm','Language models'],['Saffron','saff','Context & agents'],
+    ['Night','night','Systems & scale'],['Rose','rose','Reward & the world'],['Kraft','kraft','Intelligence Factory'],['Ivory','ivory','Title slip'],
+    ['Ink','ink','Type'],['Lemon','lemon','Accent'],['Blush','blush','Accent'],['Cobalt','cobalt','Accent']
+  ];
+  const plyPic = n => `<svg viewBox="0 0 160 96">${[...Array(n)].map((_,k)=>{ const kk=n-1-k; return `<rect x="8" y="${30-kk*9}" width="144" height="${58+kk*9}" fill="${[C.ivory,C.ultra,C.verm][kk]}" style="filter:drop-shadow(0 1.5px 1.5px rgba(0,0,0,.35))"/>`; }).join('')}<rect x="8" y="30" width="144" height="58" fill="${C.ivory}" style="filter:drop-shadow(0 2px 2px rgba(0,0,0,.4))"/><rect x="20" y="42" width="80" height="9" fill="${C.ink}"/><rect x="20" y="56" width="60" height="9" fill="${C.ink}"/></svg>`;
+  document.getElementById('sys').innerHTML = `
+    <div class="card"><h3>Paper stock</h3><div class="swatches">${sw.map(([n,k,u])=>`<div class="sw"><i style="background:var(--${k})"></i><b>${n}</b><span>${C[k].toUpperCase()}</span><br>${u}</div>`).join('')}</div></div>
+    <div class="card typespec"><h3>Type</h3>
+      <p class="big">Bricolage<br>Grotesque</p>
+      <p class="it">Fraunces Italic, for subtitles</p>
+      <p>Titles are Bricolage Grotesque ExtraBold, tracked tight, set to the largest size that fits the slip (76px cap), broken by hand so no line ends on a lonely short word. Its ink-trap notches look like they were cut, not drawn.</p>
+      <p>Labels are Bricolage Bold at 12.5px, small caps tracked +14%. Imprint: a <b>V</b> made of two crossed strips of card, ink under vermilion, the whole system in one mark.</p>
+    </div>
+    <div class="card"><h3>Level = ply</h3>
+      <div class="plyrow"><figure>${plyPic(1)}Beginner<br>one sheet</figure><figure>${plyPic(2)}Intermediate<br>two sheets</figure><figure>${plyPic(3)}Advanced<br>three sheets</figure></div>
+      <p class="small">The deeper the book, the more sheets of card the title is mounted on. The label also names the level beside a small ply icon.</p>
+      <h3 style="margin-top:18px">Board colour = shelf</h3>
+      <div class="shelves">${Object.values(SHELF).map(s=>`<div><i style="background:${s.board}"></i>${s.name}</div>`).join('')}</div>
+    </div>`;
+}
+
+build();
+document.fonts.ready.then(() => { fitTitles(); setTimeout(fitTitles, 300); });
+</script>
+</body>
+</html>

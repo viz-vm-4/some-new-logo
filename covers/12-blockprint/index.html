@@ -1,0 +1,555 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chhaap — Vizuara Books</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anek+Latin:wdth,wght@75..125,300..800&family=Eczar:wght@400..800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --kora:#EAE1CC; --indigo:#1C2A4A; --madder:#9B2F25; --iron:#201B19; --haldi:#C8962C;
+  --page:#D9D0BC; --ink:#201B19;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--page);color:var(--ink)}
+body{font-family:'Anek Latin',system-ui,sans-serif;font-variation-settings:'wdth' 100;}
+
+/* ---------- presentation ---------- */
+.intro{max-width:1504px;margin:0 auto;padding:72px 48px 24px;display:grid;grid-template-columns:1.1fr 1fr;gap:56px}
+.intro h1{font-family:'Eczar';font-weight:700;font-size:112px;line-height:.9;margin:0 0 12px;letter-spacing:-.01em}
+.intro h1 small{display:block;font-size:30px;font-weight:500;letter-spacing:0;margin-top:14px}
+.intro p{font-size:19px;line-height:1.5;margin:0 0 14px;max-width:44em}
+.kicker{font-weight:650;font-size:13px;letter-spacing:.18em;text-transform:uppercase;margin:0 0 18px}
+.spec{border-top:2px solid var(--ink);padding-top:18px}
+.spec h3{font-weight:650;font-size:13px;letter-spacing:.18em;text-transform:uppercase;margin:0 0 12px}
+.swatches{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:26px}
+.sw{font-size:13px;line-height:1.3}
+.sw i{display:block;height:64px;margin-bottom:6px;border:1px solid rgba(0,0,0,.15)}
+.sw b{display:block;font-weight:650}
+.levels{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:26px}
+.lv{font-size:13px;line-height:1.35}
+.lv i{display:block;height:34px;margin-bottom:6px}
+.types{font-size:15px;line-height:1.45}
+.types .e{font-family:'Eczar';font-weight:700;font-size:34px;line-height:1.1;display:block}
+.types .a{font-weight:650;font-size:14px;letter-spacing:.16em;text-transform:uppercase;display:block;margin:10px 0 4px}
+
+.shelf{display:flex;flex-wrap:wrap;justify-content:center;gap:72px 56px;padding:40px 24px 96px}
+figure.c{margin:0;width:720px}
+figure.c figcaption{font-size:14px;line-height:1.45;margin-top:14px;max-width:640px}
+figure.c figcaption b{font-weight:650;letter-spacing:.12em;text-transform:uppercase;font-size:12px;display:block;margin-bottom:2px}
+.sect{max-width:1504px;margin:0 auto;padding:40px 48px 0}
+.sect h2{font-family:'Eczar';font-weight:700;font-size:44px;margin:0 0 6px}
+.sect p{font-size:17px;line-height:1.5;max-width:60em;margin:0}
+
+/* ---------- the cover ---------- */
+.cover{position:relative;width:720px;height:888px;overflow:hidden;flex:none;background:var(--kora);
+  box-shadow:0 2px 3px rgba(0,0,0,.18),0 18px 40px -18px rgba(0,0,0,.35)}
+.cover svg.cloth{position:absolute;left:0;top:0;display:block}
+.panel{position:absolute;left:0;top:560px;width:720px;height:328px;padding:34px 48px 0;color:var(--ink)}
+.series{font-weight:650;font-size:13px;letter-spacing:.2em;text-transform:uppercase;margin:0 0 12px;font-variation-settings:'wdth' 100}
+.title{font-family:'Eczar';font-weight:700;line-height:.98;letter-spacing:-.012em;margin:0;color:var(--ink);font-feature-settings:'kern' 1,'liga' 1}
+.title span{display:block;white-space:nowrap;width:max-content}
+.title .t2{font-weight:500;letter-spacing:-.005em}
+.sub{font-family:'Eczar';font-weight:500;font-size:21px;line-height:1.3;margin:14px 0 0;max-width:560px}
+.foot{position:absolute;left:48px;right:48px;bottom:32px;display:flex;align-items:center;justify-content:space-between;
+  font-weight:650;font-size:13px;letter-spacing:.16em;text-transform:uppercase;line-height:1}
+.imprint{display:flex;align-items:center;gap:11px}
+.imprint svg{display:block}
+.imprint span{font-variation-settings:'wdth' 112;font-weight:700;letter-spacing:.2em}
+.meta{display:flex;align-items:center;gap:10px;text-align:right}
+.dye{display:block;width:13px;height:13px;border:1.5px solid var(--ink)}
+</style>
+</head>
+<body>
+
+<section class="intro">
+  <div>
+    <p class="kicker">Vizuara Books · cover system 12</p>
+    <h1>Chhaap<small>छाप — the impression a carved block leaves on cloth</small></h1>
+    <p>Every Vizuara book is a length of hand-block-printed cotton. Each title gets its own carved block, built from the actual mechanism of its subject — a causal mask, a pipeline schedule, a Sobel kernel — and that block is stamped across the cloth as a repeat, the way an Ajrakh printer in Kutch builds a field from a single carved unit. The stamping is itself the idea: a block repeated with a stride across a surface is a convolution, and the same carved unit printed again and again is a model replicated across data.</p>
+    <p>The structure comes from the textile, not its ornaments: a <em>field</em> of repeats, a black <em>kinar</em> border shared by every book, and a <em>pallu</em> end-panel reserved from the dye where the title is set. Level is the number of dye baths the cloth has been through: raw kora for beginner, madder for intermediate, indigo for advanced. The four <em>Charlie</em> books are woven, not printed: a double-ikat sub-series after the Patola of Patan, where every thread is dyed to a pre-computed grid — a bitmap made of thread.</p>
+  </div>
+  <div>
+    <div class="spec">
+      <h3>Natural-dye palette</h3>
+      <div class="swatches">
+        <div class="sw"><i style="background:var(--kora)"></i><b>Kora</b>undyed cotton<br>#EAE1CC</div>
+        <div class="sw"><i style="background:var(--madder)"></i><b>Manjith</b>madder red<br>#9B2F25</div>
+        <div class="sw"><i style="background:var(--indigo)"></i><b>Neel</b>indigo<br>#1C2A4A</div>
+        <div class="sw"><i style="background:var(--iron)"></i><b>Kat</b>iron black<br>#201B19</div>
+        <div class="sw"><i style="background:var(--haldi)"></i><b>Anar</b>pomegranate<br>#C8962C</div>
+      </div>
+      <h3>Level = dye baths</h3>
+      <div class="levels">
+        <div class="lv"><i style="background:var(--kora);border:1px solid rgba(0,0,0,.2)"></i><b>Beginner</b> — printed on raw kora; indigo and iron black blocks.</div>
+        <div class="lv"><i style="background:var(--madder)"></i><b>Intermediate</b> — one bath in madder; motif reserved white, iron black, indigo.</div>
+        <div class="lv"><i style="background:var(--indigo)"></i><b>Advanced</b> — through the indigo vat; motif reserved white, madder, iron black.</div>
+      </div>
+      <h3>Type — both from Indian foundries</h3>
+      <div class="types">
+        <span class="e">Eczar Bold, for titles</span>
+        Vaibhav Singh / Rosetta. A sharp, calligraphic display serif designed alongside its Devanagari.
+        <span class="a">Anek Latin, for the imprint</span>
+        Ek Type, Mumbai. Variable width; used wide and tracked for the stamp line.
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="sect"><h2>The shelf</h2><p>One carved block per book. Field above, black kinar, reserved pallu for the title, printer's stamp at the foot.</p></div>
+<section class="shelf" id="shelf"></section>
+
+<script>
+/* =====================================================================
+   CHHAAP — block-printed covers for Vizuara Books
+   Everything is generated here: blocks are SVG groups, stamped with a
+   seeded hand (registration jitter, re-ink cycle) and printed through
+   an ink filter onto procedurally woven cotton.
+   ===================================================================== */
+const P = {kora:'#EAE1CC', indigo:'#1C2A4A', madder:'#9B2F25', iron:'#201B19', haldi:'#C8962C'};
+const LV = {
+  beginner:     {ground:P.kora,   main:P.indigo, accent:P.madder, line:P.iron, label:'Beginner',     baths:1},
+  intermediate: {ground:P.madder, main:P.kora,   accent:P.indigo, line:P.iron, label:'Intermediate', baths:2},
+  advanced:     {ground:P.indigo, main:P.kora,   accent:P.madder, line:P.iron, label:'Advanced',     baths:3},
+};
+const FIELD_H = 528, KINAR_Y = 528, KINAR_H = 32, PANEL_Y = 560;
+
+function hash(s){let h=2166136261;for(const ch of s){h^=ch.charCodeAt(0);h=Math.imul(h,16777619);}return h>>>0;}
+function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;}}
+const f = (n)=>+n.toFixed(2);
+
+/* ---------- drawing helpers (block-local coords) ---------- */
+const R = (x,y,w,h,extra='')=>`<rect x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${f(h)}" ${extra}/>`;
+const C = (x,y,r)=>`<circle cx="${f(x)}" cy="${f(y)}" r="${f(r)}"/>`;
+const L = (x1,y1,x2,y2,w)=>`<line x1="${f(x1)}" y1="${f(y1)}" x2="${f(x2)}" y2="${f(y2)}" stroke-width="${w}"/>`;
+const PG = (pts)=>`<polygon points="${pts.map(p=>p.map(f).join(',')).join(' ')}"/>`;
+const lozenge=(cx,cy,rx,ry)=>PG([[cx-rx,cy],[cx,cy-ry],[cx+rx,cy],[cx,cy+ry]]);
+
+/* =====================================================================
+   BLOCKS — one per book, derived from the subject.
+   Each returns {w,h, layers:{role:svg}, order:[roles], arr(c,r)}.
+   Roles are colour slots: main / accent / line / ground (knock-out) / kora / haldi
+   ===================================================================== */
+const BLOCKS = {
+
+  /* AI Context Engineering — a jaal of context windows. Each node is a window
+     packed with a 4x4 grid of selected tokens (one is the query); four streams
+     (instructions, tools, retrieval, memory) run into it from the sides. */
+  context(){
+    let main='',accent='',line='';
+    line += `<rect x="31" y="31" width="58" height="58" fill="none" stroke="currentColor" stroke-width="3.4"/>`;
+    const sel=['1111','1101','1011','1102'];
+    sel.forEach((row,i)=>[...row].forEach((v,j)=>{
+      const x=36.5+j*12.2, y=36.5+i*12.2;
+      if(v==='1') main+=R(x,y,10,10); else if(v==='2') accent+=R(x,y,10,10);
+    }));
+    for(const y of [5,14,23]) { main+=C(60,y,2.7); main+=C(60,120-y,2.7); }  // N/S streams: dots
+    for(const x of [3,15]) { main+=R(x,58.3,8,3.4); main+=R(120-x-8,58.3,8,3.4); } // E/W streams: dashes
+    line += lozenge(0,0,15,15) + lozenge(0,0,0,0);
+    accent += C(0,0,4.2);
+    return {w:120,h:120,layers:{main,accent,line},order:['line','main','accent']};
+  },
+
+  /* Mathematical Foundations — contour ellipses of a quadratic bowl (the
+     eigen-axes of A set the tilt) with gradient descent zig-zagging to the
+     minimum. Alternate blocks are turned 90°, a printer's trick for a jaal. */
+  gradient(){
+    let main='',accent='',line='';
+    const rot='rotate(-45 60 60)';
+    [[78,27,4.6],[62,21,3.6],[46,15.5,3.2]].forEach(([a,b,w])=>{
+      main+=`<ellipse cx="60" cy="60" rx="${a}" ry="${b}" transform="${rot}" fill="none" stroke="currentColor" stroke-width="${w}"/>`;
+    });
+    main+=`<ellipse cx="60" cy="60" rx="24" ry="8" transform="${rot}"/>`;
+    // descent path in the ellipse frame (u along the valley, v across it)
+    const uv=[[-70,20],[-54,-15],[-40,11],[-29,-7.5],[-19,5]];
+    const ang=-Math.PI/4, pts=uv.map(([u,v])=>[60+u*Math.cos(ang)-v*Math.sin(ang),60+u*Math.sin(ang)+v*Math.cos(ang)]);
+    line+=`<polyline points="${pts.map(p=>p.map(f).join(',')).join(' ')},60,60" fill="none" stroke="currentColor" stroke-width="2.2"/>`;
+    pts.forEach(([x,y],i)=>accent+=C(x,y,4.4-i*.35));
+    return {w:120,h:120,layers:{main,line,accent},order:['main','line','accent'],
+      arr:(c,r)=>((c+r)%2?'rotate(90 60 60)':'')};
+  },
+
+  /* Neural Networks from Scratch — a fully-connected layer. Tiled edge to edge,
+     each block's outputs are the next block's inputs: the net becomes a net. */
+  mlp(){
+    let main='',accent='',line='',ground='';
+    const ys=[15,45,75,105];
+    for(const x0 of [0,60]) for(const a of ys) for(const b of ys) line+=L(x0,a,x0+60,b,1.6);
+    // two activations traced through the layers: 1→2→1 and 3→0→3, continuous from block to block
+    accent+=`<polyline points="0,45 60,75 120,45" fill="none" stroke="currentColor" stroke-width="4.2"/>`;
+    accent+=`<polyline points="0,105 60,15 120,105" fill="none" stroke="currentColor" stroke-width="4.2"/>`;
+    for(const x of [0,60]) for(const y of ys){ main+=C(x,y,9); ground+=C(x,y,3.6); }
+    return {w:120,h:120,layers:{line,accent,main,ground},order:['line','accent','main','ground']};
+  },
+
+  /* Build LLMs from Scratch — the causal attention mask. Lower triangle: tokens
+     a position may attend to; diagonal: itself; the masked future is a dot. */
+  causal(){
+    let main='',accent='',line='';
+    const n=8,p=15;
+    for(let i=0;i<n;i++)for(let j=0;j<n;j++){
+      const x=j*p+2,y=i*p+2;
+      if(j<i) main+=R(x,y,11,11); else if(j===i) accent+=R(x,y,11,11); else line+=C(x+5.5,y+5.5,2.1);
+    }
+    return {w:120,h:120,layers:{line,main,accent},order:['line','main','accent']};
+  },
+
+  /* 5D Parallelism — a GPipe pipeline schedule: 4 stages (rows) x 12 time slots.
+     Forward micro-batches (white) run down one diagonal, backward (madder) back up
+     the other; each stage is split in two (tensor parallel); the idle bubble is
+     left as a dot. The block stamped again and again is data parallelism. */
+  pipeline(){
+    let main='',accent='',line='';
+    for(let s=0;s<4;s++)for(let t=0;t<12;t++){
+      const F=t>=s&&t<=s+2, B=t>=9-s&&t<=11-s, x=t*10+1.6;
+      for(const y of [s*30+3.5,s*30+16]){
+        if(F) main+=R(x,y,6.8,10.5); else if(B) accent+=R(x,y,6.8,10.5); else main+=C(x+3.4,y+5.25,1.25);
+      }
+    }
+    return {w:120,h:120,layers:{main,accent},order:['main','accent']};
+  },
+
+  /* Pi vs Hermes vs Codex — three lanes, three agents. Token lines crowd closer
+     as the context fills, then compact into a summary band (madder); a memory
+     dot survives beside each compaction. Lanes are phase-shifted by a third. */
+  compaction(){
+    let main='',accent='',line='';
+    const lanes=[[5,33,0],[45,33,40],[85,33,80]];
+    const ys=[];let y=2,g=13;while(y<92){ys.push(y);y+=g;g=Math.max(4.6,g*.82);}
+    lanes.forEach(([x,w,ph])=>{
+      const put=(yy,fn)=>{const a=((yy+ph)%120);fn(a);if(a>120-16)fn(a-120);};
+      ys.forEach(yy=>put(yy,a=>main+=R(x,a,w,2.4)));
+      put(100,a=>{accent+=R(x,a,w,14); line+=R(x,a,w,14,'fill="none" stroke="currentColor" stroke-width="2"');});
+      put(107,a=>main+=C(x-4,a,2.6));
+    });
+    return {w:120,h:120,layers:{main,accent,line},order:['main','accent','line']};
+  },
+
+  /* CNN Fundamentals — the block IS the kernel: a 5x5 Laplacian-of-Gaussian
+     edge filter carved as a Hinton diagram (square size grows with |weight|;
+     white positive, black negative, zero a dot). Its symmetry makes a buti. */
+  log(){
+    let main='',accent='',line='';
+    const K=[[0,0,-1,0,0],[0,-1,-2,-1,0],[-1,-2,16,-2,-1],[0,-1,-2,-1,0],[0,0,-1,0,0]];
+    const sz=(v)=>({16:21,2:15,1:9.5})[Math.abs(v)];
+    K.forEach((row,i)=>row.forEach((v,j)=>{
+      const cx=j*24+12, cy=i*24+12;
+      if(v>0){ main+=R(cx-sz(v)/2,cy-sz(v)/2,sz(v),sz(v)); }
+      else if(v<0) line+=R(cx-sz(v)/2,cy-sz(v)/2,sz(v),sz(v));
+      else accent+=C(cx,cy,2.6);
+    }));
+    accent+=R(60-4,60-4,8,8);
+    return {w:120,h:120,layers:{line,main,accent},order:['line','main','accent']};
+  },
+
+  /* Decision Trees — a depth-3 binary tree: split nodes as squares, leaves as
+     class-coloured discs. Alternate rows hang upside down so leaves meet leaves. */
+  dtree(){
+    let main='',accent='',line='';
+    const sw=3.4;
+    const node=(x,y,lvl)=>{
+      if(lvl===3){ return; }
+      const dx=[30,15,7.5][lvl], y1=y+12, y2=y+26;
+      main+=L(x,y,x,y1,sw)+L(x-dx-sw/2,y1,x+dx+sw/2,y1,sw)+L(x-dx,y1,x-dx,y2,sw)+L(x+dx,y1,x+dx,y2,sw);
+      line+=R(x-5,y-5,10,10);
+      node(x-dx,y2,lvl+1); node(x+dx,y2,lvl+1);
+    };
+    node(60,12,0);
+    const cls=[0,0,1,0,1,1,0,1];
+    cls.forEach((k,i)=>{const x=7.5+i*15,y=12+26*3+8; if(k) accent+=C(x,y,6); else line+=C(x,y,6);});
+    return {w:120,h:120,layers:{main,line,accent},order:['main','line','accent'],
+      arr:(c,r)=>(r%2?'translate(0 120) scale(1 -1)':'')};
+  },
+
+  /* Kernel Engineering — tiled matrix multiply. A row panel of A and a column
+     panel of B stream through shared memory (fine threads); where they cross,
+     the output tile C accumulates. Tiled, it weaves into a check. */
+  gemm(){
+    let main='',accent='',line='';
+    for(let k=0;k<8;k++){ const o=42+k*4.5; main+=R(0,o,42,2)+R(78,o,42,2)+R(o,0,2,42)+R(o,78,2,42); }
+    accent+=R(42,42,36,36);
+    for(let i=0;i<4;i++)for(let j=0;j<4;j++) main+=C(48+j*8,48+i*8,1.9);
+    for(const [x,y] of [[12,12],[98,12],[12,98],[98,98]]) main+=R(x,y,10,10);
+    return {w:120,h:120,layers:{main,accent},order:['accent','main']};
+  },
+};
+
+/* =====================================================================
+   IKAT — the Charlie sub-series is woven, not printed. A design is a
+   bitmap (the Patola naksha); every weft thread is dyed to it, and the
+   thread-slip of tied bundles feathers each edge.
+   ===================================================================== */
+const IKAT = {
+  /* Language Room — speculative decoding. Each row is one decoding step: a draft
+     of five tokens, the accepted prefix (white), the target model's correction
+     (anar), the rejected rest (madder). The next step starts where this one ended,
+     so the rows march forward like a Patola step. */
+  language(rand){
+    const W=60,H=40,g=[];for(let y=0;y<H;y++)g.push(new Array(W).fill(0));
+    const TW=3, PITCH=4, N=W/PITCH; let s=0;
+    for(let r=0;r<14;r++){
+      const y0=r*3; const acc=1+Math.floor(rand()*4);
+      for(let k=0;k<5;k++){
+        const v = k<acc?1 : k===acc?4 : 2;
+        const x0=((s+k)%N)*PITCH;
+        for(let dx=0;dx<TW;dx++)for(let dy=0;dy<2;dy++){const yy=y0+dy; if(yy<H) g[yy][x0+dx]=v;}
+      }
+      // earlier context stays on the row as white tokens
+      for(let k=1;k<=5;k++){ const x0=((s-k+N*4)%N)*PITCH; if(rand()<.9) for(let dx=0;dx<TW;dx++)for(let dy=0;dy<2;dy++){const yy=y0+dy; if(yy<H&&!g[yy][x0+dx]) g[yy][x0+dx]=1;} }
+      s+=acc+1;
+    }
+    return {W,H,g,feather:.5};
+  },
+  /* Vision Room — a ViT's view: the image cut into patches, each patch shaded by
+     how much the class token attends to it (anar > white > indigo > none). */
+  vision(rand){
+    const W=60,H=40,g=[];
+    const blobs=[[27,17,9,1],[40,25,6,.8],[14,29,4,.45],[49,9,3.5,.4]];
+    for(let y=0;y<H;y++){g.push([]);for(let x=0;x<W;x++){
+      const px=Math.floor(x/6), py=Math.floor((y+2)/6), gx=x%6, gy=(y+2)%6;
+      if(gx===5||gy===5){g[y].push(0);continue;}
+      const cx=px*6+2.5, cy=py*6+0.5;
+      let a=0;for(const [bx,by,s,w] of blobs)a+=w*Math.exp(-((cx-bx)**2+(cy-by)**2)/(2*s*s));
+      a+= (hash('p'+px+'.'+py)%100)/100*.18;
+      let v=0;
+      if(a>.72) v=4; else if(a>.4) v=1; else if(a>.2) v=2;
+      else if(gx===2&&gy===2) v=1;          // untouched patches keep only their centre thread
+      if(v===4 && (gx===0||gx===4||gy===0||gy===4)) v=1;
+      g[y].push(v);
+    }}
+    return {W,H,g,feather:.42};
+  },
+  /* Sound Room — two spoken phrases as a waveform: words are bursts of energy,
+     silences a single thread; every other thread-column is left undyed. */
+  sound(rand){
+    const W=60,H=40,g=[];for(let y=0;y<H;y++)g.push(new Array(W).fill(0));
+    [[10,.8],[29,1]].forEach(([cy,amp])=>{
+      const words=[];let x=1+rand()*3;while(x<W){const len=4+rand()*9;words.push([x,x+len,.55+rand()*.45]);x+=len+2+rand()*3;}
+      for(let x=0;x<W;x+=2){
+        let e=0;for(const [a,b,h] of words){ if(x>=a&&x<=b){ const t=(x-a)/(b-a); e=Math.max(e,h*Math.sin(Math.PI*t)**.7); } }
+        e*= (0.6+0.4*Math.abs(Math.sin(x*1.3+cy)));
+        const A=Math.round(e*8.4*amp);
+        if(A===0){ g[cy][x]=2; continue; }
+        for(let d=-A;d<=A;d++){ const yy=cy+d; if(yy>=0&&yy<H) g[yy][x]=(Math.abs(d)>=A-1&&A>=5)?4:1; }
+      }
+    });
+    return {W,H,g,feather:.3};
+  },
+  /* Reasoning Room — a solved gridworld: every cell a chevron along the optimal
+     policy, flowing around madder walls to the anar goals. */
+  reasoning(rand){
+    const W=60,H=40,g=[];for(let y=0;y<H;y++)g.push(new Array(W).fill(0));
+    const CW=10,CH=7, goals=[[7,1],[2,5]], walls=[[4,1],[4,2],[4,3],[6,4],[7,4],[8,4],[1,2]];
+    const key=(x,y)=>x+','+y, wall=new Set(walls.map(([x,y])=>key(x,y)));
+    const dist={}; const q=[]; goals.forEach(([x,y])=>{dist[key(x,y)]=0;q.push([x,y]);});
+    while(q.length){const [x,y]=q.shift();for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy,k=key(nx,ny);
+      if(nx<0||ny<0||nx>=CW||ny>=CH||wall.has(k)||k in dist)continue;dist[k]=dist[key(x,y)]+1;q.push([nx,ny]);}}
+    const chev=['11000','01100','00110','01100','11000'];
+    const rot=(m,dir)=>{ const o=[];for(let y=0;y<5;y++){o.push('');for(let x=0;x<5;x++){
+        let sx,sy; if(dir==='r'){sx=x;sy=y;} else if(dir==='l'){sx=4-x;sy=y;} else if(dir==='d'){sx=y;sy=x;} else {sx=y;sy=4-x;}
+        o[y]+=m[sy][sx];}} return o; };
+    function set(x,y,v){ if(x>=0&&y>=0&&x<W&&y<H) g[y][x]=v; }
+    for(let cy=0;cy<CH;cy++)for(let cx=0;cx<CW;cx++){
+      const ox=cx*6, oy=cy*6-1, k=key(cx,cy);
+      if(wall.has(k)){ for(let y=0;y<5;y++)for(let x=0;x<5;x++)set(ox+x,oy+y,2); continue; }
+      if(dist[k]===0){ for(let y=0;y<5;y++)for(let x=0;x<5;x++)set(ox+x,oy+y,(x%4===0||y%4===0)?4:(x===2&&y===2?4:0)); continue; }
+      let best='r',bd=1e9;
+      for(const [dx,dy,d] of [[1,0,'r'],[-1,0,'l'],[0,1,'d'],[0,-1,'u']]){const kk=key(cx+dx,cy+dy); if(kk in dist && dist[kk]<bd){bd=dist[kk];best=d;}}
+      const tile=rot(chev,best);
+      for(let y=0;y<5;y++)for(let x=0;x<5;x++) if(tile[y][x]==='1') set(ox+x,oy+y,1);
+    }
+    return {W,H,g,feather:.4};
+  },
+};
+
+/* =====================================================================
+   BOOKS
+   ===================================================================== */
+const BOOKS = [
+  {slug:'ai-context-engineering', lines:['AI Context','Engineering'], level:'intermediate', capsules:43, hours:10, block:'context',
+   why:'A jaal of context windows: each node packs a 4×4 grid of chosen tokens (one is the query), fed by four streams — instructions, tools, retrieval, memory.'},
+  {slug:'mathematical-foundations-for-ml', lines:['Mathematical','Foundations for','Machine Learning'], level:'beginner', capsules:43, hours:10, block:'gradient',
+   why:'Contour ellipses of a quadratic bowl, tilted by its eigen-axes, with gradient descent zig-zagging down the valley. Alternate stamps turned 90°.'},
+  {slug:'neural-networks-from-scratch', lines:['Neural Networks','from Scratch'], level:'beginner', capsules:33, hours:7, block:'mlp',
+   why:'One fully-connected layer. Stamped edge to edge, every block\'s outputs are the next block\'s inputs, so the net becomes a literal net.'},
+  {slug:'build-llms-from-scratch', lines:['Build Large Language','Models (LLMs)','from Scratch'], level:'intermediate', capsules:20, hours:6, block:'causal',
+   why:'The causal attention mask, 8×8: the past printed white, each token\'s own position in indigo, the masked future a dot. Repeated, it becomes the sawtooth border every Indian printer knows.'},
+  {slug:'5d-parallelism', lines:['5D Parallelism','for Large Model','Training'], level:'advanced', capsules:40, hours:9, block:'pipeline',
+   why:'A pipeline schedule — forward micro-batches down one diagonal, backward (madder) back up; each stage split in two for tensor parallelism; the block repeated is data parallelism.'},
+  {slug:'pi-vs-hermes-vs-codex', lines:['Pi vs Hermes','vs Codex'], sub2:'Context Compaction and Memory', level:'advanced', capsules:9, hours:1, block:'compaction',
+   why:'Three lanes for three agents. Token lines crowd tighter as the window fills, then compact into a madder summary band with a memory dot beside it.'},
+  {slug:'cnn-fundamentals', lines:['Convolutional','Neural Networks','Fundamentals'], level:'intermediate', capsules:34, hours:8, block:'log',
+   why:'The block is the kernel: a 5×5 Laplacian-of-Gaussian edge filter carved as a Hinton diagram — white positive centre, black negative ring, zeros as dots. Stamping a block across cloth is convolution.'},
+  {slug:'decision-trees-from-scratch', lines:['Build Decision Trees','from Scratch'], level:'beginner', capsules:23, hours:5, block:'dtree',
+   why:'A depth-3 binary tree: split tests as squares, leaves as class-coloured discs. Alternate rows hang inverted so leaves meet leaves.'},
+  {slug:'kernel-engineering', lines:['Kernel','Engineering'], sub:'From silicon to speculative decoding — GPU kernels for modern LLMs.', level:'advanced', soon:true, block:'gemm',
+   why:'Tiled matrix multiply: a row panel of A and a column panel of B stream through shared memory; where they cross, the output tile accumulates. It weaves into a check.'},
+  {slug:'charlie-language-room', lines:['Charlie and the','Language Room'], series:'I', sub:'Language — Inference Engineering', level:'advanced', capsules:22, hours:5, ikat:'language',
+   why:'Speculative decoding as ikat stripes: runs of accepted draft tokens (white), the target model\'s correction (yellow), rejected drafts (madder).'},
+  {slug:'charlie-vision-room', lines:['Charlie and the','Vision Room'], series:'II', sub:'Vision — Vision Transformers', level:'intermediate', capsules:20, hours:6, ikat:'vision',
+   why:'How a ViT sees: an image of concentric rings cut into a grid of patches, woven as double ikat.'},
+  {slug:'charlie-sound-room', lines:['Charlie and the','Sound Room'], series:'III', sub:'Audio — Voice Agents', level:'intermediate', capsules:20, hours:6, ikat:'sound',
+   why:'Three spoken utterances as mirrored waveforms; the loudest peaks dyed yellow, silences as a single indigo thread.'},
+  {slug:'charlie-reasoning-room', lines:['Charlie and the','Reasoning Room'], series:'IV', sub:'Reason — Reinforcement Learning, from bandits to reasoning models', level:'advanced', capsules:21, hours:6, ikat:'reasoning',
+   why:'A solved gridworld: each cell a chevron along the optimal policy, flowing around madder walls to the yellow goals.'},
+];
+
+/* =====================================================================
+   FILTERS — ink on cotton, and the cotton itself
+   ===================================================================== */
+function inkFilter(id,seed,rough=2.6,voids=.66){
+  return `<filter id="${id}" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+    <feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="3" seed="${seed}" result="w"/>
+    <feDisplacementMap in="SourceGraphic" in2="w" scale="${rough}" xChannelSelector="R" yChannelSelector="G" result="d"/>
+    <feTurbulence type="fractalNoise" baseFrequency="0.42 0.5" numOctaves="3" seed="${seed+7}" result="n"/>
+    <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="${seed+3}" result="m"/>
+    <feComposite in="n" in2="m" operator="arithmetic" k2="0.8" k3="0.35" k4="-0.1" result="nm"/>
+    <feColorMatrix in="nm" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -4.2 0 0 0 ${(voids*4.2).toFixed(3)}" result="mask"/>
+    <feComposite in="d" in2="mask" operator="in"/>
+  </filter>`;
+}
+function clothDefs(id,seed){
+  return `
+  <filter id="${id}-weave" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+    <feTurbulence type="fractalNoise" baseFrequency="0.008 0.9" numOctaves="2" seed="${seed}" result="h"/>
+    <feTurbulence type="fractalNoise" baseFrequency="0.9 0.008" numOctaves="2" seed="${seed+1}" result="v"/>
+    <feComposite in="h" in2="v" operator="arithmetic" k2="0.5" k3="0.5" result="hv"/>
+    <feColorMatrix in="hv" type="matrix" values="0 0 0 0 0.12  0 0 0 0 0.08  0 0 0 0 0.04  3 0 0 0 -1.5" result="dark"/>
+    <feColorMatrix in="hv" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 .96  -3 0 0 0 1.38" result="light"/>
+    <feMerge><feMergeNode in="dark"/><feMergeNode in="light"/></feMerge>
+  </filter>
+  <filter id="${id}-mottle" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+    <feTurbulence type="fractalNoise" baseFrequency="0.0045 0.006" numOctaves="3" seed="${seed+5}" result="m"/>
+    <feColorMatrix in="m" type="matrix" values="0 0 0 0 0.16  0 0 0 0 0.09  0 0 0 0 0.05  1.6 0 0 0 -0.62"/>
+  </filter>`;
+}
+
+/* ---------- stamping ---------- */
+function stampField(B, lv, rand, id){
+  const cols=Math.ceil(720/B.w)+1, rows=Math.ceil(FIELD_H/B.h)+1;
+  const ox=(720-Math.floor(720/B.w)*B.w)/2 - (B.ox||0), oy=B.oy||0;
+  let defs='', out='';
+  B.order.forEach((role,li)=>{
+    defs+=`<g id="${id}-${role}" fill="currentColor" stroke="currentColor" stroke-width="0">${B.layers[role]}</g>`;
+    defs+=inkFilter(`${id}-ink-${role}`, (hash(id)%500)+li*31, role==='line'?2.2:2.8, role==='ground'?.78:.68);
+    let g='', n=0;
+    for(let r=-1;r<rows;r++)for(let c=-1;c<cols;c++){
+      const x=ox+c*B.w, y=oy+r*B.h;
+      const dx=(rand()-.5)*2.2, dy=(rand()-.5)*2.2, rot=(rand()-.5)*.8;
+      const op=[1,.94,.88][n++%3]-rand()*.04;
+      g+=`<use href="#${id}-${role}" transform="translate(${f(x+dx)} ${f(y+dy)}) rotate(${f(rot)} ${B.w/2} ${B.h/2}) ${B.arr?B.arr(c,r):''}" opacity="${f(op)}"/>`;
+    }
+    const col = role==='ground'?lv.ground: role==='kora'?P.kora: role==='haldi'?P.haldi: lv[role];
+    out+=`<g color="${col}" filter="url(#${id}-ink-${role})">${g}</g>`;
+  });
+  return {defs,out};
+}
+
+/* ---------- weaving ---------- */
+function weaveIkat(design, lv, rand, id){
+  const {W,H,g}=design, p=720/W, th=2;           // unit size in px, thread thickness
+  const colOf=[null, P.kora, lv.accent, P.iron, P.haldi];
+  const rowsT=Math.ceil(FIELD_H/th), colsT=Math.ceil(720/th);
+  // bundle noise: ikat threads are tied and dyed in bundles, which slip together
+  const bundle=(n,len)=>{const k=[];for(let i=0;i<n/len+2;i++)k.push((rand()-.5));return i=>{const t=i/len,a=Math.floor(t),fr=t-a,s=(1-Math.cos(fr*Math.PI))/2;return k[a]*(1-s)+k[a+1]*s;};};
+  const bx=bundle(rowsT,5), by=bundle(colsT,5);
+  const jx=[],jy=[];
+  const fe=design.feather||.45;
+  for(let i=0;i<rowsT;i++) jx.push(bx(i)*p*fe*1.6+(rand()-.5)*p*fe*.5);
+  for(let i=0;i<colsT;i++) jy.push(by(i)*p*fe*.7+(rand()-.5)*p*fe*.25);
+  const byColor={};
+  for(let r=0;r<rowsT;r++){
+    const y=r*th; let run=null, rx=0;
+    const flush=(x)=>{ if(run){ (byColor[run]=byColor[run]||[]).push(`M${rx} ${y}h${x-rx}v${th}h${rx-x}z`);} };
+    for(let c=0;c<=colsT;c++){
+      let v=null;
+      if(c<colsT){
+        const x=c*th;
+        const ux=Math.floor((x+th/2+jx[r])/p), uy=Math.floor((y+th/2+jy[c])/p);
+        const cv=(ux>=0&&uy>=0&&ux<W&&uy<H)?g[uy][ux]:0;
+        v=cv?colOf[cv]:null;
+      }
+      if(v!==run){ flush(c*th); run=v; rx=c*th; }
+    }
+  }
+  let out='';
+  for(const [col,ds] of Object.entries(byColor)) out+=`<path fill="${col}" d="${ds.join('')}"/>`;
+  // warp threads: faint vertical ribbing across the woven field
+  return `<g filter="url(#${id}-ikat)">${out}</g>`;
+}
+
+/* ---------- the kinar: one border for the whole library ---------- */
+function kinar(id){
+  let s=`<g filter="url(#${id}-ink-k)"><rect x="-6" y="${KINAR_Y}" width="732" height="${KINAR_H}" fill="${P.iron}"/></g>`;
+  let w='';
+  const cy=KINAR_Y+KINAR_H/2;
+  for(let k=-1;k<32;k++){ const cx=12+k*24; w+=lozenge(cx,cy,7.2,7.2); w+=C(cx+12,cy,1.9); }
+  w+=R(-4,KINAR_Y+4,728,1.6)+R(-4,KINAR_Y+KINAR_H-5.6,728,1.6);
+  s+=`<g fill="${P.kora}" filter="url(#${id}-ink-kw)">${w}</g>`;
+  return s;
+}
+
+/* ---------- Vizuara stamp: a carved square block with a stepped V ---------- */
+function mark(size=24,col=P.iron,bg=P.kora){
+  const V=['##....##','##....##','.##..##.','.##..##.','..####..','..####..','...##...','...##...'];
+  const u=size/10; let cells='';
+  V.forEach((row,y)=>[...row].forEach((ch,x)=>{ if(ch==='#') cells+=R((x+1)*u,(y+1)*u,u+.03,u+.03); }));
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" aria-label="Vizuara"><rect width="${size}" height="${size}" fill="${col}"/><g fill="${bg}">${cells}</g></svg>`;
+}
+
+/* ---------- assemble one cover ---------- */
+function cover(b){
+  const lv=LV[b.level], id='c'+hash(b.slug).toString(36), rand=mulberry(hash(b.slug));
+  let defs=clothDefs(id,hash(b.slug)%997), body='';
+  defs+=inkFilter(`${id}-ink-k`,11,2.0,.70)+inkFilter(`${id}-ink-kw`,19,1.6,.74);
+  defs+=`<clipPath id="${id}-field"><rect x="0" y="0" width="720" height="${KINAR_Y+2}"/></clipPath>`;
+  body+=`<rect width="720" height="888" fill="${lv.ground}"/>`;
+  body+=`<rect width="720" height="${FIELD_H}" filter="url(#${id}-mottle)" opacity="${b.level==='beginner'?.14:.42}"/>`;
+  if(b.block){
+    const st=stampField(BLOCKS[b.block](), lv, rand, id);
+    defs+=st.defs; body+=`<g clip-path="url(#${id}-field)">${st.out}</g>`;
+  } else {
+    defs+=inkFilter(`${id}-ikat`,23,1.2,.8);
+    body+=`<g clip-path="url(#${id}-field)">${weaveIkat(IKAT[b.ikat](rand), lv, rand, id)}</g>`;
+  }
+  body+=`<rect x="0" y="${PANEL_Y}" width="720" height="${888-PANEL_Y}" fill="${P.kora}"/>`;
+  body+=kinar(id);
+  body+=`<rect width="720" height="888" filter="url(#${id}-weave)" opacity=".16" clip-path="url(#${id}-field)"/>`;
+  body+=`<rect y="${PANEL_Y}" width="720" height="${888-PANEL_Y}" filter="url(#${id}-weave)" opacity=".07"/>`;
+
+  const meta = b.soon ? `${lv.label} · Forthcoming` : `${lv.label} · ${b.capsules} capsules`;
+  const dye = `<i class="dye" style="background:${lv.ground}"></i>`;
+  const lines = b.lines.map(t=>`<span>${t}</span>`).join('') + (b.sub2?`<span class="t2">${b.sub2}</span>`:'');
+  return `<figure class="c"><div class="cover" data-slug="${b.slug}">
+    <svg class="cloth" width="720" height="888" viewBox="0 0 720 888" xmlns="http://www.w3.org/2000/svg"><defs>${defs}</defs>${body}</svg>
+    <div class="panel">
+      ${b.series?`<p class="series">Charlie and the Intelligence Factory · ${b.series}</p>`:''}
+      <h2 class="title">${lines}</h2>
+      ${b.sub?`<p class="sub">${b.sub}</p>`:''}
+      <div class="foot"><div class="imprint">${mark(25)}<span>Vizuara Books</span></div>
+        <div class="meta">${dye}<span>${meta}</span></div></div>
+    </div></div>
+    <figcaption><b>${b.slug}</b>${b.why}</figcaption></figure>`;
+}
+
+document.getElementById('shelf').innerHTML = BOOKS.map(cover).join('');
+
+/* ---------- fit titles: widest line fills the measure, capped ---------- */
+function fit(){
+  document.querySelectorAll('.cover').forEach(cv=>{
+    const t=cv.querySelector('.title'), spans=[...t.querySelectorAll('span:not(.t2)')], t2=t.querySelector('.t2');
+    const hasSeries=!!cv.querySelector('.series'), hasSub=!!cv.querySelector('.sub');
+    const maxW=624, cap=spans.length>2?64:76;
+    t.style.fontSize='100px';
+    const widest=Math.max(...spans.map(s=>s.getBoundingClientRect().width));
+    let fs=Math.min(cap, 100*maxW/widest);
+    t.style.fontSize=fs.toFixed(1)+'px';
+    if(t2){ t2.style.fontSize='0.44em'; t2.style.marginTop='.3em'; }
+  });
+}
+document.fonts.ready.then(fit);
+</script>
+</body>
+</html>

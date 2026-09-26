@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Double Take — Vizuara Books</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Albert+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=GFS+Didot&display=block" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@700&family=Noto+Sans+Devanagari:wght@700&family=Noto+Sans+Arabic:wght@700&display=block" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@700&text=%E8%A8%80%E3%81%82%E8%AA%9E&display=block" rel="stylesheet">
+<style>
+:root{
+  --paper:#EFE7D6; --ink:#1A1817; --red:#D5412A; --blue:#2B4DA8; --yellow:#F0B429; --tint:#D6C8AA;
+  --page:#D9D2C4;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--page);color:var(--ink);font-family:'Albert Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+
+/* ---------- the cover system ---------- */
+.cover{position:relative;width:720px;height:888px;overflow:hidden;flex:none;font-family:'Albert Sans',sans-serif;font-kerning:normal}
+.cover.beginner{background:var(--paper);color:var(--ink)}
+.cover.intermediate{background:var(--red);color:var(--ink)}
+.cover.advanced{background:var(--ink);color:var(--paper)}
+.cover .art{position:absolute;left:0;top:0;width:720px;height:888px;display:block}
+.cover .tb{position:absolute;left:48px;right:44px;top:612px}
+.cover h2{margin:0;font-weight:700;font-size:56px;line-height:1.0;letter-spacing:-0.024em;font-feature-settings:"kern","ss01"}
+.cover h2.s{font-size:50px}
+.cover .sub{margin:14px 0 0;font-weight:500;font-size:23px;line-height:1.18;letter-spacing:-0.006em;max-width:560px}
+.cover .foot{position:absolute;left:48px;right:48px;bottom:36px;display:flex;justify-content:space-between;align-items:center;font-size:15px;font-weight:600;letter-spacing:.01em;line-height:1}
+.cover .imprint{display:flex;align-items:center;gap:9px}
+.cover .imprint svg{display:block}
+.cover .imprint b{font-weight:700;letter-spacing:.005em}
+.cover .imprint span{font-weight:500}
+.cover .lvl{display:flex;align-items:center;gap:8px;font-weight:600}
+.cover .lvl i{font-style:normal;font-weight:500;opacity:1}
+.cover .lvl svg{display:block}
+.cover .soon{display:inline-block;padding:5px 9px 4px;border:2px solid currentColor;border-radius:3px;font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;margin-right:4px}
+
+/* ---------- presentation page ---------- */
+.wrapall{max-width:1520px;margin:0 auto;padding:72px 40px 120px}
+header.intro{display:grid;grid-template-columns:1.1fr 1fr;gap:56px;align-items:start;margin-bottom:72px}
+.kicker{font-size:14px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin:0 0 18px}
+h1{font-size:112px;line-height:.9;letter-spacing:-.045em;margin:0 0 28px;font-weight:800}
+.lede{font-size:21px;line-height:1.45;margin:0 0 16px;max-width:640px}
+.lede em{font-style:italic}
+.spec{font-size:15px;line-height:1.5}
+.spec h3{font-size:13px;letter-spacing:.14em;text-transform:uppercase;margin:0 0 12px;font-weight:700}
+.sw{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:34px}
+.sw div{height:92px;border-radius:2px;padding:10px;display:flex;flex-direction:column;justify-content:flex-end;font-size:12px;font-weight:600;line-height:1.3}
+.lv{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:34px}
+.lv div{padding:14px;border-radius:2px;font-size:14px;font-weight:600;line-height:1.35}
+.lv div svg{display:block;margin-bottom:10px}
+.typ{margin-bottom:12px}
+.typ .big{font-size:44px;font-weight:700;letter-spacing:-.024em;line-height:1}
+.grid{display:flex;flex-wrap:wrap;gap:64px 56px;justify-content:center}
+figure.c{margin:0;width:720px}
+figure.c figcaption{margin-top:16px;font-size:16px;line-height:1.45;max-width:660px}
+figure.c figcaption b{font-weight:700}
+.sect{font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin:96px 0 28px;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrapall">
+<header class="intro">
+  <div>
+    <p class="kicker">Vizuara Books · Cover system proposal 16</p>
+    <h1>Double Take</h1>
+    <p class="lede">One idea per book. Each cover is a single visual thought — a pun, a metaphor, a figure–ground trick — built from a handful of flat shapes, that you get in a second and remember for a year. The idea has to be <em>true</em>: a joke that teaches the wrong thing about the subject doesn't make the cut.</p>
+    <p class="lede">Everything around the idea is deliberately quiet: one typeface, one title size, one hang line, three grounds. The shelf reads as a family because the system never changes; each book is findable because its picture never repeats.</p>
+  </div>
+  <div class="spec" id="spec"></div>
+</header>
+<div class="grid" id="grid"></div>
+</div>
+
+<script>
+const C = {paper:'#EFE7D6', ink:'#1A1817', red:'#D5412A', blue:'#2B4DA8', yellow:'#F0B429', tint:'#D6C8AA'};
+const LV = {
+  beginner:    {name:'Beginner',     ground:C.paper, fg:C.ink,   glyph:(c)=>`<svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6.5" fill="${c}"/></svg>`},
+  intermediate:{name:'Intermediate', ground:C.red,   fg:C.ink,   glyph:(c)=>`<svg width="13" height="13" viewBox="0 0 13 13"><rect width="13" height="13" fill="${c}"/></svg>`},
+  advanced:    {name:'Advanced',     ground:C.ink,   fg:C.paper, glyph:(c)=>`<svg width="16" height="16" viewBox="0 0 16 16"><path d="M8 0L16 8L8 16L0 8Z" fill="${c}"/></svg>`},
+};
+// imprint: an open book seen end-on (a V) holding one idea (the dot)
+const mark = (fg, dot) => `<svg width="26" height="22" viewBox="0 0 26 22"><path d="M1 4 L13 20 L25 4" fill="none" stroke="${fg}" stroke-width="4.2" stroke-linejoin="miter" stroke-miterlimit="8"/><circle cx="13" cy="6" r="3.6" fill="${dot}"/></svg>`;
+
+/* ---------- helpers ---------- */
+const P = (d, fill, extra='') => `<path d="${d}" fill="${fill}" ${extra}/>`;
+const S = (d, stroke, w, extra='') => `<path d="${d}" fill="none" stroke="${stroke}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" ${extra}/>`;
+const circ = (x,y,r,fill,extra='') => `<circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" ${extra}/>`;
+const rect = (x,y,w,h,fill,extra='') => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}" ${extra}/>`;
+const f = (n) => Math.round(n*100)/100;
+function insetTri(Pt, d){
+  const c=[(Pt[0][0]+Pt[1][0]+Pt[2][0])/3,(Pt[0][1]+Pt[1][1]+Pt[2][1])/3], L=[];
+  for(let i=0;i<3;i++){const a=Pt[i],b=Pt[(i+1)%3];let nx=-(b[1]-a[1]),ny=b[0]-a[0];const l=Math.hypot(nx,ny);nx/=l;ny/=l;
+    if((c[0]-a[0])*nx+(c[1]-a[1])*ny<0){nx=-nx;ny=-ny;}
+    L.push({p:[a[0]+nx*d[i],a[1]+ny*d[i]],v:[b[0]-a[0],b[1]-a[1]]});}
+  const X=(l1,l2)=>{const den=l1.v[0]*l2.v[1]-l1.v[1]*l2.v[0];const t=((l2.p[0]-l1.p[0])*l2.v[1]-(l2.p[1]-l1.p[1])*l2.v[0])/den;return [l1.p[0]+t*l1.v[0],l1.p[1]+t*l1.v[1]];};
+  return [X(L[2],L[0]),X(L[0],L[1]),X(L[1],L[2])];
+}
+const poly = (pts) => 'M'+pts.map(p=>f(p[0])+' '+f(p[1])).join(' L')+' Z';
+
+/* ---------- the ideas ---------- */
+const ART = {};
+
+// B or 13? The same mark means different things in different context.
+ART['ai-context-engineering'] = () => {
+  const s = 0.93, sw = 21;
+  const G = {
+    A:   'M0 150 L65 0 L130 150 M25 103 H105',
+    C:   'M115.5 26.8 A62 75 0 1 0 115.5 123.2',
+    one: 'M14 30 L50 0 V150',
+    two: 'M10 42 C10 16 34 0 62 0 C92 0 114 20 114 46 C114 76 84 98 10 150 H118',
+    four:'M86 150 V0 L4 104 H122',
+    amb: 'M10 0 V150 M41 0 H70 A37.5 37.5 0 0 1 70 75 H50 M50 75 H72 A37.5 37.5 0 0 1 72 150 H41',
+  };
+  const g = (k,x,y,col) => `<path transform="translate(${x} ${y}) scale(${s})" d="${G[k]}" fill="none" stroke="${col}" stroke-width="${sw/s}" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const cy = 236, gapV = 196;
+  return `
+    ${g('one', 250, cy-gapV, C.ink)}${g('two', 322, cy-gapV, C.ink)}
+    ${g('A', 96, cy, C.paper)}
+    ${g('amb', 305, cy, C.yellow)}
+    ${g('C', 482, cy, C.paper)}
+    ${g('one', 244, cy+gapV, C.ink)}${g('four', 322, cy+gapV, C.ink)}
+  `;
+};
+
+// The Parthenon, built from Greek letters: a Δ pediment on four Π's (eight columns), on three steps.
+ART['mathematical-foundations-for-ml'] = () => {
+  const out = [];
+  const tri = [[88,292],[360,150],[632,292]];
+  const inn = insetTri(tri,[10,28,17]);
+  out.push(`<path d="${poly(tri)} ${poly(inn)}" fill="${C.red}" fill-rule="evenodd"/>`);
+  const W=120, gap=12, x0 = 360 - (4*W+3*gap)/2, y0 = 304, H = 216;
+  for(let i=0;i<4;i++){
+    const x = x0 + i*(W+gap);
+    out.push(rect(x, y0, W, 15, C.ink));                       // lintel (the Π's top bar)
+    out.push(rect(x+17, y0+15, 27, H-23, C.ink));              // left stem
+    out.push(rect(x+W-44, y0+15, 27, H-23, C.ink));            // right stem
+    out.push(rect(x+6, y0+H-8, 49, 8, C.ink));                 // foot serifs = column bases
+    out.push(rect(x+W-55, y0+H-8, 49, 8, C.ink));
+    out.push(P(`M${x+17} ${y0+H-8} q0 -10 -6 -10 v10 z M${x+44} ${y0+H-8} q0 -10 6 -10 v10 z M${x+W-44} ${y0+H-8} q0 -10 -6 -10 v10 z M${x+W-17} ${y0+H-8} q0 -10 6 -10 v10 z`, C.ink));
+    out.push(rect(x, y0+15, 5, 14, C.ink)); out.push(rect(x+W-5, y0+15, 5, 14, C.ink));
+  }
+  const steps = [['CALCULUS',548],['PROBABILITY & STATISTICS',602],['LINEAR ALGEBRA',656]];
+  steps.forEach(([t,w],i)=>{
+    const y = 528 + i*21;
+    out.push(rect(360-w/2, y, w, 21, C.ink));
+    out.push(`<text x="360" y="${y+15}" text-anchor="middle" font-family="Albert Sans" font-weight="700" font-size="11" letter-spacing="2.4" fill="${C.paper}">${t.replace('&','&amp;')}</text>`);
+  });
+  return out.join('');
+};
+
+// A spider spinning a neural network instead of a web — every connection by hand, from scratch.
+ART['neural-networks-from-scratch'] = () => {
+  const layers = [[3,130],[4,282],[4,434],[2,586]], cy = 318, sp = 98;
+  const N = layers.map(([n,x]) => Array.from({length:n},(_,i)=>[x, cy + (i-(n-1)/2)*sp]));
+  const out = [];
+  // guy lines to the edges, like a real web
+  N[0].forEach(([x,y],i)=> out.push(S(`M${x} ${y} L0 ${[150,318,486][i]}`, C.ink, 2.2)));
+  N[3].forEach(([x,y],i)=> out.push(S(`M${x} ${y} L720 ${[196,440][i]}`, C.ink, 2.2)));
+  out.push(S(`M${N[1][0][0]} ${N[1][0][1]} L250 0`, C.ink, 2.2));
+  // the unfinished edge
+  const a = N[2][3], b = N[3][1], t = 0.56;
+  const sx = a[0]+(b[0]-a[0])*t, sy = a[1]+(b[1]-a[1])*t;
+  for(let l=0;l<3;l++) N[l].forEach(p=>N[l+1].forEach(q=>{
+    if(p===a && q===b) return;
+    out.push(S(`M${p[0]} ${p[1]} L${q[0]} ${q[1]}`, C.ink, 2.2));
+  }));
+  out.push(S(`M${a[0]} ${a[1]} L${f(sx)} ${f(sy)}`, C.ink, 2.2));
+  N.flat().forEach(([x,y])=> out.push(circ(x,y,10,C.ink)));
+  // spider (drawn facing +x, then rotated along the edge)
+  const ang = Math.atan2(b[1]-a[1], b[0]-a[0])*180/Math.PI;
+  const legs = [];
+  [[-1],[1]].forEach(([sg])=>{
+    [[6,28,-8,52,-30],[2,34,4,58,-6],[-4,32,18,52,22],[-9,26,26,40,44]].forEach(([bx,kx,ky,fx,fy])=>{
+      legs.push(S(`M${bx} 0 L${bx+ky*0.5} ${sg*kx} L${fx*0.2+bx+ky} ${sg*fx}`, C.ink, 3.6));
+    });
+  });
+  out.push(`<g transform="translate(${f(sx)} ${f(sy)}) rotate(${f(ang)})">
+     ${legs.join('')}
+     <ellipse cx="-22" cy="0" rx="21" ry="16" fill="${C.red}"/>
+     ${circ(4,0,10,C.ink)}
+   </g>`);
+  return out.join('');
+};
+
+// The Tower of Babel, rebuilt: a stack of identical blocks that learns every language.
+ART['build-llms-from-scratch'] = () => {
+  const out = [], base = 584, th = 62, glyphs = ['A','अ','λ','ع','言','Я','あ','Ω','क','ж','語','ب','e','ह','β','и'];
+  let gi = 0;
+  const widths = [600, 512, 424, 336, 248, 160];
+  widths.forEach((w,i)=>{
+    const y = base - (i+1)*th, x = 360 - w/2;
+    out.push(rect(x, y, w, th, C.paper));
+    const n = Math.floor((w-24)/46), span = n*46, x1 = 360 - span/2 + 10;
+    for(let k=0;k<n;k++){
+      const ax = x1 + k*46, ay = y+14, aw = 26, ah = 40;
+      out.push(P(`M${ax} ${ay+ah} V${ay+13} A13 13 0 0 1 ${ax+aw} ${ay+13} V${ay+ah} Z`, C.ink));
+      out.push(`<text x="${ax+13}" y="${ay+32}" text-anchor="middle" font-family="Noto Sans, Noto Sans Devanagari, Noto Sans Arabic, Noto Sans JP" font-weight="700" font-size="15" fill="${C.paper}">${glyphs[gi++ % glyphs.length]}</text>`);
+    }
+  });
+  // crane lowering the last block
+  const topY = base - widths.length*th; // 212
+  const mx = 408;
+  out.push(S(`M${mx} ${topY} V46 M${mx+14} ${topY} V46`, C.ink, 3.5));
+  let z = ''; for(let y=topY; y>50; y-=16) z += `M${mx} ${y} L${mx+14} ${y-16} `;
+  out.push(S(z, C.ink, 2.4));
+  out.push(S(`M${mx-150} 60 H${mx+96} M${mx-150} 46 H${mx+96}`, C.ink, 3.5));
+  let zj=''; for(let x=mx-150; x<mx+96; x+=16) zj += `M${x} 60 L${x+16} 46 `;
+  out.push(S(zj, C.ink, 2.4));
+  out.push(S(`M${mx+7} 46 L${mx+7} 20 M${mx+7} 20 L${mx-110} 46 M${mx+7} 20 L${mx+84} 46`, C.ink, 2.4));
+  out.push(rect(mx+60, 62, 34, 26, C.ink));
+  out.push(S(`M300 60 V124`, C.ink, 2.4));
+  out.push(S(`M300 124 L262 142 M300 124 L338 142`, C.ink, 2.4));
+  out.push(rect(260, 142, 80, 50, C.yellow));
+  out.push(P(`M${287} 184 V162 A13 13 0 0 1 313 162 V184 Z`, C.ink));
+  out.push(`<text x="300" y="181" text-anchor="middle" font-family="Noto Sans" font-weight="700" font-size="15" fill="${C.yellow}">?</text>`);
+  return out.join('');
+};
+
+// A 5-dimensional cube: 2×2×2×2×2 = 32 GPUs, one axis per kind of parallelism.
+ART['5d-parallelism'] = () => {
+  const n=5, R=64, cx=360, cy=318, rot=-Math.PI/2;
+  const dirs=[...Array(n)].map((_,k)=>{const a=rot+Math.PI*k/n;return [Math.cos(a),Math.sin(a)];});
+  const V=[]; for(let i=0;i<32;i++){let x=0,y=0;for(let k=0;k<n;k++){const s=(i>>k)&1?1:-1;x+=s*dirs[k][0];y+=s*dirs[k][1];}V.push([cx+x*R,cy+y*R]);}
+  const out=[], hi = 0b00000;
+  const E=[]; for(let i=0;i<32;i++)for(let k=0;k<n;k++){const j=i^(1<<k);if(j>i)E.push([i,j,k]);}
+  E.forEach(([i,j])=>{ if(i===hi||j===hi) return; out.push(S(`M${f(V[i][0])} ${f(V[i][1])} L${f(V[j][0])} ${f(V[j][1])}`, C.paper, 2)); });
+  E.forEach(([i,j])=>{ if(i!==hi&&j!==hi) return; out.push(S(`M${f(V[i][0])} ${f(V[i][1])} L${f(V[j][0])} ${f(V[j][1])}`, C.yellow, 5)); });
+  V.forEach(([x,y],i)=>{ out.push(rect(f(x-8),f(y-8),16,16, i===hi?C.yellow:C.red, `stroke="${C.ink}" stroke-width="3"`)); });
+  return out.join('');
+};
+
+// A flower pressed in a book — flattened, and leaving its imprint on the facing page.
+ART['pi-vs-hermes-vs-codex'] = () => {
+  const out = [];
+  // pages
+  out.push(P('M360 150 C300 124 170 118 84 128 L84 560 C170 550 300 552 360 578 Z', C.paper));
+  out.push(P('M360 150 C420 124 550 118 636 128 L636 560 C550 550 420 552 360 578 Z', C.paper));
+  out.push(S('M360 150 V578', C.tint, 3));
+  // page edges (thickness)
+  out.push(S('M84 566 C170 556 300 558 360 584 C420 558 550 556 636 566', C.paper, 2.4));
+  out.push(S('M84 572 C170 562 300 564 360 590 C420 564 550 562 636 572', C.paper, 2.4));
+  const flower = (col, petalCol, centre, leafCol) => {
+    const g=[];
+    g.push(S('M470 530 C472 470 500 390 526 300', col, 5));
+    g.push(P('M486 440 C450 430 430 402 424 372 C456 380 480 400 486 440 Z', leafCol));
+    g.push(P('M500 392 C534 378 560 384 580 402 C552 412 526 410 500 392 Z', leafCol));
+    for(let k=0;k<5;k++){ const a = k*72 - 90 + 8;
+      g.push(`<ellipse cx="0" cy="-40" rx="27" ry="42" transform="translate(526 262) rotate(${a+90})" fill="${petalCol}"/>`); }
+    g.push(circ(526,262,17,centre));
+    return g.join('');
+  };
+  out.push(`<g transform="translate(720 0) scale(-1 1)">${flower(C.tint, C.tint, C.tint, C.tint)}</g>`);
+  out.push(flower(C.ink, C.red, C.yellow, C.blue));
+  return out.join('');
+};
+
+/* ---------- the catalogue ---------- */
+const BOOKS = [
+  {slug:'ai-context-engineering', level:'intermediate', title:'AI Context<br>Engineering', meta:'43 capsules · 10 hours',
+   cap:'<b>B or 13?</b> The same mark reads as a letter across, a number down. What a model makes of your words depends on what you put around them — which is the whole discipline.'},
+  {slug:'mathematical-foundations-for-ml', level:'beginner', title:'Mathematical<br>Foundations for<br>Machine Learning', meta:'43 capsules · 10 hours',
+   cap:'<b>Foundations, literally.</b> A Greek temple built from Greek letters: a Δ pediment on four Π’s — eight columns, like the Parthenon — standing on three steps: calculus, probability, linear algebra.'},
+  {slug:'neural-networks-from-scratch', level:'beginner', title:'Neural Networks<br>from Scratch', meta:'33 capsules · 7 hours',
+   cap:'<b>Web → net.</b> A spider spinning a fully connected network instead of a web, one thread at a time. The last connection isn’t finished yet.'},
+  {slug:'build-llms-from-scratch', level:'intermediate', title:'Build Large<br>Language Models<br>(LLMs) from Scratch', meta:'20 capsules · 6 hours',
+   cap:'<b>Babel, rebuilt.</b> Build + large + language: a tower of identical blocks — as a decoder is a stack of identical layers — with every script in its windows. The crane lowers the last block.'},
+  {slug:'5d-parallelism', level:'advanced', title:'5D Parallelism<br>for Large<br>Model Training', meta:'40 capsules · 9 hours',
+   cap:'<b>Five dimensions, literally.</b> A 5-cube is exactly a 2×2×2×2×2 device mesh: 32 GPUs, and every edge is one axis of parallelism. One GPU and its five partners are lit.'},
+  {slug:'pi-vs-hermes-vs-codex', level:'advanced', title:'Pi vs Hermes<br>vs Codex', sub:'Context Compaction and Memory', meta:'9 capsules · 1 hour',
+   cap:'<b>Pressed.</b> Compaction flattens a conversation so it fits in a book (a codex) — and memory is the faint imprint it leaves on the facing page.'},
+];
+
+function coverHTML(b){
+  const L = LV[b.level];
+  const dot = b.level==='beginner' ? C.red : (b.level==='intermediate' ? C.paper : C.yellow);
+  return `<div class="cover ${b.level}" data-slug="${b.slug}">
+    <svg class="art" viewBox="0 0 720 888" xmlns="http://www.w3.org/2000/svg">${ART[b.slug] ? ART[b.slug]() : ''}</svg>
+    <div class="tb"><h2 class="${b.small?'s':''}">${b.title}</h2>${b.sub?`<p class="sub">${b.sub}</p>`:''}</div>
+    <div class="foot">
+      <div class="imprint">${mark(L.fg, dot)}<b>Vizuara</b><span>Books</span></div>
+      <div class="lvl">${b.soon?'<span class="soon">Coming soon</span>':`<i>${b.meta}</i><span style="width:10px"></span>`}${L.glyph(L.fg)}<span>${L.name}</span></div>
+    </div>
+  </div>`;
+}
+document.getElementById('grid').innerHTML = BOOKS.map(b=>`<figure class="c">${coverHTML(b)}<figcaption>${b.cap||''}</figcaption></figure>`).join('');
+</script>
+</body>
+</html>

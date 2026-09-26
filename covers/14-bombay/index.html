@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Signboard — Vizuara Books cover system</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anek+Latin:wdth,wght@75,600;75,700;75,800;100,500;100,600;100,700&family=Anek+Devanagari:wdth,wght@100,600;100,700&family=Yellowtail&display=block" rel="stylesheet">
+<style>
+:root{
+  --red:#CF2A1E; --oxblood:#7E1710; --yellow:#F3B21B; --green:#0E6641; --blue:#1F3A93;
+  --firozi:#11837E; --maroon:#6D1A24; --coal:#16120F; --chuna:#F4EBD6; --paper:#FBF4E4;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:#E9E2D2;color:var(--coal)}
+body{font-family:'Anek Latin',system-ui,sans-serif;font-stretch:100%}
+.covers{display:flex;flex-wrap:wrap;gap:56px 48px;padding:24px 64px 80px}
+.cover{width:720px;height:888px;position:relative;overflow:hidden;flex:none;box-shadow:0 2px 0 rgba(0,0,0,.08),0 18px 40px -18px rgba(40,20,0,.45)}
+.cover svg{display:block}
+</style>
+</head>
+<body>
+<section class="covers" id="covers"></section>
+
+<script src="board.js"></script>
+<script>
+/* ==========================================================================
+   SIGNBOARD — the cover system
+   ========================================================================== */
+const P = {
+  red:'#CF2A1E', oxblood:'#7E1710', yellow:'#F3B21B', yellowLt:'#F7CF63', green:'#0E6641', greenDk:'#07402A', greenLt:'#1E7A52',
+  blue:'#1F3A93', blueDk:'#12235C', blueLt:'#3050A8', firozi:'#11837E', firoziDk:'#0A5553', maroon:'#6D1A24', maroonDk:'#420D14',
+  coal:'#16120F', chuna:'#F4EBD6', paper:'#FBF4E4', redDk:'#9B1D14',
+};
+// Shelves: the board colour tells you which part of the library a book is from.
+const SHELF = {
+  foundations:{name:'Foundations', board:P.yellow, rule:P.coal, ink:P.coal, ray:[P.yellow,'#F6C84A'],
+    letter:{fillTop:P.red, fillBot:P.redDk, outline:P.coal, shadow:P.coal, inline:P.chuna}, script:P.red},
+  deep:{name:'Neural Networks', board:P.red, rule:P.chuna, ink:P.chuna, ray:[P.red,'#DA4A36'],
+    letter:{fillTop:P.chuna, fillBot:P.yellow, outline:P.coal, shadow:P.oxblood, inline:P.red}, script:P.yellow},
+  language:{name:'Language Models', board:P.maroon, rule:P.chuna, ink:P.chuna, ray:[P.maroon,'#86303A'],
+    letter:{fillTop:P.chuna, fillBot:P.yellow, outline:P.coal, shadow:P.maroonDk, inline:P.red}, script:P.yellow},
+  agents:{name:'Agents & Context', board:P.green, rule:P.chuna, ink:P.chuna, ray:[P.green,'#2A8358'],
+    letter:{fillTop:P.chuna, fillBot:P.yellow, outline:P.coal, shadow:P.greenDk, inline:P.red}, script:P.yellow},
+  systems:{name:'Systems & Scale', board:P.blue, rule:P.chuna, ink:P.chuna, ray:[P.blue,'#3A57AE'],
+    letter:{fillTop:P.chuna, fillBot:P.yellow, outline:P.coal, shadow:P.blueDk, inline:P.red}, script:P.yellow},
+  vision:{name:'Vision & Robotics', board:P.firozi, rule:P.chuna, ink:P.chuna, ray:[P.firozi,'#2C9790'],
+    letter:{fillTop:P.chuna, fillBot:P.yellow, outline:P.coal, shadow:P.firoziDk, inline:P.red}, script:P.yellow},
+};
+const LEVEL = {
+  1:{word:'BEGINNER', field:P.yellow, num:P.coal},
+  2:{word:'INTERMEDIATE', field:P.red, num:P.chuna},
+  3:{word:'ADVANCED', field:P.coal, num:P.yellow},
+};
+
+const ctx2d = document.createElement('canvas').getContext('2d');
+const textW = (t, font) => { ctx2d.font = font; return ctx2d.measureText(t).width; };
+const esc = (s) => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+const F = (n) => Math.round(n*100)/100;
+let SEQ = 0; const uid = (p='u') => p + (SEQ++);
+
+/* ---------- frame: painted double rule with ticket-notch corners ---------- */
+function notchRect(x, y, w, h, r){
+  return `M${x+r} ${y}H${x+w-r}A${r} ${r} 0 0 0 ${x+w} ${y+r}V${y+h-r}A${r} ${r} 0 0 0 ${x+w-r} ${y+h}H${x+r}A${r} ${r} 0 0 0 ${x} ${y+h-r}V${y+r}A${r} ${r} 0 0 0 ${x+r} ${y}Z`;
+}
+
+/* ---------- title typesetting ---------- */
+const SCRIPT = 'Yellowtail';
+function scriptText(txt, x, y, size, fill, anchor='middle'){
+  const sh = Math.max(1.5, size*0.05);
+  return `<g font-family="${SCRIPT}" font-size="${size}" text-anchor="${anchor}">
+    <text x="${F(x+sh)}" y="${F(y+sh)}" fill="${P.coal}" stroke="${P.coal}" stroke-width="${F(size*0.09)}" stroke-linejoin="round">${esc(txt)}</text>
+    <text x="${F(x)}" y="${F(y)}" fill="${fill}" stroke="${P.coal}" stroke-width="${F(size*0.09)}" stroke-linejoin="round" paint-order="stroke">${esc(txt)}</text></g>`;
+}
+
+// lays out title lines; returns {svg, h}
+function titleBlock(lines, sh, measure){
+  const parts = []; let y = 0;
+  const L = sh.letter;
+  lines.forEach((ln, i) => {
+    if (ln.t) {
+      const ft = Board.fit(ln.t, ln.H, ln.m || measure, {rmax: ln.rmax || 0.74, rmin: ln.rmin || 0.36});
+      const p = Board.paint(ln.t, ft.u, ft.H, L);
+      parts.push({svg:p.svg, w:p.w + p.depth, y, h:ft.H});
+      y += ft.H + p.depth + (ln.gap != null ? ln.gap : 14);
+    } else if (ln.s) {
+      const size = ln.size || 46;
+      const w = textW(ln.s, `${size}px ${SCRIPT}`);
+      parts.push({svg:scriptText(ln.s, w/2, size*0.72, size, sh.script), w, y: y - size*0.12 + (ln.dy||0), h:size*0.6});
+      y += size*0.6 + (ln.gap != null ? ln.gap : 12);
+    } else if (ln.tr) {
+      // trade line: small block letters, same enamel, between painted rules
+      const H = ln.H || 28;
+      const st = {fillTop:L.fillTop, fillBot:L.fillBot, outline:P.coal, shadow:L.shadow, depth:H*0.1, o:Math.max(1.5,H*0.05)};
+      const ft = Board.fit(ln.tr, H, ln.m || measure*0.86, {rmax:0.62, rmin:0.34});
+      const p = Board.paint(ln.tr, ft.u, ft.H, st, {track:0.7});
+      parts.push({svg:p.svg, w:p.w, y, h:ft.H, rules:true});
+      y += ft.H + p.depth + (ln.gap != null ? ln.gap : 12);
+    } else if (ln.scratch) {
+      // the recurring "from SCRATCH" lockup
+      const H = ln.H || 50, size = H*1.05;
+      const ft = {u:H*0.6, H};
+      const p = Board.paint('SCRATCH', ft.u, ft.H, L);
+      const sw = textW('from', `${size}px ${SCRIPT}`);
+      const gapx = 12;
+      const tot = sw + gapx + p.w + p.depth;
+      const svg = scriptText('from', sw, H*0.92, size, sh.script, 'end') +
+        `<g transform="translate(${F(sw+gapx)} 0)">${p.svg}</g>`;
+      parts.push({svg, w:tot, y, h:H});
+      y += H + p.depth + (ln.gap != null ? ln.gap : 10);
+    }
+  });
+  const h = y - 12;
+  const svg = parts.map((p) => `<g transform="translate(${F(-p.w/2)} ${F(p.y)})">${p.svg}</g>`).join('');
+  return {svg, h};
+}
+
+/* ---------- label (the matchbox-label emblem panel) ---------- */
+function rays(cx, cy, n, c1, c2, R=900){
+  let s = `<rect x="-2000" y="-2000" width="4000" height="4000" fill="${c1}"/>`;
+  for (let i = 0; i < n; i += 2) {
+    const a0 = (i/n)*Math.PI*2, a1 = ((i+1)/n)*Math.PI*2;
+    s += `<path d="M${F(cx)} ${F(cy)}L${F(cx+R*Math.cos(a0))} ${F(cy+R*Math.sin(a0))}L${F(cx+R*Math.cos(a1))} ${F(cy+R*Math.sin(a1))}Z" fill="${c2}"/>`;
+  }
+  return s;
+}
+function label(book, sh, x, y, w, h){
+  const id = uid('lb');
+  const capH = 44, footH = 34, pad = 12;
+  const px = pad, py = capH, pw = w - pad*2, ph = h - capH - footH;
+  const em = EMBLEM[book.emblem](pw, ph, sh, book);
+  const cap = Board.fit(book.cap, 21, pw - 40, {rmax:0.62, rmin:0.3});
+  const capP = Board.paint(book.cap, cap.u, cap.H, {fillTop:P.coal, outline:P.coal, o:0, depth:0}, {track:0.8, space:0.8});
+  const ctr = em.center || [pw/2, ph/2];
+  return `<g transform="translate(${x} ${y})">
+    <defs><clipPath id="${id}"><rect x="${px}" y="${py}" width="${pw}" height="${ph}"/></clipPath></defs>
+    <path d="${notchRect(0,0,w,h,16)}" fill="${P.paper}" stroke="${P.coal}" stroke-width="3"/>
+    <path d="${notchRect(5,5,w-10,h-10,12)}" fill="none" stroke="${P.coal}" stroke-width="1.2"/>
+    <g transform="translate(${F((w-capP.w)/2)} ${F((capH-cap.H)/2+2)})">${capP.svg}</g>
+    <g clip-path="url(#${id})"><g transform="translate(${px} ${py})">
+      ${rays(ctr[0], ctr[1], em.rays || 40, sh.ray[0], sh.ray[1])}
+      ${em.svg}
+    </g></g>
+    <rect x="${px}" y="${py}" width="${pw}" height="${ph}" fill="none" stroke="${P.coal}" stroke-width="3"/>
+    <text x="${w/2}" y="${h - footH/2 + 5}" text-anchor="middle" font-family="Anek Latin" font-stretch="75%" font-weight="700" font-size="14.5" letter-spacing="2.4" fill="${P.coal}">CONTENTS&#8195;${book.capsules} CAPSULES&#8194;·&#8194;${book.hours} HOURS</text>
+  </g>`;
+}
+
+/* ---------- level stamp (perforated) ---------- */
+function stamp(level, x, y){
+  const Lv = LEVEL[level], w = 84, h = 104, pr = 4.2, step = 10.5;
+  const id = uid('st');
+  let holes = '';
+  for (let i = step/2; i < w; i += step) holes += `<circle cx="${F(i)}" cy="0" r="${pr}"/><circle cx="${F(i)}" cy="${h}" r="${pr}"/>`;
+  for (let j = step/2; j < h; j += step) holes += `<circle cx="0" cy="${F(j)}" r="${pr}"/><circle cx="${w}" cy="${F(j)}" r="${pr}"/>`;
+  const num = Board.fit(String(level), 50, 60, {rmax:0.7});
+  const nP = Board.paint(String(level), num.u, num.H, {fillTop:Lv.num, outline:Lv.field, o:0, depth:0});
+  return `<g transform="translate(${x} ${y})">
+    <defs><mask id="${id}"><rect x="-10" y="-10" width="${w+20}" height="${h+20}" fill="#fff"/><g fill="#000">${holes}</g></mask></defs>
+    <g mask="url(#${id})">
+      <rect x="1.5" y="1.5" width="${w}" height="${h}" fill="${P.coal}" opacity=".35"/>
+      <rect width="${w}" height="${h}" fill="${P.paper}"/>
+    </g>
+    <rect x="8" y="8" width="${w-16}" height="${h-16}" fill="${Lv.field}" stroke="${P.coal}" stroke-width="1.5"/>
+    <text x="${w/2}" y="24" text-anchor="middle" font-family="Anek Latin" font-stretch="75%" font-weight="700" font-size="11" letter-spacing="2" fill="${Lv.num}">LEVEL</text>
+    <g transform="translate(${F((w-nP.w)/2)} 31)">${nP.svg}</g>
+    <text x="${w/2}" y="${h-15}" text-anchor="middle" font-family="Anek Latin" font-stretch="75%" font-weight="700" font-size="${Lv.word.length>9?8.6:10.5}" letter-spacing="${Lv.word.length>9?0.8:1.6}" fill="${Lv.num}">${Lv.word}</text>
+  </g>`;
+}
+
+/* ---------- imprint ---------- */
+function imprint(sh, x, y){
+  const v = Board.paint('V', 17, 24, {fillTop:sh.board, outline:sh.board, o:0, depth:0});
+  return `<g transform="translate(${x} ${y})">
+    <rect x="0" y="-26" width="36" height="36" rx="3" fill="${sh.ink}"/>
+    <g transform="translate(${F(18 - v.w/2)} -20)">${v.svg}</g>
+    <text x="48" y="-2" font-family="Anek Latin" font-stretch="100%" font-weight="700" font-size="17" letter-spacing="3.2" fill="${sh.ink}">VIZUARA BOOKS</text>
+    <text x="209" y="0" font-family="Anek Devanagari" font-weight="600" font-size="18" fill="${sh.ink}">विज़ुआरा</text>
+  </g>`;
+}
+
+/* ---------- the cover ---------- */
+function cover(book){
+  const sh = SHELF[book.shelf];
+  const W = 720, H = 888;
+  const tb = titleBlock(book.title, sh, 612);
+  const top = 58, bottom = 436;
+  const ty = top + Math.max(0, (bottom - top - tb.h)/2);
+  const Lx = 96, Ly = 470, Lw = 528, Lh = 318;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+    <rect width="${W}" height="${H}" fill="${sh.board}"/>
+    <path d="${notchRect(16,16,W-32,H-32,22)}" fill="none" stroke="${sh.rule}" stroke-width="4"/>
+    <path d="${notchRect(25,25,W-50,H-50,16)}" fill="none" stroke="${sh.rule}" stroke-width="1.5"/>
+    <g transform="translate(${W/2} ${F(ty)})">${tb.svg}</g>
+    ${label(book, sh, Lx, Ly, Lw, Lh)}
+    ${stamp(book.level, Lx + Lw - 58, Ly - 38)}
+    ${imprint(sh, 48, 842)}
+    <text x="${W-48}" y="840" text-anchor="end" font-family="Anek Latin" font-stretch="75%" font-weight="700" font-size="15" letter-spacing="2.6" fill="${sh.ink}">${esc(sh.name.toUpperCase())}</text>
+  </svg>`;
+}
+
+/* ==========================================================================
+   EMBLEMS — one per book, drawn from the book's own mechanism.
+   Litho-label rules: flat enamel colours, 3px coal keyline, one object.
+   ========================================================================== */
+const K = 3;
+const EMBLEM = {
+  contextWindow(pw, ph, sh){
+    const cx = pw/2 + 60, cy = ph/2;
+    const ww = 150, wh = 184, wx = cx - ww/2, wy = cy - wh/2;
+    const slips = [[P.red,16],[P.blue,24],[P.green,20],[P.yellow,22],[P.yellow,16],[P.chuna,30],[P.red,14]];
+    let s = '';
+    // the pile (everything that could go in)
+    const px = 58, py = cy + 64;
+    const pile = [P.chuna,P.yellow,P.chuna,P.blue,P.chuna,P.red,P.chuna,P.green,P.chuna,P.yellow];
+    pile.forEach((c,i)=>{
+      const a = (i%2?1:-1)*(i*1.3), yy = py - i*13;
+      s += `<rect x="${px-44}" y="${yy}" width="88" height="11" fill="${c}" stroke="${P.coal}" stroke-width="2.4" transform="rotate(${a} ${px} ${yy+5})"/>`;
+    });
+    // arrow into the window
+    s += `<path d="M${px+52} ${cy-40} C ${px+90} ${cy-78}, ${wx-40} ${cy-80}, ${wx-8} ${cy-50}" fill="none" stroke="${P.coal}" stroke-width="5" stroke-linecap="round"/>`;
+    s += `<path d="M${wx-4} ${cy-44} l-20 -2 l10 -16 z" fill="${P.coal}"/>`;
+    // window frame
+    s += `<rect x="${wx-9}" y="${wy-9}" width="${ww+18}" height="${wh+18}" fill="${P.coal}"/>`;
+    s += `<rect x="${wx}" y="${wy}" width="${ww}" height="${wh}" fill="${P.paper}" stroke="${P.coal}" stroke-width="${K}"/>`;
+    let yy = wy + 6;
+    slips.forEach(([c,h],i)=>{
+      s += `<rect x="${wx+7}" y="${yy}" width="${ww-14}" height="${h}" fill="${c}" stroke="${P.coal}" stroke-width="2.4"/>`;
+      if (c === P.chuna) for (let k=0;k<3;k++) s += `<line x1="${wx+15}" x2="${wx+ww-(20+k*18)}" y1="${yy+7+k*8}" y2="${yy+7+k*8}" stroke="${P.coal}" stroke-width="2"/>`;
+      yy += h + 4;
+    });
+    // budget gauge
+    const gx = wx + ww + 22;
+    s += `<rect x="${gx-5}" y="${wy}" width="10" height="${wh}" fill="${P.paper}" stroke="${P.coal}" stroke-width="2.4"/>`;
+    s += `<rect x="${gx-5}" y="${wy + wh*0.12}" width="10" height="${wh*0.88}" fill="${P.red}" stroke="${P.coal}" stroke-width="2.4"/>`;
+    for (let k=0;k<=8;k++) s += `<line x1="${gx+5}" x2="${gx+11}" y1="${wy + k*wh/8}" y2="${wy + k*wh/8}" stroke="${P.coal}" stroke-width="2"/>`;
+    return {svg:s, center:[cx, cy], rays:44};
+  },
+  network(pw, ph, sh){
+    const cx = pw/2, cy = ph/2;
+    const layers = [3,4,4,2], gapx = 104, r = 17;
+    const X = (i) => cx + (i - (layers.length-1)/2)*gapx;
+    const Y = (n, j) => cy + (j - (n-1)/2)*48;
+    let e = '', nodes = '';
+    const wts = [0.9,-0.4,0.2,0.7,-0.8,0.3,0.5,-0.2,0.8,0.1,-0.6,0.4,0.6,-0.3,0.9,0.2,-0.7,0.5,0.3,-0.4,0.8,-0.1,0.6,0.2,-0.5,0.7,0.4,-0.9,0.3,0.6,-0.2,0.5,0.1,-0.6,0.8,0.3];
+    let q = 0;
+    for (let i = 0; i < layers.length-1; i++)
+      for (let a = 0; a < layers[i]; a++) for (let b = 0; b < layers[i+1]; b++) {
+        const wv = wts[(q++)%wts.length];
+        e += `<line x1="${F(X(i))}" y1="${F(Y(layers[i],a))}" x2="${F(X(i+1))}" y2="${F(Y(layers[i+1],b))}" stroke="${wv<0?P.coal:P.coal}" stroke-width="${F(1.5+Math.abs(wv)*4)}" ${wv<0?'stroke-dasharray="5 4"':''}/>`;
+      }
+    layers.forEach((n,i)=>{ for (let j=0;j<n;j++){
+      const x = X(i), y = Y(n,j);
+      const fill = i===0?P.paper : i===layers.length-1?P.red : P.yellow;
+      nodes += `<circle cx="${F(x)}" cy="${F(y)}" r="${r}" fill="${fill}" stroke="${P.coal}" stroke-width="${K}"/>`;
+      if (i>0 && i<layers.length-1) nodes += `<path d="M${F(x-10)} ${F(y+6)} C ${F(x-2)} ${F(y+6)}, ${F(x+2)} ${F(y-6)}, ${F(x+10)} ${F(y-6)}" fill="none" stroke="${P.coal}" stroke-width="2.4"/>`;
+    }});
+    return {svg:e+nodes, rays:40};
+  },
+  cube5d(pw, ph, sh){
+    const cx = pw/2, cy = ph/2 + 14, s = 38;
+    const c30 = Math.cos(Math.PI/6), s30 = 0.5;
+    const iso = (x,y,z) => [cx + (x - y)*c30*s, cy + (x + y)*s30*s - z*s];
+    const pt = (a) => `${F(a[0])} ${F(a[1])}`;
+    const quad = (a,b,c,d,fill) => `<path d="M${pt(a)}L${pt(b)}L${pt(c)}L${pt(d)}Z" fill="${fill}" stroke="${P.coal}" stroke-width="${K}" stroke-linejoin="round"/>`;
+    const n = 2, off = -n/2;
+    let s1 = '';
+    // top face z = n (shifted to centre)
+    for (let i=0;i<n;i++) for (let j=0;j<n;j++){
+      const x = i+off, y = j+off, z = n/2;
+      s1 += quad(iso(x,y,z),iso(x+1,y,z),iso(x+1,y+1,z),iso(x,y+1,z), (i+j)%2?P.yellow:'#F7CF63');
+    }
+    // left face y = +n/2 (front-left)
+    for (let i=0;i<n;i++) for (let k=0;k<n;k++){
+      const x = i+off, y = n/2, z = k - n/2;
+      s1 += quad(iso(x,y,z),iso(x+1,y,z),iso(x+1,y,z+1),iso(x,y,z+1), (i+k)%2?P.red:'#E0493A');
+    }
+    // right face x = +n/2
+    for (let j=0;j<n;j++) for (let k=0;k<n;k++){
+      const x = n/2, y = j+off, z = k - n/2;
+      s1 += quad(iso(x,y,z),iso(x,y+1,z),iso(x,y+1,z+1),iso(x,y,z+1), (j+k)%2?P.paper:P.chuna);
+    }
+    // five axes
+    const axes = [
+      [iso(0,0,1)[0], iso(0,0,1)[1]-10, 0, -1, 'PIPELINE'],
+      [iso(-1.9,1,0)[0], iso(-1.9,1,0)[1], -1, 0.45, 'TENSOR'],
+      [iso(1,-1.9,0)[0], iso(1,-1.9,0)[1], 1, 0.45, 'DATA'],
+    ];
+    let ax = '';
+    const arrow = (x1,y1,x2,y2,lab,anchor) => {
+      const a = Math.atan2(y2-y1,x2-x1), hl = 13;
+      return `<line x1="${F(x1)}" y1="${F(y1)}" x2="${F(x2 - Math.cos(a)*hl*0.8)}" y2="${F(y2 - Math.sin(a)*hl*0.8)}" stroke="${P.coal}" stroke-width="4"/>` +
+        `<path d="M${F(x2)} ${F(y2)}L${F(x2 - Math.cos(a-0.45)*hl)} ${F(y2 - Math.sin(a-0.45)*hl)}L${F(x2 - Math.cos(a+0.45)*hl)} ${F(y2 - Math.sin(a+0.45)*hl)}Z" fill="${P.coal}"/>`;
+    };
+    const top = iso(0,0,1), lf = iso(-1,1,-1), rt = iso(1,-1,-1);
+    ax += arrow(top[0], top[1]-6, top[0], top[1]-52);
+    const fl = iso(-1, 1, 0), fr = iso(1, -1, 0);
+    ax += arrow(fl[0]-4, fl[1]+2, fl[0]-62, fl[1]+32);
+    ax += arrow(fr[0]+4, fr[1]+2, fr[0]+62, fr[1]+32);
+    ax += arrow(cx - 150, cy - 30, cx - 214, cy - 30);
+    ax += arrow(cx + 150, cy - 30, cx + 214, cy - 30);
+    const lab = (x,y,t,a='middle') => `<text x="${F(x)}" y="${F(y)}" text-anchor="${a}" font-family="Anek Latin" font-stretch="75%" font-weight="800" font-size="15" letter-spacing="1.5" fill="${P.coal}">${t}</text>`;
+    ax += lab(top[0]+10, top[1]-40, 'PIPELINE', 'start');
+    ax += lab(fl[0]-66, fl[1]+52, 'TENSOR', 'middle');
+    ax += lab(fr[0]+66, fr[1]+52, 'DATA', 'middle');
+    ax += lab(cx - 214, cy - 40, 'EXPERT', 'start');
+    ax += lab(cx + 214, cy - 40, 'CONTEXT', 'end');
+    return {svg: ax + s1, center:[cx, cy], rays:40};
+  },
+};
+
+/* ==========================================================================
+   THE BOOKS
+   ========================================================================== */
+const BOOKS = [
+  {slug:'ai-context-engineering', shelf:'agents', level:2, capsules:43, hours:10, emblem:'contextWindow', cap:'THE CONTEXT WINDOW',
+    title:[{t:'AI CONTEXT', H:108},{t:'ENGINEERING', H:108}]},
+  {slug:'neural-networks-from-scratch', shelf:'deep', level:1, capsules:33, hours:7, emblem:'network', cap:'THE PERCEPTRON STACK',
+    title:[{t:'NEURAL', H:112},{t:'NETWORKS', H:112},{scratch:true, H:50}]},
+  {slug:'5d-parallelism', shelf:'systems', level:3, capsules:40, hours:9, emblem:'cube5d', cap:'FIVE AXES OF SCALE',
+    title:[{t:'5D', H:150, rmax:0.8},{t:'PARALLELISM', H:92},{tr:'FOR LARGE MODEL TRAINING', H:28}]},
+];
+
+function build(){
+  const host = document.getElementById('covers');
+  host.innerHTML = BOOKS.map((b) => `<div class="cover" data-slug="${b.slug}">${cover(b)}</div>`).join('');
+}
+const faces = ['40px Yellowtail','700 17px "Anek Latin"','600 18px "Anek Devanagari"'];
+Promise.all(faces.map((f) => document.fonts.load(f, 'Aav विज़ुआरा'))).catch(()=>{}).then(build);
+</script>
+</body>
+</html>

@@ -54,7 +54,7 @@ h1 .sub{display:block;font-style:italic;font-weight:400;letter-spacing:-.005em;m
 .kicker svg{width:22px;height:22px;--sig:var(--signal)}
 .anat{display:block;margin-top:48px;max-width:100%;height:auto}
 .dir{font:500 148px/.9 var(--serif);font-variation-settings:'opsz' 72;letter-spacing:-.03em;margin:0}
-.dir small{display:block;font:italic 400 34px/1.15 var(--serif);letter-spacing:-.01em;margin-top:22px;max-width:15em}
+.dir small{display:block;font:italic 400 34px/1.15 var(--serif);letter-spacing:-.01em;margin-top:22px;max-width:17em;text-wrap:balance}
 .lede{font:400 19px/1.5 var(--serif);font-variation-settings:'opsz' 16;margin:0 0 18px;max-width:34em}
 .lede em{font-style:italic}
 .spec{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:26px}
@@ -66,7 +66,7 @@ h1 .sub{display:block;font-style:italic;font-weight:400;letter-spacing:-.005em;m
 .specrow .t1{font:500 44px/1 var(--serif);font-variation-settings:'opsz' 72;letter-spacing:-.02em}
 .specrow .t2{font:400 13px/1.5 var(--mono)}
 .sec{padding:72px 48px 28px;display:flex;align-items:baseline;gap:24px;max-width:1640px}
-.sec h2{font:500 40px/1 var(--serif);font-variation-settings:'opsz' 72;letter-spacing:-.02em;margin:0}
+.sec h2{flex:none;font:500 40px/1 var(--serif);font-variation-settings:'opsz' 72;letter-spacing:-.02em;margin:0}
 .sec p{font:400 12px/1.5 var(--mono);margin:0;max-width:62em}
 .wrapbox{padding:0 48px 96px;overflow-x:auto}
 .wrap{position:relative;width:1512px;height:888px;display:flex;flex:none}
@@ -133,13 +133,13 @@ h1 .sub{display:block;font-style:italic;font-weight:400;letter-spacing:-.005em;m
 
 <div class="sec"><h2>The core six</h2><p>Plates are SVG, generated deterministically from a seed hashed from each slug — reload and you get the same cover; change the algorithm and the cover changes with it.</p></div>
 <div class="wall" id="core"></div>
-<div class="sec"><h2>Range</h2><p>A beginner title, an advanced one with a long parenthetical, and a forthcoming book that has a subtitle but no capsule count yet.</p></div>
+<div class="sec"><h2>Range</h2><p>Two beginner titles — one of them not about AI at all — an advanced one with a long parenthetical, and a forthcoming book that has a subtitle but no capsule count yet.</p></div>
 <div class="wall" id="range"></div>
 <div class="sec"><h2>Sub-series — Charlie and the Intelligence Factory</h2><p>The four rooms trade the full-bleed field for a square “room” plate and an italic lead-in; the room number rides the top line. Each room computes its own subject.</p></div>
 <div class="wall" id="series"></div>
 <div class="sec"><h2>Print wrap</h2><p>Back, spine and front at trim for Mathematical Foundations. The back cover prints the exact function that drew the front.</p></div>
 <div class="wrapbox" id="wrapbox"></div>
-<div class="foot" id="foot"></div>
+<div class="foot">Colophon — Newsreader and IBM Plex Mono from Google Fonts; no other assets, no images. Every plate on this page was computed when the page loaded (about a second and a half, network training included), from a seed hashed from the book’s slug.</div>
 
 <script>
 /* =========================================================================
@@ -328,7 +328,7 @@ GEN['ai-context-engineering'] = (r, b, acc) => {
   return {
     svg: `<path class="fk" d="${dots}"/>` + path(threads, 'k', 1.05) + `<path class="fr" d="${segs}"/>` + path(box(bx0, byy, bw, bh), 'k', 1) + chosen +
       `<circle class="ring" cx="${f1(qx)}" cy="${f1(qy)}" r="7" stroke-width="1.8"/><circle class="fk" cx="${f1(qx)}" cy="${f1(qy)}" r="2"/>`,
-    caption: `${fmt(N)} document chunks in a ${dim}-dimensional embedding space, flattened here by PCA; ◎ is the query. Maximal marginal relevance (λ = ${lam}) picks the ${S.length} that fill an ${fmt(budget)}-token window (${fmt(used)} used), laid out most-relevant-at-the-ends. The chosen are in ${acc}.`
+    caption: `${fmt(N)} synthetic document chunks in a ${dim}-dimensional embedding space, flattened here by PCA; ◎ is the query. Maximal marginal relevance (λ = ${lam}) picks the ${S.length} that fill an ${fmt(budget)}-token window (${fmt(used)} used), laid out most-relevant-at-the-ends. The chosen are in ${acc}.`
   };
 };
 
@@ -361,7 +361,7 @@ GEN['build-llms-from-scratch'] = (r, b, acc) => {
   let ticks = ''; for (const t of toks) if (t.s !== '\n' && t.head) ticks += seg(X(t.a), base - 3, X(t.a), base + 3);
   return {
     svg: path(up, 'k', 0.7, 'opacity=".78"') + path(down, 'k', 0.7, 'opacity=".5"') + path(red, 'r', 1.6) + path(seg(36, base, 684, base), 'k', 1.2) + path(ticks, 'k', 0.8),
-    caption: `The titles of all ${TITLES.length} Vizuara books, tokenised by a byte-pair encoder trained on them in this page: ${merges} merges turn ${fmt(total)} characters into ${fmt(toks.length)} tokens. Each arc joins two uses of one token — whole words above the line, word-pieces below; ${acc} is “${sig.trim()}”, used ${cnt.get(sig)} times.`
+    caption: `The titles of all ${TITLES.length} Vizuara books, tokenised by a byte-pair encoder trained on them in this page: ${merges} merges turn ${fmt(total)} characters into ${fmt(toks.length)} tokens. Each arc joins two uses of one token — tokens that begin a word above the line, the rest below; ${acc} is “${sig.trim()}”, used ${cnt.get(sig)} times.`
   };
 };
 
@@ -529,7 +529,38 @@ GEN['kernel-engineering'] = (r, b, acc) => {
   digits += `<text x="${f1(X(target))}" y="${f1(Y(ST) + 16)}" font-size="9" text-anchor="middle" class="acc">${vals[target]}</text>`;
   return {
     svg: path(lanes, 'k2', 0.8) + path(diag, 'k', 0.7, 'opacity=".9"') + `<path class="fk" d="${adds}"/>` + path(red, 'r', 1.5) + digits,
-    caption: `A Kogge–Stone prefix sum, the pattern inside warp-level scans: ${LN} GPU lanes, ${ST} steps, ${nOps} additions. At step k each lane adds the partial sum 2ᵏ lanes to its left. In ${acc}: the additions lane ${target} depends on, gathering ${cone[0].size} of the digits above into ${vals[target]}${ok ? '' : ' (check failed)'}.`
+    caption: `A Kogge–Stone prefix sum, the pattern inside GPU scan kernels: ${LN} threads, ${ST} steps, ${nOps} additions. At step k each thread adds the partial sum 2ᵏ places to its left. In ${acc}: the additions thread ${target} depends on, gathering ${cone[0].size} of the digits above into ${vals[target]}${ok ? '' : ' (check failed)'}.`
+  };
+};
+
+/* ---- Git & GitHub Masterclass: a repository's history, simulated and drawn like git log --graph ---- */
+GEN['git-github-masterclass'] = (r, b, acc) => {
+  const T = 96, LANES = [0, -1, 1, -2, 2, -3, 3, -4, 4, -5, 5], free = new Array(LANES.length).fill(true), br = [], commits = [], merges = [];
+  const main = { lane: 0, t0: 0, end: T - 1, last: 0 }; free[0] = false;
+  for (let t = 1; t < T - 1; t++) {
+    const live = br.filter((x) => x.end === null);
+    // merges back into main: a branch needs two commits and a step of quiet since its last one
+    for (const x of live) if (x.n >= 2 && t >= x.last + 2 && r() < 0.12) { x.end = t; merges.push([x, t]); commits.push([main, t, true]); main.last = t; }
+    // open a feature branch off main, on the free lane nearest the trunk
+    if (r() < 0.2 && live.length < 9) { const k = LANES.findIndex((_, i) => i > 0 && free[i]); if (k > 0) { free[k] = false; br.push({ lane: k, t0: t, end: null, n: 0, last: t }); } }
+    for (const x of br) if (x.end !== null && x.end < t && !x.freed) { free[x.lane] = true; x.freed = true; }
+    // ordinary commits
+    if (t > main.last && r() < 0.2) { commits.push([main, t]); main.last = t; }
+    for (const x of live) if (x.end === null && t >= x.t0 + 2 && r() < 0.36) { commits.push([x, t]); x.n++; x.last = t; }
+  }
+  const x0 = 36, W = 648, cy = P.y + P.h / 2, gap = 46, X = (t) => x0 + W * t / (T - 1), Y = (k) => cy + LANES[k] * gap;
+  const curve = (ta, ya, tb, yb) => { const a = X(ta), c = X(tb), m = (a + c) / 2; return `C${f1(m)} ${f1(ya)} ${f1(m)} ${f1(yb)} ${f1(c)} ${f1(yb)}`; };
+  let lines = '', dots = '', beads = '', rings = '', open = 0;
+  for (const x of br) {
+    const ys = Y(x.lane);
+    lines += `M${f1(X(x.t0))} ${f1(cy)}` + curve(x.t0, cy, x.t0 + 2, ys);
+    if (x.end === null) { open++; lines += `L${f1(X(T - 1))} ${f1(ys)}`; } else lines += `L${f1(X(x.end - 2))} ${f1(ys)}` + curve(x.end - 2, ys, x.end, cy);
+  }
+  for (const [x, t, isMerge] of commits) { if (x === main) { if (!isMerge) beads += `<circle class="ring" cx="${f1(X(t))}" cy="${f1(cy)}" r="3.3" stroke-width="1.8" style="stroke:var(--sig)"/>`; } else dots += `<circle class="fk" cx="${f1(X(t))}" cy="${f1(Y(x.lane))}" r="2.6"/>`; }
+  for (const [, t] of merges) rings += `<circle class="ring" cx="${f1(X(t))}" cy="${f1(cy)}" r="4.6" stroke-width="1.8"/>`;
+  return {
+    svg: path(lines, 'k', 1.5) + path(seg(X(0), cy, X(T - 1), cy), 'r', 3.4) + dots + beads + rings,
+    caption: `A repository’s history, simulated in this page and laid out like git log --graph, time running right: ${commits.length} commits, ${br.length} feature branches, ${merges.length} merged back into main (○)${open ? `, ${open} still open` : ''}. The trunk is ${acc}.`
   };
 };
 
@@ -544,7 +575,7 @@ GEN['charlie-language-room'] = (r, b, acc) => {
   const prob = (ctx) => { const p = new Map(Vs.map((c) => [c, 0])); let wsum = 0;
     for (let o = 0; o <= 4; o++) { const m = cnt[o].get(ctx.slice(ctx.length - o)); if (!m) continue; let tot = 0; for (const v of m.values()) tot += v; for (const [c, v] of m) p.set(c, p.get(c) + lam[o] * v / tot); wsum += lam[o]; }
     for (const c of Vs) p.set(c, (p.get(c) + 1e-4) / (wsum + 1e-4 * Vs.length)); return p; };
-  const prompt = 'Charlie and the ', goal = 'Language Room', B = 40, depth = 16;
+  const prompt = 'Charlie and the ', goal = 'Language Room', B = 32, depth = 16;
   let beams = [{ s: '^^^^' + prompt, lp: 0, id: 0, done: false }], nid = 1; const all = new Map([[0, { id: 0, parent: -1, s: prompt, kids: [] }]]);
   for (let d = 1; d <= depth; d++) {
     const cand = [];
@@ -559,8 +590,13 @@ GEN['charlie-language-room'] = (r, b, acc) => {
   const ranked = beams.filter((bm) => bm.done).map((bm) => bm.s.slice(4)), goalRank = ranked.indexOf(prompt + goal + '\n') + 1;
   let lines = '', red = '', labels = '';
   for (const nd of all.values()) { if (nd.parent < 0) continue; const p = all.get(nd.parent), x0 = X(p), y0 = Y(p), x1 = X(nd), y1 = Y(nd), mx = (x0 + x1) / 2, d = `M${f1(x0)} ${f1(y0)}C${f1(mx)} ${f1(y0)} ${f1(mx)} ${f1(y1)} ${f1(x1)} ${f1(y1)}`;
-    if ((prompt + goal + '\n').startsWith(nd.s)) red += d; else lines += d;
-    if (nd.done) { const txt = nd.s.slice(prompt.length).replace('\n', ''); labels += `<text x="${f1(x1 + 6)}" y="${f1(y1 + 2.9)}" font-size="8.5"${txt === goal ? ' class="acc"' : ''}>${txt}</text>`; } }
+    if ((prompt + goal + '\n').startsWith(nd.s)) red += d; else lines += d; }
+  // label the finished titles, goal first, skipping any label a branch would run through
+  const done = [...all.values()].filter((nd) => nd.done).sort((a, c) => (a.s === prompt + goal + '\n' ? -1 : c.s === prompt + goal + '\n' ? 1 : 0)), boxes = [];
+  for (const nd of done) { const txt = nd.s.slice(prompt.length).replace('\n', ''), lx = X(nd) + 6, ly = Y(nd), w = txt.length * 5.2;
+    const hit = [...all.values()].some((n) => n !== nd && n.parent >= 0 && Math.abs(Y(n) - ly) < 6.5 && X(n) > lx - 2 && X(all.get(n.parent)) < lx + w) || boxes.some(([a, b, c]) => Math.abs(b - ly) < 10 && a < lx + w && c > lx);
+    if (hit && txt !== goal) continue; boxes.push([lx, ly, lx + w]);
+    labels += `<text x="${f1(lx)}" y="${f1(ly + 2.9)}" font-size="8.5" stroke="var(--ground)" stroke-width="3.2" paint-order="stroke" stroke-linejoin="round"${txt === goal ? ' class="acc"' : ''}>${txt}</text>`; }
   return {
     svg: path(lines, 'k', 0.9) + path(red, 'r', 2.2) + labels,
     caption: `Beam search (width ${B}) through a character 5-gram model trained in this page on the ${TITLES.length} titles of this library, continuing the words “${prompt.trim()}”. Each branch is a letter it considered; the labels are titles it finished. In ${acc}: this one, its no. ${goalRank} guess.`
@@ -583,7 +619,7 @@ GEN['charlie-vision-room'] = (r, b, acc) => {
   }
   return {
     svg: path(lines, 'k', 0.9) + self,
-    caption: `A Vision Transformer reads a picture as a ${G} × ${G} grid of patches and tells them apart by position embeddings. These are its fixed 2-D sine–cosine ones (d = ${d}): each small field contours one patch’s cosine similarity to every other position; ${acc} marks the patch itself.`
+    caption: `A Vision Transformer reads a picture as an ${G} × ${G} grid of patches and tells them apart by position embeddings. These are its fixed 2-D sine–cosine ones (d = ${d}): each small field contours one patch’s cosine similarity to every other position; ${acc} marks the patch itself.`
   };
 };
 
@@ -658,6 +694,7 @@ const BOOKS = [
   { set: 'core', slug: '5d-parallelism', title: '5D Parallelism for<br>Large Model Training', level: 'advanced', capsules: 40, hours: 9, size: 60 },
   { set: 'core', slug: 'pi-vs-hermes-vs-codex', title: 'Pi vs Hermes vs Codex:<br>Context Compaction<br>and Memory', level: 'advanced', capsules: 9, hours: 1, size: 60 },
   { set: 'range', slug: 'decision-trees-from-scratch', title: 'Build Decision Trees<br>from Scratch', level: 'beginner', capsules: 23, hours: 5, size: 68 },
+  { set: 'range', slug: 'git-github-masterclass', title: 'Git &amp; GitHub<br>Masterclass', level: 'beginner', capsules: 40, hours: 9, size: 84 },
   { set: 'range', slug: 'sciml', title: 'Scientific Machine<br>Learning (SciML)', level: 'advanced', capsules: 39, hours: 9, size: 70 },
   { set: 'range', slug: 'kernel-engineering', title: 'Kernel<br>Engineering', level: 'advanced', soon: true, size: 84, sub: 'From silicon to speculative decoding — GPU kernels for modern LLMs.', subSize: 20 },
   { set: 'series', slug: 'charlie-language-room', pre: 'Charlie and the', title: 'Language Room', level: 'advanced', capsules: 22, hours: 5, size: 70, series: 'I', sub: 'Language — Inference Engineering' },
