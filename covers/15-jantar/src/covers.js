@@ -351,6 +351,52 @@
     return { S, cam };
   };
 
+  // Charlie and the Intelligence Factory — each room of the factory, cut open by the section plane.
+  // A shared frame (same room, same cut) with one light-instrument inside per room.
+  function roomScene(hr, o) {
+    const cam = CAM({ az: 0, s: o.s || 1, ox: 360, el: o.el || 26 });
+    const S = new Scene(); S.E = frame(cam, 0); ground(S, hr, cam);
+    const cm = cutOr(S, hr, hr.stone);
+    const X = 262, T = 28, Y1 = 470, Hr = 300, R = Hr + T;
+    S.box(-X - T, 0, 0, -X, Y1 + T, R, { mat: cm });
+    S.box(X, 0, 0, X + T, Y1 + T, R, { mat: cm });
+    S.box(-X, Y1, 0, X, Y1 + T, Hr, { mat: cm });
+    // roof with openings: grid decomposition around the holes
+    const holes = o.holes || [];
+    const xs = [-X, X], ys = [0, Y1];
+    for (const [a, b, c, d] of holes) xs.push(a, b), ys.push(c, d);
+    const ux = [...new Set(xs)].sort((a, b) => a - b), uy = [...new Set(ys)].sort((a, b) => a - b);
+    for (let i = 0; i < ux.length - 1; i++) for (let j = 0; j < uy.length - 1; j++) {
+      const cx = (ux[i] + ux[i + 1]) / 2, cy = (uy[j] + uy[j + 1]) / 2;
+      if (holes.some(([a, b, c, d]) => cx > a && cx < b && cy > c && cy < d)) continue;
+      S.box(ux[i], uy[j], Hr, ux[i + 1], uy[j + 1], R, { mat: cm });
+    }
+    S.box(-X - T - 3, 0, R, X + T + 3, Y1 + T + 3, R + 6, { mat: (n, pts) => (dot(n, S.E[1]) < -0.99 && pts.every(p => Math.abs(dot(p, S.E[1])) < 1e-6)) ? hr.cut : hr.marble });
+    if (o.inside) o.inside(S, { X, Y1, Hr });
+    return { S, cam, L: sunRel(cam, o.theta == null ? 40 : o.theta, o.alt || 62) };
+  }
+  SCENES.roomLanguage = (hr) => roomScene(hr, {
+    holes: Array.from({ length: 9 }, (_, i) => [-230 + i * 54, -230 + i * 54 + 16, 150, 330]),
+    inside: (S, r) => { for (let i = 0; i < 13; i++) { const x = -234 + i * 37; S.box(x, 250, 0, x + 24, 274, 24, { mat: hr.marble }); } },
+    theta: 70, alt: 64,
+  });
+  SCENES.roomVision = (hr) => roomScene(hr, {
+    holes: (() => { const h = []; for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) h.push([-150 + i * 76, -150 + i * 76 + 50, 110 + j * 64, 110 + j * 64 + 40]); return h; })(),
+    theta: 60, alt: 66,
+  });
+  SCENES.roomSound = (hr) => roomScene(hr, {
+    holes: (() => { const amp = [30, 70, 120, 90, 150, 60, 110, 170, 80, 40, 100, 55]; return amp.map((a, i) => [-228 + i * 38, -228 + i * 38 + 14, 250 - a / 2, 250 + a / 2]); })(),
+    theta: 70, alt: 64,
+  });
+  SCENES.roomReason = (hr) => roomScene(hr, {
+    holes: [[118, 214, 180, 290]],
+    inside: (S, r) => {
+      const n = 9, run = 34, rise = 28;
+      for (let i = 0; i < n; i++) S.box(-230 + i * run, 200, 0, -230 + (i + 1) * run, 330, (i + 1) * rise, { mat: hr.stone });
+    },
+    theta: 55, alt: 58,
+  });
+
   // ---------- books ----------
   const BOOKS = [
     { slug: 'mathematical-foundations-for-ml', title: ['Mathematical', 'Foundations for', 'Machine Learning'], level: 'beginner', capsules: 43, hours: 10, scene: 'samrat', fig: 'After the Samrat Yantra, Jaipur, 1734' },
@@ -361,6 +407,10 @@
     { slug: 'pi-vs-hermes-vs-codex', title: ['Pi vs Hermes vs Codex:', 'Context Compaction', 'and Memory'], level: 'advanced', capsules: 9, hours: 1, scene: 'folds', fig: 'Three ways to fold one climb' },
     { slug: 'transformers-from-scratch', title: ['Transformers:', 'Theory, Intuition, and', 'Building from Scratch'], level: 'intermediate', capsules: 20, hours: 5, scene: 'jaiprakash', fig: 'After the Jai Prakash Yantra, Jaipur' },
     { slug: 'decision-trees-from-scratch', title: ['Build Decision Trees', 'from Scratch'], level: 'beginner', capsules: 23, hours: 5, scene: 'partition', fig: 'A court split by ever-lower walls' },
+    { slug: 'charlie-language-room', series: 'Charlie and the Intelligence Factory', no: 'I', title: ['Charlie and the', 'Language Room'], sub: 'Language — Inference Engineering', level: 'advanced', capsules: 22, hours: 5, scene: 'roomLanguage', fig: 'Room I · light in a sequence' },
+    { slug: 'charlie-vision-room', series: 'Charlie and the Intelligence Factory', no: 'II', title: ['Charlie and the', 'Vision Room'], sub: 'Vision — Vision Transformers', level: 'intermediate', capsules: 20, hours: 6, scene: 'roomVision', fig: 'Room II · light in patches' },
+    { slug: 'charlie-sound-room', series: 'Charlie and the Intelligence Factory', no: 'III', title: ['Charlie and the', 'Sound Room'], sub: 'Audio — Voice Agents', level: 'intermediate', capsules: 20, hours: 6, scene: 'roomSound', fig: 'Room III · light as a waveform' },
+    { slug: 'charlie-reasoning-room', series: 'Charlie and the Intelligence Factory', no: 'IV', title: ['Charlie and the', 'Reasoning Room'], sub: 'Reason — Reinforcement Learning, from bandits to reasoning models', level: 'advanced', capsules: 21, hours: 6, scene: 'roomReason', fig: 'Room IV · a climb toward the light' },
     { slug: 'kernel-engineering', title: ['Kernel', 'Engineering'], level: 'advanced', soon: true, scene: 'jali', fig: 'A jali, five rows laid' },
   ];
 
@@ -387,7 +437,11 @@
     el.style.setProperty('--sky', hr.sky); el.style.setProperty('--ink', hr.ink); el.style.setProperty('--sub', hr.sub);
     const stats = b.soon ? 'Coming soon' : `${b.capsules} capsules · ${b.hours} ${b.hours === 1 ? 'hour' : 'hours'}`;
     el.innerHTML = `<svg class="art" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><rect width="${W}" height="${H}" fill="${hr.sky}"/>${art}${extra}<rect x="0" y="806" width="${W}" height="${H - 806}" fill="${hr.cut.flat}"/></svg>
-      <h2 class="title">${b.title.join('<br>')}</h2>
+      <div class="head">
+        ${b.series ? `<div class="series"><span class="no">${b.no}</span>${b.series}</div>` : ''}
+        <h2 class="title" style="font-size:${b.size || 68}px">${b.title.join('<br>')}</h2>
+        ${b.sub ? `<p class="sub">${b.sub}</p>` : ''}
+      </div>
       <div class="band">
         <div class="row r1"><span class="imp">${mark('#F4EADC')}<b>Vizuara</b> Books</span><span class="lvl">${levelGlyph(hr.n, '#F4EADC')}${hr.label}</span></div>
         <div class="row r2"><span>${stats}</span><span class="fig">${b.fig}</span></div>

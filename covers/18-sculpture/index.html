@@ -84,7 +84,7 @@ h2.title.s2{font-size:62px}
 .intro .kicker{grid-column:1/-1;font:600 12px/1 "Instrument Sans";letter-spacing:.22em;text-transform:uppercase;color:#6b665e;margin:0}
 .intro h1{grid-column:1/-1;margin:-6px 0 0;font:380 150px/.9 "Newsreader";font-variation-settings:"opsz" 72;letter-spacing:-.035em}
 .intro h1 em{font-weight:300;letter-spacing:-.02em}
-.intro .lede{font:italic 400 30px/1.25 "Newsreader";margin:0 0 22px;letter-spacing:-.005em}
+.intro .body p.lede{font:italic 400 31px/1.22 "Newsreader";margin:0 0 24px;letter-spacing:-.008em;max-width:600px}
 .intro .body p{font:400 19px/1.55 "Newsreader";margin:0 0 14px;max-width:640px}
 .sys h3{font:600 12px/1 "Instrument Sans";letter-spacing:.2em;text-transform:uppercase;margin:0 0 16px;color:#6b665e}
 .sys section{margin:0 0 38px}
@@ -121,6 +121,11 @@ figure.plate .cover{box-shadow:0 1px 2px rgba(0,0,0,.18),0 18px 40px -18px rgba(
 figure.plate figcaption{margin-top:14px;font:500 12px/1.4 "Instrument Sans";letter-spacing:.08em;text-transform:uppercase;color:#6b665e;display:flex;justify-content:space-between}
 .wrapfig{margin:36px 0 0}
 .wrapfig figcaption{margin-top:14px;font:500 12px/1.4 "Instrument Sans";letter-spacing:.08em;text-transform:uppercase;color:#6b665e}
+.thumbs{display:grid;grid-template-columns:repeat(7,180px);justify-content:space-between;gap:36px 0;margin-top:36px}
+.thumb{position:relative;width:180px;height:222px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.2),0 8px 18px -10px rgba(0,0,0,.4)}
+.tin{position:absolute;left:0;top:0;width:720px;height:888px;transform:scale(.25);transform-origin:0 0;background:var(--chalk);color:var(--ink)}
+.tin.k1{background:var(--stone)} .tin.k2{background:var(--soot);color:var(--bone)}
+.tin canvas{position:absolute;left:0;top:0;width:720px;height:888px}
 footer.colophon{margin-top:96px;padding-top:28px;border-top:1px solid var(--rule);display:grid;grid-template-columns:1fr 1fr;gap:40px}
 footer.colophon p{font:400 16.5px/1.55 "Newsreader";margin:0;max-width:640px}
 footer.colophon b{font:600 11px/1 "Instrument Sans";letter-spacing:.18em;text-transform:uppercase;display:block;margin-bottom:10px;color:#6b665e}
@@ -170,6 +175,9 @@ footer.colophon b{font:600 11px/1 "Instrument Sans";letter-spacing:.18em;text-tr
       </section>
     </div>
   </header>
+
+  <div class="sec"><h2>The shelf at 180&thinsp;px</h2><span>How the library grid will see it</span></div>
+  <div class="thumbs" id="thumbs"></div>
 
   <div class="sec"><h2>The core six</h2><span>Two beginner · two intermediate · two advanced</span></div>
   <div class="shelf" id="shelf-core"></div>
@@ -832,6 +840,11 @@ function buildCover(b){
   document.getElementById('shelf-'+(b.group||'range')).appendChild(fig);
   return c.querySelector('canvas');
 }
+function buildThumb(b){
+  const d=document.createElement('div'); d.className='thumb';
+  d.innerHTML=`<div class="tin k${b.key}"><canvas width="360" height="444"></canvas>${coverInner(b)}</div>`;
+  document.getElementById('thumbs').appendChild(d); return d.querySelector('canvas');
+}
 const WRAP={ slug:'ai-context-engineering', css:1498, spineAt:720, frontAt:778 };
 function buildWrap(b){
   const RW=Math.round(WRAP.css*W/720);
@@ -926,13 +939,16 @@ BOOKS.sort((a,b)=>SHOW.indexOf(a.slug)-SHOW.indexOf(b.slug));
 const ONLY=window.ONLY||null;
 const LIST=ONLY?BOOKS.filter(b=>ONLY.includes(b.slug)):BOOKS;
 const CANVASES=LIST.map(b=>buildCover(b));
+const THUMBS=LIST.map(b=>buildThumb(b));
 const WRAPT=(!ONLY||ONLY.includes('wrap'))?buildWrap(BOOKS.find(b=>b.slug===WRAP.slug)):null;
 try{ ['430 78px Newsreader','italic 400 20px Newsreader','600 12px "Instrument Sans"'].forEach(f=>document.fonts.load(f)); }catch(e){}
 
 function renderAll(){
   try{ initGL(); }catch(e){ console.error('WebGL unavailable',e); return; }
   const times=[];
-  LIST.forEach((b,i)=>{ const t0=performance.now(); try{ renderBook(b,CANVASES[i]); }catch(e){ console.error('render fail '+b.slug+': '+e.message); } times.push(b.slug+':'+Math.round(performance.now()-t0)); });
+  LIST.forEach((b,i)=>{ const t0=performance.now(); try{ renderBook(b,CANVASES[i]);
+      const tc=THUMBS[i].getContext('2d'); tc.imageSmoothingQuality='high'; tc.drawImage(CANVASES[i],0,0,360,444); }
+    catch(e){ console.error('render fail '+b.slug+': '+e.message); } times.push(b.slug+':'+Math.round(performance.now()-t0)); });
   if(WRAPT){ const t0=performance.now(); try{ renderBook(BOOKS.find(b=>b.slug===WRAP.slug),WRAPT.canvas,WRAPT.RW,WRAPT.offX); }catch(e){ console.error('wrap fail '+e.message); } times.push('wrap:'+Math.round(performance.now()-t0)); }
   console.log('TIMES '+times.join(' '));
   window.RENDER_TIMES=times;

@@ -76,8 +76,8 @@ body{font-family:'Bodoni Moda',serif;font-optical-sizing:auto;min-width:1600px}
 .face .title .sub{display:block;font-style:italic;font-weight:500;font-size:27px;line-height:1.14;letter-spacing:0;margin-top:12px;max-width:560px;
   font-variation-settings:'opsz' 12}
 .face .rule{position:absolute;left:40px;right:40px;height:0;border-top:1.2px solid var(--ink)}
-.face .legend{position:absolute;left:40px;right:40px;font-style:italic;font-size:13.5px;line-height:1.36;font-weight:500;
-  font-variation-settings:'opsz' 11}
+.face .legend{position:absolute;left:40px;right:40px;bottom:52px;font-style:italic;font-size:13.5px;line-height:1.36;font-weight:500;
+  font-variation-settings:'opsz' 11;border-top:1.2px solid var(--ink);padding-top:8px;text-wrap:pretty}
 .face .legend b{font-weight:700}
 .face .foot{position:absolute;left:40px;right:40px;bottom:28px;display:flex;justify-content:space-between;align-items:center;
   font-size:11px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;font-variation-settings:'opsz' 8}
@@ -108,12 +108,12 @@ body{font-family:'Bodoni Moda',serif;font-optical-sizing:auto;min-width:1600px}
 .si{fill:none;stroke:var(--ink);stroke-linecap:round;stroke-linejoin:round}
 .sh{fill:none;stroke:var(--hi);stroke-linecap:round;stroke-linejoin:round}
 .sg{fill:none;stroke:var(--ground);stroke-linecap:round;stroke-linejoin:round}
-.lab{font-family:'Bodoni Moda',serif;font-style:italic;font-size:19px;font-weight:600;fill:var(--ink);
-  paint-order:stroke;stroke:var(--ground);stroke-width:5px;stroke-linejoin:round;font-variation-settings:'opsz' 12}
-.labs{font-family:'Bodoni Moda',serif;font-size:10px;font-weight:700;letter-spacing:.18em;fill:var(--ink);
-  paint-order:stroke;stroke:var(--ground);stroke-width:4px;stroke-linejoin:round;font-variation-settings:'opsz' 8}
-.fig{font-family:'Bodoni Moda',serif;font-style:italic;font-size:14px;font-weight:600;fill:var(--ink);font-variation-settings:'opsz' 11;
-  paint-order:stroke;stroke:var(--ground);stroke-width:4px;stroke-linejoin:round}
+.lab{font-family:'Bodoni Moda',serif;font-style:italic;font-size:19px;font-weight:600;fill:var(--ink);font-variation-settings:'opsz' 12}
+.labs{font-family:'Bodoni Moda',serif;font-size:10px;font-weight:700;letter-spacing:.18em;fill:var(--ink);font-variation-settings:'opsz' 8}
+.fig{font-family:'Bodoni Moda',serif;font-style:italic;font-size:14px;font-weight:600;fill:var(--ink);font-variation-settings:'opsz' 11}
+/* halos: a second, ground-coloured copy of the text laid underneath (paint-order prints as blobs in PDF) */
+.halo{fill:var(--ground);stroke:var(--ground);stroke-linejoin:round;stroke-width:4px}
+.lab.halo{stroke-width:5px}
 </style>
 </head>
 <body>
@@ -211,8 +211,9 @@ class Plate {
   fill(cls, d) { if (d) this._push('f' + cls, 'f', cls, 0, d); return this; }
   line(cls, sw, d, extra = '') { if (d) this._push('s' + cls + sw + extra, 's', cls, sw + '"' + (extra ? ' ' + extra : ''), d); return this; }
   raw(svg) { this.items.push({ key: 'raw' + Math.random(), kind: 'raw', svg }); return this; }
-  text(x, y, str, cls = 'lab', anchor = 'start', extra = '') {
-    return this.raw(`<text x="${f1(x)}" y="${f1(y)}" class="${cls}" text-anchor="${anchor}" ${extra}>${str}</text>`);
+  text(x, y, str, cls = 'lab', anchor = 'start', extra = '', halo = true) {
+    const t = (c) => `<text x="${f1(x)}" y="${f1(y)}" class="${c}" text-anchor="${anchor}" ${extra}>${str}</text>`;
+    return this.raw((halo ? t(cls + ' halo') : '') + t(cls));
   }
   toString() {
     return this.items.map((it) => it.kind === 'raw' ? it.svg :
@@ -444,7 +445,7 @@ function arrowHead(P, x, y, ang, s = 7, cls = 'i') {
   const a1 = ang + Math.PI * 0.86, a2 = ang - Math.PI * 0.86;
   P.fill(cls, poly([[x, y], [x + Math.cos(a1) * s, y + Math.sin(a1) * s], [x + Math.cos(ang + Math.PI) * s * 0.5, y + Math.sin(ang + Math.PI) * s * 0.5], [x + Math.cos(a2) * s, y + Math.sin(a2) * s]]));
 }
-function toRoman(n) { const m = [[50, 'L'], [40, 'XL'], [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']]; let s = ''; for (const [v, r] of m) while (n >= v) { s += r; n -= v; } return s; }
+function toRoman(n) { const m = [[100, 'C'], [90, 'XC'], [50, 'L'], [40, 'XL'], [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']]; let s = ''; for (const [v, r] of m) while (n >= v) { s += r; n -= v; } return s; }
 
 /* =====================================================================
    FIGURES — one specimen per book, derived from the book's mechanism
@@ -588,7 +589,7 @@ FIG['5d-parallelism'] = (P) => {
     const u = verts[front.m ^ (1 << k)];
     const mx = lerp(front.x, u.x, 0.6), my = lerp(front.y, u.y, 0.6);
     P.fill('g', circ(mx, my, 12.5)); P.fill('i', circ(mx, my, 11.5)); P.fill('g', circ(mx, my, 10.2));
-    P.text(mx, my + 5, L[k], 'lab', 'middle', 'style="stroke-width:0"');
+    P.text(mx, my + 5, L[k], 'lab', 'middle', '', false);
   }
 };
 
@@ -1427,54 +1428,110 @@ FIG['charlie-reasoning-room'] = (P) => {
 /* =====================================================================
    THE BOOKS
    ===================================================================== */
-const ORDER = ['ai-context-engineering', 'mathematical-foundations-for-ml', 'neural-networks-from-scratch', 'build-llms-from-scratch', '5d-parallelism', 'pi-vs-hermes-vs-codex', 'deepseek-harness', 'how-to-host-kimi-k3', 'machine-learning-fundamentals', 'pretraining-mini-kimi-k3', 'prompt-engineering', 'python-for-data-science', 'rag-in-production', 'decision-trees-from-scratch', 'deep-learning-fundamentals', 'foundations-for-ai-ml', 'generative-ai-fundamentals', 'git-github-masterclass', 'modern-software-developer', 'r-masterclass', 'sql-masterclass', 'ai-agents-bootcamp', 'claude-certified-architect', 'cnn-fundamentals', 'computer-vision-bootcamp', 'dsa-in-python', 'llm-finetuning', 'llm-production-deployment', 'memory-in-ai-systems', 'mini-clawdbot', 'ml-dl-mastery', 'nlp-cv-mastery', 'reinforcement-learning', 'transformers-from-scratch', 'vit-from-scratch', 'writing-papers', 'deit-from-scratch', 'diffusion-lm-from-scratch', 'kimi-k3-from-scratch', 'modern-robot-learning', 'nanovlm-from-scratch', 'rlhf-from-scratch', 'sciml', 'transformers-vision-multimodal', 'vla-world-models', 'charlie-language-room', 'charlie-vision-room', 'charlie-sound-room', 'charlie-reasoning-room', 'harness-engineering', 'kernel-engineering', 'inference-engineering'];
+/* Plate numbers are permanent and append-only: a new title takes the next free numeral; nothing is ever renumbered. */
+const PLATE = {
+  'ai-context-engineering': 1,
+  'mathematical-foundations-for-ml': 2,
+  'neural-networks-from-scratch': 3,
+  'build-llms-from-scratch': 4,
+  '5d-parallelism': 5,
+  'pi-vs-hermes-vs-codex': 6,
+  'deepseek-harness': 7,
+  'how-to-host-kimi-k3': 8,
+  'machine-learning-fundamentals': 9,
+  'pretraining-mini-kimi-k3': 10,
+  'prompt-engineering': 11,
+  'python-for-data-science': 12,
+  'rag-in-production': 13,
+  'decision-trees-from-scratch': 14,
+  'deep-learning-fundamentals': 15,
+  'foundations-for-ai-ml': 16,
+  'generative-ai-fundamentals': 17,
+  'git-github-masterclass': 18,
+  'modern-software-developer': 19,
+  'r-masterclass': 20,
+  'sql-masterclass': 21,
+  'ai-agents-bootcamp': 22,
+  'claude-certified-architect': 23,
+  'cnn-fundamentals': 24,
+  'computer-vision-bootcamp': 25,
+  'dsa-in-python': 26,
+  'llm-finetuning': 27,
+  'llm-production-deployment': 28,
+  'memory-in-ai-systems': 29,
+  'mini-clawdbot': 30,
+  'ml-dl-mastery': 31,
+  'nlp-cv-mastery': 32,
+  'reinforcement-learning': 33,
+  'transformers-from-scratch': 34,
+  'vit-from-scratch': 35,
+  'writing-papers': 36,
+  'deit-from-scratch': 37,
+  'diffusion-lm-from-scratch': 38,
+  'kimi-k3-from-scratch': 39,
+  'modern-robot-learning': 40,
+  'nanovlm-from-scratch': 41,
+  'rlhf-from-scratch': 42,
+  'sciml': 43,
+  'transformers-vision-multimodal': 44,
+  'vla-world-models': 45,
+  'charlie-language-room': 46,
+  'charlie-vision-room': 47,
+  'charlie-sound-room': 48,
+  'charlie-reasoning-room': 49,
+  'harness-engineering': 50,
+  'kernel-engineering': 51,
+  'inference-engineering': 52,
+};
+const plateOf = (slug) => PLATE[slug];
 
 const BOOKS = [
   { slug: 'ai-context-engineering', level: 'intermediate', lines: ['AI Context', 'Engineering'], meta: '43 capsules · 10 hours',
     cap: '<b>Fig. 1.</b> A context window, cored; first token at the base. <b>a</b> the query; <b>b</b> conversation, two laminae a turn; <b>c</b> recalled memory; <b>d</b> retrieved documents; <b>e</b> tool definitions; <b>f</b> the system prompt.' },
-  { slug: 'mathematical-foundations-for-ml', level: 'beginner', lines: ['Mathematical', 'Foundations for', 'Machine Learning'], meta: '43 capsules · 10 hours',
+  { slug: 'mathematical-foundations-for-ml', level: 'beginner', lines: ['Mathematical', 'Foundations', 'for Machine Learning'], meta: '43 capsules · 10 hours',
     cap: '<b>Fig. 1.</b> A loss surface, surveyed and sectioned, with two paths of steepest descent. <b>a</b> initial parameters; <b>b</b> the minimum; <b>c</b> one step along −∇L; <b>d</b> a local minimum, where the second path is caught.' },
   { slug: 'neural-networks-from-scratch', level: 'beginner', lines: ['Neural Networks', 'from Scratch'], meta: '33 capsules · 7 hours',
     cap: '<b>Fig. 1.</b> A single unit, dissected. <b>a</b> inputs; <b>b</b> weights, each bead sized to its magnitude; <b>c</b> bias; <b>d</b> the core, where the weighted sum is formed; <b>e</b> the shell of activation; <b>f</b> output.' },
-  { slug: 'build-llms-from-scratch', level: 'intermediate', lines: ['Build Large Language', 'Models (LLMs)', 'from Scratch'], size: 58, meta: '20 capsules · 6 hours',
+  { slug: 'build-llms-from-scratch', level: 'intermediate', lines: ['Build Large Language', 'Models (LLMs)', 'from Scratch'], size: 56, meta: '20 capsules · 6 hours',
     cap: '<b>Fig. 1.</b> A decoder-only model, raised as a column. <b>a</b> tokens; <b>b</b> embedding; <b>c</b> a transformer block, one of N; <b>d</b> the residual stream they are threaded on; <b>e</b> output head; <b>f</b> next-token distribution.' },
-  { slug: '5d-parallelism', level: 'advanced', lines: ['5D Parallelism for', 'Large Model Training'], size: 58, dy: -28, meta: '40 capsules · 9 hours',
+  { slug: '5d-parallelism', level: 'advanced', lines: ['5D Parallelism', 'for Large Model', 'Training'], dy: 8, meta: '40 capsules · 9 hours',
     cap: '<b>Fig. 1.</b> A device mesh of 2 × 2 × 2 × 2 × 2, projected out of five dimensions. From the nearest device, one rod along each axis: <b>a</b> data; <b>b</b> tensor; <b>c</b> pipeline; <b>d</b> sequence; <b>e</b> expert.' },
   { slug: 'pi-vs-hermes-vs-codex', level: 'advanced', lines: ['Pi vs Hermes vs Codex'], size: 56, sub: 'Context Compaction and Memory', meta: '9 capsules · 1 hour',
     cap: '<b>Fig. 1.</b> Three agents’ histories wound as one spiral, each older span sealed into a smaller chamber. <b>a</b> the live context; <b>b</b> a compaction; <b>c</b> the compacted past; <b>d</b> memory, the thread through it all.' },
-  { slug: 'decision-trees-from-scratch', level: 'beginner', lines: ['Build Decision Trees', 'from Scratch'], size: 60, meta: '23 capsules · 5 hours',
+  { slug: 'decision-trees-from-scratch', level: 'beginner', lines: ['Build Decision Trees', 'from Scratch'], meta: '23 capsules · 5 hours',
     cap: '<b>Fig. 1.</b> A decision tree, pressed. <b>a</b> the root split; <b>b</b> a leaf of class A, pale; <b>c</b> a leaf of class B, dark. <b>Fig. 2.</b> The plane, partitioned by the same four splits.' },
   { slug: 'transformers-from-scratch', level: 'intermediate', lines: ['Transformers'], sub: 'Theory, Intuition, and Building from Scratch', meta: '20 capsules · 5 hours',
     cap: '<b>Fig. 1.</b> One causal attention head over nine tokens, each arch weighted by softmax(QK<sup>T</sup>/√d). <b>a</b> tokens; <b>b</b> the last query, in white; <b>c</b> the attention sink. <b>Fig. 2.</b> The weights as a matrix; <b>d</b> its diagonal.' },
   { slug: 'harness-engineering', level: 'advanced', lines: ['Harness', 'Engineering'], sub: 'Build the layer that turns<br>a model into an agent.', soon: true,
     cap: '<b>Fig. 1.</b> The harness, as an armillary. <b>a</b> the model; <b>b</b> the agent loop; <b>c</b> tools, mounted; <b>d</b> memory; <b>e</b> the horizon of the sandbox; <b>f</b> the frame of permissions that holds it all.' },
-  { slug: 'charlie-language-room', level: 'advanced', series: 'I', lines: ['Charlie and the', 'Language Room'], size: 60, sub: 'Language — Inference Engineering', meta: '22 capsules · 5 hours',
+  { slug: 'charlie-language-room', level: 'advanced', series: 'I', lines: ['Charlie and the', 'Language Room'], size: 56, sub: 'Language — Inference Engineering', meta: '22 capsules · 5 hours',
     cap: '<b>Fig. 1.</b> The key–value cache, kept in pages like a card catalogue. <b>a</b> the cabinet, GPU memory; <b>b</b> a page, drawn out; <b>c</b> one card per token, its keys and values; <b>d</b> a free page; <b>e</b> the page table.' },
-  { slug: 'charlie-vision-room', level: 'intermediate', series: 'II', lines: ['Charlie and the', 'Vision Room'], size: 60, sub: 'Vision — Vision Transformers', meta: '20 capsules · 6 hours',
+  { slug: 'charlie-vision-room', level: 'intermediate', series: 'II', lines: ['Charlie and the', 'Vision Room'], size: 56, sub: 'Vision — Vision Transformers', meta: '20 capsules · 6 hours',
     cap: '<b>Fig. 1.</b> An image cast by a lens, then cut into patches to be read like words. <b>a</b> the subject; <b>b</b> the lens; <b>c</b> the image, divided four by four; <b>d</b> the patches in sequence, numbered by position.' },
-  { slug: 'charlie-sound-room', level: 'intermediate', series: 'III', lines: ['Charlie and the', 'Sound Room'], size: 60, sub: 'Audio — Voice Agents', meta: '20 capsules · 6 hours',
+  { slug: 'charlie-sound-room', level: 'intermediate', series: 'III', lines: ['Charlie and the', 'Sound Room'], size: 56, sub: 'Audio — Voice Agents', meta: '20 capsules · 6 hours',
     cap: '<b>Fig. 1.</b> A phonautograph: a voice traced through soot on a turning drum. <b>a</b> the horn; <b>b</b> the membrane; <b>c</b> the stylus; <b>d</b> the drum and its trace. <b>Fig. 2.</b> The trace unrolled, <b>e</b> cut into frames.' },
-  { slug: 'charlie-reasoning-room', level: 'advanced', series: 'IV', lines: ['Charlie and the', 'Reasoning Room'], size: 60, sub: 'Reason — Reinforcement Learning,<br>from bandits to reasoning models', meta: '21 capsules · 6 hours',
+  { slug: 'charlie-reasoning-room', level: 'advanced', series: 'IV', lines: ['Charlie and the', 'Reasoning Room'], size: 56, sub: 'Reason — Reinforcement Learning,<br>from bandits to reasoning models', meta: '21 capsules · 6 hours',
     cap: '<b>Fig. 1.</b> From bandits to reasoning. <b>a</b> the arms of a bandit; <b>b</b> each arm’s distribution of reward; <b>c</b> the arm pulled; <b>d</b> a tree of reasoning steps grown from it; <b>e</b> the path that reward reinforced.' },
 ];
 
 const LEVEL = { beginner: 1, intermediate: 2, advanced: 3 };
 const MARK = `<svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="8.7" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M5.3 5.6 L10 15.2 L14.7 5.6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="miter"/></svg>`;
 function levelGlyph(n) { // a micrograph scale bar; one, two or three bars filled
-  let s = '<svg width="52" height="9" viewBox="0 0 52 9">';
-  for (let i = 0; i < 3; i++) s += `<rect x="${0.75 + i * 17}" y="0.75" width="15.5" height="7.5" ${i < n ? 'fill="currentColor"' : 'fill="none"'} stroke="currentColor" stroke-width="1.5"/>`;
+  let s = '<svg width="58" height="9" viewBox="0 0 58 9">';
+  for (let i = 0; i < 3; i++) s += `<rect x="${0.75 + i * 19}" y="0.75" width="15.5" height="7.5" ${i < n ? 'fill="currentColor"' : 'fill="none"'} stroke="currentColor" stroke-width="1.5"/>`;
   return s + '</svg>';
 }
 
+// keep every lettered key on the same line as the first word of its gloss, and 'Fig. 2.' in one piece
+function bindKeys(cap) { return cap.replace(/Fig\. (\d)/g, 'Fig.&nbsp;$1').replace(/<\/b> /g, '</b>&nbsp;'); }
 function faceHTML(b, P) {
-  const pl = toRoman(ORDER.indexOf(b.slug) + 1);
+  const pl = toRoman(plateOf(b.slug));
   const lv = b.level[0].toUpperCase() + b.level.slice(1);
   return `
     <svg class="art" viewBox="0 0 720 888" xmlns="http://www.w3.org/2000/svg"><g transform="translate(0 ${b.dy || 0})">${P}</g></svg>
     <div class="head"><span>Plate ${pl}</span><span class="lv">${lv}${levelGlyph(LEVEL[b.level])}</span></div>
     <h2 class="title" style="${b.size ? `font-size:${b.size}px` : ''}">${b.series ? `<span class="series">Charlie and the Intelligence Factory &nbsp;·&nbsp; Book ${b.series}</span>` : ''}${b.lines.map((l) => `<span class="l">${l}</span>`).join('')}${b.sub ? `<span class="sub">${b.sub}</span>` : ''}</h2>
-    <div class="rule" style="top:792px"></div>
-    <div class="legend" style="top:801px">${b.cap}</div>
+    <div class="legend">${bindKeys(b.cap)}</div>
     <div class="foot"><span class="imprint">${MARK}<span>Vizuara Books</span></span><span class="meta">${b.soon ? 'In preparation' : (b.meta || '')}</span></div>`;
 }
 function build(b) {
@@ -1515,12 +1572,30 @@ GROUPS.forEach((g) => {
     const it = document.createElement('div'); it.className = 'item';
     it.appendChild(build(b));
     const n = document.createElement('p'); n.className = 'note';
-    n.innerHTML = `<b>Plate ${toRoman(ORDER.indexOf(slug) + 1)}.</b> ${NOTES[slug] || ''}`;
+    n.innerHTML = `<b>Plate ${toRoman(plateOf(slug))}.</b> ${NOTES[slug] || ''}`;
     it.appendChild(n); row.appendChild(it);
   });
   groupsEl.appendChild(sec);
 });
 document.getElementById('lvkey').innerHTML = ['beginner', 'intermediate', 'advanced'].map((l, i) => `<div style="background:var(--${['sage', 'ingres', 'madder'][i]})"><span>${l}</span>${levelGlyph(i + 1)}</div>`).join('');
+
+/* ---------------- build-time checks: the frame must hold for the next 40 books ---------------- */
+document.fonts.ready.then(() => requestAnimationFrame(() => {
+  document.querySelectorAll('.cover').forEach((c) => {
+    const slug = c.dataset.slug, bad = (m) => { console.error(`[plates] ${slug}: ${m}`); c.style.outline = '4px solid red'; };
+    const lg = c.querySelector('.legend'), cs = getComputedStyle(lg);
+    const lines = Math.round((lg.clientHeight - parseFloat(cs.paddingTop)) / parseFloat(cs.lineHeight));
+    if (lines > 2) bad(`legend runs to ${lines} lines`);
+    const tr = c.querySelector('.title').getBoundingClientRect().right;
+    c.querySelectorAll('.title .l').forEach((l) => {
+      const r = document.createRange(); r.selectNodeContents(l);
+      if (r.getBoundingClientRect().right > tr + 0.5) bad(`title line overflows: "${l.textContent}"`);
+      if (/\s(for|of|to|with|from)$/i.test(l.textContent.trim())) bad(`title line ends on a preposition: "${l.textContent}"`);
+    });
+    const fs = parseFloat(getComputedStyle(c.querySelector('.title')).fontSize);
+    if (![64, 56].includes(fs)) bad(`title size ${fs}px is not one of the two steps (64, 56)`);
+  });
+}));
 
 /* ---------------- the print wrap for Plate III ---------------- */
 FIG['nn-back'] = (P) => {
@@ -1541,18 +1616,18 @@ FIG['nn-back'] = (P) => {
   const wrap = document.createElement('div'); wrap.className = 'wrap beginner';
   const back = document.createElement('div'); back.className = 'face back beginner';
   const PB = new Plate(); FIG['nn-back'](PB);
-  const cat = ORDER.slice(0, 6).map((sl, i) => { const bk = BOOKS.find((q) => q.slug === sl); return `<span><i>${toRoman(i + 1)}</i>${bk.lines.join(' ').replace(/<br>/g, ' ')}${bk.sub && bk.slug === 'pi-vs-hermes-vs-codex' ? ': ' + bk.sub : ''}</span>`; }).join(' &nbsp;·&nbsp; ');
+  const cat = Object.keys(PLATE).filter((sl) => PLATE[sl] <= 6).sort((x, y) => PLATE[x] - PLATE[y]).map((sl, i) => { const bk = BOOKS.find((q) => q.slug === sl); return `<span><i>${toRoman(i + 1)}</i>${bk.lines.join(' ').replace(/<br>/g, ' ')}${bk.sub && bk.slug === 'pi-vs-hermes-vs-codex' ? ': ' + bk.sub : ''}</span>`; }).join(' &nbsp;·&nbsp; ');
   back.innerHTML = `
     <svg class="art" viewBox="0 0 720 888" xmlns="http://www.w3.org/2000/svg">${PB}</svg>
     <div class="head"><span>Plate III</span><span class="lv">Beginner${levelGlyph(1)}</span></div>
     <div class="blurb">Build a neural network the way an anatomist learns a body: one part at a time. Take a single unit apart (its inputs, its weights, the sum it forms, the curve that decides what it passes on), then wire the units into layers and teach them, <em>from scratch</em>.</div>
     <div class="facts"><span>Beginner</span><span>33 capsules</span><span>About 7 hours</span><span>Free to read online</span></div>
-    <div class="legend" style="top:622px"><b>Fig. 2.</b> The unit of Plate III, repeated and wired into a small network. Ink rods carry positive weights, white rods negative, and each rod’s thickness is the weight’s magnitude.</div>
+    <div class="legend" style="bottom:auto;top:614px">${bindKeys('<b>Fig. 2.</b>')} The unit of Plate III, repeated and wired into a small network. Ink rods carry positive weights, white rods negative, and each rod’s thickness is the weight’s magnitude.</div>
     <div class="cat"><h4>From the atlas</h4>${cat}</div>
     <div class="foot"><span class="imprint">${MARK}<span>Vizuara Books</span></span><span class="meta">books.vizuara.ai</span></div>`;
   const spine = document.createElement('div'); spine.className = 'spine';
   spine.innerHTML = `<div class="no">III</div><div class="t">Neural Networks from Scratch</div>
-    <div class="mk"><svg width="12" height="40" viewBox="0 0 12 40">${[0, 1, 2].map((i) => `<rect x="0.75" y="${0.75 + i * 13.5}" width="10.5" height="12" ${i < 1 ? 'fill="currentColor"' : 'fill="none"'} stroke="currentColor" stroke-width="1.5"/>`).join('')}</svg><svg width="22" height="22" viewBox="0 0 20 20">${MARK.replace(/^<svg[^>]*>|<\/svg>$/g, '')}</svg></div>`;
+    <div class="mk"><svg width="12" height="44" viewBox="0 0 12 44">${[0, 1, 2].map((i) => `<rect x="0.75" y="${0.75 + i * 15}" width="10.5" height="12" ${i < 1 ? 'fill="currentColor"' : 'fill="none"'} stroke="currentColor" stroke-width="1.5"/>`).join('')}</svg><svg width="22" height="22" viewBox="0 0 20 20">${MARK.replace(/^<svg[^>]*>|<\/svg>$/g, '')}</svg></div>`;
   const front = document.createElement('div'); front.className = 'face beginner';
   const PF = new Plate(); FIG[b.slug](PF);
   front.innerHTML = faceHTML(b, PF);

@@ -66,5 +66,9 @@
   "14-bombay": {
     "name": "Signboard",
     "pitch": "Every book is lettered like a Bombay shop board and labelled like a Sivakasi matchbox. The title is set in Board Block, a display alphabet built in SVG for this system (coal keyline, split cream-over-chrome fill, red inline, block shadow), widened or narrowed to fill the board as sign-painters do. A matchbox label carries one object from the book's mechanism. Board colour marks the shelf, a perforated stamp marks level, and the imprint runs in Latin and Devanagari at equal size, as Maharashtra's shop-sign rule requires."
+  },
+  "20-cutpaper": {
+    "name": "Paperworks",
+    "pitch": "Every book is a small construction of cut, folded and layered coloured card, and the construction is the idea: a die-cut window over a scroll of context, neurons pinned with brass paper fasteners, chat history pleated into a concertina. Board colour marks the subject shelf (Matisse's cut-out palette plus kraft), and the number of sheets stacked under the title slip is the level. In print the layers become real die-cut, laminated board."
   }
 }
