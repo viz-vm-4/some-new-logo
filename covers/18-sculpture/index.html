@@ -56,17 +56,140 @@ h2.title.s2{font-size:62px}
 .level .scale i:nth-child(3).on::after{background:var(--bone)}
 .level span{font:600 11.5px/1 "Instrument Sans";letter-spacing:.2em;text-transform:uppercase}
 
+/* ---------------- print wrap ---------------- */
+.wrap{position:relative;width:1498px;height:888px;overflow:hidden;background:var(--stone);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.18),0 18px 40px -18px rgba(0,0,0,.35)}
+.wrap canvas{position:absolute;left:0;top:0;width:1498px;height:888px}
+.wrap .front{position:absolute;left:778px;top:0;width:720px;height:888px}
+.wrap .spine{position:absolute;left:720px;top:0;width:58px;height:888px;border-left:1px dashed rgba(23,22,20,.28);border-right:1px dashed rgba(23,22,20,.28)}
+.wrap .spine .st{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(90deg);white-space:nowrap;
+  font:430 25px/1 "Newsreader";font-variation-settings:"opsz" 30;letter-spacing:-.005em}
+.wrap .spine .sn{position:absolute;left:0;right:0;top:34px;text-align:center;font:600 11px/1 "Instrument Sans";letter-spacing:.08em}
+.wrap .spine svg{position:absolute;left:50%;bottom:34px;width:14px;height:20px;margin-left:-7px;fill:currentColor}
+.wrap .back{position:absolute;left:0;top:0;width:720px;height:888px}
+.back .bi{position:absolute;left:52px;top:40px;display:flex;align-items:center;gap:9px;font:600 11.5px/1 "Instrument Sans";letter-spacing:.2em;text-transform:uppercase}
+.back .bi svg{width:13px;height:19px;fill:currentColor}
+.back .entry{position:absolute;left:52px;top:112px;width:500px}
+.back .entry .k{font:600 11.5px/1.5 "Instrument Sans";letter-spacing:.16em;text-transform:uppercase;margin:0 0 14px}
+.back .entry h3{font:430 40px/1.04 "Newsreader";font-variation-settings:"opsz" 60;letter-spacing:-.012em;margin:0 0 26px}
+.back .entry p{font:400 19px/1.45 "Newsreader";margin:0 0 14px;max-width:470px}
+.back .entry p i{font-style:italic}
+.back .foot{position:absolute;left:52px;right:52px;bottom:40px;display:flex;justify-content:space-between;align-items:flex-end}
+.back .foot .url{font:600 11.5px/1.5 "Instrument Sans";letter-spacing:.16em;text-transform:uppercase}
+.back .bar{width:190px;height:104px;background:#fbfaf7;color:#1a1a1a;display:flex;align-items:center;justify-content:center;
+  font:500 10px/1 "Instrument Sans";letter-spacing:.16em;text-transform:uppercase}
+
 /* ---------------- presentation page ---------------- */
-.page{max-width:1560px;margin:0 auto;padding:72px 60px 120px}
-.shelf{display:flex;flex-wrap:wrap;gap:64px 56px;justify-content:center;margin-top:40px}
+.page{max-width:1600px;margin:0 auto;padding:80px 50px 140px}
+.intro{display:grid;grid-template-columns:1fr 1fr;gap:40px 88px;align-items:start;padding:0 2px 72px;border-bottom:1px solid var(--rule)}
+.intro .kicker{grid-column:1/-1;font:600 12px/1 "Instrument Sans";letter-spacing:.22em;text-transform:uppercase;color:#6b665e;margin:0}
+.intro h1{grid-column:1/-1;margin:-6px 0 0;font:380 150px/.9 "Newsreader";font-variation-settings:"opsz" 72;letter-spacing:-.035em}
+.intro h1 em{font-weight:300;letter-spacing:-.02em}
+.intro .lede{font:italic 400 30px/1.25 "Newsreader";margin:0 0 22px;letter-spacing:-.005em}
+.intro .body p{font:400 19px/1.55 "Newsreader";margin:0 0 14px;max-width:640px}
+.sys h3{font:600 12px/1 "Instrument Sans";letter-spacing:.2em;text-transform:uppercase;margin:0 0 16px;color:#6b665e}
+.sys section{margin:0 0 38px}
+.keys{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.keys .sw{height:118px;padding:14px 14px;display:flex;flex-direction:column;justify-content:space-between;font:500 12px/1.35 "Instrument Sans";letter-spacing:.06em}
+.keys .sw b{font:430 25px/1 "Newsreader";letter-spacing:-.01em}
+.keys .sw span{text-transform:uppercase;letter-spacing:.14em;font-weight:600;font-size:11px}
+.keys .k0{background:var(--chalk);color:var(--ink);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
+.keys .k1{background:var(--stone);color:var(--ink)}
+.keys .k2{background:var(--soot);color:var(--bone)}
+.keys p{grid-column:1/-1;font:400 16.5px/1.5 "Newsreader";margin:4px 0 0}
+.types{display:grid;grid-template-columns:1fr 1fr;gap:18px 28px}
+.types div{border-top:1px solid var(--rule);padding-top:12px}
+.types .a{font:430 44px/1 "Newsreader";font-variation-settings:"opsz" 72;letter-spacing:-.018em}
+.types .b{font:italic 400 30px/1 "Newsreader"}
+.types .c{font:600 15px/1.4 "Instrument Sans";letter-spacing:.2em;text-transform:uppercase}
+.types small{display:block;margin-top:9px;font:500 12px/1.4 "Instrument Sans";letter-spacing:.04em;color:#6b665e}
+.labelspec{display:grid;grid-template-columns:auto 1fr;gap:10px 22px;align-items:baseline;font:400 16.5px/1.45 "Newsreader"}
+.labelspec dt{font:600 11px/1.3 "Instrument Sans";letter-spacing:.16em;text-transform:uppercase;color:#6b665e}
+.labelspec dd{margin:0}
+.markrow{display:flex;align-items:center;gap:22px}
+.markrow svg{width:34px;height:50px;fill:var(--ink)}
+.markrow p{font:400 16.5px/1.45 "Newsreader";margin:0;max-width:430px}
+.mats{display:flex;flex-wrap:wrap;gap:8px}
+.mats span{display:flex;align-items:center;gap:8px;font:500 12px/1 "Instrument Sans";letter-spacing:.05em;padding:6px 10px 6px 6px;border:1px solid var(--rule)}
+.mats i{display:block;width:16px;height:16px;border-radius:50%}
+.sec{display:flex;align-items:baseline;gap:22px;margin:88px 2px 6px}
+.sec h2{font:430 44px/1 "Newsreader";font-variation-settings:"opsz" 60;letter-spacing:-.015em;margin:0}
+.sec span{font:600 12px/1 "Instrument Sans";letter-spacing:.2em;text-transform:uppercase;color:#6b665e}
+.secnote{font:400 19px/1.5 "Newsreader";max-width:880px;margin:10px 2px 0}
+.shelf{display:flex;flex-wrap:wrap;gap:64px 56px;justify-content:space-between;margin-top:36px}
 figure.plate{margin:0}
 figure.plate .cover{box-shadow:0 1px 2px rgba(0,0,0,.18),0 18px 40px -18px rgba(0,0,0,.35)}
-figure.plate figcaption{margin-top:14px;font:500 12px/1.4 "Instrument Sans";letter-spacing:.08em;text-transform:uppercase;color:#6b665e}
+figure.plate figcaption{margin-top:14px;font:500 12px/1.4 "Instrument Sans";letter-spacing:.08em;text-transform:uppercase;color:#6b665e;display:flex;justify-content:space-between}
+.wrapfig{margin:36px 0 0}
+.wrapfig figcaption{margin-top:14px;font:500 12px/1.4 "Instrument Sans";letter-spacing:.08em;text-transform:uppercase;color:#6b665e}
+footer.colophon{margin-top:96px;padding-top:28px;border-top:1px solid var(--rule);display:grid;grid-template-columns:1fr 1fr;gap:40px}
+footer.colophon p{font:400 16.5px/1.55 "Newsreader";margin:0;max-width:640px}
+footer.colophon b{font:600 11px/1 "Instrument Sans";letter-spacing:.18em;text-transform:uppercase;display:block;margin-bottom:10px;color:#6b665e}
 </style>
 </head>
 <body>
 <main class="page">
-  <section class="shelf" id="shelf"></section>
+  <header class="intro">
+    <p class="kicker">Direction 18 &nbsp;·&nbsp; A cover system for Vizuara Books</p>
+    <h1>Maquette</h1>
+    <div class="body">
+      <p class="lede">Every book is one object, made in code and photographed on seamless paper.</p>
+      <p>A maquette is the small model a sculptor makes before the real work, and every book in this library is about a model. So each cover is a single sculpted form that embodies its subject: a saddle surface with its straight rulings for the mathematics, a stone window packed block by block for context engineering, the shadow of a five-dimensional cube for 5D parallelism.</p>
+      <p>The system is a museum catalogue. The title is set large on the paper wall. The object sits in studio light. At the foot is a gallery label giving the object's name, its material, and its dimensions, measured in capsules and hours.</p>
+      <p>Nothing is drawn or stock. Each cover is ray-marched in the browser from signed-distance functions (soft shadows, occlusion, studio softboxes) straight onto a 2250&thinsp;×&thinsp;2775&nbsp;px canvas, 300&nbsp;dpi at trim.</p>
+    </div>
+    <div class="sys">
+      <section>
+        <h3>Paper is the level</h3>
+        <div class="keys">
+          <div class="sw k0"><span>Beginner</span><div><b>Chalk</b><br>#E7E3DB · high key</div></div>
+          <div class="sw k1"><span>Intermediate</span><div><b>Stone</b><br>#A8A39A · mid key</div></div>
+          <div class="sw k2"><span>Advanced</span><div><b>Soot</b><br>#232120 · low key</div></div>
+          <p>Level is lighting. Beginner books are shot bright and airy, advanced books under a single spot on dark paper. It is a difference of value, not hue, so it survives greyscale print and reads from across a room. A small grey-scale target, the kind photographers put beside an artwork, repeats it in words.</p>
+        </div>
+      </section>
+      <section>
+        <h3>Type</h3>
+        <div class="types">
+          <div><span class="a">Newsreader</span><small>Display, 430 · titles</small></div>
+          <div><span class="b">Newsreader Italic</span><small>subtitles · the object's name</small></div>
+          <div><span class="c">Instrument Sans</span><small>600 caps · imprint, material, dimensions</small></div>
+          <div><span class="c" style="letter-spacing:.14em">No. 01–52</span><small>catalogue number = place in the library</small></div>
+        </div>
+      </section>
+      <section>
+        <h3>The label</h3>
+        <dl class="labelspec">
+          <dt>Object</dt><dd>What the sculpture is, in plain words: <i>Cube with a mouth. Column of twelve identical blocks.</i></dd>
+          <dt>Medium</dt><dd>Plaster, terracotta, travertine, oxblood glaze, beeswax, marble. The colour on the shelf comes from the material, never from a brand accent.</dd>
+          <dt>Dimensions</dt><dd>The book's true size: capsules × hours. Forthcoming titles are shown as white plaster maquettes, with the metal still to be cast.</dd>
+        </dl>
+      </section>
+      <section>
+        <h3>Imprint</h3>
+        <div class="markrow"><svg viewBox="0 0 26 38"><use href="#vmark"/></svg><p>A V standing on a plinth: the publisher as the one who puts ideas on display. It is always small, always top left, and never louder than the title.</p></div>
+      </section>
+    </div>
+  </header>
+
+  <div class="sec"><h2>The core six</h2><span>Two beginner · two intermediate · two advanced</span></div>
+  <div class="shelf" id="shelf-core"></div>
+
+  <div class="sec"><h2>Range</h2><span>Short title · long title · forthcoming</span></div>
+  <p class="secnote">The same rules stretch from a two-word title to a three-line one. A forthcoming book gets the plaster maquette of its object, so the catalogue can announce a book before its cover is "cast".</p>
+  <div class="shelf" id="shelf-range"></div>
+
+  <div class="sec"><h2>Charlie and the Intelligence Factory</h2><span>Sub-series · I–IV</span></div>
+  <p class="secnote">Four rooms, one cube. The sub-series keeps a single object — a porcelain cube, the "room" — and changes only the one opening cut into its face: a mouth for Language, an eye for Vision, an ear for Sound, a stair for Reasoning. The cuts are gilded inside, a nod to the golden ticket. The paper still follows each book's level.</p>
+  <div class="shelf" id="shelf-charlie"></div>
+
+  <div class="sec"><h2>Print wrap</h2><span>Back · spine · front, one continuous photograph</span></div>
+  <p class="secnote">The studio keeps going around the spine. The back cover is the same sheet of paper, lit from the same softbox, and it carries the catalogue entry for the object on the front.</p>
+  <figure class="wrapfig" id="wrapfig"></figure>
+
+  <footer class="colophon">
+    <div><b>How it is made</b><p>One WebGL2 fragment shader shared by every book: an analytic paper sweep (floor, cove, wall), a sphere-traced object, soft shadows toward a softbox, ambient occlusion, a studio environment of softbox, scrim and cards for reflections, a gentle filmic shoulder and photographic grain. Each book supplies one distance function and one material function, about thirty lines of GLSL. If WebGL is unavailable the covers fall back to flat paper in the level colour, with all the typography intact.</p></div>
+    <div><b>What is next</b><p>Give every one of the fifty books its object. Cast a physical edition of the forthcoming plaster maquettes. Add an animated variant for the web library, where the object turns slowly on hover. Build a spine system in which a row of books forms a continuous paper sweep.</p></div>
+  </footer>
 </main>
 
 <svg width="0" height="0" style="position:absolute">
@@ -702,8 +825,8 @@ function buildCover(b, idx){
     <div class="level"><div class="scale"><i class="${b.key==0?'on':''}"></i><i class="${b.key==1?'on':''}"></i><i class="${b.key==2?'on':''}"></i></div><span>${lv}</span></div>
   </div>`;
   fig.appendChild(c);
-  const cap=document.createElement('figcaption'); cap.textContent=b.slug; fig.appendChild(cap);
-  document.getElementById('shelf').appendChild(fig);
+  const cap=document.createElement('figcaption'); cap.innerHTML=`<span>${b.slug}</span><span>${['Beginner','Intermediate','Advanced'][b.key]} · ${b.dim}</span>`; fig.appendChild(cap);
+  document.getElementById('shelf-'+(b.group||'range')).appendChild(fig);
   return c.querySelector('canvas');
 }
 

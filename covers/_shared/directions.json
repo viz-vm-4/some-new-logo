@@ -58,5 +58,9 @@
   "11-kolam": {
     "name": "Pulli",
     "pitch": "Every book gets a Tamil sikku kolam computed from the book itself. There is one dot (pulli) per capsule, laid out in the shape of the subject, and a single line weaves around them under the real kolam rules (45° runs, turns at the borders, never touching a dot, always closing). A real mirror-curve engine finds the turns: 5D Parallelism closes as five lines, Pi vs Hermes vs Codex as three. The ground gives level: ink on notebook paper, rice flour on red-oxide kaavi, rice flour on dark earth."
+  },
+  "19-terminal": {
+    "name": "stdout",
+    "pitch": "Every cover is what the book's own code prints. The top two-thirds is a full-bleed field of machine output on a 120 × 80 character grid (an attention matrix, a hex dump, a device mesh, a packed context window) that forms the emblem at arm's length and is real numbers up close. Tone comes from glyph weight, like a line printer. The title is typed at a prompt: > for beginner, $ for intermediate, # (root) for advanced."
   }
 }

@@ -123,33 +123,36 @@
     return { S, cam, L: sunRel(cam, 30, 50) };
   };
 
-  // The far wall of a stepwell (after Chand Baori, Abhaneri): terraces stepping back as they rise,
-  // every terrace joined to the next by pairs of flights — layers joined by connections.
+  // Stepwell in section (after Chand Baori, Abhaneri): the section plane cuts the pit open;
+  // terraces (layers) step down, every one joined to the next by pairs of flights (connections).
   SCENES.baori = (hr) => {
-    const cam = CAM({ az: 0, s: 1, ox: 360, el: 18 });
-    const S = new Scene(); ground(S, hr, cam); S.E = frame(cam, -6);
-    const n = 5, Dz = 70, t = 30, y0 = 110, X0 = -250, X = 620, P = 150, w = 60, lw = 9, m = 7, d = 24;
+    const cam = CAM({ az: 0, s: 1, ox: 360, el: 34 });
+    const S = new Scene(); S.E = frame(cam, 0);
+    const n = 9, h = 30, g = 27, X = 335, Y = 640, Zb = -1500;
+    pitGround(S, hr, [{ x0: -X, x1: X, y1: Y, cols: [] }]);
+    const sm = cutOr(S, hr, hr.stone), wm = cutOr(S, hr, hr.water);
     for (let i = 0; i < n; i++) {
-      const ya = y0 + i * t, yb = i === n - 1 ? y0 + 1400 : y0 + (i + 1) * t;
-      S.box(X0, ya, 0, X, yb, (i + 1) * Dz, { mat: i === n - 1 ? (nn) => (nn[2] > 0.9 ? hr.ground : hr.stone) : hr.stone });
+      const zt = -i * h, a0 = -X + i * g, a1 = X - i * g, b1 = Y - i * g;
+      S.box(a0, b1 - g, Zb, a1, b1, zt, { mat: sm });
+      S.box(a0, 0, Zb, a0 + g, b1 - g, zt, { mat: sm });
+      S.box(a1 - g, 0, Zb, a1, b1 - g, zt, { mat: sm });
     }
-    S.box(X0 - 3, y0 + (n - 1) * t - 3, n * Dz, X, y0 + (n - 1) * t + 26, n * Dz + 6, { mat: hr.marble });
-    const X_ = X; 
-    // water in front of the lowest riser
-    S.box(X0 - 60, 20, 0, X, y0, 5, { mat: hr.water, cast: false });
-    const run = w / m, rise = Dz / m;
-    for (let i = -1; i < n - 1; i++) {
-      const zb = (i + 1) * Dz, ry = y0 + (i + 1) * t, off = ((i + 1) % 2) * P / 2;
-      for (let xc = X0 + 20 + w + lw + off; xc + lw + w <= X + 40; xc += P) {
+    const a0 = -X + n * g, a1 = X - n * g, b1 = Y - n * g;
+    S.box(a0, 0, Zb, a1, b1, -n * h - 12, { mat: sm });
+    S.box(a0, 0, -n * h - 12, a1, b1, -n * h + 6, { mat: wm, cast: false });
+    // flights on each back riser: pairs of stairs meeting at a landing, offset level to level
+    const m = 5, rs = h / m, run = 6, pd = 15, span = 2 * m * run + 10;
+    for (let i = 1; i < n; i++) {
+      const zt = -i * h, ry = Y - i * g, xa = -X + i * g + 6, xb = X - i * g - 6, off = (i % 2) * span / 2;
+      for (let x = xa + off; x + 2 * m * run + 10 <= xb; x += span) {
         for (let j = 0; j < m; j++) {
-          const zt = zb + (j + 1) * rise;
-          S.box(xc - lw - (m - j) * run, ry - d, zb, xc - lw - (m - j - 1) * run, ry, zt, { mat: hr.stone });
-          S.box(xc + lw + (m - j - 1) * run, ry - d, zb, xc + lw + (m - j) * run, ry, zt, { mat: hr.stone });
+          S.box(x + j * run, ry - pd, zt, x + (j + 1) * run, ry, zt + (j + 1) * rs, { mat: hr.stone });
+          S.box(x + 10 + (2 * m - 1 - j) * run, ry - pd, zt, x + 10 + (2 * m - j) * run, ry, zt + (j + 1) * rs, { mat: hr.stone });
         }
-        S.box(xc - lw, ry - d, zb, xc + lw, ry, zb + Dz, { mat: hr.stone });
+        S.box(x + m * run, ry - pd, zt, x + m * run + 10, ry, zt + h, { mat: hr.stone });
       }
     }
-    return { S, cam, L: sunRel(cam, 14, 36) };
+    return { S, cam, L: sunRel(cam, -64, 42) };
   };
 
   // A wall with one window — the context window. Sun behind the wall; light falls through onto a row of tokens.
