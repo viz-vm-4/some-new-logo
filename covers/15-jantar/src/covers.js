@@ -188,7 +188,7 @@
     const cam = CAM({ az: 0, s: 0.92, ox: 400 });
     const S = new Scene(); ground(S, hr, cam); S.E = frame(cam, -22);
     for (let r = 0; r < 5; r++) for (let c = 0; c < 5; c++) {
-      const x = -420 + c * 150, y = 80 + r * 150;
+      const x = -420 + c * 150, y = 150 + r * 150;
       S.extrude([S.W(x, y, 0), S.W(x + 104, y, 0), S.W(x, y, 96)], mul(S.E[1], 34), { mat: hr.stone });
     }
     return { S, cam };
@@ -448,5 +448,35 @@
     return el;
   }
 
-  window.JANTAR = { BOOKS, build, HOURS };
+  // full print wrap: back (720) + spine + front (720); the drawing runs continuously across all three
+  function buildWrap(b, spine, back) {
+    const hr = HOURS[b.level], WW = 2 * W + spine, off = W + spine;
+    const sc = SCENES[b.scene](hr);
+    const L = sc.L || sunRel(sc.cam, hr.light[0], hr.light[1]);
+    const cam = Object.assign({}, sc.cam, { P: (p) => { const q = sc.cam.P(p); return [q[0] + off, q[1]]; } });
+    const art = render(sc.S, cam, L);
+    const extra = sc.extra ? sc.extra(cam) : '';
+    const el = document.createElement('div');
+    el.className = 'wrap lv-' + b.level; el.dataset.slug = b.slug + '-wrap';
+    el.style.setProperty('--sky', hr.sky); el.style.setProperty('--ink', hr.ink); el.style.width = WW + 'px';
+    const stats = `${b.capsules} capsules · ${b.hours} hours`;
+    el.innerHTML = `<svg class="art" width="${WW}" height="${H}" viewBox="0 0 ${WW} ${H}"><rect width="${WW}" height="${H}" fill="${hr.sky}"/>${art}${extra}<rect x="0" y="806" width="${WW}" height="${H - 806}" fill="${hr.cut.flat}"/><rect width="${WW}" height="${H}" filter="url(#grain)" opacity="${hr.grain || 0.22}"/>
+      <line x1="${W}" y1="0" x2="${W}" y2="${H}" stroke="${hr.ink}" stroke-opacity=".18" stroke-dasharray="3 5"/><line x1="${off}" y1="0" x2="${off}" y2="${H}" stroke="${hr.ink}" stroke-opacity=".18" stroke-dasharray="3 5"/></svg>
+      <div class="back">
+        <div class="kicker">${mark(hr.ink)}<span><b>Vizuara</b> Books · ${hr.label}</span></div>
+        ${back}
+      </div>
+      <div class="spine" style="left:${W}px;width:${spine}px"><span class="sp-lv">${levelGlyph(hr.n, hr.ink)}</span><span class="sp-t">${b.title.join(' ')}</span><span class="sp-mk">${mark('#F4EADC')}</span></div>
+      <div class="front" style="left:${off}px">
+        <div class="head"><h2 class="title" style="font-size:${b.size || (b.title.length >= 3 ? 68 : 80)}px">${b.title.join('<br>')}</h2></div>
+        <div class="band">
+          <div class="row r1"><span class="imp">${mark('#F4EADC')}<b>Vizuara</b> Books</span><span class="lvl">${levelGlyph(hr.n, '#F4EADC')}${hr.label}</span></div>
+          <div class="row r2"><span>${stats}</span><span class="fig">${b.fig}</span></div>
+        </div>
+      </div>
+      <div class="bband"><div class="row r1"><span class="imp">books.vizuara.ai</span></div><div class="row r2"><span>${stats}</span></div><div class="isbn">ISBN / barcode</div></div>`;
+    return el;
+  }
+
+  window.JANTAR = { BOOKS, build, buildWrap, HOURS };
 })();
