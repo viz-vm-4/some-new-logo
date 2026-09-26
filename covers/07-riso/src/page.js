@@ -26,7 +26,6 @@
     fl += T(34, 270, 'Overprint', { ...st, size });
     key += T(41, 275, 'Overprint', { ...st, size });
     key += T(40, 52, 'Vizuara Books · cover system · direction 07', mono(13, 500, 0.14));
-    key += T(w - 40, 52, 'Proposal · September 2026', { ...mono(13, 500, 0.14), anchor: 'end' });
     key += T(40, h - 28, 'Two or three spot inks · procedural halftones · controlled misregistration · every emblem is the book’s own mechanism', mono(12.5, 400, 0.08));
     const v = vMark(w - 40 - 170, h - 26, 26);
     fl += v.left; key += v.right;

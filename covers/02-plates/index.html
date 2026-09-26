@@ -35,6 +35,8 @@ body{font-family:'Bodoni Moda',serif;font-optical-sizing:auto}
 .cover .title{position:absolute;left:37px;right:36px;top:58px;margin:0;font-weight:600;font-size:64px;line-height:1.0;letter-spacing:-.022em;
   font-variation-settings:'opsz' 14}
 .cover .title .l{display:block;white-space:nowrap}
+.cover .title .series{display:block;font-size:11px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;margin:4px 0 12px;
+  font-variation-settings:'opsz' 8;line-height:1.2}
 .cover .title .sub{display:block;font-style:italic;font-weight:500;font-size:27px;line-height:1.14;letter-spacing:0;margin-top:12px;max-width:560px;
   font-variation-settings:'opsz' 12}
 .cover .rule{position:absolute;left:40px;right:40px;height:0;border-top:1.2px solid var(--ink)}
@@ -981,6 +983,353 @@ FIG['harness-engineering'] = (P) => {
   const mr = front(rings[0], (p, q) => p[1] < q[1]); label(P, mr[0] + 60, mr[1] + 12, 520, 304, 'f');
 };
 
+/* ---------- oblique projection shared by the Charlie machines: front faces true, depth recedes up and to the right ---------- */
+const OB = (dx = 0.5, dy = -0.34) => (x, y, z) => [x + z * dx, y + z * dy]; // z = depth into the page
+function obBox(P, pr, x0, y0, x1, y1, z0, z1, o = {}) {
+  // front (z0) face, top face, right face
+  const F = [pr(x0, y0, z0), pr(x1, y0, z0), pr(x1, y1, z0), pr(x0, y1, z0)];
+  const T = [pr(x0, y0, z1), pr(x1, y0, z1), pr(x1, y0, z0), pr(x0, y0, z0)];
+  const Rt = [pr(x1, y0, z0), pr(x1, y0, z1), pr(x1, y1, z1), pr(x1, y1, z0)];
+  quad(P, [Rt[0], Rt[3], Rt[2], Rt[1]], { sp: o.sp || 3, w: o.rw ?? 1.6, ow: o.ow });
+  if (o.tw) quad(P, T, { sp: o.tsp || 4, w: o.tw, cls: o.tcls || 'h', ow: o.ow }); else { P.fill('g', poly(T)); P.line('si', o.ow || 1.2, poly(T)); }
+  if (o.fw === 0) { P.fill('g', poly(F)); P.line('si', o.ow || 1.2, poly(F)); }
+  else quad(P, F, { sp: o.fsp || 3.4, w: o.fw ?? 0.7, cls: o.fcls || 'i', ow: o.ow });
+  return { F, T, Rt };
+}
+/* bevelled panel: light on the upper-left edges, shadow on the lower-right — a relief read by the engraver's rule */
+function bevel(P, x0, y0, x1, y1, b = 3) {
+  P.fill('h', poly([[x0, y0], [x1, y0], [x1 - b, y0 + b], [x0 + b, y0 + b], [x0 + b, y1 - b], [x0, y1]]));
+  P.fill('i', poly([[x1, y0], [x1, y1], [x0, y1], [x0 + b, y1 - b], [x1 - b, y1 - b], [x1 - b, y0 + b]]));
+  P.line('si', 0.9, poly([[x0, y0], [x1, y0], [x1, y1], [x0, y1]]));
+}
+
+/* Charlie I — the Language Room: inference, where the KV cache is kept in pages, like a card catalogue */
+FIG['charlie-language-room'] = (P) => {
+  const pr = OB(0.52, -0.36);
+  const X0 = 132, Y0 = 356, cols = 4, rows = 5, dw = 84, dh = 66, D = 150;
+  const X1 = X0 + cols * dw + 16, Y1 = Y0 + rows * dh + 16;
+  // plinth and cabinet
+  obBox(P, pr, X0 - 12, Y1, X1 + 12, Y1 + 22, -8, D + 8, { rw: 1.8, fw: 1.0, fsp: 3, tw: 0.9, tcls: 'i', tsp: 3.2 });
+  obBox(P, pr, X0, Y0, X1, Y1, 0, D, { rw: 1.7, fw: 0, tw: 1.1, tsp: 3.6 });
+  // front: wood grain in fine horizontal lines, then the drawers
+  for (let y = Y0 + 3; y < Y1 - 1; y += 3.3) P.fill('i', ribbon([[X0 + 2, y], [X1 - 2, y]], [0.6, 0.6]));
+  const pulled = { '1,1': 64, '2,3': 104, '0,3': 38 }, free = new Set(['3,0', '1,4', '3,4']);
+  const later = [];
+  for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+    const x0 = X0 + 8 + c * dw + 4, y0 = Y0 + 8 + r * dh + 4, x1 = x0 + dw - 8, y1 = y0 + dh - 8;
+    const key = c + ',' + r;
+    if (pulled[key]) {
+      // the cavity it left, in shadow
+      quad(P, [[x0, y0], [x1, y0], [x1, y1], [x0, y1]], { sp: 2.2, w: 1.3, ow: 1.2 });
+      later.push([x0, y0, x1, y1, pulled[key], r * 7 + c]);
+      continue;
+    }
+    P.fill('g', poly([[x0, y0], [x1, y0], [x1, y1], [x0, y1]]));
+    bevel(P, x0, y0, x1, y1, 3.2);
+    // label holder and pull
+    const cx = (x0 + x1) / 2;
+    const isFree = free.has(key);
+    P.fill(isFree ? 'g' : 'h', poly([[cx - 17, y0 + 13], [cx + 17, y0 + 13], [cx + 17, y0 + 27], [cx - 17, y0 + 27]]));
+    P.line('si', 1.1, poly([[cx - 17, y0 + 13], [cx + 17, y0 + 13], [cx + 17, y0 + 27], [cx - 17, y0 + 27]]));
+    if (!isFree) for (let q = 0; q < 2; q++) P.fill('i', ribbon([[cx - 12, y0 + 18 + q * 4.5], [cx + (q ? 4 : 11), y0 + 18 + q * 4.5]], [0.8, 0.8]));
+    const hp = sample((t) => [cx - 10 + 20 * t, y0 + 38 + 7 * Math.sin(t * Math.PI)], 20);
+    swell(P, 'i', hp, () => 2.2, { taper: 1 });
+    P.fill('h', ribbon(hp.slice(3, 12).map(([x, y]) => [x, y - 0.8]), hp.slice(3, 12).map(() => 0.9)));
+  }
+  // pulled drawers, drawn last, lowest first so the nearer ones overlap
+  later.sort((a, b) => a[1] - b[1]).forEach(([x0, y0, x1, y1, out, seed]) => {
+    const z = -out, R = rng(seed + 3);
+    // inside: the cards standing on edge, one per token (keys and values)
+    const inner = [pr(x0 + 3, y0 + 3, z), pr(x1 - 3, y0 + 3, z), pr(x1 - 3, y0 + 3, 0), pr(x0 + 3, y0 + 3, 0)];
+    obBox(P, pr, x0, y0, x1, y1, z, 0, { rw: 1.9, fw: 0, tw: 0 });
+    quad(P, inner, { sp: 2.2, w: 1.4, ow: 0.8 });
+    const n = 9;
+    for (let k = 0; k < n; k++) {
+      const zz = z + 8 + k * (out - 12) / n, hgt = 12 + R() * 3;
+      const a = pr(x0 + 6, y0 + 4, zz), b = pr(x1 - 6, y0 + 4, zz);
+      const Q = [[a[0], a[1] - hgt], [b[0], b[1] - hgt], b, a];
+      P.fill('g', poly(Q)); P.fill('h', poly(Q.map(([x, y], i) => [x + (i === 1 || i === 2 ? -1 : 1), y + (i < 2 ? 1 : -0.5)])));
+      P.line('si', 0.8, poly(Q));
+      if (k % 3 === 1) P.fill('i', poly([[a[0] + 10, a[1] - hgt - 4], [a[0] + 22, a[1] - hgt - 4], [a[0] + 22, a[1] - hgt], [a[0] + 10, a[1] - hgt]]));
+    }
+    // front panel of the drawer
+    const f = [pr(x0, y0, z), pr(x1, y0, z), pr(x1, y1, z), pr(x0, y1, z)];
+    P.fill('g', poly(f));
+    bevel(P, f[0][0], f[0][1], f[2][0], f[2][1], 3.2);
+    const cx = (f[0][0] + f[1][0]) / 2, yy = f[0][1];
+    P.fill('h', poly([[cx - 17, yy + 13], [cx + 17, yy + 13], [cx + 17, yy + 27], [cx - 17, yy + 27]]));
+    P.line('si', 1.1, poly([[cx - 17, yy + 13], [cx + 17, yy + 13], [cx + 17, yy + 27], [cx - 17, yy + 27]]));
+    for (let q = 0; q < 2; q++) P.fill('i', ribbon([[cx - 12, yy + 18 + q * 4.5], [cx + (q ? 4 : 11), yy + 18 + q * 4.5]], [0.8, 0.8]));
+    swell(P, 'i', sample((t) => [cx - 10 + 20 * t, yy + 38 + 7 * Math.sin(t * Math.PI)], 20), () => 2.2, { taper: 1 });
+  });
+  // the page table: a ledger open on the cabinet top
+  const lt = (x, z) => pr(x, Y0 - 1, z);
+  const L = [lt(250, 40), lt(390, 40), lt(390, 120), lt(250, 120)];
+  P.fill('g', poly(L.map(([x, y]) => [x, y + 6])));
+  quad(P, [L[3], L[2], [L[2][0], L[2][1] + 6], [L[3][0], L[3][1] + 6]], { sp: 1.6, w: 0.7, ow: 1 });
+  quad(P, L, { sp: 3.4, w: 0.9, cls: 'h', ow: 1.2 });
+  P.line('si', 1.4, seg(lt(320, 40), lt(320, 120)));
+  for (let k = 0; k < 7; k++) { const a = lt(262, 50 + k * 10), b = lt(308, 50 + k * 10); P.fill('i', ribbon([a, [b[0] - (k % 3) * 8, b[1]]], [0.9, 0.9])); const c = lt(332, 50 + k * 10), d = lt(378, 50 + k * 10); P.fill('i', ribbon([c, [d[0] - (k % 2) * 12, d[1]]], [0.9, 0.9])); }
+  // labels
+  label(P, X1 + 40, Y0 + 180, 656, Y0 + 150, 'a');
+  const pd = later.find((q) => q[4] === 104); const pf = pr(pd[2] - 10, pd[1] + 30, -104); label(P, pf[0], pf[1], 660, 640, 'b');
+  const cd = pr(pd[0] + 30, pd[1] - 6, -60); label(P, cd[0], cd[1] - 8, 470, 300, 'c');
+  const fr = [X0 + 8 + 3 * dw + 4 + 38, Y0 + 8 + 0 * dh + 4 + 20]; label(P, fr[0], fr[1], 660, 330, 'd');
+  const le = lt(290, 80); label(P, le[0], le[1] - 4, 180, 292, 'e');
+};
+
+/* Charlie II — the Vision Room: an image cast by a lens, cut into patches, read as a sentence */
+FIG['charlie-vision-room'] = (P) => {
+  // the subject: a sphere resting on a cube
+  const subj = (P2, ox, oy, s, flip) => {
+    const f = flip ? -1 : 1;
+    const cube = [[ox - 30 * s, oy + f * 0], [ox + 30 * s, oy + f * 0], [ox + 30 * s, oy + f * 58 * s], [ox - 30 * s, oy + f * 58 * s]];
+    return { cube, sphere: [ox, oy - f * 29 * s, 29 * s] };
+  };
+  // bench
+  const pr = OB(0.45, -0.3);
+  obBox(P, pr, 76, 612, 660, 630, 0, 90, { rw: 1.8, fw: 1.1, fsp: 2.8, tw: 0, ow: 1.3 });
+  for (let x = 90; x < 640; x += 60) { const a = pr(x, 612, 8), b = pr(x + 34, 612, 82); }
+  // a — the subject, engraved
+  const S = subj(P, 150, 540, 1, false);
+  obBox(P, pr, 120, 540, 180, 598, 10, 60, { rw: 1.8, fw: 0.8, fsp: 3, tw: 1, tsp: 3.4, ow: 1.2 });
+  sphere(P, pr(150, 510, 35)[0], pr(150, 510, 35)[1] - 2, 30, { spacing: 2.6 });
+  // b — the lens in its ring, on a post
+  const lx = 300, ly = 470, lr = 70;
+  rod(P, [[lx, ly + lr + 6], [lx, 612]], 9, 11, { halo: 3 });
+  const lens = sample((t) => { const a = t * TAU; return [lx + 16 * Math.cos(a), ly + lr * Math.sin(a)]; }, 120);
+  P.fill('g', poly(lens));
+  for (let y = ly - lr + 3; y < ly + lr; y += 3) { const hw = 16 * Math.sqrt(Math.max(0, 1 - ((y - ly) / lr) ** 2)) - 1; if (hw > 1.5) P.fill(y < ly - 10 ? 'h' : 'i', ribbon([[lx - hw, y], [lx + hw, y]], [y < ly - 10 ? 1 : 0.7, y < ly - 10 ? 1 : 0.7])); }
+  swell(P, 'i', lens.concat([lens[0]]), (i) => 1.4 + 1.8 * sstep(0, 1, Math.cos(i / 120 * TAU)), { taper: 1 });
+  const ring = sample((t) => { const a = t * TAU; return [lx + 22 * Math.cos(a), ly + (lr + 7) * Math.sin(a)]; }, 120);
+  swell(P, 'i', ring.concat([ring[0]]), (i) => 2 + 2 * sstep(0, 1, Math.cos(i / 120 * TAU)), { taper: 1 });
+  // rays from the subject's extremities, crossing at the lens, to the screen
+  const top = [150, 478], bot = [150, 598], sx = 470;
+  const through = (p, q) => { const t = (sx - p[0]) / (q[0] - p[0]); return [sx, p[1] + (q[1] - p[1]) * t]; };
+  const imgTop = through(top, [lx, ly]), imgBot = through(bot, [lx, ly]);
+  for (const [p, c] of [[top, [lx, ly - 30]], [top, [lx, ly]], [top, [lx, ly + 30]], [bot, [lx, ly - 30]], [bot, [lx, ly]], [bot, [lx, ly + 30]]]) {
+    const target = p === top ? imgTop : imgBot;
+    P.line('si', 0.7, seg(p, c) + seg(c, target), 'stroke-dasharray="1 3"');
+  }
+  // c — the screen with the inverted image, gridded into patches
+  const X0 = 470, Y0 = 380, W = 150, H = 150, n = 4;
+  const scr = pr;
+  obBox(P, pr, X0, Y0, X0 + W, Y0 + H, 0, 8, { rw: 1.6, fw: 0, tw: 0, ow: 1.4 });
+  rod(P, [[X0 + W / 2 + 2, Y0 + H + 2], [X0 + W / 2 + 2, 612]], 8, 10, { halo: 2 });
+  const drawImage = (P2, ox, oy, sc) => { // inverted: cube above, sphere below
+    const c = [[ox - 32 * sc, oy - 58 * sc], [ox + 32 * sc, oy - 58 * sc], [ox + 32 * sc, oy], [ox - 32 * sc, oy]];
+    quad(P2, c, { sp: 2.6 * sc + 0.4, w: 0.9, ow: 1.2 });
+    const r = 30 * sc, cy2 = oy + r;
+    P2.fill('g', circ(ox, cy2, r));
+    for (let y = cy2 - r + 2.6; y < cy2 + r; y += 2.8) { const hw = Math.sqrt(Math.max(0, r * r - (y - cy2) ** 2)); if (hw > 2) swell(P2, 'i', [[ox - hw, y], [ox + hw, y]], (i) => (i ? 0.5 : 1.8) * ((y - cy2) / r + 1) * 0.7 + 0.3, { taper: 1 }); }
+    P2.line('si', 1.2, circ(ox, cy2, r));
+  };
+  P.raw(`<clipPath id="vr-screen"><rect x="${X0}" y="${Y0}" width="${W}" height="${H}"/></clipPath>`);
+  const img = new Plate(); drawImage(img, X0 + W / 2, Y0 + 72, 1);
+  P.raw(`<g clip-path="url(#vr-screen)">${img}</g>`);
+  for (let k = 1; k < n; k++) { P.line('sh', 2.2, seg([X0 + k * W / n, Y0], [X0 + k * W / n, Y0 + H])); P.line('sh', 2.2, seg([X0, Y0 + k * H / n], [X0 + W, Y0 + k * H / n])); }
+  P.line('si', 1.6, `M${X0} ${Y0}h${W}v${H}h${-W}Z`);
+  // d — the patches, taken in reading order, laid out as a sequence
+  const tw = 30, gap = 6, rowY = 680, sx0 = 360 - (16 * tw + 15 * gap) / 2;
+  for (let k = 0; k < 16; k++) {
+    const r = Math.floor(k / n), c = k % n;
+    const tx = sx0 + k * (tw + gap), ty = rowY;
+    const id = `vr-p${k}`;
+    P.raw(`<clipPath id="${id}"><rect x="${tx}" y="${ty}" width="${tw}" height="${tw}"/></clipPath>`);
+    const im = new Plate(); drawImage(im, X0 + W / 2, Y0 + 72, 1);
+    const dx = tx - (X0 + c * W / n) , dy = ty - (Y0 + r * H / n);
+    const s2 = tw / (W / n);
+    P.fill('g', poly([[tx, ty], [tx + tw, ty], [tx + tw, ty + tw], [tx, ty + tw]]));
+    P.raw(`<g clip-path="url(#${id})"><g transform="translate(${f1(tx)} ${f1(ty)}) scale(${f1(s2 * 100) / 100}) translate(${f1(-(X0 + c * W / n))} ${f1(-(Y0 + r * H / n))})">${im}</g></g>`);
+    P.line('si', 1.2, `M${f1(tx)} ${ty}h${tw}v${tw}h${-tw}Z`);
+    P.text(tx + tw / 2, ty + tw + 15, String(k + 1), 'labs', 'middle');
+  }
+  // a guide from the screen down to the sequence
+  P.line('si', 0.8, seg([X0 + W + 14, Y0 + H * 0.5], [X0 + W + 30, Y0 + H * 0.5]) + seg([X0 + W + 30, Y0 + H * 0.5], [X0 + W + 30, rowY - 26]) + seg([X0 + W + 30, rowY - 26], [sx0 + 8, rowY - 26]) + seg([sx0 + 8, rowY - 26], [sx0 + 8, rowY - 12]));
+  arrowHead(P, sx0 + 8, rowY - 8, Math.PI / 2, 7);
+  label(P, 128, 560, 84, 470, 'a');
+  label(P, lx - 10, ly - 40, 250, 330, 'b');
+  label(P, X0 + 20, Y0 + 20, 420, 330, 'c', { dot: true });
+  label(P, sx0 + 3 * (tw + gap) + tw / 2, rowY + tw + 24, 170, 770, 'd');
+};
+
+/* Charlie III — the Sound Room: a phonautograph; the voice traced on a sooted drum, the trace unrolled and cut into frames */
+FIG['charlie-sound-room'] = (P) => {
+  const pr = OB(0.42, -0.28);
+  // base board
+  obBox(P, pr, 70, 620, 640, 644, 0, 110, { rw: 1.8, fw: 1.1, fsp: 2.7, tw: 0.9, tcls: 'i', tsp: 3.4, ow: 1.3 });
+  // drum geometry: horizontal axis, seen a little from the right
+  const xa = 372, xb = 588, yc = 488, R = 76, e = 0.26;
+  const Pd = (x, ph) => [x + e * R * Math.cos(ph), yc + R * Math.sin(ph)]; // ph: 0 faces us, −π/2 is the top
+  // supports
+  obBox(P, pr, xa - 26, yc - 6, xa - 12, 624, 30, 44, { rw: 1.6, fw: 0.8, sp: 2.4, ow: 1 });
+  // axle, left part
+  rod(P, [[xa - 60, yc], [xa, yc]], 9, 9, { halo: 2.5 });
+  // drum body, sooted: dark engraving everywhere but the lit crest
+  const body = sample((t) => Pd(xa, lerp(-Math.PI / 2, Math.PI / 2, t)), 60).concat(sample((t) => Pd(xb, lerp(Math.PI / 2, -Math.PI / 2, t)), 60));
+  P.fill('g', poly(body));
+  for (let ph = -Math.PI / 2 + 0.03; ph < Math.PI / 2; ph += 0.042) {
+    const n = [0, Math.sin(ph), Math.cos(ph)];
+    const b = clamp(V.dot(n, LIGHT) * 1.1 + 0.05);
+    const a = Pd(xa, ph), c = Pd(xb, ph);
+    const w = 0.7 + 1.8 * (1 - b);
+    P.fill('i', ribbon([a, c], [w, w]));
+  }
+  // the trace, wound as a helix and scratched white through the soot
+  const turns = 11, pitch = (xb - xa - 24) / turns;
+  for (let k = 0; k < turns; k++) {
+    const pts = [], ws = [];
+    for (let ph = -Math.PI / 2 + 0.05; ph < Math.PI / 2 - 0.05; ph += 0.012) {
+      const tt = k + (ph + Math.PI / 2) / TAU;
+      const amp = 7 * (0.35 + 0.65 * Math.abs(Math.sin(tt * 1.3))) * Math.sin(ph * 38 + k) * Math.cos(ph * 7 + k * 0.7);
+      const x = xa + 12 + tt * pitch + amp;
+      pts.push(Pd(x, ph)); ws.push(0.9 + 0.5 * Math.cos(ph));
+    }
+    P.fill('h', ribbon(pts, ws.map((w) => Math.max(MINH, w))));
+  }
+  // end cap
+  const cap = sample((t) => Pd(xb, t * TAU), 120);
+  P.fill('g', poly(cap));
+  for (let y = yc - R + 3; y < yc + R; y += 3.1) { const hw = e * R * Math.sqrt(Math.max(0, 1 - ((y - yc) / R) ** 2)); if (hw > 1.5) P.fill('i', ribbon([[xb - hw, y], [xb + hw, y]], [1.1, 1.1])); }
+  swell(P, 'i', cap.concat([cap[0]]), (i) => 1.3 + 1.2 * sstep(0, 1, Math.sin(i / 120 * TAU)), { taper: 1 });
+  swell(P, 'i', sample((t) => Pd(xa, lerp(-Math.PI / 2, Math.PI / 2, t)), 60), () => 1.4, { taper: 1 });
+  P.fill('i', ribbon([Pd(xa, -Math.PI / 2), Pd(xb, -Math.PI / 2)], [1.4, 1.4]));
+  P.fill('i', ribbon([Pd(xa, Math.PI / 2), Pd(xb, Math.PI / 2)], [2.2, 2.2]));
+  // axle, right part and crank
+  rod(P, [[xb, yc], [xb + 54, yc]], 9, 9, { halo: 2.5 });
+  obBox(P, pr, xb + 22, yc - 6, xb + 36, 624, 30, 44, { rw: 1.6, fw: 0.8, sp: 2.4, ow: 1 });
+  rod(P, [[xb + 54, yc], [xb + 54, yc + 58]], 7, 7, { halo: 2.5 });
+  rod(P, [[xb + 54, yc + 58], [xb + 80, yc + 58]], 8, 8, { halo: 2.5 });
+  sphere(P, xb + 84, yc + 58, 9, { spacing: 2.3, cross: false });
+  sphere(P, xb + 54, yc, 7, { spacing: 2.2, cross: false });
+  // horn: a bell flaring to the left
+  const m0 = [132, 452], m1 = [336, 486];
+  const hr = (u) => 11 + 96 * Math.pow(1 - u, 2.3);
+  const hc = (u) => [lerp(m0[0], m1[0], u), lerp(m0[1], m1[1], u)];
+  const Hp = (u, ph) => { const c = hc(u), r = hr(u); return [c[0] + 0.3 * r * Math.cos(ph), c[1] + r * Math.sin(ph)]; };
+  // stand for the horn
+  obBox(P, pr, 262, 520, 276, 624, 34, 48, { rw: 1.6, fw: 0.8, sp: 2.4, ow: 1 });
+  // mouth interior: dark
+  const mouth = sample((t) => Hp(0, t * TAU), 140);
+  P.fill('g', poly(mouth));
+  for (let y = m0[1] - hr(0) + 3; y < m0[1] + hr(0); y += 2.6) { const hw = 0.3 * hr(0) * Math.sqrt(Math.max(0, 1 - ((y - m0[1]) / hr(0)) ** 2)) - 1; if (hw > 1) P.fill('i', ribbon([[m0[0] - hw, y], [m0[0] + hw, y]], [1.5, 1.5])); }
+  // outer surface of the bell
+  const outer = sample((u) => Hp(u, -Math.PI / 2), 60).concat(sample((u) => Hp(1 - u, Math.PI / 2), 60));
+  P.fill('g', poly(outer.concat(sample((t) => Hp(0, lerp(Math.PI / 2, -Math.PI / 2, t)), 40))));
+  for (let ph = -Math.PI / 2 + 0.05; ph < Math.PI / 2; ph += 0.09) {
+    const pts = sample((u) => Hp(u, ph), 60);
+    const n = [Math.cos(ph) * 0.5, Math.sin(ph), Math.cos(ph)];
+    const b = clamp(V.dot(V.norm(n), LIGHT) * 1.1);
+    toneLine(P, pts, (i) => b + 0.1 * (i / 60), { W: 1.9, Wh: 1.1, k0: 0.62, h0: 0.82, thin: true });
+  }
+  for (const u of [0.02, 0.1, 0.22, 0.4, 0.62, 0.85]) swell(P, 'i', sample((t) => Hp(u, lerp(-Math.PI / 2, Math.PI / 2, t)), 40), (i) => 0.9 + 1.4 * i / 40, { taper: 1 });
+  swell(P, 'i', mouth.concat([mouth[0]]), (i) => 1.6 + 1.0 * sstep(0, 1, Math.cos(i / 140 * TAU)), { taper: 1 });
+  swell(P, 'i', outer.slice(0, 61), () => 1.2, { taper: 1 });
+  swell(P, 'i', outer.slice(60), () => 2.2, { taper: 1 });
+  // diaphragm housing at the throat
+  const dh = [344, 488];
+  const dcap = sample((t) => [dh[0] + 7 * Math.cos(t * TAU), dh[1] + 26 * Math.sin(t * TAU)], 60);
+  P.fill('g', poly(dcap)); swell(P, 'i', dcap.concat([dcap[0]]), () => 2, { taper: 1 });
+  for (let y = dh[1] - 22; y < dh[1] + 24; y += 3) P.fill(y < dh[1] - 6 ? 'h' : 'i', ribbon([[dh[0] - 4, y], [dh[0] + 4, y]], [0.9, 0.9]));
+  // stylus: a bristle from the membrane to the drum
+  const st = sample(bez([dh[0] + 4, dh[1] - 4], [360, 470], [372, 452], Pd(xa + 18, -0.55)), 20);
+  swell(P, 'i', st, (i) => 2.2 - i / 20 * 1.4, { taper: 1 });
+  // Fig. 2 — the trace, unrolled and cut into frames
+  const sy = 700, sx0 = 120, sx1 = 600, sh = 40;
+  P.fill('i', poly([[sx0, sy], [sx1, sy], [sx1, sy + sh], [sx0, sy + sh]]));
+  const wave = [], ww = [];
+  for (let x = sx0 + 4; x < sx1 - 4; x += 0.8) { const tt = (x - sx0) / 60; wave.push([x, sy + sh / 2 + 14 * (0.35 + 0.65 * Math.abs(Math.sin(tt * 0.9))) * Math.sin(tt * 9.5) * Math.cos(tt * 2.1)]); ww.push(1.2); }
+  P.fill('h', ribbon(wave, ww));
+  for (let x = sx0 + 32; x < sx1; x += 32) { P.fill('g', ribbon([[x, sy - 7], [x, sy + sh + 7]], [1.6, 1.6])); P.fill('i', ribbon([[x, sy - 6], [x, sy + sh + 6]], [0.8, 0.8])); }
+  P.text(sx0 - 12, sy + sh / 2 + 5, 'Fig. 2', 'fig', 'end');
+  label(P, 126, 400, 84, 320, 'a');
+  label(P, dh[0], dh[1] - 24, 360, 340, 'b');
+  label(P, st[10][0], st[10][1], 420, 356, 'c');
+  const dp = Pd(540, 0.5); label(P, dp[0], dp[1], 660, 420, 'd');
+  label(P, sx0 + 6 * 32, sy + sh + 6, sx0 + 6 * 32 + 40, sy + sh + 36, 'e');
+};
+
+/* Charlie IV — the Reasoning Room: the bandit's arms below, a tree of reasoning growing from the arm that paid */
+FIG['charlie-reasoning-room'] = (P) => {
+  const pr = OB(0.46, -0.3);
+  const arms = 5, ax0 = 172, adx = 92, baseY = 660, best = 3;
+  // cabinet of the bandit
+  obBox(P, pr, 120, baseY, 600, baseY + 84, 0, 70, { rw: 1.8, fw: 0, tw: 1, tsp: 3.6, ow: 1.4 });
+  for (let y = baseY + 3; y < baseY + 84; y += 3.2) P.fill('i', ribbon([[122, y], [598, y]], [0.65, 0.65]));
+  // reward distributions, one per arm, as engraved hills standing on the cabinet's top edge
+  const means = [0.35, 0.52, 0.3, 0.78, 0.46], sds = [0.16, 0.12, 0.2, 0.1, 0.18];
+  for (let k = 0; k < arms; k++) {
+    const x = ax0 + k * adx, y0 = baseY - 6;
+    bevel(P, x - 32, baseY + 14, x + 32, baseY + 64, 3);
+    const hill = sample((t) => { const u = t; const g = Math.exp(-((u - means[k]) ** 2) / (2 * sds[k] ** 2)); return [x - 38 + 76 * u, y0 - 70 * g * (0.14 / sds[k]) ** 0.5]; }, 60);
+    const shape = hill.concat([[x + 38, y0], [x - 38, y0]]);
+    P.fill('g', poly(shape));
+    for (let xx = x - 36; xx < x + 38; xx += 2.6) {
+      const u = (xx - (x - 38)) / 76, g = Math.exp(-((u - means[k]) ** 2) / (2 * sds[k] ** 2)), top = y0 - 70 * g * (0.14 / sds[k]) ** 0.5;
+      if (y0 - top > 2) P.fill(k === best ? 'h' : 'i', ribbon([[xx, top + 1], [xx, y0 - 1]], [k === best ? 1.2 : 0.9, k === best ? 1.2 : 0.9]));
+    }
+    swell(P, 'i', hill, () => 1.5, { taper: 1 });
+    P.line('si', 1.2, seg([x - 40, y0], [x + 40, y0]));
+    // the lever: pivot on the cabinet's face, arm up and out; the best one pulled down
+    const pv = [x + 26, baseY + 40];
+    const ang = k === best ? 0.5 : -1.05;
+    const tip = [pv[0] + 58 * Math.cos(ang), pv[1] + 58 * Math.sin(ang)];
+    rod(P, [pv, tip], 5, 4, { halo: 2.5 });
+    sphere(P, tip[0], tip[1], 8.5, { spacing: 2.3, cross: false });
+    sphere(P, pv[0], pv[1], 6, { spacing: 2.2, cross: false });
+  }
+  // the tree of reasoning, grown from the arm that paid
+  const R = rng(12);
+  const root = [ax0 + best * adx, 548];
+  const levels = [[root]];
+  const edges = [];
+  const chosen = new Set(['0-0']);
+  let chosenIdx = 0;
+  for (let L = 1; L <= 4; L++) {
+    const prev = levels[L - 1], cur = [];
+    prev.forEach((p, pi) => {
+      const kids = L === 1 ? 3 : (chosen.has(`${L - 1}-${pi}`) ? 3 : (R() < 0.6 ? 2 : 1));
+      for (let c = 0; c < kids; c++) {
+        const spread = 170 / Math.pow(1.7, L - 1);
+        const x = p[0] + (c - (kids - 1) / 2) * spread * (L === 1 ? 1.2 : 0.8) + (R() - 0.5) * 10;
+        const y = p[1] - 64 - (R() - 0.5) * 8;
+        cur.push([x, y]);
+        edges.push([L, pi, cur.length - 1]);
+      }
+    });
+    // pick the reinforced child among the chosen parent's children
+    const parentIdx = chosenIdx;
+    const kidsOfChosen = edges.filter((e) => e[0] === L && e[1] === parentIdx).map((e) => e[2]);
+    chosenIdx = kidsOfChosen[L % kidsOfChosen.length];
+    chosen.add(`${L}-${chosenIdx}`);
+    levels.push(cur);
+  }
+  // clamp x inside the plate
+  levels.forEach((lv) => lv.forEach((p) => { p[0] = clamp(p[0], 110, 610); }));
+  const onPath = (L, i) => chosen.has(`${L}-${i}`);
+  // stem from the pulled arm
+  rod(P, [[root[0] + 26, baseY - 4], [root[0], root[1]]], 6, 6, { halo: 3, cls: 'i' });
+  edges.forEach(([L, pi, ci]) => {
+    const a = levels[L - 1][pi], b = levels[L][ci];
+    const pts = sample(bez(a, [a[0], a[1] - 30], [b[0], b[1] + 30], b), 30);
+    const hot = onPath(L - 1, pi) && onPath(L, ci);
+    const w = Math.max(2.4, 6 - L);
+    if (hot) { P.fill('g', ribbon(pts, pts.map(() => w + 7))); P.fill('i', ribbon(pts, pts.map(() => w + 3))); P.fill('h', ribbon(pts, pts.map(() => w))); }
+    else rod(P, pts, w, w * 0.85, { halo: 3 });
+  });
+  levels.forEach((lv, L) => lv.forEach((p, i) => {
+    const hot = onPath(L, i);
+    sphere(P, p[0], p[1], hot ? 10 - L * 0.8 : 8 - L * 0.9, { spacing: 2.3, cross: false });
+    if (hot && L === 4) { P.line('si', 1.4, circ(p[0], p[1], 16)); P.line('si', 0.9, circ(p[0], p[1], 21)); }
+  }));
+  // labels
+  label(P, ax0 + 26 + 58 * Math.cos(-1.05), baseY + 40 + 58 * Math.sin(-1.05) - 8, 84, 560, 'a');
+  label(P, ax0 + adx - 10, baseY - 40, 84, 640, 'b');
+  label(P, root[0] + 26 + 58 * Math.cos(0.5) + 6, baseY + 40 + 58 * Math.sin(0.5) + 4, 650, 760, 'c');
+  const mid = levels[2][0]; label(P, mid[0] - 8, mid[1] - 2, 84, 400, 'd');
+  const top = levels[4][chosenIdx]; label(P, top[0] + 18, top[1] - 8, 650, 300, 'e');
+};
+
 /* =====================================================================
    THE BOOKS
    ===================================================================== */
@@ -1005,6 +1354,14 @@ const BOOKS = [
     cap: '<b>Fig. 1.</b> One causal attention head over nine tokens, each arch weighted by softmax(QK<sup>T</sup>/√d). <b>a</b> tokens; <b>b</b> the last query, in white; <b>c</b> the attention sink. <b>Fig. 2.</b> The weights as a matrix; <b>d</b> its diagonal.' },
   { slug: 'harness-engineering', level: 'advanced', lines: ['Harness', 'Engineering'], sub: 'Build the layer that turns<br>a model into an agent.', soon: true,
     cap: '<b>Fig. 1.</b> The harness, as an armillary. <b>a</b> the model; <b>b</b> the agent loop; <b>c</b> tools, mounted; <b>d</b> memory; <b>e</b> the horizon of the sandbox; <b>f</b> the frame of permissions that holds it all.' },
+  { slug: 'charlie-language-room', level: 'advanced', series: 'I', lines: ['Charlie and the', 'Language Room'], size: 60, sub: 'Language — Inference Engineering', meta: '22 capsules · 5 hours',
+    cap: '<b>Fig. 1.</b> The key–value cache, kept in pages like a card catalogue. <b>a</b> the cabinet, GPU memory; <b>b</b> a page, drawn out; <b>c</b> one card per token, its keys and values; <b>d</b> a free page; <b>e</b> the page table.' },
+  { slug: 'charlie-vision-room', level: 'intermediate', series: 'II', lines: ['Charlie and the', 'Vision Room'], size: 60, sub: 'Vision — Vision Transformers', meta: '20 capsules · 6 hours',
+    cap: '<b>Fig. 1.</b> An image cast by a lens, then cut into patches to be read like words. <b>a</b> the subject; <b>b</b> the lens; <b>c</b> the image, divided four by four; <b>d</b> the patches in sequence, numbered by position.' },
+  { slug: 'charlie-sound-room', level: 'intermediate', series: 'III', lines: ['Charlie and the', 'Sound Room'], size: 60, sub: 'Audio — Voice Agents', meta: '20 capsules · 6 hours',
+    cap: '<b>Fig. 1.</b> A phonautograph: a voice traced through soot on a turning drum. <b>a</b> the horn; <b>b</b> the membrane; <b>c</b> the stylus; <b>d</b> the drum and its trace. <b>Fig. 2.</b> The trace unrolled, <b>e</b> cut into frames.' },
+  { slug: 'charlie-reasoning-room', level: 'advanced', series: 'IV', lines: ['Charlie and the', 'Reasoning Room'], size: 60, sub: 'Reason — Reinforcement Learning,<br>from bandits to reasoning models', meta: '21 capsules · 6 hours',
+    cap: '<b>Fig. 1.</b> From bandits to reasoning. <b>a</b> the arms of a bandit; <b>b</b> each arm’s distribution of reward; <b>c</b> the arm pulled; <b>d</b> a tree of reasoning steps grown from it; <b>e</b> the path that reward reinforced.' },
 ];
 
 const LEVEL = { beginner: 1, intermediate: 2, advanced: 3 };
@@ -1025,7 +1382,7 @@ function build(b) {
   el.innerHTML = `
     <svg class="art" viewBox="0 0 720 888" xmlns="http://www.w3.org/2000/svg"><g transform="translate(0 ${b.dy || 0})">${P}</g></svg>
     <div class="head"><span>Plate ${pl}</span><span class="lv">${lv}${levelGlyph(LEVEL[b.level])}</span></div>
-    <h2 class="title" style="${b.size ? `font-size:${b.size}px` : ''}">${b.lines.map((l) => `<span class="l">${l}</span>`).join('')}${b.sub ? `<span class="sub">${b.sub}</span>` : ''}</h2>
+    <h2 class="title" style="${b.size ? `font-size:${b.size}px` : ''}">${b.series ? `<span class="series">Charlie and the Intelligence Factory &nbsp;·&nbsp; Book ${b.series}</span>` : ''}${b.lines.map((l) => `<span class="l">${l}</span>`).join('')}${b.sub ? `<span class="sub">${b.sub}</span>` : ''}</h2>
     <div class="rule" style="top:792px"></div>
     <div class="legend" style="top:801px">${b.cap}</div>
     <div class="foot"><span class="imprint">${MARK}<span>Vizuara Books</span></span><span class="meta">${b.soon ? 'In preparation' : (b.meta || '')}</span></div>`;

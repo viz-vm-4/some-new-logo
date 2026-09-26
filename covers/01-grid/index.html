@@ -112,7 +112,9 @@ figcaption code{font-family:inherit;font-weight:400;opacity:1}
 @media print{
   .page{width:720px;padding:0}
   .mast,.bar,section>h2,section>.note,.rules,.inks,.levels,.type,.twocol,.row,.corridor,.library,.wrapbox,.foot,figcaption{display:none !important}
-  .shelf2{display:block}
+  /* every cover starts on page 1 at the trim origin (Chrome mis-paints SVG transforms/clips of covers laid out on later pages) */
+  .page{position:relative;height:888px;overflow:hidden}
+  .shelf2 figure{position:absolute;left:0;top:0}
   section{margin:0}
 }
 </style>

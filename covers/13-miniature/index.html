@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vizuara Folios</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Eczar:wght@400..800&family=Anek+Latin:wdth,wght@75..125,300..800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1C1814; --ivory:#F3EAD3; --gold:#C9A04A; --lapis:#243B8C; --malachite:#1E6A52;
+  --vermilion:#CF3B22; --saffron:#E4A42E; --lac:#8C1F35;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:#EDE6D6;color:var(--ink)}
+body{font-family:'Anek Latin',system-ui,sans-serif;font-stretch:100%}
+.covers{display:flex;flex-wrap:wrap;gap:48px;padding:48px}
+
+/* ---------- the cover ---------- */
+.cover{position:relative;width:720px;height:888px;overflow:hidden;flex:0 0 auto;
+  box-shadow:0 1px 2px rgba(0,0,0,.18),0 12px 40px rgba(40,25,10,.18)}
+.cover svg.art{position:absolute;left:0;top:0;width:720px;height:888px;display:block}
+.cover .title{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+  font-family:'Eczar',serif;font-weight:700;color:var(--ink);line-height:1.0;letter-spacing:-.012em;
+  font-feature-settings:"kern" 1,"liga" 1;}
+.cover .title .ln{display:block;white-space:nowrap}
+.cover .title .sub{font-weight:500;letter-spacing:0;margin-top:.28em}
+.cover .title .rub{font-family:'Anek Latin';font-stretch:112%;font-weight:600;font-size:12.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--vermilion);margin-bottom:12px}
+.cover .imprint{position:absolute;left:0;right:0;font-family:'Anek Latin';text-transform:uppercase;font-weight:600;
+  font-size:12.5px;letter-spacing:.22em;font-stretch:112%}
+.cover .imprint .l{position:absolute;right:calc(50% + 40px);text-align:right;white-space:nowrap}
+.cover .imprint .r{position:absolute;left:calc(50% + 40px);text-align:left;white-space:nowrap}
+.cover .imprint small{display:block;font-size:11px;font-weight:500;letter-spacing:.14em;opacity:.9;margin-top:5px;text-transform:none}
+</style>
+</head>
+<body>
+<main class="covers" id="covers"></main>
+
+<script>
+/* ======================= pigments ======================= */
+const P = {
+  ink:'#1C1814', ivory:'#F3EAD3', paper:'#F7F0DE', gold:'#C9A04A', goldD:'#8E6B25', goldL:'#E6CB84',
+  lapis:'#243B8C', lapisD:'#18296A', malachite:'#1E6A52', malachiteL:'#3F8C6E', vermilion:'#CF3B22',
+  saffron:'#E4A42E', lac:'#8C1F35', pink:'#E7B09C', sky:'#9DBBD0'
+};
+const LEVEL = {
+  beginner:     {margin:P.saffron,   n:1, label:'Beginner',     text:P.ink,   fleck:P.goldD},
+  intermediate: {margin:P.malachite, n:2, label:'Intermediate', text:P.ivory, fleck:P.gold},
+  advanced:     {margin:P.lapis,     n:3, label:'Advanced',     text:P.ivory, fleck:P.gold},
+};
+
+/* ======================= utilities ======================= */
+function rng(seedStr){ let h=1779033703^seedStr.length; for(let i=0;i<seedStr.length;i++){h=Math.imul(h^seedStr.charCodeAt(i),3432918353);h=h<<13|h>>>19;}
+  let a=h>>>0; return ()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;}; }
+const f = (n)=> +n.toFixed(2);
+function rect(x,y,w,h,fill,extra=''){return `<rect x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${f(h)}" fill="${fill}" ${extra}/>`;}
+function ring(x,y,w,h,t,col){ // a rule of thickness t whose OUTER edge is the rect
+  return `<rect x="${f(x+t/2)}" y="${f(y+t/2)}" width="${f(w-t)}" height="${f(h-t)}" fill="none" stroke="${col}" stroke-width="${t}"/>`;}
+function circ(cx,cy,r,fill,extra=''){return `<circle cx="${f(cx)}" cy="${f(cy)}" r="${f(r)}" fill="${fill}" ${extra}/>`;}
+function line(x1,y1,x2,y2,col,w,extra=''){return `<line x1="${f(x1)}" y1="${f(y1)}" x2="${f(x2)}" y2="${f(y2)}" stroke="${col}" stroke-width="${w}" ${extra}/>`;}
+
+/* ======================= page architecture ======================= */
+const W=720,H=888;
+const B = {x:48, y:48, w:624, h:716};            // page block (inside the hashiya)
+const JAD = [[P.ink,1.6],[P.gold,5],[P.ink,1.2],[P.ivory,2.4],[P.vermilion,2.2],[P.ink,1.2]]; // jadval, outside -> in
+const JT = JAD.reduce((s,r)=>s+r[1],0);
+const C = {x:B.x+JT, y:B.y+JT, w:B.w-2*JT};        // content column
+const CART_H = 204;                               // title cartouche section height
+const DIV = [[P.ink,1.2],[P.gold,4.4],[P.ink,1.2]];
+const DIVT = DIV.reduce((s,r)=>s+r[1],0);
+const M = {x:C.x, y:C.y+CART_H+DIVT, w:C.w};      // miniature panel
+M.h = (B.y+B.h-JT) - M.y;
+
+function zarAfshan(r, col){ // gold-flecked margin paper
+  let s='';
+  const inBlock=(x,y)=> x>B.x-26 && x<B.x+B.w+26 && y>B.y-26 && y<B.y+B.h+26;
+  const inImprint=(x,y)=> y>B.y+B.h+30 && y<H-18;
+  for(let i=0;i<520;i++){
+    const x=r()*W, y=r()*H; if(inBlock(x,y)||inImprint(x,y)) continue;
+    const sz=0.8+Math.pow(r(),2.2)*3.4, k=4+Math.floor(r()*3), a0=r()*6.28;
+    let d=''; for(let j=0;j<k;j++){const a=a0+j*6.283/k+(r()-.5)*.8, rr=sz*(.55+r()*.6); d+=(j?'L':'M')+f(x+Math.cos(a)*rr)+','+f(y+Math.sin(a)*rr);}
+    s+=`<path d="${d}Z" fill="${col}" opacity="${f(.55+r()*.45)}"/>`;
+  }
+  return s;
+}
+
+function cartouche(x,y,w,h){
+  // gold spandrel ground with tooled dots, ivory cusped cartouche, inner gold tahrir line
+  const pad=9, E=44, ym=y+h/2;
+  const shape=(p,e)=>{const xl=x+p+e, xr=x+w-p-e, yt=y+p, yb=y+h-p, xt=x+p, xT=x+w-p;
+    return `M${xl},${yt} L${xr},${yt} Q${xr},${ym} ${xT},${ym} Q${xr},${ym} ${xr},${yb} L${xl},${yb} Q${xl},${ym} ${xt},${ym} Q${xl},${ym} ${xl},${yt} Z`;};
+  let s=rect(x,y,w,h,P.gold);
+  s+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#tool)"/>`;
+  s+=`<path d="${shape(pad,E)}" fill="${P.ivory}" stroke="${P.ink}" stroke-width="1.3"/>`;
+  s+=`<path d="${shape(pad+6,E+2)}" fill="none" stroke="${P.gold}" stroke-width="1.4"/>`;
+  return s;
+}
+
+function shamsa(cx,cy,r,fill,stroke){
+  const n=12; let d='';
+  for(let i=0;i<n;i++){const a1=i/n*6.2832-Math.PI/2, a2=(i+1)/n*6.2832-Math.PI/2;
+    const x1=cx+Math.cos(a1)*r, y1=cy+Math.sin(a1)*r, x2=cx+Math.cos(a2)*r, y2=cy+Math.sin(a2)*r;
+    d+=(i?'':'M'+f(x1)+','+f(y1))+` A${f(r*.3)},${f(r*.3)} 0 0 1 ${f(x2)},${f(y2)}`;}
+  return `<path d="${d}Z" fill="${fill}" stroke="${stroke}" stroke-width="1.4"/>`+
+    circ(cx,cy,r*.74,'none',`stroke="${stroke}" stroke-width="1.1"`)+
+    `<text x="${cx}" y="${cy+r*.3}" text-anchor="middle" font-family="Eczar" font-weight="800" font-size="${f(r*.95)}" fill="${stroke}">V</text>`;
+}
+
+/* ======================= emblems ======================= */
+// each emblem(w,h,r) returns SVG in local coords of the miniature panel (0,0,w,h)
+const EMBLEM = {};
+
+EMBLEM.nn = (w,h,r)=>{ // multilayer perceptron: weights as gold/vermilion threads, activations as jewels
+  const layers=[3,5,5,2], xs=layers.map((_,i)=> w*.2 + i*(w*.6)/(layers.length-1));
+  const pos=layers.map((n,i)=>Array.from({length:n},(_,j)=>[xs[i], h/2 + (j-(n-1)/2)*74]));
+  let s='';
+  for(let i=0;i<layers.length-1;i++) for(const a of pos[i]) for(const b of pos[i+1]){
+    const wgt=r()*2-1; s+=line(a[0],a[1],b[0],b[1], wgt>0?P.goldL:P.vermilion, f(0.8+Math.abs(wgt)*2.6), 'stroke-linecap="round"');
+  }
+  pos.forEach((L,i)=>L.forEach(([x,y],j)=>{
+    const act=r(); const out=(i===layers.length-1 && j===0);
+    s+=circ(x,y,20,P.ink); s+=circ(x,y,17.5, out?P.gold:P.ivory);
+    s+=circ(x,y,4+act*9, out?P.vermilion:(i==0?P.lapis:P.saffron),`stroke="${P.ink}" stroke-width="1"`);
+  }));
+  return s;
+};
+
+EMBLEM.llm = (w,h,r)=>{ // causal self-attention: the lower-triangular mask, painted cell by cell
+  const N=11, cs=34, ox=(w-N*cs)/2, oy=(h-N*cs)/2+6;
+  const cols=[P.lapisD,P.lapis,P.sky,P.ivory,P.gold];
+  let s='';
+  // masked upper triangle: fine hatch
+  for(let i=0;i<N;i++) for(let j=i+1;j<N;j++) s+=rect(ox+j*cs+3,oy+i*cs+3,cs-6,cs-6,'none',`stroke="${P.ink}" stroke-opacity=".35" stroke-width="1"`);
+  for(let i=0;i<N;i++){
+    // attention weights for query i
+    let ws=[]; for(let j=0;j<=i;j++){ let v=r()*.6; if(j===0) v+=1.1; if(j===i) v+=.9; if(j===i-1) v+=.4; ws.push(v);}
+    const mx=Math.max(...ws);
+    for(let j=0;j<=i;j++){ const q=Math.min(4,Math.floor(ws[j]/mx*4.99));
+      s+=rect(ox+j*cs+1.5,oy+i*cs+1.5,cs-3,cs-3,cols[q],`stroke="${P.ink}" stroke-width="1.2"`);
+    }
+  }
+  return s;
+};
+
+EMBLEM.p5d = (w,h,r)=>{ // 5-D device mesh: nested partition DP > PP > TP > CP > EP
+  const gx=[16,6,2.5], gy=[10,4]; // gaps: x splits DP, TP, EP ; y splits PP, CP
+  const nx=8, ny=8, cw=44, ch=40;
+  const Wtot = nx*cw + 1*gx[0] + 2*gx[1] + 4*gx[2]; const Htot = ny*ch + 3*gy[0] + 4*gy[1];
+  const ox=(w-Wtot)/2, oy=(h-Htot)/2;
+  const stageCol=[P.vermilion,P.saffron,P.malachite,P.lapis];
+  let s='';
+  const X=i=>{const dp=i>>2, tp=(i>>1)&1, ep=i&1; return ox + i*cw + dp*gx[0] + (dp*2+tp)*gx[1] + (dp*4+tp*2+ep)*gx[2] - (dp*2+tp)*0; };
+  const Y=j=>{const pp=j>>1, cp=j&1; return oy + j*ch + pp*gy[0] + (pp*2+cp)*gy[1]; };
+  for(let i=0;i<nx;i++) for(let j=0;j<ny;j++){
+    const x=X(i), y=Y(j), pp=j>>1;
+    s+=rect(x,y,cw,ch,stageCol[pp],`stroke="${P.ink}" stroke-width="1.2"`);
+    s+=circ(x+cw/2,y+ch/2,5.5,(i&1)?P.gold:P.ivory,`stroke="${P.ink}" stroke-width="1"`);
+  }
+  return s;
+};
+
+/* ======================= books ======================= */
+const BOOKS = [
+  {slug:'neural-networks-from-scratch', level:'beginner', capsules:33, hours:7,
+   title:[['Neural Networks'],['from Scratch']], size:60, ground:P.malachite, emblem:'nn'},
+  {slug:'build-llms-from-scratch', level:'intermediate', capsules:20, hours:6,
+   title:[['Build Large Language'],['Models (LLMs)'],['from Scratch']], size:50, ground:P.vermilion, emblem:'llm'},
+  {slug:'5d-parallelism', level:'advanced', capsules:40, hours:9,
+   title:[['5D Parallelism'],['for Large Model Training']], size:52, ground:P.ivory, emblem:'p5d'},
+];
+
+/* ======================= assemble ======================= */
+function coverSVG(b){
+  const L=LEVEL[b.level], r=rng(b.slug);
+  let s=`<svg class="art" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="tool-${b.slug}" width="7" height="7" patternUnits="userSpaceOnUse"><circle cx="1.75" cy="1.75" r="0.9" fill="${P.goldL}"/><circle cx="5.25" cy="5.25" r="0.9" fill="${P.goldL}"/></pattern>
+  </defs>`;
+  s+=rect(0,0,W,H,L.margin);
+  s+=zarAfshan(r, L.fleck);
+  // level: n gold tahrir lines around the page block, in the margin
+  for(let i=0;i<L.n;i++){ const o=8+i*6; s+=ring(B.x-o-1.6,B.y-o-1.6,B.w+2*o+3.2,B.h+2*o+3.2,1.6,P.gold); }
+  // jadval
+  let o=0; for(const [col,t] of JAD){ s+=ring(B.x+o,B.y+o,B.w-2*o,B.h-2*o,t,col); o+=t; }
+  // cartouche
+  s+=cartouche(C.x,C.y,C.w,CART_H).replace('url(#tool)',`url(#tool-${b.slug})`);
+  // divider
+  let y=C.y+CART_H; for(const [col,t] of DIV){ s+=rect(C.x,y,C.w,t,col); y+=t; }
+  // miniature
+  s+=rect(M.x,M.y,M.w,M.h,b.ground);
+  s+=`<g transform="translate(${M.x},${M.y})">${EMBLEM[b.emblem](M.w,M.h,r)}</g>`;
+  // imprint seal
+  s+=shamsa(W/2, B.y+B.h+62, 21, L.margin, L.text==P.ink?P.ink:P.goldL);
+  s+='</svg>';
+  return s;
+}
+
+function build(){
+  const host=document.getElementById('covers');
+  for(const b of BOOKS){
+    const L=LEVEL[b.level];
+    const d=document.createElement('div'); d.className='cover'; d.dataset.slug=b.slug;
+    const tx = C.x+60, tw=C.w-120;
+    const lines=b.title.map(l=>`<span class="ln">${l.join(' ')}</span>`).join('');
+    d.innerHTML = coverSVG(b) +
+      `<div class="title" style="left:${tx}px;top:${C.y+14}px;width:${tw}px;height:${CART_H-28}px;font-size:${b.size}px">${lines}</div>`+
+      `<div class="imprint" style="top:${B.y+B.h+48}px;color:${L.text}"><div class="l">Vizuara Books</div><div class="r">${L.label}<small>${b.capsules} capsules · ${b.hours} hours</small></div></div>`;
+    host.appendChild(d);
+  }
+}
+build();
+</script>
+</body>
+</html>

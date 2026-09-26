@@ -206,7 +206,9 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
       'font-weight': o.wt || 500, 'text-anchor': o.a || 'start', fill: o.c || C.g,
       'letter-spacing': o.ls, 'font-style': o.it ? 'italic' : undefined,
       'dominant-baseline': o.mid ? 'central' : undefined,
-      transform: o.rot ? `rotate(${f(o.rot)} ${f(x)} ${f(y)})` : undefined, opacity: o.op })}>${esc}</text>`;
+      transform: o.rot ? `rotate(${f(o.rot)} ${f(x)} ${f(y)})` : undefined, opacity: o.op,
+      stroke: o.halo ? C.paper : undefined, 'stroke-width': o.halo ? (o.halo === true ? 4 : o.halo) : undefined,
+      'paint-order': o.halo ? 'stroke' : undefined, 'stroke-linejoin': o.halo ? 'round' : undefined })}>${esc}</text>`;
   }
   // filled arrowhead, tip at (x,y) pointing along angle (radians)
   function AH(x, y, ang, o = {}) {
@@ -242,7 +244,7 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
       // normal pointing "up" in the rotated text frame
       const upx = Math.sin(rot * Math.PI / 180), upy = -Math.cos(rot * Math.PI / 180);
       out += Tx(mx + upx * tn, my + upy * tn + (o.below ? 8 : 0) * 1, label,
-        { a: 'middle', rot: Math.abs(rot) < 0.01 ? undefined : rot, c, s: o.s || 11, wt: o.wt || 500 });
+        { a: 'middle', rot: Math.abs(rot) < 0.01 ? undefined : rot, c, s: o.s || 11, wt: o.wt || 500, halo: o.halo ?? true });
     }
     return out;
   }
@@ -358,7 +360,7 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
     s += AH(cx + r * Math.cos(a1), cy + r * Math.sin(a1), t1, { c, l: 8, h: 2.4 });
     s += AH(cx + r * Math.cos(a2), cy + r * Math.sin(a2), t2, { c, l: 8, h: 2.4 });
     const am = (a1 + a2) / 2, rr = r + (o.tr || 12);
-    s += Tx(cx + rr * Math.cos(am) + (o.tx || 0), cy + rr * Math.sin(am) + 4 + (o.ty || 0), label, { a: o.a || 'middle', c, s: o.s || 10.5, wt: o.wt || 600 });
+    s += Tx(cx + rr * Math.cos(am) + (o.tx || 0), cy + rr * Math.sin(am) + 4 + (o.ty || 0), label, { a: o.a || 'middle', c, s: o.s || 10.5, wt: o.wt || 600, halo: true });
     return s;
   }
   // isometric dimension: P1,P2 3-D points, off 3-D offset vector (extension direction)
@@ -374,7 +376,7 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
     let rot = ang * 180 / Math.PI; if (rot > 90.1 || rot <= -90.1) rot += 180;
     const mx = (a1[0] + a2[0]) / 2, my = (a1[1] + a2[1]) / 2;
     const up = rot * Math.PI / 180, tn = o.below ? 13 : -5;
-    s += Tx(mx - Math.sin(up) * tn, my + Math.cos(up) * tn, label, { a: 'middle', rot, c, s: o.s || 10.5, wt: o.wt || 600, ls: '0.04em' });
+    s += Tx(mx - Math.sin(up) * tn, my + Math.cos(up) * tn, label, { a: 'middle', rot, c, s: o.s || 10.5, wt: o.wt || 600, ls: '0.04em', halo: true });
     return s;
   }
   // a turned shaft in elevation. segs: [{l, r, fill}] from x0; returns {svg, x1}
@@ -465,9 +467,9 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
     let s = '';
     for (let i = 0; i < 3; i++) {
       const on = i < n;
-      s += `<rect x="${1 + i * 13}" y="1" width="10" height="10" fill="${on ? C.ink : 'none'}" stroke="${on ? C.ink : C.g}" stroke-width="1.2"/>`;
+      s += `<rect x="${1 + i * 15}" y="1" width="12" height="12" fill="${on ? C.ink : 'none'}" stroke="${on ? C.ink : C.g}" stroke-width="1.2"/>`;
     }
-    return `<svg class="lv" width="38" height="12" viewBox="0 0 38 12">${s}</svg>`;
+    return `<svg class="lv" width="44" height="14" viewBox="0 0 44 14">${s}</svg>`;
   }
 
   function markSvg(size = 1, id = 'mk', o = {}) {
@@ -543,7 +545,7 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
       // sheath = the window (ink)
       s += Ci(cx, cy, (R0 + R1) / 2, { c: C.ink, w: R1 - R0 });
       s += Ci(cx, cy, R0, { fill: `url(#${id}-d)`, c: 'none', op: 0.5 });
-      s += cmark(cx, cy, R1, { e: 14 });
+      s += cmark(cx, cy, R1, { e: 9 });
       const strands = [
         { x: -62, y: -58, r: 60, fill: 'h' },            // instructions
         { x: 66, y: -66, r: 54, fill: 'x' },             // tools
@@ -585,7 +587,7 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
       s += PL([[px + 18 * Math.cos(a), py + 18 * Math.sin(a)], [520, 110], [604, 110]], { c: C.ink, w: T });
       s += AH(px + 0.5 * Math.cos(a), py + 0.5 * Math.sin(a), a + Math.PI, { c: C.ink, l: 11, h: 3 });
       s += Tx(526, 104, '⌀ WINDOW', { s: 11, wt: 700, c: C.ink, ls: '0.06em' });
-      s += Tx(398, 504, 'SECTION A–A', { a: 'middle', s: 11, wt: 700, ls: '0.08em' });
+      s += Tx(398, 512, 'SECTION A–A', { a: 'middle', s: 11, wt: 700, ls: '0.08em' });
       return s;
     }
   });
@@ -637,7 +639,7 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
       // eigen dimensions (lower-left semi-major, upper-left semi-minor)
       const P1 = S(-e1[0] * l1, -e1[1] * l1), P2 = S(-e2[0] * l2, -e2[1] * l2);
       s += dim(ox, oy, ...P1, 30, `λ₁ = ${l1.toFixed(2)}`, { c: C.ink, s: 11, wt: 700, gap: 5 });
-      s += dim(ox, oy, ...P2, -22, `λ₂ = ${l2.toFixed(2)}`, { c: C.ink, s: 11, wt: 700, gap: 5 });
+      s += dim(ox, oy, ...P2, 26, `λ₂ = ${l2.toFixed(2)}`, { c: C.ink, s: 11, wt: 700, gap: 5 });
       // angle of the principal axis
       s += arcDim(ox, oy, 236, -th, 0, `${(th / D2R).toFixed(1)}°`, { tr: 8, tx: 10, ty: 2, a: 'start' });
       // det callout
@@ -705,7 +707,7 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
         const a = Math.atan2(ny - iy, nx - ix);
         s += L(ix, iy, nx - Math.cos(a) * 33, ny - Math.sin(a) * 33, { w: 1.3 }) + AH(nx - Math.cos(a) * 25, ny - Math.sin(a) * 25, a, { l: 8, h: 2.4 });
       });
-      s += Tx(X - 60, Y - 50, 'w₁', { s: 10.5, wt: 700 }) + Tx(X - 66, Y - 8, 'w₂', { s: 10.5, wt: 700 }) + Tx(X - 60, Y + 55, 'w₃', { s: 10.5, wt: 700 });
+      s += Tx(X - 50, Y - 34, 'w₁', { s: 10.5, wt: 700 }) + Tx(X - 66, Y - 8, 'w₂', { s: 10.5, wt: 700 }) + Tx(X - 50, Y + 42, 'w₃', { s: 10.5, wt: 700 });
       s += Ci(nx, ny, 25, { w: K, fill: C.paper });
       s += Tx(nx, ny + 8, 'Σ', { a: 'middle', s: 24, wt: 500, f: IS });
       s += Tx(nx + 2, ny + 42, '+ b', { a: 'middle', s: 10.5, wt: 700 });
@@ -1302,7 +1304,7 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
       s += R(ax, ay, kw, mh, { w: K }) + R(bx, by, nw, kh, { w: K }) + R(cx, cy, nw, mh, { w: K });
       s += Tx(ax + kw / 2, ay + mh + 20, 'A', { a: 'middle', s: 16, wt: 600, f: IS });
       s += Tx(bx - 18, by + kh / 2 + 6, 'B', { a: 'middle', s: 16, wt: 600, f: IS });
-      s += Tx(cx + nw / 2, cy + mh + 20, 'C', { a: 'middle', s: 16, wt: 600, f: IS });
+      s += Tx(cx + nw * 0.25, cy + mh + 20, 'C', { a: 'middle', s: 16, wt: 600, f: IS });
       // dimensions
       s += dim(ax, ay, ax + kw, ay, -16, 'K', { s: 11, wt: 700 });
       s += dim(ax, ay + mh, ax, ay, -16, 'M', { s: 11, wt: 700, gap: 4 });
@@ -1325,9 +1327,9 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
     },
     extra(id) {
       // PRELIMINARY stamp
-      const x = 590, y = 330;
+      const x = 594, y = 474;
       return `<g transform="rotate(-8 ${x} ${y})">` +
-        R(x - 80, y - 36, 160, 72, { c: C.ink, w: 3, fill: C.paper }) + R(x - 74, y - 30, 148, 60, { c: C.ink, w: 1.1 }) +
+        R(x - 76, y - 36, 152, 72, { c: C.ink, w: 3, fill: C.paper }) + R(x - 70, y - 30, 140, 60, { c: C.ink, w: 1.1 }) +
         Tx(x, y - 6, 'PRELIMINARY', { a: 'middle', s: 16.5, wt: 700, c: C.ink, ls: '0.1em' }) +
         Tx(x, y + 10, 'NOT FOR CONSTRUCTION', { a: 'middle', s: 8, wt: 700, c: C.ink, ls: '0.08em' }) +
         Tx(x, y + 22, 'COMING SOON', { a: 'middle', s: 8, wt: 700, c: C.ink, ls: '0.2em' }) + `</g>`;

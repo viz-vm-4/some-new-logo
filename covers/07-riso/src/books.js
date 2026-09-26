@@ -267,20 +267,20 @@
     cols.forEach((c, ci) => {
       let d = '';
       let y = top, n = 0;
-      const hL = 6;
+      const hL = 8.5;
       while (y < bot) {
         const t = (y - top) / (bot - top);
         const k = Math.max(0, (t - c.c0) / (1 - c.c0));
-        const pitch = 25 - (25 - hL) * Math.pow(Math.min(1, k * 1.3), c.e);
+        const pitch = 30 - (30 - hL) * Math.pow(Math.min(1, k * 1.3), c.e);
         if (pitch <= hL + 0.35) { d += rectD(c.x, y, cw, bot - y); break; }
         const x0 = k > 0 ? c.x : c.x + 16;
         const len = (cw - (x0 - c.x)) * (k > 0 ? (0.55 + 0.45 * R()) * (1 - k) + k : 0.3 + 0.7 * R());
         d += rectD(x0, y, len, hL);
-        if (k === 0) key += (n % 2 ? p(circ(c.x + 4.5, y + hL / 2, 4.5)) : p(rectD(c.x, y - 1.5, 9, 9)));
+        if (k === 0) key += (n % 2 ? p(circ(c.x + 5, y + hL / 2, 5.5)) : p(rectD(c.x - 0.5, y - 1.5, 11, 11)));
         y += pitch; n++;
       }
       if (ci === 0) outs[0] += p(d); else if (ci === 1) outs[1] += p(d); else { outs[0] += p(d); outs[1] += p(d); }
-      knock += T(c.x + 10, bot - 12, 'MEMORY', mono(12, 500, 0.16));
+      knock += T(c.x + 12, bot - 14, 'MEMORY', mono(14, 500, 0.16));
       key += T(c.x, top - 20, c.name, mono(13, 500, 0.16));
     });
     const id = `pm-${book.slug}`;

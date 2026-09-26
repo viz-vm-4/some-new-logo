@@ -15,7 +15,7 @@
 *{box-sizing:border-box}
 html,body{margin:0;background:#DCDBD5;color:var(--carbon)}
 body{font-family:var(--serif)}
-.wall{display:flex;flex-wrap:wrap;gap:48px;padding:0 64px}
+.wall{display:flex;flex-wrap:wrap;gap:48px;padding:0 48px}
 
 /* ---------- the cover system ---------- */
 .cover,.front{position:relative;width:720px;height:888px;overflow:hidden;background:var(--ground);color:var(--ink);flex:none;box-shadow:0 0 0 2px var(--ground)}
@@ -49,9 +49,10 @@ h1 .sub{display:block;font-style:italic;font-weight:400;letter-spacing:-.005em;m
 .imp svg{width:20px;height:20px;display:block}
 
 /* ---------- presentation ---------- */
-.intro{padding:72px 64px 40px;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:40px 72px;max-width:1640px}
+.intro{padding:72px 48px 40px;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:40px 72px;max-width:1640px}
 .kicker{grid-column:1/-1;font:500 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;display:flex;gap:18px;align-items:center}
 .kicker svg{width:22px;height:22px;--sig:var(--signal)}
+.anat{display:block;margin-top:48px;max-width:100%;height:auto}
 .dir{font:500 148px/.9 var(--serif);font-variation-settings:'opsz' 72;letter-spacing:-.03em;margin:0}
 .dir small{display:block;font:italic 400 34px/1.15 var(--serif);letter-spacing:-.01em;margin-top:22px;max-width:15em}
 .lede{font:400 19px/1.5 var(--serif);font-variation-settings:'opsz' 16;margin:0 0 18px;max-width:34em}
@@ -64,10 +65,10 @@ h1 .sub{display:block;font-style:italic;font-weight:400;letter-spacing:-.005em;m
 .specrow h3{font:600 10.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;margin:0 0 10px}
 .specrow .t1{font:500 44px/1 var(--serif);font-variation-settings:'opsz' 72;letter-spacing:-.02em}
 .specrow .t2{font:400 13px/1.5 var(--mono)}
-.sec{padding:72px 64px 28px;display:flex;align-items:baseline;gap:24px;max-width:1640px}
+.sec{padding:72px 48px 28px;display:flex;align-items:baseline;gap:24px;max-width:1640px}
 .sec h2{font:500 40px/1 var(--serif);font-variation-settings:'opsz' 72;letter-spacing:-.02em;margin:0}
 .sec p{font:400 12px/1.5 var(--mono);margin:0;max-width:62em}
-.wrapbox{padding:0 64px 96px;overflow-x:auto}
+.wrapbox{padding:0 48px 96px;overflow-x:auto}
 .wrap{position:relative;width:1512px;height:888px;display:flex;flex:none}
 .wrap .back{position:relative;width:720px;height:888px;background:var(--ground);color:var(--ink);overflow:hidden}
 .wrap .spine{position:relative;width:72px;height:888px;background:var(--ground);color:var(--ink);border-left:1px dashed rgba(20,21,24,.18);border-right:1px dashed rgba(20,21,24,.18)}
@@ -82,11 +83,11 @@ h1 .sub{display:block;font-style:italic;font-weight:400;letter-spacing:-.005em;m
 .back .bk{position:absolute;left:48px;right:48px;top:56px}
 .back .bk h4{font:500 34px/1.05 var(--serif);font-variation-settings:'opsz' 60;letter-spacing:-.015em;margin:0 0 16px}
 .back .bk p{font:400 15px/1.5 var(--serif);font-variation-settings:'opsz' 14;margin:0 0 12px;max-width:33em}
-.back pre{position:absolute;left:48px;right:48px;top:292px;margin:0;font:400 8.6px/1.42 var(--mono);white-space:pre-wrap;word-break:break-all;opacity:.86}
+.back pre{position:absolute;left:48px;right:48px;top:318px;margin:0;font:400 8.6px/1.42 var(--mono);white-space:pre-wrap;word-break:break-all;opacity:.86}
 .back .bar{position:absolute;right:48px;bottom:40px;width:170px;height:92px;background:#fff;border:1px solid var(--ink);display:flex;align-items:flex-end;justify-content:center;font:500 9px/1 var(--mono);letter-spacing:.12em;padding-bottom:8px;color:var(--carbon)}
 .back .bi{position:absolute;left:48px;bottom:40px;font:600 19px/1 var(--serif);display:flex;align-items:center;gap:9px}
 .back .bi svg{width:20px;height:20px}
-.foot{padding:24px 64px 80px;font:400 11px/1.5 var(--mono);max-width:1100px}
+.foot{padding:24px 48px 80px;font:400 11px/1.5 var(--mono);max-width:1100px}
 </style>
 </head>
 <body>
@@ -95,6 +96,25 @@ h1 .sub{display:block;font-style:italic;font-weight:400;letter-spacing:-.005em;m
   <div class="kicker"><span id="kmark"></span><span>Vizuara Books — cover system proposal 05 — algorithmic</span></div>
   <div>
     <h1 class="dir">Figure&nbsp;0<small>Every cover is one run of the book’s own algorithm.</small></h1>
+    <svg class="anat" viewBox="0 0 640 420" width="640" height="420" aria-label="Anatomy of a cover">
+      <g fill="none" stroke="#141518" stroke-width="1.2">
+        <rect x="0.6" y="0.6" width="324" height="399.6"/>
+        <rect x="18" y="16" width="4" height="4" fill="#141518"/><rect x="24" y="16" width="4" height="4"/><rect x="30" y="16" width="4" height="4"/>
+        <path d="M40 18h28M258 18h48"/>
+      </g>
+      <g fill="#141518"><rect x="18" y="36" width="210" height="22"/><rect x="18" y="64" width="150" height="22"/></g>
+      <g stroke="#141518" stroke-width=".8" fill="none" id="anatHatch"></g>
+      <g stroke="#141518" stroke-width="1.2"><path d="M18 368h180M18 375h196M18 382h120"/></g>
+      <g transform="translate(270 364) scale(.8)" fill="none"><path d="M2.2 3.2 C4.6 3.4 7.2 15.6 10 15.6 C12.8 15.6 15.4 3.4 17.8 3.2" stroke="#141518" stroke-width="2.4" stroke-linecap="round"/><circle cx="10" cy="15.6" r="2.6" fill="#D8372B"/></g>
+      <g stroke="#141518" stroke-width=".8" stroke-dasharray="2 3" fill="none"><path d="M72 18H360M232 50H360M300 240H360M204 368L232 336H360M292 372H360"/></g>
+      <g font-family="IBM Plex Mono, monospace" font-size="11" fill="#141518" letter-spacing=".06em">
+        <text x="368" y="22">LEVEL ■□□ · CAPSULES · HOURS</text>
+        <text x="368" y="46">TITLE — Newsreader 500,</text><text x="368" y="60">one size per title length</text>
+        <text x="368" y="236">PLATE — computed in the page,</text><text x="368" y="250">full-bleed 720 × 484 SVG</text><text x="368" y="264">(a 456² “room” for series)</text>
+        <text x="368" y="340">FIG. 0 — what ran, with numbers</text><text x="368" y="354">read back from the run</text>
+        <text x="368" y="376">IMPRINT — the valley mark</text>
+      </g>
+    </svg>
   </div>
   <div>
     <p class="lede">A technical book’s cover should be evidence, not decoration. In <em>Figure 0</em> each plate is computed in the page, at print time, by the subject of the book itself: gradient descent draws the maths book, a network trained right here draws <em>Neural Networks</em>, a pipeline schedule draws <em>5D Parallelism</em>, an agent session run through three compaction policies draws <em>Pi vs Hermes vs Codex</em>.</p>
@@ -524,7 +544,7 @@ GEN['charlie-language-room'] = (r, b, acc) => {
   const prob = (ctx) => { const p = new Map(Vs.map((c) => [c, 0])); let wsum = 0;
     for (let o = 0; o <= 4; o++) { const m = cnt[o].get(ctx.slice(ctx.length - o)); if (!m) continue; let tot = 0; for (const v of m.values()) tot += v; for (const [c, v] of m) p.set(c, p.get(c) + lam[o] * v / tot); wsum += lam[o]; }
     for (const c of Vs) p.set(c, (p.get(c) + 1e-4) / (wsum + 1e-4 * Vs.length)); return p; };
-  const prompt = 'Charlie and the ', goal = 'Language Room', B = 28, depth = 16;
+  const prompt = 'Charlie and the ', goal = 'Language Room', B = 40, depth = 16;
   let beams = [{ s: '^^^^' + prompt, lp: 0, id: 0, done: false }], nid = 1; const all = new Map([[0, { id: 0, parent: -1, s: prompt, kids: [] }]]);
   for (let d = 1; d <= depth; d++) {
     const cand = [];
@@ -542,27 +562,27 @@ GEN['charlie-language-room'] = (r, b, acc) => {
     if ((prompt + goal + '\n').startsWith(nd.s)) red += d; else lines += d;
     if (nd.done) { const txt = nd.s.slice(prompt.length).replace('\n', ''); labels += `<text x="${f1(x1 + 6)}" y="${f1(y1 + 2.9)}" font-size="8.5"${txt === goal ? ' class="acc"' : ''}>${txt}</text>`; } }
   return {
-    svg: path(lines, 'k', 0.8, 'opacity=".85"') + path(red, 'r', 2) + labels,
+    svg: path(lines, 'k', 0.9) + path(red, 'r', 2.2) + labels,
     caption: `Beam search (width ${B}) through a character 5-gram model trained in this page on the ${TITLES.length} titles of this library, continuing the words “${prompt.trim()}”. Each branch is a letter it considered; the labels are titles it finished. In ${acc}: this one, its no. ${goalRank} guess.`
   };
 };
 
 /* ---- II · Vision Room: 2-D sin–cos position embeddings of a ViT, compared patch by patch ---- */
 GEN['charlie-vision-room'] = (r, b, acc) => {
-  const G = 12, d = 256, q = d / 4, om = Array.from({ length: q }, (_, k) => 1 / Math.pow(10000, k / q));
+  const G = 8, d = 256, q = d / 4, om = Array.from({ length: q }, (_, k) => 1 / Math.pow(10000, k / q));
   const half = (p) => { const v = []; for (const w of om) v.push(Math.sin(p * w), Math.cos(p * w)); return v; };   // one axis of the embedding
-  const S = 3, NS = (G - 1) * S + 1, sp = Array.from({ length: NS }, (_, i) => i / S), hs = sp.map(half), ha = Array.from({ length: G }, (_, i) => half(i));
+  const S = 5, NS = (G - 1) * S + 1, sp = Array.from({ length: NS }, (_, i) => i / S), hs = sp.map(half), ha = Array.from({ length: G }, (_, i) => half(i));
   const dd = ha.map((a) => hs.map((h) => dot(a, h)));                 // exact: cos-sim = (row part + column part) / 2q
-  const map = Q.w / G, pad = 4, cell = (map - 2 * pad) / (NS - 1), levels = [0.985, 0.962, 0.935, 0.905, 0.875, 0.845];
+  const map = Q.w / G, pad = 6, cell = (map - 2 * pad) / (NS - 1), levels = [0.99, 0.975, 0.955, 0.93, 0.905, 0.88, 0.855, 0.83];
   let lines = '', self = '';
   for (let ai = 0; ai < G; ai++) for (let aj = 0; aj < G; aj++) {
     const F = new Float64Array(NS * NS); for (let j = 0; j < NS; j++) for (let i = 0; i < NS; i++) F[j * NS + i] = (dd[ai][j] + dd[aj][i]) / (2 * q);
     const ox = Q.x + aj * map + pad, oy = Q.y + ai * map + pad, X = (i) => ox + i * cell, Y = (j) => oy + j * cell;
     for (const L of levels) for (const ln of contours(F, NS, NS, L, X, Y)) lines += D(ln);
-    self += `<circle class="fr" cx="${f1(ox + aj * S * cell)}" cy="${f1(oy + ai * S * cell)}" r="1.9"/>`;
+    self += `<circle class="fr" cx="${f1(ox + aj * S * cell)}" cy="${f1(oy + ai * S * cell)}" r="2.6"/>`;
   }
   return {
-    svg: path(lines, 'k', 0.8) + self,
+    svg: path(lines, 'k', 0.9) + self,
     caption: `A Vision Transformer reads a picture as a ${G} × ${G} grid of patches and tells them apart by position embeddings. These are its fixed 2-D sine–cosine ones (d = ${d}): each small field contours one patch’s cosine similarity to every other position; ${acc} marks the patch itself.`
   };
 };
@@ -635,7 +655,7 @@ const BOOKS = [
   { set: 'core', slug: 'mathematical-foundations-for-ml', title: 'Mathematical Foundations<br>for Machine Learning', level: 'beginner', capsules: 43, hours: 10, size: 62 },
   { set: 'core', slug: 'neural-networks-from-scratch', title: 'Neural Networks<br>from Scratch', level: 'beginner', capsules: 33, hours: 7, size: 80 },
   { set: 'core', slug: 'build-llms-from-scratch', title: 'Build Large Language<br>Models (LLMs)<br>from Scratch', level: 'intermediate', capsules: 20, hours: 6, size: 62 },
-  { set: 'core', slug: '5d-parallelism', title: '5D Parallelism<br>for Large Model Training', level: 'advanced', capsules: 40, hours: 9, size: 62 },
+  { set: 'core', slug: '5d-parallelism', title: '5D Parallelism for<br>Large Model Training', level: 'advanced', capsules: 40, hours: 9, size: 60 },
   { set: 'core', slug: 'pi-vs-hermes-vs-codex', title: 'Pi vs Hermes vs Codex:<br>Context Compaction<br>and Memory', level: 'advanced', capsules: 9, hours: 1, size: 60 },
   { set: 'range', slug: 'decision-trees-from-scratch', title: 'Build Decision Trees<br>from Scratch', level: 'beginner', capsules: 23, hours: 5, size: 68 },
   { set: 'range', slug: 'sciml', title: 'Scientific Machine<br>Learning (SciML)', level: 'advanced', capsules: 39, hours: 9, size: 70 },
@@ -664,7 +684,7 @@ function wrap(b, out) {
   return `<div class="wrap ${b.level}">
     <div class="back"><div class="bk"><h4>This cover is a program.</h4>
       <p>The front of this book was not drawn. It was computed — by the function printed below, the same way every figure in the book is: ${fmt(46 * 32)} starting points on Himmelblau’s function, each walked downhill by gradient descent until it came to rest in one of the four minima.</p>
-      <p>Run it again and you get the same picture. Change the learning rate and the cover changes with it.</p></div>
+      <p>Run it again and you get the same picture. Change the learning rate and the cover changes with it.</p><p style="font:400 10.5px/1.5 var(--mono);letter-spacing:.04em;margin-top:18px">SEED 0x${hash(b.slug).toString(16).toUpperCase()} — FNV-1a HASH OF “${b.slug}”</p></div>
       <pre>${src.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</pre>
       <div class="bi">${MARK(20)}Vizuara Books</div>
       <div class="bar">ISBN / BARCODE</div></div>
@@ -679,6 +699,9 @@ if (typeof document !== 'undefined') {
   const mf = BOOKS.find((b) => b.slug === 'mathematical-foundations-for-ml');
   document.getElementById('wrapbox').innerHTML = wrap(mf, outs.get(mf.slug));
   document.getElementById('kmark').innerHTML = MARK(22);
+  /* schematic only: ruled lines stand in for the plate */
+  let hd = ''; for (let k = 0; k < 44; k++) { const y = 112 + k * 5.6; hd += `M0.6 ${y}H324.6`; }
+  document.getElementById('anatHatch').innerHTML = `<path d="${hd}" stroke-width=".6" opacity=".55"/><rect x="0.6" y="108" width="324" height="248" stroke-width="1.2"/>`;
 }
 </script>
 </body>
