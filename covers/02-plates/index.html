@@ -152,11 +152,11 @@ body{font-family:'Bodoni Moda',serif;font-optical-sizing:auto;min-width:1600px}
     <section>
       <h3>Anatomy of a plate</h3>
       <ul class="rules">
-        <li data-k="a"><i>Plate number:</i> the book’s place in the catalogue, in roman numerals, top left.</li>
+        <li data-k="a"><i>Plate number:</i> permanent and append-only, in roman numerals, top left. A new title takes the next free numeral, so spines and the web never disagree.</li>
         <li data-k="b"><i>Level:</i> the paper colour plus a scale bar of one, two or three filled bars, top right.</li>
         <li data-k="c"><i>Title:</i> the hero, top left, broken by hand. Subtitles are italic, and a series line sits above.</li>
-        <li data-k="d"><i>Specimen:</i> one mechanism, engraved and lettered. Occasionally a Fig. 2 gives its section.</li>
-        <li data-k="e"><i>Legend:</i> the key to the letters, two lines of italic under a rule.</li>
+        <li data-k="d"><i>Specimen:</i> one mechanism, engraved and lettered. Occasionally a Fig. 2 gives its section. Spheres are reserved for physical things; tokens, tree nodes and vertices are flat roundels.</li>
+        <li data-k="e"><i>Legend:</i> the key to the letters, two lines of italic under a rule, anchored to the foot. Each key is bound to its first words, and a build check refuses a third line.</li>
         <li data-k="f"><i>Imprint:</i> the V-in-a-lens mark (two converging rays; <i>viz</i>, to see) and the name, small, at the foot.</li>
       </ul>
     </section>
@@ -1561,18 +1561,18 @@ const NOTES = {
   'neural-networks-from-scratch': 'One artificial unit, dissected like an anatomical specimen. Inputs arrive on filaments, and each weight is a bead sized by its magnitude. The core forms Σwx + b and the shell applies the activation.',
   'build-llms-from-scratch': 'A decoder-only transformer raised as a classical column: a course of tokens, the embedding as plinth, N identical blocks as drums threaded on the dowel of the residual stream, and the output head as a capital bearing the next-token distribution.',
   '5d-parallelism': 'The smallest five-dimensional device mesh (2<sup>5</sup> = 32 devices) is a penteract. Projected in its decagonal symmetry, it shows one device’s five edges as the five axes of parallelism.',
-  'pi-vs-hermes-vs-codex': 'A three-armed logarithmic spiral. Each agent’s history winds inward, with older spans sealed into ever smaller chambers, and a pale thread (memory) runs through all of them. The figure compares structure; it makes no claim about any one agent’s ratios.',
+  'pi-vs-hermes-vs-codex': 'A three-armed logarithmic spiral. Each agent’s history winds inward, with older spans sealed into ever smaller chambers, and a pale thread (memory) runs through all of them. All three arms share one cadence, so the figure compares structure only; each keeps its own engraving convention (continuous, dashed, heavy) so it can be followed to the first turn.',
   'decision-trees-from-scratch': 'A binary tree pressed like a herbarium sheet, with its split conditions at the nodes and the leaves coloured by class. Fig. 2 shows the same four splits partitioning the plane.',
   'transformers-from-scratch': 'One causal attention head. Arches run from each query back to the keys it weighs, their width set by the softmax weight, and the last query is drawn in white. Below, the same weights appear as a Hinton diagram.',
   'harness-engineering': 'Watt’s centrifugal governor, the nineteenth-century layer that turned a raw engine into a self-regulating machine. The engine’s shaft is the model, the flyballs are the loop that observes and acts, the linkage to the throttle is the tools, the stop collar is the permissions and the frame is the sandbox. As a coming-soon title it carries “In preparation” at the foot.',
   'charlie-language-room': 'Inference engineering’s paged KV cache as a library card catalogue. Drawers are pages, each card holds one token’s keys and values, some pages are free, and the ledger on top is the page table.',
-  'charlie-vision-room': 'A lens casts an image, the screen cuts it four by four, and the patches are read off as a numbered sentence: patch embedding as a piece of Victorian optics.',
+  'charlie-vision-room': 'A lens casts an inverted image on a square screen, cut four by four into square patches, and the patches are read off as a numbered sentence: patch embedding as a piece of Victorian optics.',
   'charlie-sound-room': 'Scott’s phonautograph (1857): horn, membrane, stylus and a sooted drum record a voice as a trace. Fig. 2 unrolls the trace and cuts it into frames, as a speech model does.',
-  'charlie-reasoning-room': 'From bandits to reasoning models. A five-armed bandit’s winning reward distribution sprouts a tree of reasoning steps, and the rewarded path is drawn in white.',
+  'charlie-reasoning-room': 'From bandits to reasoning models. Each arm’s reward distribution stands on one ruled reward scale with its mean ticked. The arm with the highest mean is pulled, and a tree of reasoning steps grows from that mean, the rewarded path in white.',
 };
 const GROUPS = [
   { h: 'The core six', l: 'The six titles every system must carry: two beginner, two intermediate, two advanced.', slugs: ['ai-context-engineering', 'mathematical-foundations-for-ml', 'neural-networks-from-scratch', 'build-llms-from-scratch', '5d-parallelism', 'pi-vs-hermes-vs-codex'] },
-  { h: 'Range', l: 'A beginner title with a Fig. 2, a one-word title with a long subtitle, and a coming-soon title.', slugs: ['decision-trees-from-scratch', 'transformers-from-scratch', 'harness-engineering'] },
+  { h: 'Range', l: 'A beginner title with a Fig. 2, a one-word title with a long subtitle, and a coming-soon title drawn as a nineteenth-century machine.', slugs: ['decision-trees-from-scratch', 'transformers-from-scratch', 'harness-engineering'] },
   { h: 'A sub-series: Charlie and the Intelligence Factory', l: 'Four rooms, four machines. A series line sits above the title, the books keep their catalogue plate numbers, and level still sets the paper.', slugs: ['charlie-language-room', 'charlie-vision-room', 'charlie-sound-room', 'charlie-reasoning-room'] },
 ];
 const groupsEl = document.getElementById('groups');
