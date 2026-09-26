@@ -231,7 +231,7 @@ function fNN(bk) {
       const ang = ys(nb.n).map(ty => Math.atan2(ty - ny, nb.x - l.x)).sort((a, b) => a - b);
       const len = Math.abs(nb.x - l.x);
       for (let i = 0; i < ang.length - 1; i++) {
-        const da = ang[i + 1] - ang[i], dd = Math.min((sw + 1.6) / (2 * Math.sin(da / 2)), len * 0.45);
+        const da = ang[i + 1] - ang[i], dd = Math.min((sw + 2.2) / (2 * Math.sin(da / 2)), len * 0.45);
         const pt = a => `${f1(l.x + dd * Math.cos(a))},${f1(ny + dd * Math.sin(a))}`;
         fuse += `M${l.x},${f1(ny)}L${pt(ang[i])}L${pt(ang[i + 1])}Z`;
       }

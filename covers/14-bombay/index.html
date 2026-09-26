@@ -930,12 +930,12 @@ const EMBLEM = {
     // the press
     const cx = 300, base = ph - 12;
     const dTop = base - 46;                 // top of the drawer cabinet (the press bed)
-    s += R_(cx-126, 26, 16, dTop - 26, P.coal, 0) + R_(cx+110, 26, 16, dTop - 26, P.coal, 0);
-    s += R_(cx-140, 18, 280, 24, P.red);
+    s += R_(cx-126, 36, 16, dTop - 36, P.coal, 0) + R_(cx+110, 36, 16, dTop - 36, P.coal, 0);
+    s += R_(cx-140, 28, 280, 24, P.red);
     const platY = dTop - 34 - 20;           // platen sits on a 34px brick
-    s += R_(cx-9, 6, 18, platY - 4, P.paper, 2.6);
-    for (let y = 50; y < platY - 8; y += 8) s += Ln(cx-9, y, cx+9, y + 5, 2.2);
-    s += R_(cx-76, 0, 152, 10, P.coal, 0) + C_(cx-82, 5, 10, P.yellow, 2.6) + C_(cx+82, 5, 10, P.yellow, 2.6);
+    s += R_(cx-9, 16, 18, platY - 14, P.paper, 2.6);
+    for (let y = 60; y < platY - 8; y += 8) s += Ln(cx-9, y, cx+9, y + 5, 2.2);
+    s += R_(cx-76, 10, 152, 10, P.coal, 0) + C_(cx-82, 15, 10, P.yellow, 2.6) + C_(cx+82, 15, 10, P.yellow, 2.6);
     s += R_(cx-96, platY, 192, 18, P.yellow);
     // the brick: the same stripes, squeezed thin
     const bw = 96, bh = 34, bx = cx - bw/2, by = dTop - bh;
@@ -986,7 +986,6 @@ const EMBLEM = {
     const W0 = g*c;
     const pic = `<rect width="${W0}" height="${W0}" fill="${P.paper}"/>
       <circle cx="${W0*0.68}" cy="${W0*0.3}" r="${W0*0.19}" fill="${P.red}"/>
-      <path d="M${W0*0.06} ${W0*0.16}l${W0*0.05} ${W0*0.04}l${W0*0.05} -${W0*0.04}M${W0*0.2} ${W0*0.26}l${W0*0.04} ${W0*0.03}l${W0*0.04} -${W0*0.03}" fill="none" stroke="${P.coal}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
       <path d="M${-10} ${W0*0.86}L${W0*0.34} ${W0*0.38}L${W0*0.72} ${W0*0.86}Z" fill="${P.green}"/>
       <path d="M${W0*0.44} ${W0*0.86}L${W0*0.76} ${W0*0.5}L${W0*1.1} ${W0*0.86}Z" fill="${P.blue}"/>
       <rect y="${W0*0.8}" width="${W0}" height="${W0*0.2}" fill="${P.yellow}"/>`;
@@ -1019,9 +1018,9 @@ const EMBLEM = {
       s += arrowHead(x + Math.cos(a + Math.PI/2)*9, y + Math.sin(a + Math.PI/2)*9, a + Math.PI/2, 22);
     });
     // barge-in gate (voice activity detection) just before the mic
-    const ga = 160*Math.PI/180, gx = cx + R*Math.cos(ga), gy = cy + R*Math.sin(ga);
-    s += `<g transform="translate(${F(gx)} ${F(gy)}) rotate(${160})"><rect x="-17" y="-7" width="34" height="14" fill="${P.red}" stroke="${P.coal}" stroke-width="2.6"/></g>`;
-    s += tagT(gx - 26, gy + 34, 'BARGE-IN', 'end', 12);
+    const ga = 138*Math.PI/180, gx = cx + R*Math.cos(ga), gy = cy + R*Math.sin(ga);
+    s += `<g transform="translate(${F(gx)} ${F(gy)}) rotate(${138})"><rect x="-17" y="-7" width="34" height="14" fill="${P.red}" stroke="${P.coal}" stroke-width="2.6"/></g>`;
+    s += tagT(gx - 24, gy + 22, 'BARGE-IN', 'end', 12);
     // listen: the mic at 9 o'clock
     const mx = cx - R, my = cy;
     s += `<rect x="${mx - 17}" y="${my - 30}" width="34" height="52" rx="17" fill="${P.paper}" stroke="${P.coal}" stroke-width="${K}"/>`;
@@ -1073,7 +1072,7 @@ const EMBLEM = {
   tiledMatmul(pw, ph){
     let s = '';
     const n = 4, c = 25, M = n*c, gap = 20;
-    const bx = pw/2 - (2*M + gap)/2 + M + gap + 8, by = ph/2 - (2*M + gap)/2 + 2;
+    const bx = pw/2 - (2*M + gap)/2 + M + gap - 8, by = ph/2 - (2*M + gap)/2 + 2;
     const ax = bx - M - gap, cy = by + M + gap;
     const grid = (x, y, on, fill) => {
       let g = R_(x, y, M, M, P.paper);
@@ -1177,14 +1176,14 @@ const EMBLEM = {
     s += R_(dx - 10, dy - 14, dw + 20, 18, P.coal, 0);
     for (let i=0;i<n;i++) {
       const x = dx + 14 + i*(cw+cg), up = top3.includes(i);
-      const y = up ? dy - 128 : dy - 42;
+      const y = up ? dy - 112 : dy - 42;
       s += R_(x, y, cw, dy + 20 - y, P.paper, 2.4);
       if (up) { s += R_(x - 4, y - 14, cw + 8, 16, P.red, 2.4); for (let k=0;k<4;k++) s += Ln(x + 3, y + 12 + k*9, x + cw - 3, y + 12 + k*9, 1.8); }
     }
     s += R_(dx, dy, dw, dh, P.yellow);
     s += R_(dx + dw/2 - 34, dy + 16, 68, 26, P.paper, 2.6) + Ln(dx + dw/2 - 22, dy + 29, dx + dw/2 + 20, dy + 29, 2.6);
     s += `<path d="M${dx + dw/2 - 20} ${dy + 62}v-8h40v8" fill="none" stroke="${P.coal}" stroke-width="5"/>`;
-    s += tagT(dx + dw + 16, dy - 96, 'TOP 3', 'start', 13);
+    s += tagT(dx + dw + 16, dy - 84, 'TOP 3', 'start', 13);
     return {svg:s, center:[dx + dw/2, dy - 40], rays:44};
   },
 
@@ -1193,28 +1192,27 @@ const EMBLEM = {
   armWorld(pw, ph){
     let s = '';
     const ty = ph - 36;
-    s += R_(70, ty, pw - 120, 12, P.coal, 0);
-    const bxw = 34, bx0 = 318, by0 = ty - bxw;
+    s += R_(44, ty, pw - 88, 12, P.coal, 0);
+    const bw = 34, bx0 = 196, by0 = ty - bw;
     const grip = (x, y, dashed) => {
-      const st = dashed ? `fill="none" stroke="${P.coal}" stroke-width="3" stroke-dasharray="6 4"` : `fill="${P.coal}"`;
-      return `<path d="M${x - 24} ${y - 14}H${x + 24 + bxw}V${y - 4}H${x + 24 + bxw - 8}V${y + 22}H${x + 24 + bxw - 16}V${y - 4}H${x - 16}V${y + 22}H${x - 24}Z" ${st}/>`;
+      const st = dashed ? `fill="none" stroke="${P.coal}" stroke-width="3" stroke-dasharray="6 4" stroke-linejoin="round"` : `fill="${P.coal}"`;
+      return `<path d="M${x - 24} ${y - 14}H${x + 24 + bw}V${y - 4}H${x + 24 + bw - 8}V${y + 22}H${x + 24 + bw - 16}V${y - 4}H${x - 16}V${y + 22}H${x - 24}Z" ${st}/>`;
     };
-    // rollout: t+1, t+2, t+3 — the predicted lift, outline only
-    const roll = [[bx0 + 10, by0 - 50], [bx0 + 22, by0 - 96], [bx0 + 34, by0 - 142]];
-    roll.forEach(([x, y]) => {
-      s += `<rect x="${x}" y="${y}" width="${bxw}" height="${bxw}" fill="none" stroke="${P.coal}" stroke-width="3" stroke-dasharray="6 4"/>` + grip(x - 8 + 8, y, true);
+    // rollout t+1, t+2, t+3: where block and gripper are predicted to go, outline only
+    [[-52, -50], [-104, -100], [-156, -150]].forEach(([ox, oy]) => {
+      s += `<rect x="${bx0 + ox}" y="${by0 + oy}" width="${bw}" height="${bw}" fill="none" stroke="${P.coal}" stroke-width="3" stroke-dasharray="6 4"/>` + grip(bx0 + ox, by0 + oy, true);
     });
-    s += tagT(bx0 + 116, by0 - 96, 'PREDICTED', 'start', 12);
-    // the arm
-    const Sx = 150, Sy = ty - 36, Ex = 214, Ey = 64, Wx = bx0 + bxw/2, Wy = by0 - 30;
+    s += tagT(bx0 - 156 + bw + 38, by0 - 150 + 6, 'PREDICTED', 'start', 12);
+    // the arm, from a base on the right
+    const Sx = 390, Sy = ty - 36, Ex = 326, Ey = 58, Wx = bx0 + bw/2, Wy = by0 - 30;
     s += `<path d="M${Sx} ${Sy}L${Ex} ${Ey}L${Wx} ${Wy}" fill="none" stroke="${P.coal}" stroke-width="28" stroke-linejoin="round" stroke-linecap="round"/>`;
     s += `<path d="M${Sx} ${Sy}L${Ex} ${Ey}L${Wx} ${Wy}" fill="none" stroke="${P.yellow}" stroke-width="20" stroke-linejoin="round" stroke-linecap="round"/>`;
     s += C_(Ex, Ey, 12, P.paper) + Ln(Wx, Wy, Wx, by0 - 14, 8);
-    s += R_(bx0, by0, bxw, bxw, P.red);
+    s += R_(bx0, by0, bw, bw, P.red);
     s += grip(bx0, by0, false);
     s += `<path d="M${Sx-36} ${ty}L${Sx-24} ${Sy+10}H${Sx+24}L${Sx+36} ${ty}Z" fill="${P.coal}"/>` + C_(Sx, Sy, 15, P.red);
-    s += tagT(Sx - 2, ty + 1, 'PICK UP THE RED BLOCK', 'middle', 11);
-    return {svg:s, center:[Wx, Wy + 10], rays:44};
+    s += tagT(Sx - 6, ty + 1, 'PICK UP THE RED BLOCK', 'middle', 11);
+    return {svg:s, center:[Wx - 40, Wy - 20], rays:44};
   },
 };
 

@@ -80,7 +80,7 @@ The pips carry the level by themselves in greyscale and on the Cocoa sub-series,
 ## Emblems — how each was derived
 - **VZ-001 AI Context Engineering.** A token budget. The context window is one socket on a 0–128K ruler, and each part is a bar whose length stands for its tokens (DOCS, HISTORY, SYSTEM, MEMORY, TOOLS, USER). Together they overrun the socket about 1.5×, so choosing what goes in is the discipline.
 - **VZ-002 Mathematical Foundations for ML.** An "alphabet sprue" of the notation: Σ ∫ ∂ ∇ π λ θ √, a matrix, e, ∞ and μ, numbered 1–12.
-- **VZ-003 Neural Networks from Scratch.** A 3-4-4-2 multilayer perceptron where every weight is a runner, so plastic reaches each neuron along its incoming weights. Nodes are labelled x₁–x₃, h⁽¹⁾, h⁽²⁾ (layer superscripts) and ŷ₁–ŷ₂.
+- **VZ-003 Neural Networks from Scratch.** A 3-4-4-2 multilayer perceptron where every weight is a runner, so plastic reaches each neuron along its incoming weights. Nodes are labelled x₁–x₃, h¹₁–h¹₄ and h²₁–h²₄ (layer superscript over unit subscript), and ŷ₁–ŷ₂.
 - **VZ-004 Build LLMs from Scratch.** 20 capsules, 20 parts:
   - a 6×6 causal attention mask;
   - a token-embedding plate with one column per position, on the same pitch as the mask;
@@ -141,7 +141,7 @@ I checked every claim against the renders and PDFs before changing anything. **A
 7. **Yellow on Grey Primer.** Confirmed at Δ19. Fixed as a system rule (the contrast floor), not a one-off. The yellow is now 35 from the card with a 4 px dark keyline.
 8. **5D.** The plates now sit on clear runner. Leaf pairs were widened to 88 px, and the rows are paired so PP and EP have room. Ranks are numbered in leaf order.
 9. **K₆/V₆.** Now hollow, pending along with the '?'.
-10. **NN labels.** Now h⁽¹⁾ and h⁽²⁾ as stacked super- and subscripts. They read cleanly at 22 px.
+10. **NN labels.** Now h¹ᵢ and h²ᵢ, with the layer as a stacked superscript over the unit subscript. They read cleanly at 22 px.
 11. **Test-shot stamp.** It now deliberately overprints the frame's top-right corner and is layered above the sprue. The position is written into the spec.
 12. **Corrupt `_sheet.png`.** Deleted. The page is captured in sections at 1× (`_page-*.png`) instead.
 
