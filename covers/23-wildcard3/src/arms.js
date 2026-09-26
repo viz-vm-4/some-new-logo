@@ -324,7 +324,7 @@ ARMS['kernel-engineering'] = () => {
   let g = '';
   for (let c = 1; c < 5; c++) g += `M${c * cw} 0V480`;
   for (let r = 1; r < 6; r++) g += `M0 ${r * cw}H400`;
-  return `<path d="${g}" stroke="currentColor" stroke-width="2" fill="none" stroke-dasharray="7 7"/>` +
+  return `<path d="${g}" stroke="currentColor" stroke-width="2" fill="none"/>` +
     `<path d="M-10 160H410V240H-10ZM240 -10V490H320V-10Z" stroke="currentColor" stroke-width="5" fill="none"/>` +
     `<rect x="240" y="160" width="80" height="80" fill="none" stroke="currentColor" stroke-width="5"/>`;
 };

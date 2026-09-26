@@ -24,7 +24,7 @@ function trickSVG(b, suffix = '', w = 400, cls = 'arms') {
   const lab = (x, y, t) => `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" fill="${ink}">${t}</text>`;
   const inner = `<g style="color:${ink}">${ARMS[b.slug]()}</g>` +
     lab(40, 40, 'sa') + lab(360, 120, 'sa') + lab(120, 360, 'sa') + lab(200, 440, 'sa') +
-    lab(120, 200, 'or') + lab(360, 200, 'or') + lab(280, 80, 'or') + lab(280, 360, 'or') + lab(280, 200, 'gu');
+    lab(120, 200, 'or') + lab(360, 200, 'or') + lab(280, 40, 'or') + lab(280, 360, 'or') + lab(280, 200, 'gu');
   return `<svg class="${cls} trick" viewBox="0 0 400 480" width="${w}" height="${n(w * 1.2)}" overflow="visible" aria-hidden="true">` +
     `<clipPath id="${id}"><path d="${SHIELD}"/></clipPath><g clip-path="url(#${id})">${inner}</g>` +
     `<path d="${SHIELD_IN}" fill="none" stroke="${ink}" stroke-width="6"/></svg>`;
@@ -117,6 +117,8 @@ function buildOrdinary() {
     ['Quartering', 'work shared out: parallelism', fieldRect(T.or) + poly([[200, -10], [410, -10], [410, 240], [200, 240]], T.sable) + poly([[-10, 240], [200, 240], [200, 500], [-10, 500]], T.sable)],
     ['Impalement', 'a join', fieldRect(T.azure) + poly([[200, -10], [410, -10], [410, 500], [200, 500]], T.argent)],
     ['Pallets couped', 'a waveform; a voice', fieldRect(T.azure) + [70, 150, 230, 150, 90].map((h, i) => `<rect x="${86 + i * 50}" y="${220 - h / 2}" width="30" height="${h}" rx="15" fill="${T.argent}" stroke="${S}" stroke-width="3"/>`).join('')],
+    ['Chief sawtoothed', 'the Intelligence Factory (its north-light roof)', fieldRect(T.purpure) + factoryChief(T.or)],
+    ['Chevron reversed', 'Vizuara: the builder’s rafters, turned into a V', fieldRect(T.sable) + '<path d="M40 -10H150L200 190L250 -10H360L230 330H170Z" fill="' + T.or + '" stroke="' + S + '" stroke-width="3"/>'],
     ['Dancetty, embattled, wavy…', 'lines of partition: one kind of cut each', (() => { const d = [below(160, 'embattled', { p: 80, a: 30, origin: 0 }), below(320, 'wavy', { p: 100, a: 36, origin: 0 })].map(pathOf).join(''); return fieldRect(T.or) + `<path d="${d}" fill="${T.sable}" fill-rule="evenodd" stroke="${S}" stroke-width="3"/>`; })()],
   ];
   document.getElementById('ordinary').innerHTML = items.map(([name, m, inner], i) =>
@@ -156,7 +158,7 @@ function hatchDefs() {
 
 function buildWrap() {
   const b = ROLL.find((x) => x.slug === 'build-llms-from-scratch');
-  const spineW = 58;
+  const spineW = 48;
   const others = ROLL.filter((x) => !x.series && !x.soon && x.slug !== b.slug).slice(0, 10);
   const back = `
     <div class="back cover ${b.level}" style="width:720px">
@@ -178,9 +180,9 @@ function buildWrap() {
     </div>`;
   const spine = `
     <div class="spine" style="width:${spineW}px;background:${T.or}">
-      <div class="sp-arms">${armsFor(b, '-sp', 38, 'mini')}</div>
+      <div class="sp-arms">${armsFor(b, '-sp', 32, 'mini')}</div>
       <div class="sp-title">Build Large Language Models (LLMs) from Scratch</div>
-      <div class="sp-mark">${imprintMark(T.sable, T.or, 30)}</div>
+      <div class="sp-mark">${imprintMark(T.sable, T.or, 26)}</div>
     </div>`;
   const front = `<div class="front cover ${b.level}">${coverInner(b, '-wrap')}</div>`;
   document.getElementById('wrap').innerHTML = back + spine + front;

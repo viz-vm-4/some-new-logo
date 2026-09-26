@@ -476,20 +476,18 @@ const DEVICES = {
   /* I. Language — inference engineering as continuous batching: six request lanes; each request is a
      wide prefill bar followed by its decode steps, and a new request slots into a lane the moment one finishes. */
   lang(c){
-    const r = rng(1107); let s = ''; const x0 = -98, x1 = 98, lh = 15, q = 10.5, g = 3.5;
+    const r = rng(1107); let s = ''; const x0 = -96, x1 = 96, lh = 16, q = 10, g = 3.6;
     for (let i = 0; i < 6; i++){
-      const y = -76 + i*37; let x = x0 - r()*40, first = true;
-      while (x < x1){
-        const pw = 20 + Math.round(r()*30), nd = 2 + Math.floor(r()*5);
-        const bars = [];
-        if (!first || x >= x0) bars.push(['p', x, pw]);
-        let xx = x + pw + 3; for (let k = 0; k < nd; k++){ bars.push(['d', xx, q]); xx += q + g; }
-        for (const [t, bx, bw] of bars){
-          const a = Math.max(bx, x0), b = Math.min(bx + bw, x1); if (b - a < 3) continue;
-          s += t === 'p' ? `<rect x="${f(a)}" y="${f(y - lh/2)}" width="${f(b-a)}" height="${lh}" fill="${WHT}"/>`
-                         : `<rect x="${f(a)}" y="${f(y - q/2)}" width="${f(b-a)}" height="${q}" fill="${WHT}"/>`; }
-        x = xx + 6; first = false; } }
-    s += `<path d="M${x0-8} -98V142" stroke="${WHT}" stroke-width="2"/>`;
+      const y = -74 + i*37; let x = x0;
+      // each lane opens mid-flight: the tail of a request already decoding, flush with the lane start
+      let tail = 1 + Math.floor(r()*4);
+      for (let k = 0; k < tail && x < x1; k++){ s += `<rect x="${f(x)}" y="${f(y - q/2)}" width="${f(Math.min(q, x1 - x))}" height="${q}" fill="${WHT}"/>`; x += q + g; }
+      x += 5;
+      while (x < x1 - 4){
+        const pw = 22 + Math.round(r()*26), nd = 2 + Math.floor(r()*5);
+        s += `<rect x="${f(x)}" y="${f(y - lh/2)}" width="${f(Math.min(pw, x1 - x))}" height="${lh}" fill="${WHT}"/>`; x += pw + 3.6;
+        for (let k = 0; k < nd && x < x1 - 3; k++){ s += `<rect x="${f(x)}" y="${f(y - q/2)}" width="${f(Math.min(q, x1 - x))}" height="${q}" fill="${WHT}"/>`; x += q + g; }
+        x += 5; } }
     return s;
   },
   /* II. Vision — an eye whose iris is cut into ViT patches. */
@@ -543,7 +541,8 @@ const DEVICES = {
       return `<clipPath id="${c.id}${id}"><rect x="${x}" y="${y}" width="${w}" height="${h}"/></clipPath><path d="${d}" stroke="${WHT}" stroke-width="2" clip-path="url(#${c.id}${id})"/>`; };
     s += hatch(A0, C0 + i0*t, ks, t, 'ha') + hatch(C0 + j0*t, A0, t, ks, 'hb');
     s += `<path d="M${A0} ${C0 + i0*t}h${ks}v${t}h-${ks}ZM${C0 + j0*t} ${A0}h${t}v${ks}h-${t}Z" fill="none" stroke="${WHT}" stroke-width="3"/>`;
-    s += `<path d="M${C0} ${C0}h${cs}v${cs}h-${cs}ZM${A0} ${C0}h${ks}v${cs}h-${ks}ZM${C0} ${A0}h${cs}v${ks}h-${cs}Z" fill="none" stroke="${WHT}" stroke-width="4.5"/>`;
+    s += `<path d="M${A0} ${C0}h${ks}v${cs}h-${ks}ZM${C0} ${A0}h${cs}v${ks}h-${cs}Z" fill="none" stroke="${WHT}" stroke-width="4.5"/>`;
+    s += `<path d="M${C0} ${C0}h${cs}v${cs}h-${cs}Z" fill="none" stroke="__A__" stroke-width="4.5"/>`;
     s += `<rect x="${C0 + j0*t + 3}" y="${C0 + i0*t + 3}" width="${t - 6}" height="${t - 6}" fill="__A__"/>`;
     return s;
   },
@@ -1034,7 +1033,7 @@ function renderCovers(){
   let html = '';
   for (const b of BOOKS){
     html += `<figure><div class="cover" data-slug="${b.slug}">${buildCover(b, 'c' + hash(b.slug).toString(36) + '-')}</div>
-      <figcaption><span><b>${b.title}</b><br>${b.level} · ${BINDING[b.level].name}${b.forthcoming ? ' · forthcoming: device blind until publication, output tile foiled' : ''}</span><span style="text-align:right">${CLOTH[b.cloth].name} cloth · ${FAMILY[CLOTH[b.cloth].fam].toLowerCase()}<br>${FOILS[b.foil].name} foil · ${b.series ? 'arch device (series)' : 'roundel device'}</span></figcaption></figure>`;
+      <figcaption><span><b>${b.title}</b><br>${b.level} · ${BINDING[b.level].name}${b.forthcoming ? ' · forthcoming: device blind, only C and its output tile foiled' : ''}</span><span style="text-align:right">${CLOTH[b.cloth].name} cloth · ${FAMILY[CLOTH[b.cloth].fam].toLowerCase()}<br>${FOILS[b.foil].name} foil · ${b.series ? 'arch device (series)' : 'roundel device'}</span></figcaption></figure>`;
   }
   document.getElementById('covers').innerHTML = html;
   const wb = BOOKS.find(x => x.slug === WRAP_BOOK);

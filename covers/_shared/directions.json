@@ -82,5 +82,9 @@
   "15-jantar": {
     "name": "Jantar",
     "pitch": "Each book gets one monumental instrument in the spirit of Jai Singh's observatories at Jaipur and Delhi, built from the book's subject and drawn in axonometric under one hard sun with true cast shadows: red sandstone, marble edging, a stepwell cut open in section as the plinth. The Jai Prakash bowl is Transformers; Chand Baori's stepwell, cut open, is Neural Networks. Level is the time of day: limewash morning, ochre noon, indigo evening."
+  },
+  "18-sculpture": {
+    "name": "Maquette",
+    "pitch": "Every book is one sculpted object, made in code and photographed on seamless paper under a museum-catalogue title. Each form embodies the subject: 5D Parallelism is a Carrara-marble rhombic icosahedron (the real 3D shadow of a five-dimensional cube), AI Context Engineering a travertine window packed block by block. A gallery label gives material and “dimensions” in capsules × hours. Level is lighting: high-key chalk, mid-key stone, low-key soot. Ray-marched live in WebGL2 and printed at 300 dpi."
   }
 }
