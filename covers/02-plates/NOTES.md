@@ -40,14 +40,26 @@ imprint, series line) is in 11px capitals letterspaced 0.24em at `opsz` 8.
 ## Level
 Level is carried twice. The paper colour (sage, blue, sanguine) reads across a shelf or a
 thumbnail grid. A micrograph-style scale bar, top right beside the level word, has one, two or
-three filled segments.
+three filled segments, separated by clear gaps so they can be counted in greyscale.
 
 ## System anatomy
-Plate number (catalogue order in roman numerals) top left · level + scale bar top right · title
+Plate number (permanent and append-only, in roman numerals; a new title takes the next free
+numeral and nothing is ever renumbered) top left · level + scale bar top right · title
 top left, hand-broken, with italic subtitle and an optional series line above · the specimen,
 lettered · rule + legend · imprint (V-in-a-lens mark: two converging rays, *viz*, to see) and
 capsules/hours at the foot. Coming-soon titles say *In preparation* instead of capsules and
-hours. The **Charlie and the Intelligence Factory** sub-series adds a series line above the title
+hours.
+
+Rules the page enforces at build time, logged as `[plates]` errors and outlined in red:
+- A legend never runs past two lines. It is anchored to the foot and grows upward under its rule,
+  and every lettered key is bound to its first word (and an article after it) with no-break spaces.
+- Titles come in two sizes only: 64px, and 56px for long titles and the Charlie sub-series.
+- A title line never overflows the measure and never ends on a binding preposition (for, of, to,
+  with, from). The series formula "Charlie and the / X Room" is an accepted exception.
+- Spheres are for physical things (a unit, a device, flyballs, knobs). Tokens, tree nodes and
+  graph vertices are flat engraved roundels, as a plate would letter them.
+- Text halos are a ground-coloured copy of the text laid underneath, not `paint-order`, which
+  prints as solid blobs in Chrome's PDF output. The **Charlie and the Intelligence Factory** sub-series adds a series line above the title
 and makes each room a nineteenth-century machine.
 
 ## Emblems, one line each
@@ -69,23 +81,29 @@ and makes each room a nineteenth-century machine.
   pipeline, sequence and expert.
 - **VI · Pi vs Hermes vs Codex**: a three-armed logarithmic spiral. Each agent's history winds
   inward, older spans sealed into ever smaller chambers (compaction), with a white thread through
-  every chamber (memory). It is a structural comparison, not a claim about any agent's ratios.
+  every chamber (memory). All three arms share one cadence and one live span, so the figure
+  compares structure only. Each arm keeps its own engraving convention (continuous, dashed,
+  heavy) so it can be followed to the first turn, which is a clean roundel.
 - **XIV · Build Decision Trees from Scratch**: a binary tree pressed like a herbarium sheet, with
   split conditions at the nodes and leaves pale or dark by class. Fig. 2 is the same four splits
   partitioning the plane.
 - **XXXIV · Transformers**: one causal attention head as an arc diagram (arch width = softmax
-  weight, the last query in white). Fig. 2 is the same weights as a Hinton diagram.
-- **L · Harness Engineering** (coming soon): an armillary sphere with the model at the centre and
-  rings for the agent loop, tools and memory, held by the horizon (sandbox) and the frame
-  (permissions).
+  weight, the last query in white) over a row of token roundels. Fig. 2 is the same weights as a
+  Hinton diagram.
+- **L · Harness Engineering** (coming soon): Watt's centrifugal governor, the nineteenth-century
+  layer that turned a raw engine into a self-regulating machine. The engine shaft and pulley are
+  the model, the flyballs are the loop that observes and acts, the linkage to the throttle is the
+  tools, the stop collar is the permissions and the frame is the sandbox.
 - **XLVI · Charlie I, Language Room**: the paged KV cache as a card catalogue. Drawers are pages,
   each card is one token's K/V, some pages are free, and a ledger on top is the page table.
-- **XLVII · Charlie II, Vision Room**: a lens casts an image, the screen is cut 4 × 4, and the
-  patches are read off as a numbered sequence (ViT patch embedding as Victorian optics).
+- **XLVII · Charlie II, Vision Room**: a lens casts an inverted image on a square screen, cut
+  4 × 4 into square patches, which are read off as a numbered sequence (ViT patch embedding as
+  Victorian optics).
 - **XLVIII · Charlie III, Sound Room**: Scott's phonautograph (horn, membrane, stylus, sooted
   drum). Fig. 2 unrolls the trace and cuts it into frames.
-- **XLIX · Charlie IV, Reasoning Room**: a five-armed bandit whose winning reward distribution
-  sprouts a tree of reasoning steps, with the rewarded path in white.
+- **XLIX · Charlie IV, Reasoning Room**: a five-armed bandit. Each arm's reward distribution
+  stands as a violin on one ruled reward scale with its mean ticked. The arm with the highest mean
+  is pulled, and a tree of reasoning steps grows from that mean, with the rewarded path in white.
 
 ## Print notes
 Minimum ink line is 0.6px at trim (≈0.45pt) and minimum knocked-out line is 0.9px. Figure letters
@@ -105,3 +123,51 @@ vector at the exact 7.5 × 9.25in trim. The page also contains a full print wrap
 - Add a blind-embossed plate mark around the figure on the printed edition, and a matching
   spine system: plate numeral at the head, so the shelf reads I, II, III …
 - Use the catalogue on each back cover as a real series index, generated from `books.json`.
+
+## Review response
+I checked every claim against the renders and the code before acting. All six must-fix items were
+correct, and so was the coordinator's warning that `paint-order` halos print as blobs: the
+pdf.js preview of the old PDFs showed every label as a black smudge. That is now fixed for all
+covers.
+
+**Must fix, all done:**
+1. *Decision tree subscripts:* confirmed (the PDF embedded LiberationSerif-BoldItalic). They are
+   now set as Bodoni figures in a `<tspan>`, lowered and at 68%.
+2. *Math nabla:* confirmed (the PDF embedded DejaVuSans). The legend now reads "c one step down the
+   gradient", which is also plainer for a beginner book. All 13 PDFs now embed only BodoniModa
+   Regular and Italic.
+3. *Stranded keys:* fixed in the system, not per book. `bindKeys()` in faceHTML binds every key to
+   its first word (and a following article), and "Fig. 2." to what follows. The legend uses
+   `text-wrap: pretty`. All legends are two lines, and the build check confirms it.
+4. *Pi/Hermes/Codex spacing:* agreed. The per-arm numbers were arbitrary, so all three now share
+   one cadence and one live span.
+5. *Reasoning Room encoding:* agreed, it was a real error for an RL book. The distributions now
+   stand on one ruled reward scale with ticked means, the highest mean is visibly highest, and the
+   tree grows from that tick. The variances are now similar, so width no longer suggests "best".
+6. *Vision Room patches:* agreed. The screen is now a 200px square, so both the grid cells and the
+   Fig. 2 tiles are square. The lens moved so the image still fits, and the cell-by-cell match is
+   kept.
+
+**Improvements taken:**
+1. *Legend slot:* anchored from the foot with the rule on top, a two-line build check, and key
+   binding by default.
+2. *Permanent plate numbers:* a fixed `PLATE` map, append-only, plus C and XC in `toRoman`.
+4. *Harness:* replaced the armillary with Watt's governor. It is the better emblem: one
+   silhouette at 180px, and literally the device that made an engine an agent of its own
+   regulation.
+5. *Ration the sphere:* written into the rules above. Transformer tokens, decision-tree nodes and
+   reasoning-tree nodes are now flat roundels.
+6. *Apparatus:* the level bar's segments now have a clear 2px gap. Titles use two sizes (64 and 56).
+   "for" no longer ends a line: math is now *Mathematical / Foundations / for Machine Learning* at
+   64, and 5D is *5D Parallelism / for Large Model / Training* at 64.
+
+**Improvement declined:**
+3. *Nautilus shells for Pi vs Hermes vs Codex:* declined. The brief for this direction rules out
+   animals (that is O'Reilly's territory), and a sectioned nautilus is an animal, however exact its
+   siphuncle. I kept the triple spiral, which is mathematics, and fixed the faults the reviewer
+   named. The spacing is now equal, and the moiré vortex is gone: laminae thin out as channels
+   narrow and stop at a clean roundel for the first turn. The "vs" is now legible because each
+   arm keeps its own engraving convention all the way in.
+
+**Still open:** the Hermes arm's dashed convention is the busiest texture in the set. On a press
+proof I would test a stipple instead.

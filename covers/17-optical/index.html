@@ -222,7 +222,22 @@ function fNN(bk) {
     const seg = `M${L[l].x},${f1(a)}L${L[l + 1].x},${f1(b)}`;
     if ((l === 0 && ib === hot) || (l === 1 && ia === hot)) c += seg; else d += seg;
   }));
-  return svg(`<path d="${d}" stroke="${INK}" stroke-width="${f1(g / 8)}" fill="none"/>` +
+  // where a neuron's edges converge, fill the wedge between neighbouring edges until their gap
+  // reaches 1.2px: the node becomes a small solid star instead of a nest of sub-pixel slivers
+  const sw = g / 8; let fuse = '';
+  L.forEach((l, li) => ys(l.n).forEach(ny => {
+    for (const nb of [L[li - 1], L[li + 1]]) {
+      if (!nb) continue;
+      const ang = ys(nb.n).map(ty => Math.atan2(ty - ny, nb.x - l.x)).sort((a, b) => a - b);
+      const len = Math.abs(nb.x - l.x);
+      for (let i = 0; i < ang.length - 1; i++) {
+        const da = ang[i + 1] - ang[i], dd = Math.min((sw + 1.2) / (2 * Math.sin(da / 2)), len * 0.45);
+        const pt = a => `${f1(l.x + dd * Math.cos(a))},${f1(ny + dd * Math.sin(a))}`;
+        fuse += `M${l.x},${f1(ny)}L${pt(ang[i])}L${pt(ang[i + 1])}Z`;
+      }
+    }
+  }));
+  return svg(`<path d="${fuse}" fill="${INK}"/><path d="${d}" stroke="${INK}" stroke-width="${f1(g / 8)}" fill="none"/>` +
     `<path d="${c}" stroke="${bk.color}" stroke-width="${f1(g / 3.5)}" fill="none"/>`);
 }
 
@@ -311,7 +326,7 @@ function fCompaction(bk) {
   const ncAt = y => { const t1 = smooth(b1 - tw, b1 + tw, y), t2 = smooth(b2 - tw, b2 + tw, y); return bands[0].nc + (bands[1].nc - bands[0].nc) * t1 + (bands[2].nc - bands[1].nc) * t2; };
   const YS = range(-8, FH + 8, 3);
   const rows = YS.map(y => {
-    const nc = ncAt(y), sr = (744 - nc * sc) / (N - nc);
+    const nc = ncAt(y), T = (732 * (N - nc) - nc * sc) / (N - nc - 1), sr = (T - nc * sc) / (N - nc);
     const xs = [], sp = []; let x = -12;
     for (let j = 0; j < N; j++) { const s = sc + (sr - sc) / (1 + Math.exp(-(j - nc) / 1.1)); xs.push(x + s / 2); sp.push(s); x += s; }
     return {xs, sp, sr};

@@ -337,10 +337,10 @@ FIG.compaction = () => {
   let s='';
   const towers=[[2,'Pi','skkkk'],[6,'Hermes','kkskkk'],[10,'Codex','s']];
   towers.forEach(([c,lab,pat])=>{
-    const xl=X(c)-G/2, xr=X(c+1)+F+G/2, yt=Y(5)-G/2, yb=Y(14);
+    const xl=X(c)+2, xr=X(c+1)+F-2, yt=Y(5)+2, yb=Y(14);
     s+=PL([[xl,yb],[xl,yt],[xr,yt],[xr,yb]],4,'sk','stroke-linejoin="miter"');
-    [...pat].forEach((ch,k)=>s+=R(X(c),Y(13-k),2*P-G,F,ch==='s'?'fs':'fk'));
-    s+=T(X(c),Y(5)+16,lab);
+    [...pat].forEach((ch,k)=>s+=R(X(c)+10,Y(13-k),2*P-G-20,F,ch==='s'?'fs':'fk'));
+    s+=T(X(c)+12,Y(5)+26,lab);
   });
   return s;
 };
@@ -525,7 +525,7 @@ book({g:'core', slug:'mathematical-foundations-for-ml', level:'beginner', capsul
   note:'A matrix maps the unit circle (outline) to an ellipse (solid). Its eigenvectors only stretch: v₁ by λ₁ out past the circle, v₂ by λ₂ inside it — Av = λv, in red.'});
 book({g:'core', slug:'neural-networks-from-scratch', level:'beginner', capsules:33, hours:7, title:['Neural Networks','from Scratch'], fig:'neuron',
   note:'One neuron, the unit everything else is built from: nine inputs whose line weight is |w|, summed in one cell, bent by ReLU on the way out.'});
-book({g:'core', slug:'build-llms-from-scratch', level:'intermediate', capsules:20, hours:6, title:['Build','Large Language Models','(LLMs) from Scratch'], size:'m', fig:'attention',
+book({g:'core', slug:'build-llms-from-scratch', level:'intermediate', capsules:20, hours:6, title:['Build Large','Language Models','(LLMs) from Scratch'], size:'m', fig:'attention',
   note:'The causal self-attention matrix of a GPT. Square area is attention weight; the upper triangle is masked; the last row is the token being predicted.'});
 book({g:'core', slug:'5d-parallelism', level:'advanced', capsules:40, hours:9, title:['5D Parallelism for','Large Model Training'], size:'m', fig:'mesh',
   note:'Thirty-two GPUs, 2⁵: one binary split per axis. Each gap width is one axis of parallelism — TP, CP, DP across; EP, PP down. One rank in red.'});
@@ -542,7 +542,7 @@ book({g:'range', slug:'rag-in-production', level:'intermediate', capsules:42, ho
   note:'Thirty chunks as unit vectors. Retrieval ranks them by angle to the query (cosine similarity); the top four are drawn at full weight.'});
 book({g:'range', slug:'sciml', level:'advanced', capsules:39, hours:9, title:['Scientific','Machine Learning','(SciML)'], fig:'odefield',
   note:'The direction field of a damped oscillator, one stroke per module, and a single solution curve spiralling into equilibrium.'});
-book({g:'range', slug:'diffusion-lm-from-scratch', level:'advanced', capsules:35, hours:8, title:['Build a','Diffusion Language Model','from Scratch'], size:'m', fig:'unmask',
+book({g:'range', slug:'diffusion-lm-from-scratch', level:'advanced', capsules:35, hours:8, title:['Build a Diffusion','Language Model','from Scratch'], size:'m', fig:'unmask',
   note:'Rows are denoising steps, top row all [MASK]. Every step unmasks one or two tokens (red) scattered across the sentence — everywhere at once, not left to right.'});
 book({g:'range', slug:'vla-world-models', level:'advanced', capsules:42, hours:10, title:['Vision-Language-Action','& World Models','for Robotics'], size:'m', fig:'arm',
   note:'A kinematic schematic on the grid. Solid is the pose now; the outline is the pose the world model imagines reaching the target; the dots are the path it predicts for the gripper.'});

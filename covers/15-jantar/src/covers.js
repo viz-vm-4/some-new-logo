@@ -196,9 +196,9 @@
 
   // Jali screen — tiles of light (coming soon: upper rows still to be built)
   SCENES.jali = (hr) => {
-    const cam = CAM({ az: 0, s: 1, ox: 360 });
+    const cam = CAM({ az: 0, s: 0.94, ox: 372 });
     const S = new Scene(); ground(S, hr, cam); S.E = frame(cam, -10);
-    const nx = 7, nz = 8, hs = 38, bw = 12, t = 16, x0 = -190, y0 = 360, built = 5;
+    const nx = 7, nz = 7, hs = 38, bw = 12, t = 16, x0 = -190, y0 = 300, built = 5;
     const Wd = nx * hs + (nx + 1) * bw;
     for (let i = 0; i <= nx; i++) { const x = x0 + i * (hs + bw); S.box(x, y0, 0, x + bw, y0 + t, bw + built * (hs + bw), { mat: hr.stone }); }
     for (let i = 0; i < nx; i++) for (let k = 0; k <= built; k++) {
@@ -355,7 +355,7 @@
   // the section plane (the poché frame is the sub-series mark); the roof is pierced in a pattern
   // that belongs to the room, and the sun draws that pattern on the chamber's back wall.
   function roomScene(hr, o) {
-    const cam = CAM({ az: 0, s: 0.96, ox: 360, el: 16 });
+    const cam = CAM({ az: 0, s: 0.86, ox: 360, el: 16 });
     const S = new Scene(); S.E = frame(cam, 0); ground(S, hr, cam);
     const cm = cutOr(S, hr, hr.stone);
     const X = 176, T = 40, Y1 = 280, Hr = 420, R = Hr + 16;
@@ -430,7 +430,6 @@
     const L = sc.L || sunRel(sc.cam, hr.light[0], hr.light[1]);
     const art = render(sc.S, sc.cam, L);
     const extra = sc.extra ? sc.extra(sc.cam) : '';
-    console.log(b.slug, sc.S.faces.length, 'faces', Math.round(performance.now() - t0), 'ms');
     const el = document.createElement('div');
     el.className = 'cover lv-' + b.level; el.dataset.slug = b.slug;
     el.style.setProperty('--sky', hr.sky); el.style.setProperty('--ink', hr.ink); el.style.setProperty('--sub', hr.sub);

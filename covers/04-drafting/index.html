@@ -6,7 +6,7 @@
 <title>Drawing Office — Vizuara Books cover system</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wdth,wght@0,75..100,400..700;1,75..100,400..700&family=Overpass+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wdth,wght@0,75..100,400..700;1,75..100,400..700&family=Overpass+Mono:wght@400;500;600;700&family=Noto+Sans+Mono:wght@400..700&family=Noto+Sans+Math&display=swap" rel="stylesheet">
 <style>
 :root{
   --paper:#EBEAE4; --g:#1F2123; --g2:#474B4F; --g3:#8A8E91; --ink:#D0381B;
@@ -22,16 +22,18 @@ body{background:var(--table);color:var(--paper);font-family:'Instrument Sans',sy
 .tb{position:absolute;left:40px;top:576px;width:640px;height:272px;border-top:2.6px solid var(--g);
   display:grid;grid-template-rows:1fr 66px}
 .tb-title{position:relative;padding:12px 20px 14px 20px;display:flex;flex-direction:column;min-height:0}
-.lab{font:600 8.5px/1 'Overpass Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--g2)}
+.lab{font:600 8.5px/1 'Overpass Mono','Noto Sans Mono','Noto Sans Math',monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--g2)}
 .lab .ser{color:var(--g)}
 .title{font-family:'Instrument Sans',sans-serif;font-weight:600;font-variation-settings:'wdth' 88;
-  line-height:.97;letter-spacing:-.018em;margin:13px 0 0;color:var(--g);font-kerning:normal}
-.desc{margin-top:auto;padding-top:10px;font:400 15.5px/1.25 'Instrument Sans',sans-serif;
-  font-variation-settings:'wdth' 92;color:var(--g2)}
+  line-height:.97;letter-spacing:-.018em;margin:10px 0 0;color:var(--g);font-kerning:normal}
+.title .tl{white-space:nowrap}
+.desc{position:absolute;left:20px;right:20px;bottom:17px;font:400 15.5px/19px 'Instrument Sans',sans-serif;
+  font-variation-settings:'wdth' 92;color:var(--g2);white-space:nowrap;overflow:hidden}
 .tb-row{display:grid;grid-template-columns:84px 170px 86px 64px 102px 134px;border-top:1px solid var(--g)}
 .cell{border-left:1px solid var(--g);padding:10px 11px 11px;display:flex;flex-direction:column;justify-content:space-between;min-width:0}
 .cell:first-child{border-left:0;padding-left:20px}
-.val{font:600 13px/1 'Overpass Mono',monospace;color:var(--g);letter-spacing:.01em;white-space:nowrap}
+.val{font:600 13px/1 'Overpass Mono','Noto Sans Mono','Noto Sans Math',monospace;color:var(--g);letter-spacing:.01em;white-space:nowrap}
+.val sub{font-size:70%;vertical-align:-.3em;line-height:0}
 .lvv{display:flex;align-items:center;gap:8px}
 .lv{display:block;flex:none}
 .imprint{display:flex;align-items:center;gap:8px;font:700 13.5px/1 'Instrument Sans',sans-serif;
@@ -40,9 +42,9 @@ body{background:var(--table);color:var(--paper);font-family:'Instrument Sans',sy
 
 /* ─────────── presentation ─────────── */
 .page{max-width:1600px;margin:0 auto;padding:0 40px 120px}
-.mono{font-family:'Overpass Mono',monospace}
+.mono{font-family:'Overpass Mono','Noto Sans Mono','Noto Sans Math',monospace}
 .hero{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:64px;align-items:end;padding:72px 0 48px;border-bottom:2px solid #55585B}
-.eyebrow{font:600 12px/16px 'Overpass Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:#A9AAA4}
+.eyebrow{font:600 12px/16px 'Overpass Mono','Noto Sans Mono','Noto Sans Math',monospace;letter-spacing:.16em;text-transform:uppercase;color:#A9AAA4}
 .eyebrow b{color:var(--ink);font-weight:700}
 .hero h1{font:600 132px/120px 'Instrument Sans',sans-serif;font-variation-settings:'wdth' 88;letter-spacing:-.035em;margin:18px 0 26px;color:var(--paper)}
 .lede{font:500 27px/36px 'Instrument Sans',sans-serif;font-variation-settings:'wdth' 92;color:var(--paper);max-width:860px;margin:0 0 20px}
@@ -51,33 +53,33 @@ body{background:var(--table);color:var(--paper);font-family:'Instrument Sans',sy
 .lockup{background:var(--paper);color:var(--g);padding:28px 28px 22px;position:relative}
 .lockup .lk{display:flex;align-items:center;gap:18px}
 .lockup .wm{font:700 34px/34px 'Instrument Sans',sans-serif;letter-spacing:.2em;text-transform:uppercase}
-.lockup .wm small{display:block;font:600 11px/14px 'Overpass Mono',monospace;letter-spacing:.2em;margin-top:8px;color:var(--g2)}
+.lockup .wm small{display:block;font:600 11px/14px 'Overpass Mono','Noto Sans Mono','Noto Sans Math',monospace;letter-spacing:.2em;margin-top:8px;color:var(--g2)}
 .lockup p{font:400 14px/21px 'Instrument Sans',sans-serif;color:var(--g2);margin:22px 0 0;border-top:1px solid var(--g);padding-top:14px}
-.lockup .tag{position:absolute;right:12px;top:10px;font:600 9px/12px 'Overpass Mono',monospace;letter-spacing:.14em;color:var(--g2)}
+.lockup .tag{position:absolute;right:12px;top:10px;font:600 9px/12px 'Overpass Mono','Noto Sans Mono','Noto Sans Math',monospace;letter-spacing:.14em;color:var(--g2)}
 .spec{display:grid;grid-template-columns:1.15fr 1fr 1fr 1.1fr;gap:0;border-bottom:2px solid #55585B}
 .spec > div{padding:28px 28px 32px 0;border-right:1px solid #45484B}
 .spec > div + div{padding-left:28px}
 .spec > div:last-child{border-right:0}
-.spec h3{font:700 11px/14px 'Overpass Mono',monospace;letter-spacing:.18em;text-transform:uppercase;color:#A9AAA4;margin:0 0 18px}
+.spec h3{font:700 11px/14px 'Overpass Mono','Noto Sans Mono','Noto Sans Math',monospace;letter-spacing:.18em;text-transform:uppercase;color:#A9AAA4;margin:0 0 18px}
 .sw{display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:center;margin-bottom:12px}
 .sw i{display:block;width:44px;height:30px;border:1px solid #6A6D70}
 .sw span{font:500 13px/18px 'Instrument Sans',sans-serif;color:#D9DAD4}
-.sw code{font:600 12px/16px 'Overpass Mono',monospace;color:var(--paper);display:block}
+.sw code{font:600 12px/16px 'Overpass Mono','Noto Sans Mono','Noto Sans Math',monospace;color:var(--paper);display:block}
 .ty{margin-bottom:18px}
 .ty .a{font:600 40px/40px 'Instrument Sans',sans-serif;font-variation-settings:'wdth' 88;letter-spacing:-.02em;color:var(--paper)}
-.ty .b{font:600 17px/22px 'Overpass Mono',monospace;letter-spacing:.06em;color:var(--paper)}
+.ty .b{font:600 17px/22px 'Overpass Mono','Noto Sans Mono','Noto Sans Math',monospace;letter-spacing:.06em;color:var(--paper)}
 .ty small{display:block;font:500 12.5px/18px 'Instrument Sans',sans-serif;color:#A9AAA4;margin-top:6px}
-.lvrow{display:flex;align-items:center;gap:12px;margin-bottom:12px;font:600 14px/18px 'Overpass Mono',monospace;color:var(--paper)}
+.lvrow{display:flex;align-items:center;gap:12px;margin-bottom:12px;font:600 14px/18px 'Overpass Mono','Noto Sans Mono','Noto Sans Math',monospace;color:var(--paper)}
 .lvrow .lvb{background:var(--paper);padding:5px 6px 3px;display:inline-flex}
 .spec p{font:400 13.5px/20px 'Instrument Sans',sans-serif;color:#B9BAB4;margin:14px 0 0}
 .lines{background:var(--paper);padding:10px 12px}
 .lines svg{display:block}
 .reg{margin:56px 0 0}
-.reg > h2,.grp > h2{font:700 12px/16px 'Overpass Mono',monospace;letter-spacing:.18em;text-transform:uppercase;color:#A9AAA4;margin:0 0 14px}
+.reg > h2,.grp > h2{font:700 12px/16px 'Overpass Mono','Noto Sans Mono','Noto Sans Math',monospace;letter-spacing:.18em;text-transform:uppercase;color:#A9AAA4;margin:0 0 14px}
 .reg table{width:100%;border-collapse:collapse;font:400 14px/20px 'Instrument Sans',sans-serif;color:#D9DAD4}
-.reg th{font:600 10px/14px 'Overpass Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#A9AAA4;text-align:left;padding:8px 14px 8px 0;border-bottom:1px solid #6A6D70}
+.reg th{font:600 10px/14px 'Overpass Mono','Noto Sans Mono','Noto Sans Math',monospace;letter-spacing:.14em;text-transform:uppercase;color:#A9AAA4;text-align:left;padding:8px 14px 8px 0;border-bottom:1px solid #6A6D70}
 .reg td{padding:9px 14px 9px 0;border-bottom:1px solid #3E4144;vertical-align:top}
-.reg td.no{font:600 13px/20px 'Overpass Mono',monospace;color:var(--paper);white-space:nowrap}
+.reg td.no{font:600 13px/20px 'Overpass Mono','Noto Sans Mono','Noto Sans Math',monospace;color:var(--paper);white-space:nowrap}
 .reg td.t{color:var(--paper);font-weight:600;width:30%}
 .reg td.lvl{white-space:nowrap}
 .reg td.lvl svg{display:inline-block;vertical-align:-2px;margin-right:8px;background:var(--paper);padding:2px;box-sizing:content-box}
@@ -86,7 +88,7 @@ body{background:var(--table);color:var(--paper);font-family:'Instrument Sans',sy
 .grp .note{font:400 16px/24px 'Instrument Sans',sans-serif;color:#C9CAC4;max-width:900px;margin:-4px 0 26px}
 .sheets{display:flex;flex-wrap:wrap;gap:48px 40px}
 .sheets figure{margin:0;width:720px}
-.sheets figcaption{font:500 12px/20px 'Overpass Mono',monospace;height:20px;color:#A9AAA4;margin-top:12px;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sheets figcaption{font:500 12px/20px 'Overpass Mono','Noto Sans Mono','Noto Sans Math',monospace;height:20px;color:#A9AAA4;margin-top:12px;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .wrapbox{overflow-x:auto;padding-bottom:6px}
 .wrap{position:relative;width:1488px;height:888px;display:flex;flex:none;background:var(--paper)}
 .wrap .back,.wrap .spine{position:relative;height:888px;flex:none;color:var(--g)}
@@ -96,9 +98,9 @@ body{background:var(--table);color:var(--paper);font-family:'Instrument Sans',sy
 .back .notes ol{margin:14px 0 0;padding:0;list-style:none;counter-reset:n}
 .back .notes li{counter-increment:n;display:grid;grid-template-columns:30px 1fr;font:400 17px/25px 'Instrument Sans',sans-serif;color:var(--g);margin-bottom:10px}
 .back .notes li:first-child{font:600 26px/31px 'Instrument Sans',sans-serif;font-variation-settings:'wdth' 90;letter-spacing:-.01em;margin-bottom:16px}
-.back .notes li::before{content:counter(n) '.';font:600 12px/25px 'Overpass Mono',monospace;color:var(--g2)}
+.back .notes li::before{content:counter(n) '.';font:600 12px/25px 'Overpass Mono','Noto Sans Mono','Noto Sans Math',monospace;color:var(--g2)}
 .back .notes li:first-child::before{line-height:31px}
-footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:500 12px/18px 'Overpass Mono',monospace;color:#8E908B;letter-spacing:.04em}
+footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:500 12px/18px 'Overpass Mono','Noto Sans Mono','Noto Sans Math',monospace;color:#8E908B;letter-spacing:.04em}
 @media (max-width:1200px){.hero{grid-template-columns:1fr}.spec{grid-template-columns:1fr 1fr}.hero h1{font-size:96px;line-height:92px}}
 @media (max-width:800px){.page{padding:0 16px 80px}.spec{grid-template-columns:1fr}.spec > div{border-right:0;padding-left:0!important}.hero h1{font-size:64px;line-height:64px}}
 @media print{
@@ -182,7 +184,9 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
   };
   const K = 2.6, M = 1.6, T = 1.0;          // thick / medium / thin pen (px @ trim)
   const DASH = { center: '16 3 3 3', hidden: '6 3', phantom: '16 3 3 3 3 3', cut: '22 4 4 4' };
-  const F = "'Overpass Mono', ui-monospace, monospace";
+  // Overpass Mono for all lettering; Noto Sans Mono (Greek) and Noto Sans Math (→ ≤ ∂ ⌀) are named,
+  // loaded fallbacks so no glyph ever comes from the reader's machine. Subscripts are drawn with tspans.
+  const F = "'Overpass Mono', 'Noto Sans Mono', 'Noto Sans Math', monospace";
   const f = (n) => Math.round(n * 100) / 100;
 
   function A(o) {
@@ -205,8 +209,26 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
     `<polygon ${A({ points: pts.map((p) => f(p[0]) + ',' + f(p[1])).join(' '), fill: o.fill || 'none', ...stroke(o) })}/>`;
   const PL = (pts, o = {}) =>
     `<polyline ${A({ points: pts.map((p) => f(p[0]) + ',' + f(p[1])).join(' '), fill: 'none', ...stroke(o) })}/>`;
+  // subscripts: Unicode subscript characters or _{...} markup become shifted tspans in Overpass Mono
+  const SUB = { '₀': '0', '₁': '1', '₂': '2', '₃': '3', '₄': '4', '₅': '5', '₆': '6', '₇': '7', '₈': '8', '₉': '9',
+    'ₜ': 't', '₊': '+', '₋': '−', 'ₙ': 'n', 'ᵢ': 'i', 'ⱼ': 'j', 'ₖ': 'k' };
+  function richText(str, size) {
+    let t = String(str).replace(/[₀-₉ₜ₊₋ₙᵢⱼₖ]+/g, (m) => `_{${[...m].map((c) => SUB[c]).join('')}}`);
+    if (!t.includes('_{')) return t;
+    const dy = f(size * 0.26), fs = f(size * 0.7);
+    // split into [normal, sub, normal, sub, ...]; each normal run after a sub resets the baseline
+    const parts = t.split(/_\{([^}]*)\}/);
+    let out = parts[0];
+    for (let i = 1; i < parts.length; i += 2) {
+      out += `<tspan dy="${dy}" font-size="${fs}">${parts[i]}</tspan>`;
+      const rest = parts[i + 1] || '';
+      if (rest) out += `<tspan dy="${-dy}">${rest}</tspan>`;
+    }
+    return out;
+  }
+  const plainLen = (str) => [...String(str).replace(/_\{([^}]*)\}/g, '$1')].length;
   function Tx(x, y, s, o = {}) {
-    const esc = String(s);
+    const esc = richText(s, o.s || 11);
     return `<text ${A({ x: f(x), y: f(y), 'font-family': o.f || F, 'font-size': o.s || 11,
       'font-weight': o.wt || 500, 'text-anchor': o.a || 'start', fill: o.c || C.g,
       'letter-spacing': o.ls, 'font-style': o.it ? 'italic' : undefined,
@@ -215,7 +237,7 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
   }
   // paper knock-out behind a label (prints reliably, unlike stroke halos)
   function knock(x, y, label, size, o = {}) {
-    const n = [...String(label)].length, ls = o.ls || 0;
+    const n = plainLen(label), ls = o.ls || 0;
     const w = n * size * (0.6 + ls) + 5, h = size * 1.02;
     const a = o.a || 'middle';
     const x0 = a === 'middle' ? x - w / 2 : a === 'end' ? x - w + 2.5 : x - 2.5;
@@ -287,6 +309,20 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
     out += Tx(cx, cy + 4, n, { a: 'middle', c: o.tc || c, s: o.s || 11, wt: 600 });
     return out;
   }
+  // equipment tag: a hexagon (architectural convention), so it never reads as a grid bubble
+  function hexTag(cx, cy, n, tx, ty, o = {}) {
+    const c = o.c || C.g, r = o.r || 11;
+    let out = '';
+    if (tx !== undefined) {
+      const ang = Math.atan2(ty - cy, tx - cx);
+      out += L(cx + Math.cos(ang) * r * 0.9, cy + Math.sin(ang) * r * 0.9, tx, ty, { c });
+      out += Ci(tx, ty, 2.2, { fill: c, c: 'none' });
+    }
+    const pts = Array.from({ length: 6 }, (_, i) => [cx + r * Math.cos(i * Math.PI / 3), cy + r * Math.sin(i * Math.PI / 3)]);
+    out += PG(pts, { c, w: 1.4, fill: o.fill || C.paper });
+    out += Tx(cx, cy + 4, n, { a: 'middle', c: o.tc || c, s: o.s || 10.5, wt: 700 });
+    return out;
+  }
   // centre mark for a circle: small cross + long dashes beyond the rim
   function cmark(cx, cy, r, o = {}) {
     const c = o.c || C.g, e = o.e ?? 5, w = T;
@@ -349,7 +385,7 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
     const pat = (name, sp, ang, col, w = 1, extra = '') =>
       `<pattern id="${id}-${name}" patternUnits="userSpaceOnUse" width="${sp}" height="${sp}" patternTransform="rotate(${ang})">` +
       `<line x1="${sp / 2}" y1="-1" x2="${sp / 2}" y2="${sp + 1}" stroke="${col}" stroke-width="${w}"/>${extra}</pattern>`;
-    return pat('h', 6, 45, C.g) + pat('hr', 5, 45, C.ink, 1.1) + pat('hb', 6, -45, C.g) +
+    return pat('h', 6, 45, C.g) + pat('hr', 5, 45, C.ink, 1.1) + pat('hrd', 3.4, 45, C.ink, 1.5) + pat('hb', 6, -45, C.g) +
       pat('hf', 4, 45, C.g, 0.9) + pat('hrb', 5, -45, C.ink, 1.1) +
       `<pattern id="${id}-x" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(45)">` +
       `<line x1="3.5" y1="-1" x2="3.5" y2="8" stroke="${C.g}" stroke-width="0.9"/><line x1="-1" y1="3.5" x2="8" y2="3.5" stroke="${C.g}" stroke-width="0.9"/></pattern>` +
@@ -443,7 +479,7 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
     return out;
   }
   window.DO = { C, K, M, T, F, f, A, L, P, R, Ci, PG, PL, Tx, AH, dim, leader, balloon, cmark, center,
-    breakZ, breakS, cutPlane, isoP, isoBox, hatchDefs, mark, DASH, knock, arc, arcDim, isoDim, shaft };
+    breakZ, breakS, cutPlane, isoP, isoBox, hatchDefs, mark, DASH, knock, hexTag, arc, arcDim, isoDim, shaft };
 })();
 
 </script>
@@ -466,7 +502,7 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
     for (let i = 0; i < 4; i++) {
       const x = 120 + 160 * i, y = 141 + 202 * i;
       s += Tx(x, 34.5, String(i + 1), { a: 'middle', s: 9, wt: 600, c: C.g2 });
-      s += Tx(x, 866, String(i + 1), { a: 'middle', s: 9, wt: 600, c: C.g2 });
+      s += Tx(x, 860.5, String(i + 1), { a: 'middle', s: 9, wt: 600, c: C.g2 });
       s += Tx(31.5, y + 3.2, 'ABCD'[i], { a: 'middle', s: 9, wt: 600, c: C.g2 });
       s += Tx(688.5, y + 3.2, 'ABCD'[i], { a: 'middle', s: 9, wt: 600, c: C.g2 });
     }
@@ -493,6 +529,23 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
     return `<svg class="mk" width="${f(w)}" height="${f(h)}" viewBox="-1.5 ${f(1.8 * size - 1.5)} ${f(w)} ${f(h)}">${mark(0, 0, size, { id, ...o })}</svg>`;
   }
 
+  /* Title sizes are a rule, not a per-book choice: two lines → 66 px, or 52 px if the longest
+     line is wider than the 584 px measure; three lines → 42 px (40 if needed). Line breaks are set
+     by hand in the data: break before a preposition or conjunction, never inside a compound noun. */
+  const STEPS = { 2: [66, 52, 46], 3: [42, 40, 38] };
+  const MEASURE = 584;
+  function fitTitles(root = document) {
+    const run = () => root.querySelectorAll('.sheetbox .title').forEach((h) => {
+      const steps = STEPS[+h.dataset.lines > 2 ? 3 : 2];
+      for (const px of steps) {
+        h.style.fontSize = px + 'px';
+        const w = Math.max(...[...h.querySelectorAll('.tl')].map((s) => s.getBoundingClientRect().width));
+        if (w <= MEASURE) break;
+      }
+    });
+    run();
+    if (document.fonts) document.fonts.load("600 66px 'Instrument Sans'").then(() => document.fonts.ready).then(run);
+  }
   function buildCover(b, opt = {}) {
     const pre = opt.idp || 'c', id = pre + b.no;
     const svg = `<svg class="sheet" width="720" height="888" viewBox="0 0 720 888" xmlns="http://www.w3.org/2000/svg" font-family="${DO.F}">` +
@@ -501,11 +554,12 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
       (b.extra ? b.extra(id) : '') +
       `</svg>`;
     const lv = LEVELS[b.level];
+    const lines = b.title.split('<br>');
     const tb = `
       <div class="tb">
         <div class="tb-title">
           <div class="lab">${b.series ? `Title · <span class="ser">${b.series}</span>` : 'Title'}</div>
-          <h2 class="title" style="font-size:${b.ts || 60}px">${b.title}</h2>
+          <h2 class="title" data-lines="${lines.length}" style="font-size:${STEPS[lines.length > 2 ? 3 : 2][0]}px">${lines.map((l) => `<span class="tl">${l}</span>`).join('<br>')}</h2>
           ${b.desc ? `<div class="desc">${b.desc}</div>` : ''}
         </div>
         <div class="tb-row">
@@ -520,7 +574,7 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
     if (opt.bare) return `<div class="sheetbox">${svg}${tb}</div>`;
     return `<div class="cover sheetbox" data-slug="${b.slug}" data-level="${b.level}">${svg}${tb}</div>`;
   }
-  window.SHEET = { buildCover, frame, markSvg, levelMarks, LEVELS, LEVEL_NAME, TB_TOP };
+  window.SHEET = { buildCover, fitTitles, frame, markSvg, levelMarks, LEVELS, LEVEL_NAME, TB_TOP };
 })();
 
 </script>
@@ -542,7 +596,7 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
   /* ───────────── 001 · AI Context Engineering ───────────── */
   B.push({
     slug: 'ai-context-engineering', no: '001', level: 'intermediate',
-    title: 'AI Context<br>Engineering', ts: 72,
+    title: 'AI Context<br>Engineering',
     desc: 'Engineer the context window like a system.',
     capsules: 43, hours: 10, units: 'Tokens',
     fig: 'FIG. 1   SECTION A–A THROUGH ONE CONTEXT WINDOW — FOUR STRATEGIES',
@@ -611,9 +665,9 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
   /* ───────────── 002 · Mathematical Foundations for ML ───────────── */
   B.push({
     slug: 'mathematical-foundations-for-ml', no: '002', level: 'beginner',
-    title: 'Mathematical Foundations<br>for Machine Learning', ts: 50,
+    title: 'Mathematical Foundations<br>for Machine Learning',
     desc: 'The linear algebra, probability, and calculus that make ML work.',
-    capsules: 43, hours: 10, units: '‖e₁‖ = 1',
+    capsules: 43, hours: 10, units: '‖e<sub>1</sub>‖ = 1',
     fig: 'FIG. 1   A MATRIX IS A TRANSFORMATION — THE UNIT CIRCLE UNDER A',
     draw(id) {
       let s = '';
@@ -637,13 +691,13 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
       // after: parallelogram (hatched = det A) + ellipse
       const a1 = [A[0][0], A[1][0]], a2 = [A[0][1], A[1][1]];
       const para = [S(0, 0), S(...a1), S(a1[0] + a2[0], a1[1] + a2[1]), S(...a2)];
-      s += PG(para, { fill: `url(#${id}-hr)`, c: 'none' });
+      s += PG(para, { fill: `url(#${id}-hrd)`, c: 'none' });
       s += PG(para, { w: M });
       s += `<ellipse cx="${ox}" cy="${oy}" rx="${f(l1 * u)}" ry="${f(l2 * u)}" transform="rotate(${f(-th / D2R)} ${ox} ${oy})" fill="none" stroke="${C.g}" stroke-width="${K}"/>`;
       // eigen-axes (ink chain lines)
       const e1 = [Math.cos(th), Math.sin(th)], e2 = [-Math.sin(th), Math.cos(th)];
-      s += L(...S(-e1[0] * 2.3, -e1[1] * 2.3), ...S(e1[0] * 2.45, e1[1] * 2.45), { c: C.ink, w: 1.5, d: 'center' });
-      s += L(...S(-e2[0] * 1.2, -e2[1] * 1.2), ...S(e2[0] * 1.2, e2[1] * 1.2), { c: C.ink, w: 1.5, d: 'center' });
+      s += L(...S(-e1[0] * 2.62, -e1[1] * 2.62), ...S(e1[0] * 2.45, e1[1] * 2.45), { w: 1.6, d: 'center' });
+      s += L(...S(-e2[0] * 1.2, -e2[1] * 1.2), ...S(e2[0] * 1.2, e2[1] * 1.2), { w: 1.6, d: 'center' });
       // column vectors
       const arrow = (v, lab, dx, dy, a) => {
         const [x2, y2] = S(...v), ang = Math.atan2(y2 - oy, x2 - ox);
@@ -652,10 +706,29 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
       };
       s += arrow(a1, 'Ae₁', 10, 16) + arrow(a2, 'Ae₂', -8, -8, 'end');
       s += Ci(ox, oy, 3.4, { fill: C.g, c: 'none' });
-      // eigen dimensions (lower-left semi-major, upper-left semi-minor)
-      const P1 = S(-e1[0] * l1, -e1[1] * l1), P2 = S(-e2[0] * l2, -e2[1] * l2);
-      s += dim(ox, oy, ...P1, 30, `λ₁ = ${l1.toFixed(2)}`, { c: C.ink, s: 11, wt: 700, gap: 5 });
-      s += dim(ox, oy, ...P2, 26, `λ₂ = ${l2.toFixed(2)}`, { c: C.ink, s: 11, wt: 700, gap: 5 });
+      // eigen dimensions. λ₁ on the upper side of the lower-left semi-axis, label clear of the unit
+      // circle; λ₂ taken outside the ellipse: the tangent at the minor vertex and the major axis
+      // (a centre line doubling as extension line) carry it past the lower-left vertex.
+      const P1 = S(-e1[0] * l1, -e1[1] * l1);
+      const along = [P1[0] - ox, P1[1] - oy].map((v) => v / (l1 * u));
+      s += dim(ox, oy, ...P1, 30, '', { gap: 5 });
+      {
+        // label on the axis side of the dimension line, 150 px out: clear of the ellipse and the unit circle
+        const nrm = [-along[1], along[0]], ang = Math.atan2(along[1], along[0]) * 180 / Math.PI + 180;
+        const lx = ox + along[0] * 140 + nrm[0] * 18, ly = oy + along[1] * 140 + nrm[1] * 18;
+        s += Tx(lx, ly, `λ₁ = ${l1.toFixed(2)}`, { a: 'middle', s: 11, wt: 700, rot: ang });
+      }
+      {
+        const v = [-e1[0], e1[1]];
+        const m = [e2[0], -e2[1]].map((q) => -q);
+        const t = l1 * u + 26, mv = l2 * u;
+        const A0 = [ox + v[0] * t, oy + v[1] * t], A1 = [A0[0] + m[0] * mv, A0[1] + m[1] * mv];
+        const V2 = [ox + m[0] * mv, oy + m[1] * mv];
+        s += L(V2[0] + v[0] * 4, V2[1] + v[1] * 4, A1[0] + v[0] * 6, A1[1] + v[1] * 6, { w: T });
+        s += L(ox + v[0] * (l1 * u + 4), oy + v[1] * (l1 * u + 4), A0[0] + v[0] * 6, A0[1] + v[1] * 6, { w: T });
+        s += dim(...A0, ...A1, 0, '', { ext: false });
+        s += Tx(A1[0] + 8, A1[1] + 16, `λ₂ = ${l2.toFixed(2)}`, { s: 11, wt: 700 });
+      }
       // angle of the principal axis
       s += arcDim(ox, oy, 236, -th, 0, `${(th / D2R).toFixed(1)}°`, { tr: 8, tx: 10, ty: 2, a: 'start' });
       // det callout
@@ -670,10 +743,11 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
       s += Tx(mx + 52, my + 16, '1.6', { s: 12, wt: 600 }) + Tx(mx + 82, my + 16, '0.6', { s: 12, wt: 600 });
       s += Tx(mx + 52, my + 34, '0.6', { s: 12, wt: 600 }) + Tx(mx + 82, my + 34, '1.0', { s: 12, wt: 600 });
       // line-type legend
-      const lx = 452, ly = 470;
+      const lx = 470, ly = 460;
       s += L(lx, ly, lx + 30, ly, { d: 'phantom', w: 1.2, c: C.g2 }) + Tx(lx + 40, ly + 4, 'BEFORE A', { s: 9.5, wt: 700 });
       s += L(lx, ly + 18, lx + 30, ly + 18, { w: K }) + Tx(lx + 40, ly + 22, 'AFTER A', { s: 9.5, wt: 700 });
-      s += L(lx, ly + 36, lx + 30, ly + 36, { d: 'center', w: 1.5, c: C.ink }) + Tx(lx + 40, ly + 40, 'EIGENVECTORS', { s: 9.5, wt: 700, c: C.ink });
+      s += L(lx, ly + 36, lx + 30, ly + 36, { d: 'center', w: 1.6 }) + Tx(lx + 40, ly + 40, 'EIGEN-AXES', { s: 9.5, wt: 700 });
+      s += R(lx, ly + 47, 30, 12, { fill: `url(#${id}-hrd)`, c: C.g, w: 1 }) + Tx(lx + 40, ly + 57, 'det A', { s: 9.5, wt: 700, c: C.ink });
       return s;
     }
   });
@@ -681,7 +755,7 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
   /* ───────────── 003 · Neural Networks from Scratch ───────────── */
   B.push({
     slug: 'neural-networks-from-scratch', no: '003', level: 'beginner',
-    title: 'Neural Networks<br>from Scratch', ts: 66,
+    title: 'Neural Networks<br>from Scratch',
     desc: 'Build a working neural network from an empty file.',
     capsules: 33, hours: 7, units: 'Neurons',
     fig: 'FIG. 1   MULTILAYER PERCEPTRON — FORWARD AND BACKWARD PASS',
@@ -716,16 +790,18 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
       s += Ci(dx, dy, 25, { w: 1.1 });
       s += PL([[dx - 18, dy - 18], [dx - 38, dy - 38], [dx - 46, dy - 38]], { w: T });
       s += Tx(dx - 50, dy - 34, 'A', { a: 'end', s: 13, wt: 700 });
-      const X = 574, Y = 196, RR = 80;
+      const X = 574, Y = 196, RR = 84;
       s += Ci(X, Y, RR, { w: 1.1, fill: C.paper });
-      const nx = X - 10, ny = Y;
-      [[X - 70, Y - 38], [X - 78, Y], [X - 70, Y + 38]].forEach(([ix, iy]) => {
-        const a = Math.atan2(ny - iy, nx - ix);
-        s += L(ix, iy, nx - Math.cos(a) * 33, ny - Math.sin(a) * 33, { w: 1.3 }) + AH(nx - Math.cos(a) * 25, ny - Math.sin(a) * 25, a, { l: 8, h: 2.4 });
+      const nx = X - 6, ny = Y;
+      // a first-hidden-layer neuron has four weighted inputs
+      [48, 16, -16, -48].forEach((deg, i) => {
+        const a = Math.PI + deg * D2R, r0 = 54, r1 = 27;
+        const x0 = nx + r0 * Math.cos(a), y0 = ny + r0 * Math.sin(a), x1 = nx + r1 * Math.cos(a), y1 = ny + r1 * Math.sin(a);
+        s += L(x0, y0, x1 - Math.cos(a) * 7, y1 - Math.sin(a) * 7, { w: 1.3 }) + AH(x1, y1, a + Math.PI, { l: 8, h: 2.4 });
+        s += Tx(x0 - 3, y0 + 4, `w${'₁₂₃₄'[i]}`, { a: 'end', s: 10.5, wt: 700 });
       });
-      s += Tx(X - 50, Y - 34, 'w₁', { s: 10.5, wt: 700 }) + Tx(X - 66, Y - 8, 'w₂', { s: 10.5, wt: 700 }) + Tx(X - 50, Y + 42, 'w₃', { s: 10.5, wt: 700 });
       s += Ci(nx, ny, 25, { w: K, fill: C.paper });
-      s += Tx(nx, ny + 8, 'Σ', { a: 'middle', s: 24, wt: 500, f: IS });
+      s += Tx(nx, ny + 8, 'Σ', { a: 'middle', s: 23, wt: 500 });
       s += Tx(nx + 2, ny + 42, '+ b', { a: 'middle', s: 10.5, wt: 700 });
       s += L(nx + 25, ny, nx + 36, ny, { w: 1.3 });
       s += R(nx + 36, ny - 15, 30, 30, { w: M, fill: C.paper });
@@ -740,90 +816,88 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
   /* ───────────── 004 · Build LLMs from Scratch ───────────── */
   B.push({
     slug: 'build-llms-from-scratch', no: '004', level: 'intermediate',
-    title: 'Build Large Language<br>Models (LLMs) from Scratch', ts: 52,
+    title: 'Build Large Language Models<br>(LLMs) from Scratch',
     desc: 'Build a GPT-style LLM from an empty file.',
     capsules: 20, hours: 6, units: 'Tokens',
     fig: 'FIG. 1   GPT-2 (124M), GENERAL ARRANGEMENT, WITH SECTION B–B',
     draw(id) {
       let s = '';
-      const x0 = 96, x1 = 236, cx = (x0 + x1) / 2, w = x1 - x0;
+      const x0 = 104, x1 = 236, cx = (x0 + x1) / 2, w = x1 - x0;
       const layer = (y, h, o = {}) => R(x0, y, w, h, { w: o.w || M, fill: o.fill || C.paper, c: o.c });
-      // output
-      s += L(cx, 98, cx, 76, { w: 1.4 }) + AH(cx, 70, -Math.PI / 2, { l: 11, h: 3.2 });
+      const oplus = (x, y) => Ci(x, y, 4.5, { w: 1.2, fill: C.paper }) + L(x - 3, y, x + 3, y, { w: 1 }) + L(x, y - 3, x, y + 3, { w: 1 });
+      // output (flow runs upward)
+      s += L(cx, 98, cx, 78, { w: 1.4 }) + AH(cx, 70, -Math.PI / 2, { l: 11, h: 3.2 });
       s += Tx(cx + 12, 80, 'NEXT TOKEN', { s: 10, wt: 700, ls: '0.05em' });
       s += layer(100, 32, { w: K });
       s += Tx(cx, 120, 'LM HEAD', { a: 'middle', s: 10, wt: 700 });
-      s += layer(140, 9, { fill: `url(#${id}-hf)` });
+      s += layer(140, 9, { fill: `url(#${id}-hf)` });                     // ln_f
+      // one pre-LN block, drawn top (output) to bottom (input):
+      //   ⊕₂ · FFN · LN₂ · ⊕₁ · MASKED MHA · LN₁ · input
       const block = (y0, label) => {
         let b = '';
-        const rows = [[y0, 9, 'ln'], [y0 + 13, 42, 'mha'], [y0 + 59, 9, 'ln'], [y0 + 72, 42, 'ffn']];
-        rows.forEach(([y, h, k]) => {
-          if (k === 'ln') b += layer(y, h, { fill: `url(#${id}-hf)`, w: T });
-          if (k === 'mha') { b += layer(y, h, { fill: `url(#${id}-hr)`, w: M }); }
-          if (k === 'ffn') b += layer(y, h, { w: M });
-        });
-        b += R(cx - 36, y0 + 23, 72, 14, { fill: C.paper, c: 'none' });
-        b += Tx(cx, y0 + 33.5, 'MASKED MHA', { a: 'middle', s: 9.5, wt: 700 });
-        b += Tx(cx, y0 + 97, 'FFN · GELU', { a: 'middle', s: 9.5, wt: 700 });
-        // residual bypasses (left side)
-        const byp = (ya, yb) => PL([[x0, ya], [x0 - 18, ya], [x0 - 18, yb], [x0 - 8, yb]], { w: 1.3 }) +
-          Ci(x0 - 4, yb, 4, { w: 1.2, fill: C.paper }) + L(x0 - 6.5, yb, x0 - 1.5, yb, { w: 1 }) + L(x0 - 4, yb - 2.5, x0 - 4, yb + 2.5, { w: 1 });
-        b += byp(y0 + 66 - 7 + 11, y0 + 11 - 2) + byp(y0 + 114 + 6, y0 + 66 + 2 - 7);
-        // outline of the whole block
-        b += R(x0 - 26, y0 - 6, w + 36, 128, { w: 1, d: 'phantom', c: C.g2 });
-        b += Tx(x1 + 16, y0 + 2, label, { s: 9.5, wt: 700, c: C.g2 });
-        return b;
+        const Y = { add2: y0 - 5, ffn: y0, ln2: y0 + 50, add1: y0 + 63, mha: y0 + 68, ln1: y0 + 117, inp: y0 + 131 };
+        b += layer(Y.ffn, 42, { w: M });
+        b += layer(Y.ln2, 9, { fill: `url(#${id}-hf)`, w: T });
+        b += layer(Y.mha, 42, { w: K });
+        b += layer(Y.ln1, 9, { fill: `url(#${id}-hf)`, w: T });
+        b += Tx(cx, Y.ffn + 25, 'FFN · GELU', { a: 'middle', s: 9.5, wt: 700 });
+        b += Tx(cx, Y.mha + 17, 'MASKED MHA', { a: 'middle', s: 9.5, wt: 700 });
+        // residual 1: block input → around LN₁ + MHA → ⊕₁ ; residual 2: ⊕₁ → around LN₂ + FFN → ⊕₂
+        b += PL([[x0, Y.inp], [x0 - 16, Y.inp], [x0 - 16, Y.add1], [x0 - 8.5, Y.add1]], { w: 1.3 });
+        b += PL([[x0 - 8.5, Y.add1], [x0 - 28, Y.add1], [x0 - 28, Y.add2], [x0 - 8.5, Y.add2]], { w: 1.3 });
+        b += Ci(x0 - 16, Y.inp, 1.9, { fill: C.g, c: 'none' });
+        b += oplus(x0 - 4, Y.add1) + oplus(x0 - 4, Y.add2);
+        b += R(x0 - 36, y0 - 13, w + 46, 150, { w: 1, d: 'phantom', c: C.g2 });
+        b += Tx(x1 + 16, y0 - 1, label, { s: 9.5, wt: 700, c: C.g2 });
+        return { svg: b, Y };
       };
-      s += block(162, 'BLOCK 12');
-      // repetition break
-      const hz = (y) => PL([[x0 - 32, y], [cx - 9, y], [cx - 4, y - 5], [cx + 4, y + 5], [cx + 9, y], [x1 + 16, y]], { w: T });
-      s += hz(296) + hz(318);
-      s += Tx(x1 + 24, 311, '× 12', { s: 11, wt: 700 });
-      s += Tx(cx, 311, '', {});
-      s += block(330, 'BLOCK 1');
-      s += layer(470, 30, { w: K });
-      s += Tx(cx, 489, 'EMBEDDING', { a: 'middle', s: 9.5, wt: 700 });
+      const b12 = block(166, 'BLOCK 12');
+      s += b12.svg;
+      const hz = (y) => PL([[x0 - 40, y], [cx - 9, y], [cx - 4, y - 5], [cx + 4, y + 5], [cx + 9, y], [x1 + 16, y]], { w: T });
+      s += hz(308) + hz(326);
+      s += Tx(x1 + 24, 321, '× 12', { s: 11, wt: 700 });
+      const b1 = block(344, 'BLOCK 1');
+      s += b1.svg;
+      s += layer(488, 26, { w: K });
+      s += Tx(cx, 505, 'EMBEDDING', { a: 'middle', s: 9.5, wt: 700 });
       for (let i = 0; i < 6; i++) {
-        const tx = x0 + 6 + i * 22.5;
-        s += R(tx, 514, 15, 15, { w: 1.3 }) + L(tx + 7.5, 512, tx + 7.5, 506, { w: 1 }) + AH(tx + 7.5, 502, -Math.PI / 2, { l: 5, h: 2 });
+        const tx = x0 + 9 + i * 20.5;
+        s += R(tx, 522, 13, 13, { w: 1.3 }) + AH(tx + 6.5, 515, -Math.PI / 2, { l: 5, h: 1.8 });
       }
-      // leaders to the right
+      // leaders to the right (block 1)
       const lab = (y, t1, t2, c) => leader([[x1 + 2, y], [x1 + 30, y]], '', { dot: true }) +
         Tx(x1 + 36, y + 4, t1, { s: 10, wt: 700, ls: '0.03em' }) + (t2 ? Tx(x1 + 36, y + 17, t2, { s: 9.5, wt: 500, c: c || C.g2 }) : '');
       s += lab(116, 'VOCAB PROJECTION', '50 257 LOGITS');
-      s += lab(354, 'MASKED ATTENTION', '12 HEADS', C.ink);
-      s += lab(420, 'FEED-FORWARD', '4 × d_model');
-      s += lab(485, 'TOKEN + POSITION', '');
-      s += lab(522, 'TOKEN IDS · BPE', '');
-      // cutting plane B-B through block 12 attention
-      const yc = 210;
-      s += cutPlane(x0 - 40, yc, x1 + 26, yc, 'B', { dir: Math.PI / 2 });
-      // SECTION B-B: causal mask
+      s += lab(b1.Y.ffn + 21, 'FEED-FORWARD', '4 × d_{model}');
+      s += lab(b1.Y.mha + 21, 'MASKED ATTENTION', '12 HEADS');
+      s += lab(501, 'TOKEN + POSITION', '');
+      s += lab(528, 'TOKEN IDS · BPE', '');
+      // cutting plane B–B through block 12's attention
+      const yc = b12.Y.mha + 31;
+      s += cutPlane(x0 - 44, yc, x1 + 26, yc, 'B', { dir: Math.PI / 2 });
+      // SECTION B–B: the causal mask. Allowed cells (j ≤ i) are the ink mass.
       const gx = 420, gy = 150, n = 8, c = 25, G = n * c;
-      for (let i = 0; i < n; i++) for (let j = 0; j <= i; j++) {
-        s += R(gx + j * c, gy + i * c, c, c, { fill: `url(#${id}-hr)`, c: 'none' });
+      for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+        if (j <= i) s += R(gx + j * c + 0.8, gy + i * c + 0.8, c - 1.6, c - 1.6, { fill: C.ink, c: 'none' });
+        else s += R(gx + j * c, gy + i * c, c, c, { w: 0.9, c: C.g2 });
       }
-      let tri = `M${gx},${gy} `;
-      for (let i = 0; i < n; i++) tri += `L${gx + (i + 1) * c},${gy + i * c} L${gx + (i + 1) * c},${gy + (i + 1) * c} `;
-      tri += `L${gx},${gy + G} Z`;
-      for (let i = 1; i < n; i++) { s += L(gx + i * c, gy, gx + i * c, gy + G, { w: 0.9, c: C.g2 }) + L(gx, gy + i * c, gx + G, gy + i * c, { w: 0.9, c: C.g2 }); }
-      s += P(tri, { w: M, c: C.ink });
       s += R(gx, gy, G, G, { w: K });
       {
-        const ix = gx + G * 0.74, iy = gy + G * 0.27, a = 9;
-        s += L(ix - 30, iy, ix - 19, iy, { w: 2 });
+        const ix = gx + G * 0.76, iy = gy + G * 0.25, a = 5.2;
+        s += R(ix - 26, iy - 8, 44, 16, { fill: C.paper, c: 'none' });
+        s += L(ix - 22, iy, ix - 14, iy, { w: 1.3 });
         s += P(`M${ix},${iy} C${ix + a * 0.6},${iy - a} ${ix + a * 1.8},${iy - a} ${ix + a * 1.8},${iy} C${ix + a * 1.8},${iy + a} ${ix + a * 0.6},${iy + a} ${ix},${iy} ` +
-          `C${ix - a * 0.6},${iy - a} ${ix - a * 1.8},${iy - a} ${ix - a * 1.8},${iy} C${ix - a * 1.8},${iy + a} ${ix - a * 0.6},${iy + a} ${ix},${iy} Z`, { w: 2 });
-        s += Tx(ix, iy + 26, 'MASKED', { a: 'middle', s: 9.5, wt: 700, c: C.g2 });
+          `C${ix - a * 0.6},${iy - a} ${ix - a * 1.8},${iy - a} ${ix - a * 1.8},${iy} C${ix - a * 1.8},${iy + a} ${ix - a * 0.6},${iy + a} ${ix},${iy} Z`, { w: 1.3 });
       }
       s += dim(gx, gy, gx + G, gy, -16, 'KEYS  j = 1 … T', { s: 10, wt: 600 });
       s += dim(gx, gy + G, gx, gy, -16, 'QUERIES  i', { s: 10, wt: 600 });
       s += Tx(gx + G / 2, gy + G + 26, 'SECTION B–B', { a: 'middle', s: 11, wt: 700, ls: '0.08em' });
       s += Tx(gx + G / 2, gy + G + 41, 'CAUSAL MASK · j ≤ i', { a: 'middle', s: 10, wt: 600, c: C.ink });
+      s += Tx(gx + G / 2, gy + G + 55, 'masked cells = −∞ before softmax', { a: 'middle', s: 9, wt: 500, c: C.g2 });
       // spec note
-      s += Tx(420, 470, 'd_model = 768', { s: 10.5, wt: 700 });
-      s += Tx(420, 485, 'n_layers = 12 · n_heads = 12', { s: 10, wt: 500 });
-      s += Tx(420, 500, 'context = 1 024 tokens', { s: 10, wt: 500 });
+      s += Tx(420, 470, 'd_{model} = 768', { s: 10.5, wt: 700 });
+      s += Tx(420, 485, 'n_{layers} = 12 · n_{heads} = 12', { s: 10, wt: 500 });
+      s += Tx(420, 500, 'context = 1 024 tokens · pre-LN', { s: 10, wt: 500 });
       return s;
     }
   });
@@ -831,7 +905,7 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
   /* ───────────── 005 · 5D Parallelism ───────────── */
   B.push({
     slug: '5d-parallelism', no: '005', level: 'advanced',
-    title: '5D Parallelism for<br>Large Model Training', ts: 56,
+    title: '5D Parallelism<br>for Large Model Training',
     desc: 'Scale a model across a cluster of GPUs.',
     capsules: 40, hours: 9, units: 'GPUs',
     fig: 'FIG. 1   DATA × TENSOR × PIPELINE, WITH AUXILIARY VIEWS C AND E',
@@ -848,7 +922,7 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
         s += PG([p(-6, -6, zz - 4), p(ext + 6, -6, zz - 4), p(ext + 6, ext + 6, zz - 4), p(-6, ext + 6, zz - 4)], { w: 1, d: 'phantom', c: C.g2 });
       }
       cubes.forEach(([x, y, z]) => {
-        const red = x === 3 && y === 3 && z === 3;
+        const red = x === 3 && y === 0 && z === 3;
         s += isoBox(p, x * pitch, y * pitch, z * zp, u, u, u, {
           top: red ? C.ink : C.paper, right: red ? `url(#${id}-hr)` : `url(#${id}-hf)`, left: C.paper,
           wo: red ? K : M, wi: T
@@ -861,14 +935,14 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
       s += isoDim(p, [ext, 0, 0], [ext, ext, 0], [38, 0, 0], 'TENSOR × 4', { below: true });
       s += isoDim(p, [0, ext, 0], [0, ext, 3 * zp + u], [-40, 40, 0], 'PIPELINE × 4');
       // leader to the red GPU
-      const g = p(3 * pitch + u / 2, 3 * pitch + u / 2, 3 * zp + u);
-      s += leader([[g[0] + 2, g[1] - 2], [g[0] + 70, 100], [g[0] + 86, 100]], '', { dot: true, c: C.ink });
-      s += Tx(g[0] + 92, 104, '1 GPU · RANK 0', { s: 10.5, wt: 700, c: C.ink, ls: '0.04em' });
+      const g = p(3 * pitch + u / 2, u / 2, 3 * zp + u);
+      s += leader([[g[0] + 4, g[1] - 1], [g[0] + 34, 100], [g[0] + 48, 100]], '', { dot: true, c: C.ink });
+      s += Tx(g[0] + 54, 104, '1 GPU · RANK 0', { s: 10.5, wt: 700, c: C.ink, ls: '0.04em' });
       // VIEW C — context parallel (ring)
       {
-        const vx = 576, vy = 214, rr = 44;
-        s += Tx(vx, 130, 'VIEW C', { a: 'middle', s: 10.5, wt: 700, ls: '0.08em' });
-        s += Tx(vx, 144, 'CONTEXT · RING', { a: 'middle', s: 9.5, wt: 600, c: C.g2 });
+        const vx = 576, vy = 234, rr = 44;
+        s += Tx(vx, 150, 'VIEW C', { a: 'middle', s: 10.5, wt: 700, ls: '0.08em' });
+        s += Tx(vx, 164, 'CONTEXT · RING', { a: 'middle', s: 9.5, wt: 600, c: C.g2 });
         s += Ci(vx, vy, rr, { w: 1.2 });
         for (let i = 0; i < 4; i++) {
           const a = (-90 + i * 90) * D2R, x = vx + rr * Math.cos(a), y = vy + rr * Math.sin(a);
@@ -880,15 +954,15 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
       }
       // VIEW E — expert parallel (router)
       {
-        const vx = 576, vy = 410;
-        s += Tx(vx, 346, 'VIEW E', { a: 'middle', s: 10.5, wt: 700, ls: '0.08em' });
-        s += Tx(vx, 360, 'EXPERTS · ROUTER', { a: 'middle', s: 9.5, wt: 600, c: C.g2 });
+        const vx = 576, vy = 422;
+        s += Tx(vx, 358, 'VIEW E', { a: 'middle', s: 10.5, wt: 700, ls: '0.08em' });
+        s += Tx(vx, 372, 'EXPERTS · TOP-2 ROUTER', { a: 'middle', s: 9.5, wt: 600, c: C.g2 });
         s += R(vx - 24, vy - 30, 48, 18, { w: M, fill: C.paper });
         s += Tx(vx, vy - 17, 'ROUTE', { a: 'middle', s: 8.5, wt: 700 });
         for (let i = 0; i < 4; i++) {
           const ex = vx - 54 + i * 36, on = i === 1 || i === 2;
-          s += L(vx, vy - 12, ex, vy + 22, { w: on ? 1.6 : 1, c: on ? C.ink : C.g2, d: on ? undefined : 'hidden' });
-          s += R(ex - 13, vy + 22, 26, 30, { w: M, fill: on ? `url(#${id}-hr)` : C.paper });
+          s += L(vx, vy - 12, ex, vy + 22, { w: on ? 1.6 : 1, c: on ? C.g : C.g2, d: on ? undefined : 'hidden' });
+          s += R(ex - 13, vy + 22, 26, 30, { w: on ? K : M, fill: on ? `url(#${id}-h)` : C.paper });
           s += Tx(ex, vy + 66, 'E' + (i + 1), { a: 'middle', s: 9, wt: 700 });
         }
       }
@@ -899,7 +973,7 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
   /* ───────────── 006 · Pi vs Hermes vs Codex ───────────── */
   B.push({
     slug: 'pi-vs-hermes-vs-codex', no: '006', level: 'advanced',
-    title: 'Pi vs Hermes vs Codex:<br>Context Compaction<br>and Memory', ts: 44,
+    title: 'Pi vs Hermes vs Codex:<br>Context Compaction<br>and Memory',
     desc: 'Three open-source coding harnesses, read out of their source.',
     capsules: 9, hours: 1, units: 'Tokens',
     fig: 'FIG. 1   ONE OVERFLOWING SESSION, THREE COMPACTIONS — CUT, BREAK, HANDOFF',
@@ -911,7 +985,7 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
         [26, 15], [42, 23], [30, 18], [38, 22], [26, 16], [36, 20], [34, 23]];
       const tot = turns.reduce((a, t) => a + t[0], 0), k = (x9 - x0) / tot;
       const T2 = turns.map(([l, r]) => ({ l: l * k, r }));
-      const red = `url(#${id}-hr)`;
+      const red = C.ink;
       const rows = [
         { y: 180, name: 'PI', note: 'CUT AT A TURN, SUMMARISE THE PREFIX' },
         { y: 330, name: 'HERMES', note: 'KEEP HEAD AND TAIL, PRUNE THE MIDDLE' },
@@ -919,7 +993,7 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
       ];
       // window + limit datum
       s += dim(x0, 120, lim, 120, -38, 'CONTEXT WINDOW', { s: 10.5, wt: 700, gap: 6 });
-      s += L(lim, 76, lim, 516, { c: C.ink, w: 1.8, d: 'center' });
+      s += L(lim, 76, lim, 516, { c: C.ink, w: 3, d: '20 4 4 4' });
       s += R(lim - 8, 524, 16, 16, { c: C.ink, w: 1.4, fill: C.paper }) + Tx(lim, 536, 'L', { a: 'middle', s: 11, wt: 700, c: C.ink });
       s += PG([[lim - 6, 524], [lim + 6, 524], [lim, 515]], { fill: C.ink, c: 'none' });
       s += Tx(lim + 14, 536, 'LIMIT', { s: 10, wt: 700, c: C.ink, ls: '0.06em' });
@@ -977,7 +1051,7 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
 <script>
 /* Drawing Office — sub-series (architectural sheets) and range books. */
 (function () {
-  const { C, K, M, T, L, P, R, Ci, PG, PL, Tx, AH, dim, leader, balloon, cmark, center, breakZ, arc, f } = DO;
+  const { C, K, M, T, L, P, R, Ci, PG, PL, Tx, AH, dim, leader, balloon, hexTag, cmark, center, breakZ, arc, knock, f } = DO;
   const B = window.BOOKS;
   const IS = "'Instrument Sans'";
   const D2R = Math.PI / 180;
@@ -1043,13 +1117,13 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
     let s = Tx(x, y0, 'EQUIPMENT', { s: 9.5, wt: 700, ls: '0.08em' }) + L(x, y0 + 6, x + 116, y0 + 6, { w: 1.4 });
     items.forEach((it, i) => {
       const y = y0 + 26 + i * 40;
-      s += Ci(x + 9, y - 4, 9, { w: 1.2, c: it.red ? C.ink : C.g }) + Tx(x + 9, y, String(i + 1), { a: 'middle', s: 10, wt: 700, c: it.red ? C.ink : C.g });
-      s += Tx(x + 24, y - 1, it.a, { s: 9.5, wt: 700, c: it.red ? C.ink : C.g });
-      if (it.b) s += Tx(x + 24, y + 11, it.b, { s: 8.5, wt: 500, c: C.g2 });
+      s += hexTag(x + 10, y - 4, String(i + 1), undefined, undefined, { r: 10, s: 10, c: it.red ? C.ink : C.g });
+      s += Tx(x + 26, y - 1, it.a, { s: 9.5, wt: 700, c: it.red ? C.ink : C.g });
+      if (it.b) s += Tx(x + 26, y + 11, it.b, { s: 8.5, wt: 500, c: C.g2 });
     });
     return s;
   }
-  const bal = (x, y, n, tx, ty, red) => balloon(x, y, String(n), tx, ty, { r: 9.5, s: 10, c: red ? C.ink : C.g });
+  const bal = (x, y, n, tx, ty, red) => hexTag(x, y, String(n), tx, ty, { r: 10.5, s: 10, c: red ? C.ink : C.g });
   function conveyor(x1, x2, y, h = 18, pitch = 9) {
     let s = R(x1, y - h / 2, x2 - x1, h, { w: 1.4, fill: C.paper });
     for (let x = x1 + pitch; x < x2 - 2; x += pitch) s += L(x, y - h / 2, x, y + h / 2, { w: 0.9, c: C.g2 });
@@ -1065,12 +1139,12 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
   }
   const doors = [{ side: 'L', a: 284, b: 334, door: 1 }, { side: 'R', a: 284, b: 334, door: 0 }];
   const wins = [{ side: 'T', a: 150, b: 214, win: 1 }, { side: 'T', a: 390, b: 454, win: 1 }];
-  const common = { level: 'advanced', ts: 54 };
+  const common = { level: 'advanced' };
 
   // I — Language: inference engineering
   B.push({
     ...common, slug: 'charlie-language-room', no: '046', level: 'advanced',
-    title: 'Charlie and the<br>Language Room',
+    title: 'Charlie and<br>the Language Room',
     series: 'Charlie and the Intelligence Factory', seriesNo: 'I',
     desc: 'Book I · Language — Inference Engineering',
     capsules: 22, hours: 5, units: 'Tokens',
@@ -1086,13 +1160,13 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
       // decode: one token per step, loops back on itself
       t += R(318, 272, 50, 74, { w: K, fill: C.paper });
       for (let i = 0; i < 3; i++) t += L(324 + i * 13, 280, 324 + i * 13, 338, { w: T });
-      t += P(`M368,288 C400,248 290,236 318,284`, { w: 1.8, c: C.ink }) + AH(318.5, 284, 1.25, { c: C.ink, l: 9, h: 3 });
+      t += P(`M368,288 C400,248 290,236 318,284`, { w: 1.8 }) + AH(318.5, 284, 1.25, { l: 9, h: 3 });
       // KV cache racks (paged)
       const racks = (y, used) => {
         let r = '';
         for (let i = 0; i < 8; i++) {
           const x = 266 + i * 28;
-          r += R(x, y, 24, 26, { w: 1.3, fill: i < used ? `url(#${id}-hr)` : C.paper });
+          r += i < used ? R(x, y, 24, 26, { fill: C.ink, c: 'none' }) : R(x, y, 24, 26, { w: 1.3, fill: C.paper });
         }
         return r;
       };
@@ -1111,7 +1185,7 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
   // II — Vision: vision transformers
   B.push({
     ...common, slug: 'charlie-vision-room', no: '047', level: 'intermediate',
-    title: 'Charlie and the<br>Vision Room',
+    title: 'Charlie and<br>the Vision Room',
     series: 'Charlie and the Intelligence Factory', seriesNo: 'II',
     desc: 'Book II · Vision — Vision Transformers',
     capsules: 20, hours: 6, units: 'Patches',
@@ -1120,28 +1194,29 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
       let t = '';
       const cy = 309;
       // image table cut into 4×4 patches, one lifted out
-      const ix = 130, iy = 184, cs = 32;
+      const ix = 128, iy = 178, cs = 38;
       for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) {
         if (i === 1 && j === 2) continue;
         t += R(ix + j * cs, iy + i * cs, cs, cs, { w: 1.2, fill: C.paper });
       }
       t += R(ix + 2 * cs, iy + cs, cs, cs, { w: 1, d: 'hidden', c: C.g2 });
       t += R(ix, iy, 4 * cs, 4 * cs, { w: K });
-      const px = 300, py = 176;
+      const px = 300, py = 166;
       t += R(px, py, cs, cs, { fill: C.ink, c: 'none' });
       t += L(ix + 3 * cs - 2, iy + cs + 6, px - 8, py + cs - 6, { w: 1.2, c: C.ink }) + AH(px - 3, py + cs - 9, -0.36, { c: C.ink, l: 9, h: 2.8 });
       // flattened: a row of patch tokens on the conveyor
       const cvy = 380;
       t += conveyor(IX0, 418, cvy, 18);
       t += R(126, cvy - 9, 14, 18, { fill: C.g, c: 'none' });
-      for (let i = 0; i < 12; i++) t += R(146 + i * 18, cvy - 7, 12, 14, { w: 1.2, fill: i === 6 ? C.ink : C.paper, c: i === 6 ? C.ink : C.g });
+      for (let i = 0; i < 16; i++) t += R(146 + i * 16, cvy - 7, 12, 14, { w: 1.2, fill: i === 6 ? C.ink : C.paper, c: i === 6 ? C.ink : C.g });
+      t += Tx(146 + 8 * 16, cvy + 22, '[CLS] + 16 PATCH TOKENS', { a: 'middle', s: 8.5, wt: 700, c: C.g2 });
       t += L(ix + 2 * cs, iy + 4 * cs + 4, ix + 2 * cs, cvy - 20, { w: T }) + AH(ix + 2 * cs, cvy - 13, Math.PI / 2, { l: 8, h: 2.5 });
-      t += Tx(ix + 2 * cs + 8, 352, 'FLATTEN', { s: 9, wt: 700, c: C.g2 });
+      t += Tx(ix + 2 * cs + 8, 350, 'FLATTEN', { s: 9, wt: 700, c: C.g2 });
       // encoder
       t += R(418, 206, 64, 200, { w: K, fill: C.paper });
       for (let i = 1; i < 6; i++) t += L(418, 206 + i * 33.3, 482, 206 + i * 33.3, { w: T });
       t += Tx(450, 198, '× L', { a: 'middle', s: 10, wt: 700 });
-      t += bal(116, 172, 1, ix + 3, iy + 3) + bal(356, 192, 2, px + cs + 1, py + 12, true) + bal(116, 340, 3, 133, cvy - 9) + bal(450, 436, 4, 450, 406);
+      t += bal(116, 166, 1, ix + 3, iy + 3) + bal(362, 180, 2, px + cs + 1, py + 12, true) + bal(116, 340, 3, 133, cvy - 9) + bal(450, 436, 4, 450, 406);
       let s = room(1, id, [{ side: 'B', a: 170, b: 220, door: 1 }, { side: 'R', a: 284, b: 334 }, ...wins], t, '');
       s += schedule([{ a: 'IMAGE', b: 'split into patches' }, { a: 'PATCH → TOKEN', b: 'linear projection', red: true },
         { a: '[CLS] TOKEN', b: 'prepended' }, { a: 'ENCODER', b: 'L attention blocks' }]);
@@ -1152,77 +1227,110 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
   // III — Sound: voice agents
   B.push({
     ...common, slug: 'charlie-sound-room', no: '048', level: 'intermediate',
-    title: 'Charlie and the<br>Sound Room',
+    title: 'Charlie and<br>the Sound Room',
     series: 'Charlie and the Intelligence Factory', seriesNo: 'III',
     desc: 'Book III · Audio — Voice Agents',
     capsules: 20, hours: 6, units: 'ms',
-    fig: 'ENLARGED PLAN — ROOM III · SOUND (EAR TO MOUTH)',
+    fig: 'ENLARGED PLAN — ROOM III · SOUND (EAR TO MOUTH, CHAIN-DIMENSIONED)',
     draw(id) {
       let t = '';
-      const cy = 322;
-      t += conveyor(IX0 + 30, IX1 - 30, cy, 14, 8);
-      // mic
-      t += Ci(130, cy, 15, { w: K, fill: C.paper }) + Ci(130, cy, 6, { fill: C.g, c: 'none' });
-      // waveform arriving
-      let d = `M${IX0 + 2},${cy - 50} `;
+      const cy = 300, top = cy - 26, bot = cy + 26;
+      // waveform arriving from the room
+      let d = `M${IX0 + 8},178 `;
       for (let x = 0; x <= 150; x += 2) {
         const env = Math.sin(Math.PI * x / 150) ** 1.4;
-        d += `L${f(IX0 + 2 + x)},${f(cy - 50 + Math.sin(x * 0.42) * 22 * env * (0.6 + 0.4 * Math.sin(x * 0.07)))} `;
+        d += `L${f(IX0 + 8 + x)},${f(178 + Math.sin(x * 0.42) * 20 * env * (0.6 + 0.4 * Math.sin(x * 0.07)))} `;
       }
-      t += P(d, { w: 1.6 });
-      t += L(IX0 + 2, cy - 50, IX0 + 154, cy - 50, { w: T, d: 'center', c: C.g2 });
-      // stations
-      const st = [[170, 'VAD', 38], [226, 'ASR', 46], [296, 'LLM', 60], [380, 'TTS', 46]];
-      st.forEach(([x, lab, w]) => { t += R(x, cy - 26, w, 52, { w: K, fill: C.paper }) + Tx(x + w / 2, cy + 4, lab, { a: 'middle', s: 10, wt: 700 }); });
-      // speaker
-      t += PG([[446, cy - 8], [456, cy - 8], [472, cy - 22], [472, cy + 22], [456, cy + 8], [446, cy + 8]], { w: M, fill: C.paper });
-      t += arc(472, cy, 12, -0.7, 0.7, { w: 1.2 }) + arc(472, cy, 20, -0.7, 0.7, { w: 1.2 });
-      // barge-in path
-      t += PL([[130, cy + 15], [130, cy + 70], [403, cy + 70], [403, cy + 26]], { w: 1.2, d: 'hidden' }) + AH(403, cy + 27, -Math.PI / 2, { l: 8, h: 2.5 });
-      t += Tx(266, cy + 64, 'BARGE-IN', { a: 'middle', s: 9.5, wt: 700, c: C.g2 });
-      // latency budget (ink)
-      t += dim(130, cy - 26, 472, cy - 26, -118, 'LATENCY BUDGET', { c: C.ink, s: 10.5, wt: 700, gap: 80 });
-      t += bal(130, 380, 1, 130, cy + 15 + 2) ;
-      let s = room(2, id, [{ side: 'L', a: 200, b: 250, door: 1 }, ...wins.slice(1), { side: 'B', a: 380, b: 440, win: 1 }], t, '');
+      t += L(IX0 + 8, 178, IX0 + 160, 178, { w: T, d: 'center', c: C.g2 }) + P(d, { w: 1.6 });
+      t += conveyor(145, 440, cy, 14, 8);
+      // mic + stations + speaker; station widths are drawn, not measured
+      t += Ci(130, cy, 15, { w: K, fill: C.paper }) + Ci(130, cy, 6, { fill: C.g, c: 'none' });
+      const st = [[162, 42, 'VAD'], [216, 54, 'ASR'], [282, 78, 'LLM'], [372, 52, 'TTS']];
+      st.forEach(([x, w, lab]) => { t += R(x, top, w, 52, { w: K, fill: C.paper }) + Tx(x + w / 2, cy + 4, lab, { a: 'middle', s: 10, wt: 700 }); });
+      t += PG([[440, cy - 8], [450, cy - 8], [466, cy - 22], [466, cy + 22], [450, cy + 8], [440, cy + 8]], { w: M, fill: C.paper });
+      t += arc(466, cy, 12, -0.7, 0.7, { w: 1.2 }) + arc(466, cy, 20, -0.7, 0.7, { w: 1.2 });
+      // barge-in: VAD hears the user and stops TTS
+      t += PL([[183, top], [183, 246], [398, 246], [398, top - 8]], { w: 1.2, d: 'hidden' }) + AH(398, top - 1, Math.PI / 2, { l: 8, h: 2.5 });
+      t += Tx(290, 240, 'BARGE-IN', { a: 'middle', s: 9.5, wt: 700, c: C.g2 });
+      // chain dimension: each stage's share of the turn, in ms
+      const ch = [145, 210, 276, 366, 453], yd = 372, names = ['VAD', 'ASR', 'LLM', 'TTS'];
+      ch.forEach((x, i) => { t += L(x, bot + 6, x, yd + 5, { w: T }); });
+      for (let i = 0; i < 4; i++) t += dim(ch[i], yd, ch[i + 1], yd, 0, `t_{${names[i]}}`, { ext: false, s: 10, wt: 700 });
+      // the budget: one ink bar, ear to mouth
+      t += R(145, 398, 308, 13, { fill: C.ink, c: 'none' });
+      t += L(145, 392, 145, 417, { w: 1.4, c: C.ink }) + L(453, 392, 453, 417, { w: 1.4, c: C.ink });
+      t += Tx(299, 436, 'LATENCY BUDGET = Σ t   (ms)', { a: 'middle', s: 10.5, wt: 700, c: C.ink, ls: '0.03em' });
+      // tags
+      t += bal(130, 344, 1, 130, cy + 16) + bal(243, 344, 2, 243, bot) + bal(321, 344, 3, 321, bot);
+      t += L(321 + 9, 344 - 5, 398, bot + 2, { w: T }) + Ci(398, bot + 2, 2.2, { fill: C.g, c: 'none' });
+      t += bal(476, 404, 4, 455, 404, true);
+      let s = room(2, id, [{ side: 'B', a: 118, b: 168, door: 1 }, ...wins.slice(1)], t, '');
       s += schedule([{ a: 'MIC · VAD', b: 'who is speaking?' }, { a: 'ASR', b: 'speech to text' },
-        { a: 'LLM · TTS', b: 'text back to voice' }, { a: 'LATENCY', b: 'the budget', red: true }]);
+        { a: 'LLM · TTS', b: 'text back to voice' }, { a: 'LATENCY', b: 'the budget, in ms', red: true }]);
       return s;
     }
   });
 
-  // IV — Reason: reinforcement learning
+  // IV — Reason: reinforcement learning. The room's floor is a gridworld; V(s) is computed here.
   B.push({
     ...common, slug: 'charlie-reasoning-room', no: '049', level: 'advanced',
-    title: 'Charlie and the<br>Reasoning Room',
+    title: 'Charlie and<br>the Reasoning Room',
     series: 'Charlie and the Intelligence Factory', seriesNo: 'IV',
     desc: 'Book IV · Reason — RL, from bandits to reasoning models',
     capsules: 21, hours: 6, units: 'Reward',
-    fig: 'ENLARGED PLAN — ROOM IV · REASON (AGENT AND ENVIRONMENT)',
+    fig: 'ENLARGED PLAN — ROOM IV · REASON (GRIDWORLD, V(s) BY VALUE ITERATION)',
     draw(id) {
       let t = '';
-      // bandit arms along the top wall
+      // bandit arms along the north wall
       for (let i = 0; i < 5; i++) {
-        const x = 150 + i * 44;
-        t += R(x, 176, 30, 34, { w: M, fill: C.paper }) + Ci(x + 15, 190, 5, { w: 1.2 });
-        t += L(x + 30, 186, x + 38, 186, { w: 1.2 }) + Ci(x + 40, 186, 2.6, { fill: C.g, c: 'none' });
+        const x = 170 + i * 44;
+        t += R(x, 164, 30, 32, { w: M, fill: C.paper }) + Ci(x + 15, 177, 5, { w: 1.2 });
+        t += L(x + 30, 174, x + 38, 174, { w: 1.2 }) + Ci(x + 40, 174, 2.6, { fill: C.g, c: 'none' });
       }
-      // the loop track
-      const lx = 150, ly = 258, lw = 300, lh = 150, rr = 40;
-      t += R(lx, ly, lw, lh, { rx: rr, w: 18, c: C.g3, op: 0.35 });
-      t += R(lx - 9, ly - 9, lw + 18, lh + 18, { rx: rr + 9, w: 1.4 }) + R(lx + 9, ly + 9, lw - 18, lh - 18, { rx: rr - 9, w: 1.4 });
-      // agent + environment stations
-      t += R(118, 296, 70, 74, { w: K, fill: C.paper }) + Tx(153, 330, 'AGENT', { a: 'middle', s: 10, wt: 700 }) + Tx(153, 346, 'π(a|s)', { a: 'middle', s: 10, wt: 500 });
-      t += R(410, 290, 76, 86, { w: K, fill: `url(#${id}-h)` });
-      t += R(418, 322, 60, 22, { fill: C.paper, c: 'none' }) + Tx(448, 337, 'ENV', { a: 'middle', s: 10, wt: 700 });
-      // action on top, state + reward below (ink)
-      t += L(230, ly, 360, ly, { w: 2.4 }) + AH(372, ly, 0, { l: 12, h: 4 });
-      t += Tx(300, ly - 16, 'ACTION  aₜ', { a: 'middle', s: 10.5, wt: 700 });
-      t += L(372, ly + lh, 242, ly + lh, { w: 2.8, c: C.ink }) + AH(230, ly + lh, Math.PI, { l: 13, h: 4.4, c: C.ink });
-      t += Tx(300, ly + lh + 26, 'STATE  sₜ₊₁ · REWARD  rₜ₊₁', { a: 'middle', s: 10.5, wt: 700, c: C.ink });
-      t += bal(404, 193, 1, 367, 186);
+      // gridworld: 7 × 5 tiles
+      const cols = 7, rows = 5, ts = 44, gx = 160, gy = 222;
+      const wall = new Set(['2,0', '2,1', '2,2', '4,2', '4,3', '4,4']);
+      const goal = '6,0', pit = '5,2', start = [0, 4], gamma = 0.9;
+      const key = (c, r) => `${c},${r}`;
+      const V = {}; for (let c = 0; c < cols; c++) for (let r = 0; r < rows; r++) V[key(c, r)] = 0;
+      const moves = [[0, -1], [1, 0], [0, 1], [-1, 0]];
+      const step = (c, r, [dc, dr]) => { const nc = c + dc, nr = r + dr; return (nc < 0 || nr < 0 || nc >= cols || nr >= rows || wall.has(key(nc, nr))) ? [c, r] : [nc, nr]; };
+      const rew = (k) => k === goal ? 1 : k === pit ? -1 : 0;
+      const q = (c, r, m) => { const [nc, nr] = step(c, r, m), k = key(nc, nr); return rew(k) + (k === goal || k === pit ? 0 : gamma * V[k]); };
+      for (let it = 0; it < 60; it++) for (let c = 0; c < cols; c++) for (let r = 0; r < rows; r++) {
+        const k = key(c, r); if (wall.has(k) || k === goal || k === pit) continue;
+        V[k] = Math.max(...moves.map((m) => q(c, r, m)));
+      }
+      // tiles
+      for (let c = 0; c < cols; c++) for (let r = 0; r < rows; r++) {
+        const k = key(c, r), x = gx + c * ts, y = gy + r * ts;
+        if (wall.has(k)) t += DO.R(x, y, ts, ts, { fill: C.g, c: 'none' });
+        else if (k === goal) t += DO.R(x, y, ts, ts, { fill: C.ink, c: 'none' }) + Tx(x + ts / 2, y + ts / 2 + 5, '+1', { a: 'middle', s: 14, wt: 700, c: C.paper });
+        else if (k === pit) t += DO.R(x, y, ts, ts, { fill: `url(#${id}-x)`, c: 'none' }) + DO.R(x + 10, y + 13, 24, 18, { fill: C.paper, c: 'none' }) + Tx(x + ts / 2, y + ts / 2 + 4, '−1', { a: 'middle', s: 11, wt: 700 });
+        else t += Tx(x + ts / 2, y + ts - 7, V[k].toFixed(2).replace(/^0/, ''), { a: 'middle', s: 8.5, wt: 600, c: C.g2 });
+      }
+      for (let c = 1; c < cols; c++) t += L(gx + c * ts, gy, gx + c * ts, gy + rows * ts, { w: 0.9, c: C.g2 });
+      for (let r = 1; r < rows; r++) t += L(gx, gy + r * ts, gx + cols * ts, gy + r * ts, { w: 0.9, c: C.g2 });
+      t += DO.R(gx, gy, cols * ts, rows * ts, { w: M });
+      // greedy policy from the start tile
+      let [c, r] = start; const path = [[c, r]];
+      for (let n = 0; n < 30 && key(c, r) !== goal; n++) {
+        const best = moves.reduce((a, m) => (q(c, r, m) > q(c, r, a) + 1e-9 ? m : a), moves[0]);
+        [c, r] = step(c, r, best); path.push([c, r]);
+      }
+      const pts = path.map(([pc, pr]) => [gx + pc * ts + ts / 2, gy + pr * ts + ts / 2 - 4]);
+      const last = pts[pts.length - 1], prev = pts[pts.length - 2];
+      const ang = Math.atan2(last[1] - prev[1], last[0] - prev[0]);
+      const end = [last[0] - Math.cos(ang) * 16, last[1] - Math.sin(ang) * 16];
+      t += PL([...pts.slice(0, -1), [end[0] - Math.cos(ang) * 9, end[1] - Math.sin(ang) * 9]], { w: 2.4, join: 'round' }) + AH(...end, ang, { l: 12, h: 4 });
+      t += Ci(...pts[0], 5, { fill: C.g, c: 'none' }) + Tx(pts[0][0] - 12, pts[0][1] + 4, 'S', { a: 'end', s: 11, wt: 700 });
+      // tags
+      t += bal(410, 180, 1, 392, 176) + bal(gx - 24 + 0, gy + 3 * ts + ts - 8, 2, gx + 14, gy + 3 * ts + ts - 12);
+      t += bal(gx + 3 * ts + ts / 2 + 30, gy + 4 * ts + ts + 18, 3, gx + 3 * ts + ts / 2 + 6, gy + 4 * ts + ts / 2 - 4);
+      t += bal(gx + 6 * ts + 22, gy - 20, 4, gx + 6 * ts + 22, gy, true);
       let s = room(3, id, [{ side: 'L', a: 408, b: 452, door: 1 }, ...wins], t, '');
-      s += schedule([{ a: 'BANDITS', b: 'where it starts' }, { a: 'AGENT', b: 'policy π' },
-        { a: 'ENVIRONMENT', b: 'answers with a state' }, { a: 'REWARD', b: 'the only teacher', red: true }]);
+      s += schedule([{ a: 'BANDITS', b: 'where it starts' }, { a: 'VALUE V(s)', b: 'γ = 0.9, iterated' },
+        { a: 'POLICY π', b: 'greedy on V' }, { a: 'REWARD', b: '+1 at the goal', red: true }]);
       return s;
     }
   });
@@ -1230,7 +1338,7 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
   /* ───────────── Build Decision Trees from Scratch (beginner) ───────────── */
   B.push({
     slug: 'decision-trees-from-scratch', no: '014', level: 'beginner',
-    title: 'Build Decision Trees<br>from Scratch', ts: 60,
+    title: 'Build Decision Trees<br>from Scratch',
     desc: 'Grow classification and regression trees by hand.',
     capsules: 23, hours: 5, units: 'Gini',
     fig: 'FIG. 1   FEATURE SPACE, CUT BY GREEDY SPLITS — AND THE TREE THAT CUTS IT',
@@ -1260,11 +1368,17 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
       s += L(t3, t2, t3, y0 + H + 4, { w: 2 });
       s += R(x0, y0, W, H, { w: K });
       // axes labels + threshold dims
-      s += Tx(x0 + W / 2, y0 + H + 58, 'FEATURE x₁', { a: 'middle', s: 10, wt: 700 });
-      s += Tx(x0 - 30, y0 + H / 2, 'FEATURE x₂', { a: 'middle', s: 10, wt: 700, rot: -90 });
-      s += dim(x0, y0 + H, t1, y0 + H, 22, 't₁', { c: C.ink, s: 11, wt: 700 });
-      s += dim(t1, y0 + H, t3, y0 + H, 22, 't₃', { s: 11, wt: 700, gap: 6 });
-      s += dim(x0 + W, t2, x0 + W, y0, 24, 't₂', { s: 11, wt: 700, gap: 17 });
+      s += Tx(x0 + W / 2, y0 + H + 76, 'FEATURE x₁ →', { a: 'middle', s: 10, wt: 700 });
+      s += Tx(x0 - 30, y0 + H / 2, 'FEATURE x₂ →', { a: 'middle', s: 10, wt: 700, rot: -90 });
+      // gini impurity of each decision node, computed from the plotted samples
+      const gini = (sel) => { const n = sel.length, cnt = [0, 1, 2].map((k) => sel.filter((q) => q[2] === k).length); return 1 - cnt.reduce((a, m) => a + (m / n) ** 2, 0); };
+      const right = pts.filter(([x]) => x0 + x > t1), low = right.filter(([, y]) => y0 + y > t2);
+      const G = [gini(pts), gini(right), gini(low)].map((g) => 'gini ' + g.toFixed(2));
+      // baseline dimensioning from the origin corner (x₁ grows right, x₂ grows up)
+      s += dim(x0, y0 + H, t1, y0 + H, 20, 't₁', { c: C.ink, s: 11, wt: 700 });
+      s += dim(x0, y0 + H, t3, y0 + H, 42, 't₃', { s: 11, wt: 700 });
+      s += dim(x0 + W, y0 + H, x0 + W, t2, 24, 't₂', { s: 11, wt: 700, gap: 17 });
+      s += Ci(x0, y0 + H, 3.2, { fill: C.g, c: 'none' }) + Tx(x0 - 6, y0 + H + 14, '0', { a: 'end', s: 10, wt: 700 });
       // the tree
       const node = (x, y, w, lab, sub, red) => R(x - w / 2, y - 15, w, 30, { w: red ? 2.4 : M, c: red ? C.ink : C.g, fill: C.paper }) +
         Tx(x, y + 1, lab, { a: 'middle', s: 10.5, wt: 700, c: red ? C.ink : C.g }) + (sub ? Tx(x, y + 12, sub, { a: 'middle', s: 8, wt: 500, c: C.g2 }) : '');
@@ -1279,11 +1393,11 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
       s += edge(rx, 143, 458, 214, 'yes', true) + edge(rx, 143, 594, 214, 'no');
       s += edge(594, 243, 548, 318, 'yes', true) + edge(594, 243, 632, 318, 'no');
       s += edge(548, 347, 512, 412, 'yes', true) + edge(548, 347, 584, 412, 'no');
-      s += node(rx, 128, 92, 'x₁ ≤ t₁', 'gini 0.66', true);
+      s += node(rx, 128, 92, 'x₁ ≤ t₁', G[0], true);
       s += leaf(458, 227, 0);
-      s += node(594, 228, 78, 'x₂ ≤ t₂', 'gini 0.49');
+      s += node(594, 228, 78, 'x₂ ≤ t₂', G[1]);
       s += leaf(632, 331, 1);
-      s += node(548, 332, 78, 'x₁ ≤ t₃', 'gini 0.44');
+      s += node(548, 332, 78, 'x₁ ≤ t₃', G[2]);
       s += leaf(512, 425, 2) + leaf(584, 425, 1);
       s += Tx(rx, 96, 'ROOT', { a: 'middle', s: 9.5, wt: 700, ls: '0.1em', c: C.ink });
       s += Tx(560, 470, 'BEST SPLIT FIRST,', { a: 'middle', s: 9.5, wt: 700 }) + Tx(560, 484, 'THEN RECURSE', { a: 'middle', s: 9.5, wt: 700 });
@@ -1294,7 +1408,7 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
   /* ───────────── Kernel Engineering (coming soon) ───────────── */
   B.push({
     slug: 'kernel-engineering', no: '051', level: 'advanced', prelim: true,
-    title: 'Kernel<br>Engineering', ts: 72,
+    title: 'Kernel<br>Engineering',
     desc: 'From silicon to speculative decoding — GPU kernels for modern LLMs.',
     capsules: '—', hours: '—', units: 'Bytes',
     fig: 'FIG. 1   TILED MATRIX MULTIPLY — C = A·B, ONE TILE PER THREAD BLOCK',
@@ -1330,7 +1444,8 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
       s += dim(cx + tj * tw, cy + mh, cx + (tj + 1) * tw, cy + mh, 30, 'BLOCK_N', { s: 9.5, wt: 700, c: C.ink });
       // memory hierarchy, in section: the nearer the core, the smaller and faster
       const mx = 598, my = 118;
-      s += Tx(mx, my - 22, 'SECTION M–M', { a: 'middle', s: 9.5, wt: 700, ls: '0.06em' });
+      s += Tx(mx, my - 22, 'MEMORY HIERARCHY', { a: 'middle', s: 9.5, wt: 700, ls: '0.06em' });
+      s += Tx(mx, my - 10, '(SCHEMATIC)', { a: 'middle', s: 8.5, wt: 600, c: C.g2, ls: '0.06em' });
       [[44, 'REG', null], [84, 'SRAM', 'hf'], [120, 'HBM', 'h']].forEach(([w, lab, fill], i) => {
         const x = mx - w / 2, y = my + i * 30;
         s += R(x, y, w, 30, { fill: fill ? `url(#${id}-${fill})` : C.paper, c: 'none' }) + R(x, y, w, 30, { w: i === 0 ? K : M });
@@ -1343,7 +1458,7 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
     },
     extra(id) {
       // PRELIMINARY stamp
-      const x = 594, y = 474;
+      const x = 580, y = 474;
       return `<g transform="rotate(-8 ${x} ${y})">` +
         R(x - 76, y - 36, 152, 72, { c: C.ink, w: 3, fill: C.paper }) + R(x - 70, y - 30, 140, 60, { c: C.ink, w: 1.1 }) +
         Tx(x, y - 6, 'PRELIMINARY', { a: 'middle', s: 16.5, wt: 700, c: C.ink, ls: '0.1em' }) +
@@ -1358,7 +1473,7 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
 /* Drawing Office — presentation page: register, groups, keys, print wrap. */
 (function () {
   const { C, K, M, T, L, P, R, Ci, PG, PL, Tx, AH, dim, center, mark, hatchDefs, f } = DO;
-  const { buildCover, frame, markSvg, levelMarks, LEVEL_NAME } = SHEET;
+  const { buildCover, fitTitles, frame, markSvg, levelMarks, LEVEL_NAME } = SHEET;
   const bySlug = Object.fromEntries(BOOKS.map((b) => [b.slug, b]));
   const plain = (h) => h.replace(/<br>/g, ' ');
 
@@ -1486,6 +1601,7 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
     const front = buildCover(b, { idp: 'wf', bare: true });
     document.getElementById('wrap').innerHTML = back + spine + front;
   }
+  fitTitles();
 })();
 
 </script>

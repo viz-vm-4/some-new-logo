@@ -49,7 +49,7 @@ function emblem(slug, seed) {
   if (cache[key]) return cache[key];
   const b = BOOKS[slug];
   const sh = b.shape();
-  const sol = K.solve(sh, { loops: b.loops, density: b.density, sym: SYM[b.sym], seed: seed || 1, force: b.force, noIsolated: true, iters: 3000, restarts: 4 });
+  const sol = K.solve(sh, { loops: b.loops, density: b.density, sym: SYM[b.sym], seed: seed || 1, force: b.force, minLoopDots: b.minLoopDots, allCross: b.allCross, noIsolated: true, iters: b.iters || 3000, restarts: b.restarts || 4 });
   if (sol.loops !== b.loops) console.warn(`! ${slug}: wanted ${b.loops} lines, got ${sol.loops}`);
   return (cache[key] = { b, sol, n: sh.cells.length });
 }

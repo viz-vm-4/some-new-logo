@@ -5,23 +5,84 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anek+Latin:wdth,wght@75..125,300..800&family=Tiro+Devanagari+Hindi:ital@0;1&display=swap" rel="stylesheet">
 <style>
-:root{--paper:#EDE5D8;--ink:#26140E;--red:#5B1D18}
+:root{--paper:#EDE5D8;--ink:#26140E;--red:#5B1D18;--rule:#C9B8A4;--muted:#6E4A3C}
 *{box-sizing:border-box}
-body{margin:0;background:var(--paper);color:var(--ink);font-family:'Anek Latin',sans-serif}
-.covers{display:flex;flex-wrap:wrap;gap:56px 48px;padding:48px}
+html{background:var(--paper)}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:'Anek Latin',sans-serif;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+
+/* ---------- presentation ---------- */
+.page{width:1536px;margin:0 auto;padding:0 24px 120px}
+.mast{display:grid;grid-template-columns:720px 1fr;gap:48px;padding:72px 0 56px;border-bottom:1.5px solid var(--ink)}
+.mast .eyebrow{font-size:14px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;display:flex;align-items:center;gap:12px;margin:0 0 28px}
+.mast h1{margin:0;font-weight:600;font-stretch:78%;font-size:168px;line-height:.86;letter-spacing:-.01em}
+.mast .dek{margin:18px 0 0;font-family:'Tiro Devanagari Hindi',serif;font-style:italic;font-size:32px;line-height:1.2;color:var(--muted)}
+.mast .why{font-family:'Tiro Devanagari Hindi',serif;font-size:20px;line-height:1.55;margin:0 0 16px;max-width:680px}
+.mast .why:first-child{margin-top:44px}
+.sec{display:grid;grid-template-columns:220px 1fr;gap:48px;padding:40px 0;border-bottom:1px solid var(--rule)}
+.sec h3{margin:0;font-size:14px;font-weight:600;letter-spacing:.18em;text-transform:uppercase}
+.sec p,.sec li{font-family:'Tiro Devanagari Hindi',serif;font-size:18px;line-height:1.5;margin:0 0 10px;max-width:880px}
+.sec ul{margin:0;padding-left:18px}
+.hours{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.hour{border:1.5px solid var(--ink)}
+.hour .sky{height:150px;position:relative;display:flex;align-items:flex-end;padding:16px}
+.hour .sky b{font-weight:600;font-stretch:80%;font-size:38px;line-height:1}
+.hour .sky small{position:absolute;top:14px;left:16px;font-size:13px;letter-spacing:.16em;text-transform:uppercase;font-weight:600}
+.hour .chips{display:flex}
+.hour .chips span{flex:1;height:34px}
+.hour dl{margin:0;padding:12px 16px 14px;display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:14px}
+.hour dt{font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:12px;padding-top:2px}
+.hour dd{margin:0;font-family:ui-monospace,Menlo,monospace;font-size:13px}
+.type{display:grid;grid-template-columns:1fr 1fr;gap:32px}
+.type .spec{border-top:1.5px solid var(--ink);padding-top:14px}
+.type .big1{font-weight:600;font-stretch:80%;font-size:50px;line-height:1}
+.type .big2{font-family:'Tiro Devanagari Hindi',serif;font-style:italic;font-size:42px;line-height:1.1}
+.type .meta{font-size:14px;margin-top:10px;color:var(--muted)}
+.anat{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+.anat div{border-top:1.5px solid var(--ink);padding-top:12px}
+.anat b{display:block;font-size:14px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px}
+.anat p{font-size:16px}
+.shelf-h{display:flex;justify-content:space-between;align-items:baseline;padding:56px 0 24px}
+.shelf-h h2{margin:0;font-weight:600;font-stretch:80%;font-size:56px;line-height:1}
+.shelf-h span{font-size:14px;letter-spacing:.16em;text-transform:uppercase;font-weight:600}
+.covers{display:grid;grid-template-columns:720px 720px;gap:64px 48px;justify-content:space-between}
+.item figcaption{margin-top:14px;display:flex;justify-content:space-between;gap:24px;font-size:14px;border-top:1.5px solid var(--ink);padding-top:10px}
+.item figcaption b{font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:13px}
+.item figcaption i{font-family:'Tiro Devanagari Hindi',serif;font-size:16px;color:var(--muted);text-align:right}
+figure{margin:0}
+.wrap-h{padding:72px 0 24px}
+.foot{padding:56px 0 0;display:grid;grid-template-columns:220px 1fr;gap:48px}
+.foot p{font-family:'Tiro Devanagari Hindi',serif;font-size:17px;line-height:1.5;max-width:900px;margin:0 0 10px}
+
+/* ---------- cover ---------- */
 .cover{position:relative;width:720px;height:888px;overflow:hidden;flex:none;background:var(--sky);color:var(--ink)}
-.cover svg.art{position:absolute;left:0;top:0}
-.cover .head{position:absolute;left:40px;top:40px;right:40px}
-.cover .title{margin:0;font-weight:600;font-stretch:80%;font-size:68px;line-height:.97;letter-spacing:-.004em;color:var(--ink)}
+.cover svg.art,.wrap svg.art{position:absolute;left:0;top:0}
+.cover .head,.wrap .head{position:absolute;left:40px;top:40px;right:40px}
+.title{margin:0;font-weight:600;font-stretch:80%;font-size:68px;line-height:.97;letter-spacing:-.004em;color:var(--ink);text-wrap:balance}
 .cover .series{display:flex;align-items:center;gap:12px;margin:0 0 16px;font-size:14px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--ink)}
 .cover .series .no{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:26px;padding:0 6px;border:1.5px solid currentColor;font-family:'Tiro Devanagari Hindi',serif;font-size:16px;letter-spacing:.04em;font-weight:400}
 .cover .sub{margin:14px 0 0;max-width:520px;font-family:'Tiro Devanagari Hindi',serif;font-style:italic;font-size:21px;line-height:1.25;color:var(--ink)}
-.cover .band{position:absolute;left:40px;right:40px;bottom:30px;color:#F4EADC}
-.cover .row{display:flex;justify-content:space-between;align-items:center}
-.cover .r1{font-size:17px;letter-spacing:.16em;text-transform:uppercase;font-weight:500}
-.cover .r1 b{font-weight:700}
-.cover .imp,.cover .lvl{display:flex;align-items:center;gap:10px}
-.cover .r2{margin-top:10px;font-family:'Tiro Devanagari Hindi',serif;font-style:italic;font-size:16px;color:#E3C3AE}
+.band{position:absolute;left:40px;right:40px;bottom:30px;color:#F4EADC}
+.row{display:flex;justify-content:space-between;align-items:center}
+.r1{font-size:17px;letter-spacing:.16em;text-transform:uppercase;font-weight:500}
+.r1 b{font-weight:700}
+.imp,.lvl{display:flex;align-items:center;gap:10px}
+.r2{margin-top:10px;font-family:'Tiro Devanagari Hindi',serif;font-style:italic;font-size:16px;color:#E3C3AE}
+
+/* ---------- wrap ---------- */
+.wrap{position:relative;height:888px;overflow:hidden;background:var(--sky);color:var(--ink)}
+.wrap .front{position:absolute;top:0;width:720px;height:888px}
+.wrap .back{position:absolute;left:40px;top:40px;width:560px}
+.wrap .back .kicker{display:flex;align-items:center;gap:12px;font-size:14px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;margin-bottom:28px}
+.wrap .back .kicker b{font-weight:700}
+.wrap .back p{font-family:'Tiro Devanagari Hindi',serif;font-size:21px;line-height:1.45;margin:0 0 14px}
+.wrap .back p.lead{font-family:'Anek Latin',sans-serif;font-weight:600;font-stretch:80%;font-size:36px;line-height:1.05;margin-bottom:22px;text-wrap:balance}
+.wrap .back p.note{font-size:16px;line-height:1.45;border-top:1.5px solid currentColor;padding-top:12px;margin-top:22px;max-width:470px}
+.wrap .spine{position:absolute;top:0;height:888px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:26px 0 30px}
+.wrap .sp-t{writing-mode:vertical-rl;font-weight:600;font-stretch:80%;font-size:21px;letter-spacing:.01em;flex:1;display:flex;align-items:center;justify-content:flex-start;padding-top:22px;white-space:nowrap}
+.wrap .sp-mk{display:flex}
+.wrap .bband{position:absolute;left:40px;width:640px;bottom:30px;color:#F4EADC}
+.wrap .bband .isbn{position:absolute;right:0;bottom:-6px;width:150px;height:62px;background:#F4EADC;color:#5B1D18;font-size:10px;letter-spacing:.14em;text-transform:uppercase;display:flex;align-items:flex-end;justify-content:center;padding-bottom:6px;font-weight:600}
 </style></head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
@@ -30,7 +91,61 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:'Anek Latin',
     <feColorMatrix in="n" type="matrix" values="0 0 0 0 0.16  0 0 0 0 0.06  0 0 0 0 0.03  0 0 0 -1.3 0.72"/>
   </filter>
 </defs></svg>
-<main class="covers" id="covers"></main>
+
+<div class="page">
+  <header class="mast">
+    <div>
+      <p class="eyebrow"><svg width="26" height="18" viewBox="0 0 26 18"><path fill="#26140E" d="M0 0h26v4.5H0zM4 4.5h18V9H4zM8 9h10v4.5H8zM12 13.5h2V18h-2z"/></svg>Direction 15 · Vizuara Books</p>
+      <h1>Jantar</h1>
+      <p class="dek">Instruments in stone: a cover system<br>for Vizuara Books</p>
+    </div>
+    <div>
+      <p class="why">In 1720s Jaipur and Delhi, Sawai Jai Singh II built mathematics at the scale of architecture: a right triangle 27 metres high that tells the time by its shadow, a bowl that maps the sky, a wall graduated to the minute. Every Vizuara cover is one such instrument, drawn in axonometric and derived from the book's own subject: a stepwell whose terraces are the layers of a neural network, a wall whose single window is the context window, a court split by ever-lower walls that is a decision tree.</p>
+      <p class="why">The drawings are generated in code by a small sun-and-stone renderer: each structure is modelled, lit by one hard sun and given true cast shadows, then output as flat-toned vector polygons. The system itself is simple. The title sits in the sky, the instrument stands on the ground, and a section cut through the earth forms the plinth that carries the imprint. The time of day gives the level: morning for beginner, noon for intermediate and evening for advanced.</p>
+    </div>
+  </header>
+
+  <section class="sec">
+    <h3>The three hours</h3>
+    <div>
+      <div class="hours" id="hours"></div>
+      <p style="margin-top:18px">Level is carried by the sky (the one flat field that is both sky and ground) and by the light itself: morning is pale and even, noon is ochre and high, and evening is indigo with a raking sun and long shadows. The sky value steps from light to mid to dark, so the level still reads when printed in greyscale. A small stepped glyph in the plinth (one, two or three steps down) repeats it in the text.</p>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h3>Type</h3>
+    <div class="type">
+      <div class="spec"><div class="big1">Anek Latin, SemiBold, width 80</div><div class="meta">Titles, imprint and labels. Designed by Ek Type (Mumbai). A condensed width keeps long titles on two or three lines at monumental sizes.</div></div>
+      <div class="spec"><div class="big2">Tiro Devanagari Hindi, Italic</div><div class="meta">Subtitles, captions and the back cover. The Latin of Tiro Typeworks' Devanagari family, a bookish counter-voice to the stone.</div></div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h3>Anatomy</h3>
+    <div class="anat">
+      <div><b>Sky</b><p>Title top left in ink or limewash, 80 px for two lines and 68 px for three. The only colour field, it changes with the level.</p></div>
+      <div><b>Instrument</b><p>One structure per book, modelled from its subject, drawn in axonometric, lit by one sun and cast in true shadow. The materials are red sandstone, white marble edging and coursed masonry.</p></div>
+      <div><b>Section line</b><p>At 748 px on every cover the ground is cut open. Pits and wells show in section, and the earth is drawn as poché in oxblood.</p></div>
+      <div><b>Plinth</b><p>Holds the imprint: a stepwell mark (an inverted stepped V), <i>Vizuara Books</i>, the level glyph, capsules and hours, and a one-line figure caption naming the source.</p></div>
+    </div>
+  </section>
+
+  <div class="shelf-h"><h2>The shelf</h2><span>13 covers · 720 × 888 px · 7.5 × 9.25 in trim</span></div>
+  <main class="covers" id="covers"></main>
+
+  <div class="shelf-h wrap-h"><h2>Print wrap</h2><span>Back · spine · front, the drawing continuous across all three</span></div>
+  <div id="wrapHost"></div>
+
+  <footer class="foot">
+    <h3 style="margin:0;font-size:14px;letter-spacing:.18em;text-transform:uppercase">Sources</h3>
+    <div>
+      <p>Jantar Mantar, Jaipur (Sawai Jai Singh II, 1728–34; UNESCO World Heritage): the Samrat Yantra, whose gnomon is inclined at the site's latitude of about 27°, and the Jai Prakash Yantra. Jantar Mantar, New Delhi (1724): the Misra Yantra and the free-standing stairs. Chand Baori, Abhaneri (9th century), with its criss-cross flights of steps. Panna Meena ka Kund, Amer. Jali screens of Rajasthan and Gujarat. These buildings supply structure, light and material; nothing is traced from them.</p>
+      <p>A production version would commission an architectural illustrator to check each instrument against measured drawings (for example the survey drawings of the Jaipur observatory) and would credit the sandstone and lime-plaster craftspeople whose finishes the palette is taken from.</p>
+    </div>
+  </footer>
+</div>
+
 <script>/* Jantar — a tiny sun-and-stone renderer.
    Convex solids -> back-face cull -> BSP painter order -> analytic hard shadows
    (every sun-facing face of every caster is projected along the sun ray onto each lit
@@ -544,7 +659,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:'Anek Latin',
     const cam = CAM({ az: 0, s: 0.92, ox: 400 });
     const S = new Scene(); ground(S, hr, cam); S.E = frame(cam, -22);
     for (let r = 0; r < 5; r++) for (let c = 0; c < 5; c++) {
-      const x = -420 + c * 150, y = 80 + r * 150;
+      const x = -420 + c * 150, y = 150 + r * 150;
       S.extrude([S.W(x, y, 0), S.W(x + 104, y, 0), S.W(x, y, 96)], mul(S.E[1], 34), { mat: hr.stone });
     }
     return { S, cam };
@@ -552,9 +667,9 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:'Anek Latin',
 
   // Jali screen — tiles of light (coming soon: upper rows still to be built)
   SCENES.jali = (hr) => {
-    const cam = CAM({ az: 0, s: 1, ox: 360 });
+    const cam = CAM({ az: 0, s: 0.94, ox: 372 });
     const S = new Scene(); ground(S, hr, cam); S.E = frame(cam, -10);
-    const nx = 7, nz = 8, hs = 38, bw = 12, t = 16, x0 = -190, y0 = 360, built = 5;
+    const nx = 7, nz = 7, hs = 38, bw = 12, t = 16, x0 = -190, y0 = 300, built = 5;
     const Wd = nx * hs + (nx + 1) * bw;
     for (let i = 0; i <= nx; i++) { const x = x0 + i * (hs + bw); S.box(x, y0, 0, x + bw, y0 + t, bw + built * (hs + bw), { mat: hr.stone }); }
     for (let i = 0; i < nx; i++) for (let k = 0; k <= built; k++) {
@@ -711,7 +826,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:'Anek Latin',
   // the section plane (the poché frame is the sub-series mark); the roof is pierced in a pattern
   // that belongs to the room, and the sun draws that pattern on the chamber's back wall.
   function roomScene(hr, o) {
-    const cam = CAM({ az: 0, s: 0.96, ox: 360, el: 16 });
+    const cam = CAM({ az: 0, s: 0.86, ox: 360, el: 16 });
     const S = new Scene(); S.E = frame(cam, 0); ground(S, hr, cam);
     const cm = cutOr(S, hr, hr.stone);
     const X = 176, T = 40, Y1 = 280, Hr = 420, R = Hr + 16;
@@ -786,7 +901,6 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:'Anek Latin',
     const L = sc.L || sunRel(sc.cam, hr.light[0], hr.light[1]);
     const art = render(sc.S, sc.cam, L);
     const extra = sc.extra ? sc.extra(sc.cam) : '';
-    console.log(b.slug, sc.S.faces.length, 'faces', Math.round(performance.now() - t0), 'ms');
     const el = document.createElement('div');
     el.className = 'cover lv-' + b.level; el.dataset.slug = b.slug;
     el.style.setProperty('--sky', hr.sky); el.style.setProperty('--ink', hr.ink); el.style.setProperty('--sub', hr.sub);
@@ -804,8 +918,65 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:'Anek Latin',
     return el;
   }
 
-  window.JANTAR = { BOOKS, build, HOURS };
+  // full print wrap: back (720) + spine + front (720); the drawing runs continuously across all three
+  function buildWrap(b, spine, back) {
+    const hr = HOURS[b.level], WW = 2 * W + spine, off = W + spine;
+    const sc = SCENES[b.scene](hr);
+    const L = sc.L || sunRel(sc.cam, hr.light[0], hr.light[1]);
+    const cam = Object.assign({}, sc.cam, { P: (p) => { const q = sc.cam.P(p); return [q[0] + off, q[1]]; } });
+    const art = render(sc.S, cam, L);
+    const extra = sc.extra ? sc.extra(cam) : '';
+    const el = document.createElement('div');
+    el.className = 'wrap lv-' + b.level; el.dataset.slug = b.slug + '-wrap';
+    el.style.setProperty('--sky', hr.sky); el.style.setProperty('--ink', hr.ink); el.style.width = WW + 'px';
+    const stats = `${b.capsules} capsules · ${b.hours} hours`;
+    el.innerHTML = `<svg class="art" width="${WW}" height="${H}" viewBox="0 0 ${WW} ${H}"><rect width="${WW}" height="${H}" fill="${hr.sky}"/>${art}${extra}<rect x="0" y="806" width="${WW}" height="${H - 806}" fill="${hr.cut.flat}"/><rect width="${WW}" height="${H}" filter="url(#grain)" opacity="${hr.grain || 0.22}"/>
+      <line x1="${W}" y1="0" x2="${W}" y2="${H}" stroke="${hr.ink}" stroke-opacity=".18" stroke-dasharray="3 5"/><line x1="${off}" y1="0" x2="${off}" y2="${H}" stroke="${hr.ink}" stroke-opacity=".18" stroke-dasharray="3 5"/></svg>
+      <div class="back">
+        <div class="kicker">${mark(hr.ink)}<span><b>Vizuara</b> Books · ${hr.label}</span></div>
+        ${back}
+      </div>
+      <div class="spine" style="left:${W}px;width:${spine}px"><span class="sp-lv">${levelGlyph(hr.n, hr.ink)}</span><span class="sp-t">${b.title.join(' ')}</span><span class="sp-mk">${mark('#F4EADC')}</span></div>
+      <div class="front" style="left:${off}px">
+        <div class="head"><h2 class="title" style="font-size:${b.size || (b.title.length >= 3 ? 68 : 80)}px">${b.title.join('<br>')}</h2></div>
+        <div class="band">
+          <div class="row r1"><span class="imp">${mark('#F4EADC')}<b>Vizuara</b> Books</span><span class="lvl">${levelGlyph(hr.n, '#F4EADC')}${hr.label}</span></div>
+          <div class="row r2"><span>${stats}</span><span class="fig">${b.fig}</span></div>
+        </div>
+      </div>
+      <div class="bband"><div class="row r1"><span class="imp">books.vizuara.ai</span></div><div class="row r2"><span>${stats}</span></div><div class="isbn">ISBN / barcode</div></div>`;
+    return el;
+  }
+
+  window.JANTAR = { BOOKS, build, buildWrap, HOURS };
 })();
 </script>
-<script>const host=document.getElementById('covers');for(const b of JANTAR.BOOKS)host.appendChild(JANTAR.build(b));</script>
+<script>
+(function () {
+  const host = document.getElementById('covers');
+  for (const b of JANTAR.BOOKS) {
+    const fig = document.createElement('figure'); fig.className = 'item';
+    fig.appendChild(JANTAR.build(b));
+    const cap = document.createElement('figcaption');
+    cap.innerHTML = `<b>${b.slug}</b><i>${b.note || b.fig}</i>`;
+    fig.appendChild(cap); host.appendChild(fig);
+  }
+  // the three hours
+  const H = JANTAR.HOURS, hh = document.getElementById('hours');
+  for (const k of ['beginner', 'intermediate', 'advanced']) {
+    const h = H[k];
+    const d = document.createElement('div'); d.className = 'hour';
+    d.innerHTML = `<div class="sky" style="background:${h.sky};color:${h.ink}"><small>${h.label}</small><b>${h.hour}</b></div>
+      <div class="chips"><span style="background:${h.stone.hi}"></span><span style="background:${h.stone.lo}"></span><span style="background:${h.stone.sh}"></span><span style="background:${h.ground.sh}"></span><span style="background:${h.marble.hi}"></span><span style="background:${h.cut.flat}"></span></div>
+      <dl><dt>Sky</dt><dd>${h.sky}</dd><dt>Stone</dt><dd>${h.stone.hi} · ${h.stone.lo} · ${h.stone.sh}</dd><dt>Shadow</dt><dd>${h.ground.sh}</dd><dt>Marble</dt><dd>${h.marble.hi}</dd><dt>Poché</dt><dd>${h.cut.flat}</dd><dt>Ink</dt><dd>${h.ink}</dd></dl>`;
+    hh.appendChild(d);
+  }
+  // print wrap
+  const m = JANTAR.BOOKS.find(b => b.slug === 'mathematical-foundations-for-ml');
+  document.getElementById('wrapHost').appendChild(JANTAR.buildWrap(m, 44, `
+    <p class="lead">The mathematics under machine learning, in 43 capsules.</p>
+    <p>Mathematical Foundations for Machine Learning is taught the Vizuara way, in short lessons called capsules. There are 43 of them, about ten hours of reading, and they are written for beginners.</p>
+    <p class="note">On the cover is the Samrat Yantra at Jaipur, a right triangle built as an instrument. Its gnomon rises at the latitude of the site, and the gnomon's shadow on the marble quadrants gives the time of day.</p>`));
+})();
+</script>
 </body></html>

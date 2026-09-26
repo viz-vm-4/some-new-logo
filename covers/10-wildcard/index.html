@@ -49,7 +49,7 @@ body{
 .imprint{display:flex;align-items:center;gap:10px;font-family:'Archivo';font-weight:800;font-stretch:125%;font-size:13px;letter-spacing:.17em;text-transform:uppercase}
 .imprint svg{width:23px;height:23px;flex:none}
 .contents{font-family:'IBM Plex Mono',monospace;font-weight:500;font-size:12.5px;letter-spacing:.05em;text-transform:uppercase}
-.stamp{position:absolute;right:40px;top:312px;transform:rotate(-6deg);border:3px solid #E5533A;color:#E5533A;padding:7px 14px 6px;border-radius:4px;
+.stamp{position:absolute;z-index:3;right:40px;top:312px;transform:rotate(-6deg);border:3px solid #E5533A;color:#E5533A;padding:7px 14px 6px;border-radius:4px;
   font-family:'Archivo';font-weight:900;font-stretch:125%;font-size:15px;letter-spacing:.16em;line-height:1.15;text-align:center;text-transform:uppercase}
 .stamp small{display:block;font-family:'IBM Plex Mono';font-weight:600;font-size:10.5px;letter-spacing:.12em}
 
@@ -334,10 +334,10 @@ class Sprue{
 }
 
 /* Rich moulded text: x_1 → subscript, h^1_2 → stacked super/subscript, and
-   '≤' borrowed from IBM Plex Mono — every glyph comes from a loaded Google
-   font, so nothing falls back to a system face. Offsets are in main-size ems. */
+   no U+2080 subscripts (not in Archivo), so nothing falls back to a system
+   face. Symbols outside the fonts (≤, π, Σ…) are drawn as moulded paths. */
 function rich(str){
-  const esc=t=>t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/≤/g,`<tspan style="font-family:'IBM Plex Mono',monospace;font-weight:600;font-style:normal">≤</tspan>`);
+  const esc=t=>t.replace(/&/g,'&amp;').replace(/</g,'&lt;');
   const K=.62; let out='', i=0, shift=0, lastSup=0;
   while(i<str.length){
     const c=str[i];
@@ -373,9 +373,9 @@ function baseFrame(S,b,letter='A'){
   return S;
 }
 // pack labelled blocks in a row
-function row(S,items,x0,y,h,gap,runnerY,label=true){
+function row(S,items,x0,y,h,gap,runnerY,size=9.5){
   let x=x0; const out=[];
-  items.forEach(([t,w])=>{ S.rect(x,y,w,h,4); S.gate(x+w/2,runnerY,x+w/2,runnerY<y?y:y+h,3.6); if(label&&t) S.text(x+w/2,y+h/2+3.6,t,{size:9.5,wt:800,wd:125,ls:.1}); out.push([x,w]); x+=w+gap; });
+  items.forEach(([t,w])=>{ S.rect(x,y,w,h,4); S.gate(x+w/2,runnerY,x+w/2,runnerY<y?y:y+h,3.6); if(t) S.text(x+w/2,y+h/2+size*.38,t,{size,wt:800,wd:125,ls:.1}); out.push([x,w]); x+=w+gap; });
   return out;
 }
 
@@ -397,11 +397,11 @@ EMBLEMS['ai-context-engineering'] = (S,b) => {
   S.text(sx+2,sy+sh+15,'0',{size:9,wt:600,mono:true,anchor:'start'});
   S.runner([[6,176],[W-6,176]],8);
   [110,324,540].forEach(xx=>S.gate(xx,ty+th,xx,176,4.5));
-  // DOCS 250 + HISTORY 214 + SYSTEM 84 fill the window; MEMORY, TOOLS, USER are the overflow (≈1.5×)
-  const h=48;
-  row(S,[['DOCS',250],['HISTORY',214],['SYSTEM',84]],38,204,h,12,176);
-  S.runner([[6,292],[W-6,292]],7); S.gate(163,204+h,163,292,3.6); S.gate(478,204+h,478,292,3.6);
-  row(S,[['MEMORY',116],['TOOLS',104],['USER',60]],38,318,h,12,292);
+  // DOCS 250 + HISTORY 214 + SYSTEM 84 fill the window; MEMORY, TOOLS, USER overflow it (≈1.5× in all)
+  const h=58;
+  row(S,[['DOCS',250],['HISTORY',214],['SYSTEM',84]],38,202,h,12,176,11);
+  S.runner([[6,302],[W-6,302]],7); S.gate(163,202+h,163,302,3.6); S.gate(478,202+h,478,302,3.6);
+  row(S,[['MEMORY',110],['TOOLS',104],['USER',68]],38,328,h,12,302,11);
 };
 
 /* Mathematical Foundations — an alphabet sprue of the notation itself. */
@@ -525,8 +525,8 @@ EMBLEMS['pi-vs-hermes-vs-codex'] = (S,b) => {
   const hy=62, hx0=40, hx1=608, n=24;
   S.gate(6,hy,hx0,hy,5); S.gate(hx1,hy,W-6,hy,5);
   S.runner([[hx0,hy],[hx1,hy]],30);
-  let g=''; for(let i=1;i<n;i++){ const x=hx0+i*(hx1-hx0)/n; g+=`M${f(x)} ${hy-9}V${hy+9}`; } S.groove(g,1.5);
-  S.plate(hx0+44,hy+30,'HISTORY',74,17,10);
+  let g=''; for(let i=1;i<n;i++){ const x=hx0+i*(hx1-hx0)/n; if(x>200&&x<290) continue; g+=`M${f(x)} ${hy-9}V${hy+9}`; } S.groove(g,1.5);
+  S.plate(245,hy,'HISTORY',78,19,10.5);
   // three compactors (identical: the cover makes no claim about which is best)
   const cols=[118,324,530], names=['PI','HERMES','CODEX'], ny=112;
   cols.forEach((cx,k)=>{
@@ -569,7 +569,8 @@ EMBLEMS['decision-trees-from-scratch'] = (S,b) => {
     else S.disc(n.x,n.y,16);
   }
   S.inject(root.x,14,14);
-  S.text(root.x,root.y+4.5,'x ≤ t',{size:12,wt:800,it:true});
+  S.text(root.x-13,root.y+4.5,'x',{size:13,wt:800,it:true}); S.text(root.x+13,root.y+4.5,'t',{size:13,wt:800,it:true});
+  S.groove(`M${root.x+4} ${root.y-6}L${root.x-4} ${root.y-2}L${root.x+4} ${root.y+2}M${root.x-4} ${root.y+6}H${root.x+4}`,1.9);
 };
 
 /* R Masterclass — least squares, moulded: the fitted line is the runner
@@ -577,10 +578,10 @@ EMBLEMS['decision-trees-from-scratch'] = (S,b) => {
 EMBLEMS['r-masterclass'] = (S,b) => {
   baseFrame(S,b);
   const ax=48, ay=392;
-  S.gate(ax+8,6,ax+8,30,5); S.gate(ax+8,ay+16,ax+8,FB,5); S.gate(612,ay+16,612,FB,5);
-  S.part(poly([[ax,28],[ax+16,28],[ax+16,ay],[620,ay],[620,ay+16],[ax,ay+16]]));
-  let tk=''; for(let i=1;i<=8;i++){ tk+=`M${ax+16+i*66} ${ay+4}V${ay+12}`; } for(let i=1;i<=5;i++){ tk+=`M${ax+4} ${ay-i*68}H${ax+12}`; } S.groove(tk,1.4);
-  S.text(236,ay+36,'lm(y ~ x)',{size:15,wt:600,mono:true,anchor:'start'});
+  S.gate(ax+8,6,ax+8,30,5); S.gate(ax+8,ay+24,ax+8,FB,5); S.gate(612,ay+24,612,FB,5);
+  S.part(poly([[ax,28],[ax+16,28],[ax+16,ay],[620,ay],[620,ay+24],[ax,ay+24]]));
+  let tk=''; for(let i=1;i<=8;i++){ if(ax+16+i*66>520) continue; tk+=`M${ax+16+i*66} ${ay+4}V${ay+14}`; } for(let i=1;i<=5;i++){ tk+=`M${ax+4} ${ay-i*68}H${ax+12}`; } S.groove(tk,1.4);
+  S.text(604,ay+17,'lm(y ~ x)',{size:13,wt:600,mono:true,anchor:'end'});
   const A=[96,352], B=[600,80];
   const yl = x => A[1]+(B[1]-A[1])*(x-A[0])/(B[0]-A[0]);
   const res=[34,-42,26,-30,50,-26,34,-56,28,-38,46,-30,-28,40,-46,30];
@@ -624,7 +625,7 @@ EMBLEMS['deit-from-scratch'] = (S,b) => {
   const sizes=[104,80,58,38]; let x=280; const tcy=110;
   S.runner([[260,tcy],[W-6,tcy]],6);
   sizes.forEach((s,i)=>{ S.rect(x,tcy-s/2,s,s,4); if(i===0) S.text(x+s/2,tcy+4,'CNN',{size:12,wt:900,wd:125,ls:.12}); x+=s+14; });
-  S.text(280,tcy+74,'TEACHER',{size:11,wt:900,wd:125,ls:.18,anchor:'start'});
+  S.gate(332,tcy+52,332,tcy+68,3.4); S.plate(332,tcy+78,'TEACHER',84,19,10.5);
   // token row: CLS and DIST are both learned tokens, fed like every patch
   S.runner([[6,256],[600,256]],7);
   const labs=['CLS','DIST','1','2','3','4','5','6','7','8','9'], tw=44, tg=7, ty=280, th=58;
@@ -632,12 +633,12 @@ EMBLEMS['deit-from-scratch'] = (S,b) => {
   const cx0=36+tw/2, dx=36+(tw+tg)+tw/2;
   // CLS → class head ; DIST → distillation head
   S.runner([[cx0,ty+th],[cx0,376],[228,376]],5);
-  S.runner([[dx,ty+th],[dx,414],[500,414],[500,396]],5);
+  S.runner([[dx,ty+th],[dx,414],[493,414],[493,396]],5);
   S.rect(228,358,168,36,4); S.text(312,380,'CLASS HEAD',{size:10.5,wt:900,wd:125,ls:.12});
-  S.rect(420,358,180,36,4); S.text(510,380,'DISTILL HEAD',{size:10.5,wt:900,wd:125,ls:.1});
+  S.rect(420,358,146,36,4); S.text(493,380,'DISTILL HEAD',{size:10.5,wt:900,wd:112,ls:.08});
   // the teacher's prediction is the target that supervises the distillation head
-  S.runner([[624,tcy],[624,376],[600,376]],6);
-  S.plate(612,300,'TARGET',58,19,10);
+  S.runner([[624,tcy],[624,376],[566,376]],6);
+  S.plate(596,376,'TARGET',50,17,9.5);
 };
 
 /* Charlie I · Language Room — inference: tokens arrive one at a time and
@@ -671,7 +672,7 @@ EMBLEMS['charlie-language-room'] = (S,b) => {
   S.part(rr(bx,by,bars.length*(bw+bg)-bg,14,3));
   bars.forEach((v,i)=>{ const hh=v*84; S.rect(bx+i*(bw+bg),by-hh,bw,hh+4,3); });
   S.gate(bx+3*(bw+bg)+bw/2,300,bx+3*(bw+bg)+bw/2,by-84,3.6); S.gate(bx+9*(bw+bg)+bw/2,300,bx+9*(bw+bg)+bw/2,by-.34*84,3.6);
-  S.text(bx+bars.length*(bw+bg)+10,by+12,'p(next)',{size:14,wt:600,mono:true,anchor:'start'});
+  { const lx=bx+bars.length*(bw+bg)+4; S.gate(lx-8,by+7,lx,by+7,3.6); S.rect(lx,by-12,96,34,4); S.text(lx+48,by+10,'p(next)',{size:14,wt:600,mono:true}); }
 };
 
 /* Charlie II · Vision Room — the image is cut into patches: an eye in
@@ -748,10 +749,12 @@ EMBLEMS['modern-robot-learning'] = (S,b) => {
   let tp=''; for(let i=0;i<=40;i++){ const [x,y]=bz(i/40); tp+=(i?'L':'M')+f(x)+' '+f(y); }
   S.rod(tp,11);
   // action chunks, tangent to the path, offset to its outer side
-  const arrow=[[-30,-9],[16,-9],[16,-17],[34,0],[16,17],[16,9],[-30,9]];
+  const arrow=[[-24,-8],[10,-8],[10,-15],[26,0],[10,15],[10,8],[-24,8]];
+  const smp=[]; let acc=0, prev=bz(0); for(let i=0;i<=400;i++){ const q=bz(i/400); acc+=Math.hypot(q[0]-prev[0],q[1]-prev[1]); smp.push([i/400,acc]); prev=q; }
+  const tAt=len=>{ const e=smp.find(v=>v[1]>=len); return e?e[0]:1; };
   for(let k=0;k<8;k++){
-    const t=.07+k*.123, [x,y]=bz(t), [dx,dy]=dbz(t), L=Math.hypot(dx,dy), nx=dy/L, ny=-dx/L, a=Math.atan2(dy,dx);
-    const ox=x+nx*62, oy=y+ny*62;
+    const t=tAt(acc*(.06+k*.125)), [x,y]=bz(t), [dx,dy]=dbz(t), L=Math.hypot(dx,dy), nx=dy/L, ny=-dx/L, a=Math.atan2(dy,dx);
+    const ox=x+nx*64, oy=y+ny*64;
     S.gate(x,y,ox,oy,3.4); S.part(poly(tr(arrow,ox,oy,a)));
     S.plate(x+nx*30,y+ny*30,`a_${k+1}`,28,17,11);
   }
@@ -787,7 +790,7 @@ EMBLEMS['cnn-fundamentals'] = (S,b) => {
   S.gate(270,ky+45,kx,ky+45,3.6);
   W3.forEach((rw,r)=>rw.forEach((v,cc)=>{ S.rect(kx+cc*(c+4),ky+r*(c+4),c,c,3); S.text(kx+cc*(c+4)+c/2,ky+r*(c+4)+c/2+5,v,{size:13,wt:800}); }));
   let kg=''; W3.forEach((_,r)=>{ kg+=''; }); for(let r=0;r<3;r++){ S.gate(kx+c,ky+r*(c+4)+c/2,kx+c+4,ky+r*(c+4)+c/2,2.4); S.gate(kx+2*c+4,ky+r*(c+4)+c/2,kx+2*c+8,ky+r*(c+4)+c/2,2.4); }
-  S.text(kx+51,ky+124,'KERNEL',{size:10,wt:900,wd:125,ls:.16});
+  S.gate(kx+51,ky+98,kx+51,ky+114,3.4); S.plate(kx+51,ky+124,'KERNEL',74,19,10);
   // output 5x5 with a hole where the new value goes, and the value itself
   const ox=440, oy=30, m=5; let od=rr(ox,oy,m*c,m*c,4)+rr(ox+2*c+3,oy+1*c+3,c-6,c-6,2);
   S.gate(270,oy+m*c/2,ox,oy+m*c/2,4); S.part(od,'evenodd');

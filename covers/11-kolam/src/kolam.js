@@ -169,7 +169,7 @@
     return cycles;
   }
   // fast loop counter: precompute pairings once per model
-  function prepCount(M) {
+  function prepCount(M, detail) {
     const cells = M.shape.cells;
     const fixed = []; // pairs of segment ids always joined (border turns)
     const byEdge = M.edges.map(() => ({ x: [], m: [] }));
@@ -197,7 +197,22 @@
       const u = (a, b) => { const ra = f(a), rb = f(b); if (ra !== rb) { par[ra] = rb; comps--; } };
       for (let k = 0; k < fixed.length; k += 2) u(fixed[k], fixed[k + 1]);
       for (let e = 0; e < byEdge.length; e++) { const arr = mirrors[e] ? byEdge[e].m : byEdge[e].x; u(arr[0], arr[1]); u(arr[2], arr[3]); }
-      return comps;
+      if (!detail) return comps;
+      // structure of the solution: dots touched by each line, and which pairs of lines cross
+      const roots = new Map();
+      for (let i = 0; i < n; i++) { const r = f(i); if (!roots.has(r)) roots.set(r, roots.size); }
+      const L = roots.size;
+      const dots = Array.from({ length: L }, () => new Set());
+      for (let i = 0; i < n; i++) dots[roots.get(f(i))].add(i >> 2);
+      const cross = new Uint8Array(L * L);
+      for (let e = 0; e < byEdge.length; e++) {
+        if (mirrors[e]) continue;
+        const a = roots.get(f(byEdge[e].x[0])), b = roots.get(f(byEdge[e].x[2]));
+        cross[a * L + b] = cross[b * L + a] = 1;
+      }
+      let apart = 0; // pairs of distinct lines that never cross
+      for (let a = 0; a < L; a++) for (let b = a + 1; b < L; b++) if (!cross[a * L + b]) apart++;
+      return { loops: comps, dotsPerLoop: dots.map((d) => d.size), apart };
     };
   }
   const countLoops = (M, mirrors) => prepCount(M)(mirrors);
@@ -290,15 +305,22 @@
       });
       return pen;
     };
-    const cnt = prepCount(M);
+    const structural = opts.minLoopDots || opts.allCross;
+    const cnt = prepCount(M, structural);
     const lp = opts.loopPenalty || 1.6;
     const aesthetic = opts.aesthetic || null;
     const score = (m) => {
-      const loops = cnt(m);
+      const r = cnt(m);
+      const loops = structural ? r.loops : r;
       let md = 0; for (let i = 0; i < nE; i++) md += m[i];
       const d = nE ? md / nE : 0;
-      const q = Math.abs(d - dens) * 8 + isolatedPenalty(m) * 3 + (aesthetic ? aesthetic(m, M) : 0);
-      return { s: Math.abs(loops - target) * lp + q, q, loops, d };
+      let hard = 0; // structural constraints: every line must be substantial and must cross every other line
+      if (structural) {
+        if (opts.minLoopDots) r.dotsPerLoop.forEach((k) => { if (k < opts.minLoopDots) hard += (opts.minLoopDots - k) / opts.minLoopDots + 1; });
+        if (opts.allCross) hard += r.apart;
+      }
+      const q = Math.abs(d - dens) * 8 + isolatedPenalty(m) * 3 + (aesthetic ? aesthetic(m, M) : 0) + hard * 6;
+      return { s: Math.abs(loops - target) * lp + q, q, loops, d, hard };
     };
     let best = null;
     const restarts = opts.restarts || 6;
@@ -319,6 +341,7 @@
       }
     }
     if (!best) best = { m: mirrors.slice(), sc: score(mirrors) };
+    if (best.sc.hard) console.warn('kolam: structural constraints not met (penalty ' + best.sc.hard.toFixed(2) + ')');
     const m = best.m;
     const cycles = trace(M, m);
     return { M, mirrors: m, cycles, loops: cycles.length, density: best.sc.d, symmetry: used, orbits: orbits.length };

@@ -35,10 +35,17 @@ const BOOKS = {
     why: 'Columns of dots are the layers of a small network, 5–7–9–7–5. Inside a layer the line only crosses, so each column reads as its own braid; between layers it mostly turns back, and a few crossings, the weights, carry it across until the whole network is one line.',
   },
   'build-llms-from-scratch': {
-    shape: () => K.fromRows([4, 4, 4, 4, 4], 'ner'), loops: 1, sym: 'D2', density: 0.38,
-    force: (e) => (e.dir === 'E' ? 'x' : undefined), // each row is a braided block; between blocks the line mostly turns back
-    spec: '4 × 5, in five blocks',
-    why: 'Five rows of four: a stack of transformer blocks, each braided on its own and joined to the next only through a few crossings, like the residual stream that runs through them all.',
+    shape: () => K.fromRows(Array(10).fill(2), 'ner'), loops: 1, sym: 'C2', density: 0.25,
+    // five 2 x 2 blocks stacked; between blocks exactly one crossing, alternating sides
+    force: (e, d) => {
+      if (e.dir !== 'N') return undefined;
+      const y = d[1], k = Math.round(y - 0.5);            // boundary between display rows k and k+1
+      if (k % 2 === 0) return undefined;                   // inside a block: free
+      const side = ((k - 1) / 2) % 2 === 0 ? 0 : 1;        // which column carries the crossing
+      return Math.round(d[0]) === side ? 'x' : 'm';
+    },
+    spec: 'a tower of five 2 × 2 blocks',
+    why: 'Five blocks of four stacked into a tower: the N× decoder stack. Each block is woven on its own and joined to the next by exactly one crossing, alternating sides, so a single line climbs the whole model.',
   },
   'ai-context-engineering': {
     shape: () => K.fromMask([
@@ -56,9 +63,10 @@ const BOOKS = {
     why: 'An outer frame of 28 dots around an inner block of 15: the window, and what you choose to put inside it. The frame is a plain two-strand braid; everything inside is one line.',
   },
   '5d-parallelism': {
-    shape: () => K.fromRows([2, 4, 6, 8, 8, 6, 4, 2], 'ner'), loops: 5, sym: 'MY', density: 0.23,
+    shape: () => K.fromRows([2, 4, 6, 8, 8, 6, 4, 2], 'ner'), loops: 5, sym: 'MX', density: 0.22,
+    minLoopDots: 6, allCross: true, iters: 6000, restarts: 6, // every line substantial, every pair of lines crosses
     spec: 'nēr pulli 2–4–6–8–8–6–4–2',
-    why: 'Forty dots, a mesh of devices, carried by exactly five closed lines — data, tensor, pipeline, sequence and expert parallelism — each weaving through the others.',
+    why: 'Forty dots, a mesh of devices, carried by exactly five closed lines — data, tensor, pipeline, sequence and expert parallelism. The solver rejects any line that covers fewer than six dots and any pair of lines that never cross, so every line weaves through every other, as every device sits in all five groupings.',
   },
   'pi-vs-hermes-vs-codex': {
     shape: () => K.fromRows([3, 3, 3], 'ner'), loops: 3, sym: 'D4', density: 0,
@@ -66,19 +74,23 @@ const BOOKS = {
     why: 'Nine dots, no turns: the square falls naturally into three interlaced lines — three agents compacting the same memory.',
   },
   'dsa-in-python': {
-    shape: () => K.fromRows([5, 7, 9, 9, 9, 9, 9, 7, 5], 'ner'), loops: 1, sym: 'C4', density: 0.26,
-    spec: 'octagon 9 × 9',
-    why: 'The largest kolam in the library, 69 dots, and still one closed line: an Euler tour, the oldest graph algorithm, drawn by hand.',
+    shape: () => K.fromMask([9, 4, 8, 2, 9, 6, 9, 4, 9].map((L) => 'o'.repeat(L + 1)).join('\n'), 'ner'), loops: 1, sym: 'none', density: 0.3,
+    // a hash table with chaining: bucket column on the left, a linked list braided along each row;
+    // chains never touch each other, so the line passes between them only through the buckets
+    force: (e, d) => (e.dir === 'E' ? 'x' : Math.round(d[0]) === 0 ? 'x' : 'm'),
+    spec: 'hash table: 9 buckets, chains 9–4–8–2–9–6–9–4–9',
+    why: 'A hash table with chaining: nine buckets down the left and a linked list braided along each row. The chains never touch each other; the single line passes from one to the next only through the bucket array.',
   },
   'r-masterclass': {
-    shape: () => K.fromCols([1, 2, 4, 7, 8, 7, 4, 2, 1], 'ner', 'bottom'), loops: 1, sym: 'MX', density: 0.24,
-    spec: 'columns 1–2–4–7–8–7–4–2–1',
-    why: 'Nine columns of dots stacked as a histogram of the normal distribution: the bell curve that R was built to draw.',
+    shape: () => K.fromCols([1, 1, 3, 5, 8, 8, 5, 3, 1, 1], 'ner', 'bottom'), loops: 1, sym: 'MX', density: 0.22,
+    spec: 'columns 1–1–3–5–8–8–5–3–1–1',
+    why: 'Ten columns of dots stacked as a histogram of the normal distribution, flat-topped with long thin tails along the baseline: the bell curve that R was built to draw.',
   },
   'deit-from-scratch': {
-    shape: () => K.fromRows([6, 6, 6, 6, 6, 6, 6], 'ner'), loops: 2, sym: 'D2', density: 0.2,
-    spec: '6 × 7 patches',
-    why: 'A 6 × 7 grid of image patches carried by two lines, not one: the class token and the distillation token, student and teacher.',
+    shape: () => K.fromMask(['oo......', 'oooooooo', 'oooooooo', 'oooooooo', 'oooooooo', 'oooooooo'].join('\n'), 'ner'), loops: 1, sym: 'none', density: 0.1,
+    force: (e, d) => (e.dir === 'N' && d[1] < 1 ? 'x' : undefined), // the two tokens are always threaded into the patches
+    spec: '8 × 5 patches + [CLS] + [DIST]',
+    why: 'An 8 × 5 grid of image patches with two extra tokens set above the first row, the class token and the distillation token. The line is forced to cross wherever the tokens meet the patches, and one line runs through tokens and patches alike, as attention does.',
   },
   'charlie-language-room': {
     shape: () => K.fromMask('oooooooo\noooooooo\noooooo', 'ner'), loops: 1, sym: 'none', density: 0.18,
@@ -106,9 +118,9 @@ const BOOKS = {
     why: 'Thirty-one dots in the shape of a speech bubble: a prompt is something you say. With no symmetry to lean on, the turns fall where the conversation takes them.',
   },
   'kernel-engineering': {
-    shape: () => K.fromRows([8, 8, 8, 8], 'ner'), loops: 1, sym: 'MX', density: 0.22, partial: 0.34,
-    spec: '8 × 4 — one warp',
-    why: 'Thirty-two dots, one warp of GPU threads. The book is coming, so the dots are down and the line has only just begun.',
+    shape: () => K.fromRows([8, 8, 8, 8], 'ner'), loops: 1, sym: 'MX', density: 0.22, partial: 0.34, placeholder: true,
+    spec: '8 × 4 — one warp (placeholder)',
+    why: 'The capsule count is not known yet, so this grid is a placeholder: 8 × 4, one warp of GPU threads. The dots are down and the line has only just begun; it will be regenerated with one dot per capsule when the book ships.',
   },
 };
 

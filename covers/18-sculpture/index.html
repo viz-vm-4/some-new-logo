@@ -533,7 +533,6 @@ vec3 n1(int i){ float a=float(i)*1.5708; return vec3(0.62*cos(a),1.32,0.62*sin(a
 const vec3 N2=vec3(0.,2.42,0.);
 vec2 scene(vec3 p){
   p.xz=rot(0.3)*p.xz;
-  float wob=0.006*(noise(p*9.)-0.5);
   float d=1e9;
   for(int i=0;i<4;i++){ d=min(d,length(p-n0(i))-R0); d=min(d,length(p-n1(i))-R1); }
   d=min(d,length(p-N2)-R2);
@@ -541,7 +540,7 @@ vec2 scene(vec3 p){
   if(p.y<1.55){ for(int i=0;i<4;i++) for(int j=0;j<4;j++) rd=min(rd,sdCapsule(p,n0(i),n1(j),RR)); }
   if(p.y>1.1){ for(int j=0;j<4;j++) rd=min(rd,sdCapsule(p,n1(j),N2,RR)); }
   d=smin(d,rd,0.05);
-  return vec2(d+wob,1.);
+  return vec2(d,1.);
 }
 Mat material(float id, vec3 p, vec3 n){
   Mat m; float f=fbm(p*5.); float g=noise(p*70.);
@@ -873,6 +872,7 @@ function buildWrap(b){
 
 let GL=null, glCanvas=null, VBO=null;
 function initGL(){
+  if(GL) return;
   glCanvas=document.createElement('canvas'); glCanvas.width=W; glCanvas.height=H;
   GL=glCanvas.getContext('webgl2',{preserveDrawingBuffer:true,antialias:false,alpha:false});
   if(!GL) throw new Error('no webgl2');
@@ -944,20 +944,46 @@ const THUMBS=LIST.map(b=>buildThumb(b));
 const WRAPT=(!ONLY||ONLY.includes('wrap'))?buildWrap(BOOKS.find(b=>b.slug===WRAP.slug)):null;
 try{ ['430 78px Newsreader','italic 400 20px Newsreader','600 12px "Instrument Sans"'].forEach(f=>document.fonts.load(f)); }catch(e){}
 
+const DONE=new Set();
+function renderOne(i){
+  if(DONE.has(i)) return; DONE.add(i);
+  const b=LIST[i], t0=performance.now();
+  try{ renderBook(b,CANVASES[i]);
+    const tc=THUMBS[i].getContext('2d'); tc.imageSmoothingQuality='high'; tc.drawImage(CANVASES[i],0,0,360,444); }
+  catch(e){ console.error('render fail '+b.slug+': '+e.message); }
+  return b.slug+':'+Math.round(performance.now()-t0);
+}
+let WRAP_DONE=false;
 function renderAll(){
   try{ initGL(); }catch(e){ console.error('WebGL unavailable',e); return; }
   const times=[];
-  LIST.forEach((b,i)=>{ const t0=performance.now(); try{ renderBook(b,CANVASES[i]);
-      const tc=THUMBS[i].getContext('2d'); tc.imageSmoothingQuality='high'; tc.drawImage(CANVASES[i],0,0,360,444); }
-    catch(e){ console.error('render fail '+b.slug+': '+e.message); } times.push(b.slug+':'+Math.round(performance.now()-t0)); });
-  if(WRAPT){ const t0=performance.now(); try{ renderBook(BOOKS.find(b=>b.slug===WRAP.slug),WRAPT.canvas,WRAPT.RW,WRAPT.offX); }catch(e){ console.error('wrap fail '+e.message); } times.push('wrap:'+Math.round(performance.now()-t0)); }
+  LIST.forEach((b,i)=>{ const r=renderOne(i); if(r) times.push(r); });
+  if(WRAPT && !WRAP_DONE){ WRAP_DONE=true; const t0=performance.now(); try{ renderBook(BOOKS.find(b=>b.slug===WRAP.slug),WRAPT.canvas,WRAPT.RW,WRAPT.offX); }catch(e){ console.error('wrap fail '+e.message); } times.push('wrap:'+Math.round(performance.now()-t0)); }
   console.log('TIMES '+times.join(' '));
   window.RENDER_TIMES=times;
+  try{ localStorage.setItem(FLAG,String(Date.now())); }catch(e){}
+}
+/* Print passes reload the page once per cover and hide everything but that cover.
+   If this browser rendered the full page a few minutes ago, wait for that isolation
+   and paint only the cover that is left visible; if nothing isolates a cover within
+   a few seconds, fall back to rendering everything (so a cover is never left blank). */
+const FLAG='maquette-full-render';
+function recentlyRendered(){ try{ const t=+localStorage.getItem(FLAG); return !!t && Date.now()-t<20*60*1000; }catch(e){ return false; } }
+function start(){
+  if(ONLY || !recentlyRendered()){ renderAll(); return; }
+  let timer=null;
+  const mo=new MutationObserver(()=>{
+    const vis=[]; CANVASES.forEach((c,i)=>{ if(c.getClientRects().length) vis.push(i); });
+    if(vis.length===1){ mo.disconnect(); clearTimeout(timer);
+      try{ initGL(); console.log('TIMES '+renderOne(vis[0])); }catch(e){ console.error('WebGL unavailable',e); } }
+  });
+  mo.observe(document.body,{subtree:true,attributes:true,attributeFilter:['style','class']});
+  timer=setTimeout(()=>{ mo.disconnect(); renderAll(); },4000);
 }
 /* Start after the load event: the page (type, layout) is live at once and the
    raymarcher then fills each canvas synchronously; anything that waits on the
    page (fonts.ready, a screenshot) queues until the last canvas is painted. */
-if(document.readyState==='complete') setTimeout(renderAll,0); else addEventListener('load',()=>setTimeout(renderAll,0));
+if(document.readyState==='complete') setTimeout(start,0); else addEventListener('load',()=>setTimeout(start,0));
 </script>
 </body>
 </html>

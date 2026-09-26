@@ -8,14 +8,14 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Overpass:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&family=Newsreader:ital,opsz,wght@0,6..72,400;1,6..72,400;1,6..72,500&display=block">
 <style>
-:root{ --paper:#F3EFE6; --ink:#16181B; --ink2:#4B4D51; --tint:#E3DDCF; --tint2:#D6CEBC; --water:#D0DEE3; --grey:#C4BCAC; }
+:root{ --paper:#F3EFE6; --ink:#16181B; --ink2:#4B4D51; --tint:#E3DDCF; --tint2:#D6CEBC; --tint3:#C4B9A2; --water:#D0DEE3; --grey:#C4BCAC; }
 *{box-sizing:border-box}
 html,body{margin:0;background:#DEDAD0;color:#16181B}
 body{font-family:Overpass, system-ui, sans-serif;-webkit-font-smoothing:antialiased}
 
 /* ───────── COVER ───────── */
 .cv{position:relative;width:720px;height:888px;overflow:hidden;background:var(--paper);color:var(--ink);flex:0 0 720px}
-.cv.night{--paper:#15181D;--ink:#EEEAE0;--ink2:#A6A8AB;--tint:#2B313A;--tint2:#363D47;--water:#1C2B34;--grey:#3A4049}
+.cv.night{--paper:#15181D;--ink:#EEEAE0;--ink2:#A6A8AB;--tint:#2B313A;--tint2:#363D47;--tint3:#444C58;--water:#1C2B34;--grey:#3A4049}
 .cv .map{position:absolute;left:0;top:0;width:720px;height:888px;overflow:visible}
 .cv .hdr{position:absolute;left:40px;right:40px;top:33px;height:20px;display:flex;justify-content:space-between;align-items:center;
   font:700 10.5px/1 Overpass;letter-spacing:.13em;text-transform:uppercase}
@@ -411,10 +411,10 @@ MAPS['neural-networks-from-scratch'] = { h:318, draw(M){
   M.line(0,[[-60,oT],[172,oT]],{avoid:[OUT,[oL-16,-1e4,oL+16,1e4]],side:1,bullet:66});
   M.line(1,[[172,oT],[304,oT]],{avoid:pz,side:1});
   M.line(2,[[304,oT],[oR,oT],[oR,ly]],{avoid:pz,side:1,r:40});
-  M.line(3,[[oR,ly],[oR,oB],[oL,oB],[oL,oT+16]],{avoid:[...pz,[oR-12,-1e4,1e4,1e4]],side:1,r:40,span:[0,20]});
+  M.line(3,[[oR,ly],[oR,oB],[oL,oB],[oL,oT]],{avoid:[...pz,[oR-12,-1e4,1e4,1e4]],side:1,r:40,span:[0,30]});
   // inner lap: code
   M.line(5,[[iL,iT],[iR,iT],[iR,ly]],{avoid:[...pz,[-1e4,-1e4,iL+20,1e4]],side:-1,r:14});
-  M.line(6,[[iR,ly],[iR,iB],[iL,iB],[iL,iT+6]],{avoid:[...pz,[iR-12,-1e4,1e4,1e4]],side:-1,r:14,span:[0,24]});
+  M.line(6,[[iR,ly],[iR,iB],[iL,iB],[iL,iT]],{avoid:[...pz,[iR-12,-1e4,1e4,1e4]],side:-1,r:14,span:[0,24]});
   // spur: a glimpse of convolutional networks
   M.line(4,[[oR,ly],[700,ly]],{avoid:[[-1e4,-1e4,oR+16,1e4],OUTR],side:1});
   M.pill(iR,ly,oR,ly,8.5);                          // the loss
@@ -612,37 +612,34 @@ MAPS['decision-trees-from-scratch'] = { h:372, draw(M){
 /* ---------- Git & GitHub Masterclass ----------
    A commit graph is already a transit map: the first four parts run down `main`;
    the rest branch off it and merge back, alternating above and below. */
-MAPS['git-github-masterclass'] = { h:256, draw(M){
-  const y=128, D=56, a0=330, a1=490, f0=560, g0=584;
-  M.rect(a0-10,y-D-24,420,48,0);
+MAPS['git-github-masterclass'] = { h:264, draw(M){
+  const y=132, D=56, a0=292, a1=446, f0=480, g0=508;
+  M.rect(a0-10,y-D-26,440,52,0);
+  M.rect(f0+30,y+D-26,220,52,0);
   M.tlabel('github.com',a0-18,y-D+5,{anchor:'end'});
+  M.tlabel('open source',626,y+D+48,{anchor:'end'});
   M.tlabel('main',24,y+30,{anchor:'start'});
-  // branches first, so main runs over their departure stubs
+  // branches first, so main runs over their departure stubs; time runs left to right
   const lens=(k,x0,x1,dir,o={})=>M.line(k,[[x0-26,y],[x0,y],[x0+D,y+dir*D],[x1-D,y+dir*D],[x1,y],[x1+26,y]],{side:dir<0?1:-1,span:[40,26],r:24,layer:'ctx',...o});
-  lens(4,a0,a1,-1,{ends:'end',ring:'end'});          // GitHub: pull requests merge back into main
-  lens(5,a0,a1,1,{span:[40,40]});                     // GitHub Desktop: branch and merge from the GUI
+  lens(4,a0,a1,-1,{ends:'end',ring:'end'});          // GitHub — its pull requests merge back into main
+  lens(5,a0,a1,1,{span:[40,40]});                     // GitHub Desktop — branch and merge from the GUI
   M.line(6,[[g0-26,y],[g0,y],[g0+D,y-D],[720,y-D]],{side:1,span:[40,0],avoid:[OUTR],r:24,layer:'ctx'});
   M.line(7,[[f0-26,y],[f0,y],[f0+D,y+D],[720,y+D]],{side:-1,span:[40,0],avoid:[OUTR],r:24,layer:'ctx'});
-  M.line(0,[[-60,y],[148,y]],{avoid:[OUT],ends:'end',ring:'end',side:1,bullet:66});
-  M.line(1,[[148,y],[252,y]],{ends:'end',ring:'end',side:1,span:[16,0]});
-  M.line(2,[[252,y],[290,y]],{ends:'end',ring:'end',side:1,span:[14,0]});
+  M.line(0,[[-60,y],[128,y]],{avoid:[OUT],ends:'end',ring:'end',side:1,bullet:66});
+  M.line(1,[[128,y],[224,y]],{ends:'end',ring:'end',side:1,span:[14,0]});
+  M.line(2,[[224,y],[256,y]],{ends:'end',ring:'end',side:1,span:[12,0]});
   const J=[a0,a1,f0,g0].map(x=>[x-18,-1e4,x+18,1e4]);
-  M.line(3,[[290,y],[700,y]],{side:1,span:[16,0],avoid:[OUTR,...J]});
-  M.label('PULL REQUEST',a1+10,y-14,{cls:'dest',anchor:'start'});
-  M.label('TO OPEN SOURCE',624,y+D+28,{cls:'dest',anchor:'end'});
-  M.bullet(1,176,y+24); M.bullet(2,266,y+24); M.bullet(3,306,y+24);
-  M.bullet(4,a0+10,y-D-6); M.bullet(5,a0+10,y+D+6); M.bullet(6,g0+30,y-D-22); M.bullet(7,f0+22,y+D+26);
+  M.line(3,[[256,y],[700,y]],{side:1,span:[14,0],avoid:[OUTR,...J]});
+  M.label('PULL REQUEST',a1-6,y-D-8,{cls:'dest',anchor:'start'});
+  M.bullet(1,154,y+24); M.bullet(2,240,y+24); M.bullet(3,272,y+24);
+  M.bullet(4,a0+8,y-D-4); M.bullet(5,a0+8,y+D+4); M.bullet(6,g0+22,y-D-30); M.bullet(7,f0+14,y+D+30);
 }};
 
 /* ---------- Charlie and the Intelligence Factory (sub-series) ----------
-   One factory, four lines from one gate. Each volume lights its own line; the parts
-   are rooms along it. */
-const CHARLIE = [
-  {slug:'charlie-language-room', lane:308, wing:'NW'},
-  {slug:'charlie-vision-room',   lane:320, wing:'NE'},
-  {slug:'charlie-sound-room',    lane:296, wing:'W'},
-  {slug:'charlie-reasoning-room',lane:332, wing:'E'},
-];
+   Series grammar: the shared factory plan shrinks to a locator inset ("you are here"),
+   and each volume's own line runs through a room drawn from its subject. Rooms are the
+   book's parts; a bullet on the line marks each room's door. Capsule 01 is the gate pill. */
+const CHARLIE = ['charlie-language-room','charlie-vision-room','charlie-sound-room','charlie-reasoning-room'];
 const CH_COL = ['#D8432E','#1F4E9C','#12875A','#6C3F99'];
 const CH_COL_N = ['#E8563F','#4A7DD6','#23A676','#9467CE'];
 function charlieRoute(i){
@@ -652,29 +649,107 @@ function charlieRoute(i){
   if(i===2) return [[296,G],[296,286],[252,242],[76,242],[34,200],[34,150]];
   return          [[332,G],[332,286],[376,242],[552,242],[594,200],[594,150]];
 }
-function drawCharlie(M,idx){
-  const wall=330;
-  M.zone(`M282,${wall} H-14 V-10 H642 V${wall} H346`,{fill:'none',stroke:'var(--ink)',sw:2.2});
-  M.tlabel('the intelligence factory',314,40);
-  // the other three volumes, in grey
-  for(let i=0;i<4;i++) if(i!==idx) M.line(0,charlieRoute(i),{ctx:true,color:'var(--grey)',w:5,layer:'ctx',r:22});
-  const pts=charlieRoute(idx);
-  const counts=M.parts().map(p=>p[2]); counts[0]-=1;          // the gate pill is capsule 01
-  const tot=counts.reduce((a,b)=>a+b,0), cum=polyCum(pts), s0=46, S=cum[cum.length-1]-s0-4;
-  let acc=0; const cuts=counts.slice(0,-1).map(c=>{ acc+=c; return s0+S*acc/tot; });
-  const route=[...pts]; const pieces=cutPoly(route,[s0,...cuts],22).slice(1);
-  // rooms: alternate tints behind the line
-  pieces.forEach((pc,i)=>{ const L=polyCum(pc).slice(-1)[0]; const tp=cutPoly(pc,[2,L-2],0)[1]; M.band(tp,36,{color:i%2?'var(--tint2)':'var(--tint)',r:22}); });
-  M.line(0,[pts[0],cutPoly(route,[s0],10)[0].slice(-1)[0]],{ctx:true,r:22});
-  M.claim(0,1);
-  pieces.forEach((pc,i)=>M.line(i,pc,{n:counts[i],side:(idx===1||idx===3)?-1:1,span:[6,6],r:22}));
-  M.pill(296,wall,332,wall,8);
-  // wing-end bullets with roman numerals
-  const R=['I','II','III','IV'];
-  for(let i=0;i<4;i++){ const e=charlieRoute(i).slice(-1)[0]; const y=e[1]-17;
-    M.bulletText(R[i],e[0],y,i===idx?M.col(0):'var(--grey)',i===idx?'#fff':'var(--paper)'); }
+function charlieInset(M,idx){
+  const x0=490, y0=0, w=150, h=98, sc=0.21, ox=x0+6, oy=y0+8;
+  M.rect(x0,y0,w,h,3,{fill:'var(--paper)',stroke:'var(--ink)',sw:1.6});
+  const g=el('g',{transform:`translate(${ox} ${oy}) scale(${sc})`},M.L.terr);
+  el('path',{d:'M282,330 H-14 V-10 H642 V330 H346',fill:'none',stroke:'var(--ink)','stroke-width':6},g);
+  for(let i=0;i<4;i++){ const p=roundPath(charlieRoute(i),22); el('path',{d:p.d,fill:'none',stroke:i===idx?M.col(0):'var(--grey)','stroke-width':i===idx?22:14},g); }
+  const e=charlieRoute(idx).slice(-1)[0];
+  el('circle',{cx:e[0],cy:e[1]-6,r:26,fill:M.col(0)},g);
+  M.tlabel('you are here',x0+w/2,y0+h+18,{size:12});
 }
-CHARLIE.forEach((c,i)=>{ MAPS[c.slug]={h:372,draw(M){drawCharlie(M,i);}}; });
+function gate(M,x,y,vertical=true){ M.claim(0,1); return vertical? M.pill(x,y-10,x,y+10,8) : M.pill(x-10,y,x+10,y,8); }
+function doors(M,rooms){ rooms.forEach(([k,path])=>{ const {p}=pointAt(path,0); M.bullet(k,p[0],p[1]); }); }
+
+/* Book I — Language: inference. Prefill is one long straight run; decode climbs a step
+   per token, and the KV cache under it grows a page per step. */
+MAPS['charlie-language-room'] = { h:372, draw(M){
+  charlieInset(M,0);
+  const y=330, x1=246, st=36, rs=30, n=8;
+  // KV-cache pages growing under the decode staircase
+  for(let j=0;j<n;j++){ const tx=x1+j*st, top=y-rs*(j+1)+14; for(let yy=y+18; yy-12>=top; yy-=16) M.rect(tx+5,yy-12,st-10,12,1.5,{fill:(j%2?'var(--tint2)':'var(--tint)')}); }
+  const stair=[[x1,y]]; for(let j=0;j<n;j++){ const cx=x1+j*st; stair.push([cx,y-rs*(j+1)],[cx+st,y-rs*(j+1)]); }
+  M.tlabel('prefill',120,y+34); M.tlabel('decode',x1+st*n/2+40,y-rs*n/2+56,{anchor:'start'}); M.tlabel('kv cache',x1+st*3,y+44);
+  const R=[];
+  gate(M,40,y); R.push([0,M.line(0,[[-60,y],[132,y]],{n:2,side:1,avoid:[OUT,[20,-1e4,58,1e4]],bullet:66})]);
+  R.push([1,M.line(1,[[132,y],[x1,y]],{side:1,r:8})]);
+  const cut=(a,b)=>stair.slice(a,b+1);
+  R.push([2,M.line(2,cut(0,3),{side:1,r:8})]);
+  R.push([3,M.line(3,cut(3,6),{side:1,r:8})]);
+  R.push([4,M.line(4,cut(6,10),{side:1,r:8})]);
+  R.push([5,M.line(5,cut(10,13),{side:1,r:8})]);
+  R.push([6,M.line(6,[...cut(13,16),[x1+st*n+40,y-rs*n]],{side:1,r:8,term:'end'})]);
+  doors(M,R.slice(1));
+}};
+
+/* Book II — Vision: the image is cut into a 4×4 grid of patches; the line reads them row
+   by row, then runs underneath as the flattened sequence of tokens. */
+MAPS['charlie-vision-room'] = { h:372, draw(M){
+  charlieInset(M,1);
+  const gx=40, gy=40, ps=46, gap=6, pitch=ps+gap;
+  const tone=[[0,0,0,1],[0,1,0,0],[1,2,1,0],[2,2,2,1]];
+  const fills=['var(--tint)','var(--tint2)','var(--tint3)'];
+  for(let r=0;r<4;r++) for(let c=0;c<4;c++) M.rect(gx+c*pitch,gy+r*pitch,ps,ps,2,{fill:fills[tone[r][c]]});
+  M.tlabel('patches are tokens',gx+2*pitch-3,gy-14);
+  const cx=c=>gx+c*pitch+ps/2, cy=r=>gy+r*pitch+ps/2, yT=330;
+  const R=[];
+  gate(M,gx-12,cy(0)); R.push([0,M.line(0,[[-60,cy(0)],[cx(1),cy(0)]],{n:2,side:1,avoid:[OUT,[gx-30,-1e4,gx+6,1e4]],bullet:66})]);
+  R.push([1,M.line(1,[[cx(1),cy(0)],[cx(3),cy(0)],[cx(3),cy(1)],[cx(1),cy(1)]],{side:1,r:20})]);
+  R.push([2,M.line(2,[[cx(1),cy(1)],[cx(0),cy(1)],[cx(0),cy(2)],[cx(3),cy(2)],[cx(3),cy(3)],[cx(2),cy(3)]],{side:1,r:20})]);
+  R.push([3,M.line(3,[[cx(2),cy(3)],[cx(0),cy(3)],[gx-20,cy(3)],[gx-20,yT],[120,yT]],{side:1,r:20})]);
+  R.push([4,M.line(4,[[120,yT],[290,yT]],{side:1})]);
+  R.push([5,M.line(5,[[290,yT],[460,yT]],{side:1})]);
+  R.push([6,M.line(6,[[460,yT],[600,yT]],{side:1,term:'end'})]);
+  M.tlabel('the sequence',470,yT-26,{anchor:'start'});
+  doors(M,R.slice(1));
+}};
+
+/* Book III — Sound: voice agents. Listening and speaking are waveforms; the brain is the
+   flat run of text between them; the wire streams in small chunks. */
+MAPS['charlie-sound-room'] = { h:352, draw(M){
+  charlieInset(M,2);
+  const y1=150, y2=312;
+  const wave=(x,y,amps)=>{ const pts=[[x,y]]; let cx=x, sgn=-1, prev=0; amps.forEach(a=>{ cx+=prev+a; pts.push([cx,y+sgn*a]); sgn=-sgn; prev=a; }); cx+=prev; pts.push([cx,y]); return pts; };
+  const L=wave(128,y1,[14,28,42,28,14]), S=wave(L.slice(-1)[0][0]+20,y1,[14,32,32,14]);
+  M.rect(122,y1-58,L.slice(-1)[0][0]-116,116,14); M.rect(S[0][0]-6,y1-58,S.slice(-1)[0][0]-S[0][0]+12,116,14);
+  M.tlabel('audio in',(128+L.slice(-1)[0][0])/2,y1+80); M.tlabel('audio out',(S[0][0]+S.slice(-1)[0][0])/2,y1+80);
+  const R=[];
+  gate(M,40,y1); R.push([0,M.line(0,[[-60,y1],[128,y1]],{n:2,side:1,avoid:[OUT,[20,-1e4,58,1e4]],bullet:66})]);
+  R.push([1,M.line(1,L,{side:1,r:5})]);
+  const xe=S.slice(-1)[0][0];
+  R.push([2,M.line(2,[[L.slice(-1)[0][0],y1],...S],{side:1,r:5})]);
+  R.push([3,M.line(3,[[xe,y1],[600,y1],[600,y2],[400,y2]],{side:1,r:40})]);
+  const wire=[[400,y2]]; for(let i=0;i<10;i++) wire.push([400-(i+1)*12, y2+(i%2?0:-12)]);
+  R.push([4,M.line(4,[...wire,[260,y2]],{side:-1,r:3})]);
+  R.push([5,M.line(5,[[260,y2],[40,y2]],{side:1,term:'end'})]);
+  M.tlabel('text',628,(y1+y2)/2+5,{anchor:'end'}); M.tlabel('the wire',336,y2+36);
+  doors(M,R.slice(1));
+}};
+
+/* Book IV — Reasoning: the agent–environment loop as a circle line, agent above and
+   environment below; the book enters it, laps once, and leaves for production. */
+MAPS['charlie-reasoning-room'] = { h:372, draw(M){
+  charlieInset(M,3);
+  const C=[252,176], rx=196, ry=126, c=64, yM=344, J=[C[0],C[1]+ry];
+  const oct=[[C[0],C[1]+ry],[C[0]-rx+c,C[1]+ry],[C[0]-rx,C[1]+ry-c],[C[0]-rx,C[1]-ry+c],[C[0]-rx+c,C[1]-ry],[C[0]+rx-c,C[1]-ry],[C[0]+rx,C[1]-ry+c],[C[0]+rx,C[1]+ry-c],[C[0]+rx-c,C[1]+ry],[C[0],C[1]+ry]];
+  M.zone(`M${C[0]-rx+c},${C[1]-ry} H${C[0]+rx-c} L${C[0]+rx},${C[1]-ry+c} V${C[1]} H${C[0]-rx} V${C[1]-ry+c}Z`);
+  M.zone(`M${C[0]-rx},${C[1]} H${C[0]+rx} V${C[1]+ry-c} L${C[0]+rx-c},${C[1]+ry} H${C[0]-rx+c} L${C[0]-rx},${C[1]+ry-c}Z`,{fill:'var(--tint2)'});
+  M.tlabel('agent',C[0],C[1]-40); M.tlabel('environment',C[0],C[1]+56);
+  M.tlabel('action',C[0]+rx+16,C[1]+5,{anchor:'start'}); M.tlabel('reward',C[0]-rx-16,C[1]+5,{anchor:'end'});
+  const R=[];
+  gate(M,40,yM); R.push([0,M.line(0,[[-60,yM],[C[0]-42,yM],[J[0],J[1]]],{n:2,side:1,avoid:[OUT,[20,-1e4,58,1e4],[C[0]-60,-1e4,1e4,1e4]],r:24,bullet:66})]);
+  const lap=roundPath(oct,40); const cum=polyCum(oct), T=cum[cum.length-1];
+  const counts=[3,3,3,4], tot=13; let acc=0; const cuts=counts.slice(0,-1).map(v=>{acc+=v; return T*acc/tot;});
+  const pcs=cutPoly(oct,cuts,26);
+  pcs.forEach((pc,i)=>R.push([i+1,M.line(i+1,pc,{side:1,r:40,span:i===0?[22,0]:[0,0],ends:i===3?'end':'none',ring:i===3?'end':null})]));
+  R.push([5,M.line(5,[[J[0],J[1]],[C[0]+42,yM],[700,yM]],{side:1,avoid:[OUTR,[-1e4,-1e4,C[0]+56,1e4]],r:24})]);
+  // direction of the loop
+  const arr=(x,y,dx,dy)=>M.zone(`M${x-dy*8},${y+dx*8} L${x+dx*14},${y+dy*14} L${x+dy*8},${y-dx*8}Z`,{fill:M.col(0),top:true});
+  arr(C[0]+rx,C[1]-24,0,1); arr(C[0]-rx,C[1]+24,0,-1);
+  M.label('TO PRODUCTION',624,yM-16,{cls:'dest',anchor:'end'});
+  doors(M,R.slice(1,5)); M.bullet(5,C[0]+84,yM+24);
+}};
 
 /* ---------- Inference Engineering (coming soon) ----------
    A line under construction: hollow, inside a hatched works corridor, with its announced stops. */
@@ -786,10 +861,10 @@ const CAPS = {
  'dsa-in-python':"Sixty-nine stations — the longest line in the library — coiled through a matrix as a spiral traversal, which is capsule 16’s actual title. Length is honest: compare it with Pi vs Hermes vs Codex.",
  'decision-trees-from-scratch':"A binary tree, root at the top, split nodes as interchanges and leaves as the regions they carve. The wrap-up line bridges the two trees (‘two trees, one algorithm’) and runs on towards forests and boosting.",
  'git-github-masterclass':"A commit graph is already a transit map, and time runs left to right. The first four parts run down main; GitHub (up in the github.com band) and GitHub Desktop branch off together and merge forward — the ring is the pull request; CI/CD and the open-source fork leave the sheet to the right.",
- 'charlie-language-room':"Sub-series treatment: one factory, four lines leaving one gate. Each volume lights its own line and its parts become rooms along it; the other three volumes stay grey. Book I heads for the north-west wing.",
- 'charlie-vision-room':"The same factory plan, Book II lit: the Vision line to the north-east wing. Across the four Charlie books only the lit line, the numeral and day/night change — the series reads as a set at thumbnail size.",
- 'charlie-sound-room':"Book III: the Sound line to the west wing — Listening, Speaking, The Brain, The Wire, Shipping — as rooms along one corridor.",
- 'charlie-reasoning-room':"Book IV: the Reasoning line to the east wing. Advanced, so the factory is drawn as a night map even inside an otherwise mixed series.",
+ 'charlie-language-room':"Sub-series: each volume keeps the factory plan as a small ‘you are here’ inset and gets its own room. Book I is inference: prefill is one long straight run, decode climbs a step per token, and the KV cache underneath grows a page per step.",
+ 'charlie-vision-room':"Book II: the image is cut into a 4×4 grid of patches; the line reads them row by row and then runs underneath as the flattened sequence of tokens — ‘patches are tokens’.",
+ 'charlie-sound-room':"Book III, voice agents: listening and speaking are drawn as waveforms, the brain is the flat run of text between them, and the wire streams in small chunks.",
+ 'charlie-reasoning-room':"Book IV: the agent–environment loop as a circle line — agent above, environment below, action down one side and reward up the other. The book enters it, laps once, and leaves for production. Advanced, so a night map.",
  'inference-engineering':"Coming soon: a line under construction — hollow, inside a hatched works corridor, stopping at the four stops the announcement names. The dashed track is the extension not yet built.",
 };
 const built=[];

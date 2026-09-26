@@ -536,7 +536,7 @@ ${top}
   // inside the window they print solid Federal Blue (overprinting to a deep olive), outside only as a screen.
   EMBLEMS['ai-context-engineering'] = ({ R, K, title }) => {
     const top = title.bottom + 26, bot = 780;
-    const win = { x0: 150, x1: 566, y0: title.baseline + 1, y1: 806 };
+    const win = { x0: 150, x1: 566, y0: title.baseline + 3, y1: 806 };
     const pitch = 28, bh = 17, lab = 108;
     const rows = [];
     for (let y = top; y + bh <= bot; y += pitch) rows.push(y);
@@ -842,16 +842,13 @@ ${top}
   // and the patches leave on the factory's conveyor as a sequence of 16 tokens, led by a [CLS] token.
   EMBLEMS['charlie-vision-room'] = (ctx) => factory({ ...ctx, belt: true }, ({ R, K, door, r, ground, belt }) => {
     let f1 = '', key = '', f1out = '', keyOut = '';
-    const n = 4, s = 50, g = 5, gx = door.cx - (n * s - g) / 2, gy = belt - 26 - n * s;
+    const n = 4, s = 47, g = 5, gx = door.cx - (n * s - g) / 2, gy = belt - 22 - n * s;
     // coverage of a crescent in each patch, quantised to four printable steps
-    const inC = (u, v) => Math.hypot(u - 0.5, v - 0.5) < 0.43 && Math.hypot(u - 0.67, v - 0.4) > 0.33;
-    const tones = [];
-    for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) {
-      let c = 0;
-      for (let a = 0; a < 12; a++) for (let b = 0; b < 12; b++) c += inC((i + (a + 0.5) / 12) / n, (j + (b + 0.5) / 12) / n) ? 1 : 0;
-      c /= 144;
-      tones.push(c > 0.55 ? 1 : c > 0.25 ? 0.55 : c > 0.04 ? 0.22 : 0.06);
-    }
+    // the image: a bold C, in four printable steps (solid, 55%, 22%, 6%)
+    const tones = [0.55, 1, 1, 0.55,
+                   1, 0.22, 0.06, 0.06,
+                   1, 0.22, 0.06, 0.06,
+                   0.55, 1, 1, 0.55];
     const tile = (x, y, sz, t, cell) => t >= 1 ? p(rectD(x, y, sz, sz)) : p(halftone({ box: [x + 1, y + 1, x + sz - 1, y + sz - 1], cell, angle: 45, tone: () => t }));
     tones.forEach((t, q) => { const i = q % n, j = Math.floor(q / n); f1 += tile(gx + i * s, gy + j * s, s - g, t, 6.5); });
     // the sequence on the belt: [CLS] + 16 patch tokens in raster order
@@ -1006,8 +1003,8 @@ ${top}
     key += p(dashes([dx, dist[1] + ts + 6], [lossX, lossY - 16], 3.5)) + p(head(lossX, lossY - 13, 0, 1));
     key += p(dashes([lx, ly], [lossX - 16, lossY], 3.5)) + p(head(lossX - 13, lossY, 1, 0));
     key += pe(ring(lossX, lossY, 9, 3.5));
-    key += T(lossX + 18, lossY + 5, 'distillation loss', mono(12.5, 500, 0.04));
-    key += T(bx, by + 234, 'teacher’s prediction = target', mono(11.5, 400, 0.04));
+    key += T(lossX, lossY + 30, 'loss', { ...mono(12.5, 500, 0.04), anchor: 'middle' });
+    key += T(bx, by + 234, 'prediction = distillation target', mono(11.5, 400, 0.02));
     key += T(bx, by + 214, 'CNN teacher', mono(13, 500, 0.08));
     key += T(gx, gy + n * s + 22, '8 × 8 patches', mono(13, 500, 0.08));
     return { flash: [p(aq), p(or)], key };

@@ -522,7 +522,7 @@ GEN['sciml'] = (r, b, acc) => {
     if (best) { best.pts.push([X(x), Y(tt)]); best.x = x; best.t = tt; } else { const o = { x, t: tt, pts: [[X(x), Y(tt)]] }; open.push(o); strk.push(o); } }
   let red = ''; for (const o of strk) if (o.pts.length > 2) red += D(o.pts);
   return {
-    svg: path(lines, 'k', 0.7, 'opacity=".55"') + cased(red, 3, '', 2.2),
+    svg: path(lines, 'k', 0.7, 'opacity=".5"') + cased(red, 4.4, '', 3),
     caption: `Burgers’ equation, u_t + u·u_x = (0.01/pi)·u_xx, solved in this page by finite volumes (${N} cells, ${fmt(steps)} steps) from a perturbed start, u0 = −sin(pi·x) ${a3 < 0 ? '−' : '+'} ${Math.abs(a3).toFixed(2)} sin(3pi·x) ${a5 < 0 ? '−' : '+'} ${Math.abs(a5).toFixed(2)} sin(5pi·x), to t = ${Tend}. Lines: ${np} particles carried by the flow, time running down; ${acc}: shocks, where they collide.`
   };
 };
@@ -548,7 +548,7 @@ GEN['kernel-engineering'] = (r, b, acc) => {
   let digits = ''; vals0.forEach((v, i) => { digits += `<text x="${f1(X(i))}" y="${f1(P.y + 12)}" font-size="8" text-anchor="middle"${cone[0].has(i) ? ' class="acc"' : ''}>${v}</text>`; });
   digits += `<text x="${f1(X(target))}" y="${f1(Y(ST) + 16)}" font-size="9" text-anchor="middle" class="acc">${vals[target]}</text>`;
   return {
-    svg: path(lanes, 'k2', 0.8) + path(diag, 'k', 0.7, 'opacity=".45"') + `<path class="fk" d="${adds}" opacity=".7"/>` + cased(red, 2.6) + digits,
+    svg: path(lanes, 'k2', 0.8) + path(diag, 'k', 0.7, 'opacity=".45"') + `<path class="fk" d="${adds}" opacity=".7"/>` + cased(red, 3.4, '', 2.6) + digits,
     caption: `A Kogge–Stone prefix sum, the pattern inside GPU scan kernels: ${LN} threads, ${ST} steps, ${nOps} additions. At step k each thread adds the partial sum 2^k places to its left. In ${acc}: the additions thread ${target} depends on, gathering ${cone[0].size} of the digits above into ${vals[target]}${ok ? '' : ' (check failed)'}.`
   };
 };
