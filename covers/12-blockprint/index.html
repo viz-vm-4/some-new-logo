@@ -202,22 +202,23 @@ const lozenge=(cx,cy,rx,ry)=>PG([[cx-rx,cy],[cx,cy-ry],[cx+rx,cy],[cx,cy+ry]]);
    ===================================================================== */
 const BLOCKS = {
 
-  /* AI Context Engineering — a jaal of context windows. Each node is a window
-     packed with a 4x4 grid of selected tokens (one is the query); four streams
-     (instructions, tools, retrieval, memory) run into it from the sides. */
+  /* AI Context Engineering — the packed window. One context window of fixed
+     budget (the frame), packed end to end with what the engineer chose to put in it,
+     each source carved in its own texture: system instructions (solid), memory
+     (chevrons), retrieved chunks (dots), tool output (stripes), and the query last
+     (accent). Stamped as a course of bricks; each course packs from the other end. */
   context(){
     let main='',accent='',line='';
-    line += `<rect x="31" y="31" width="58" height="58" fill="none" stroke="currentColor" stroke-width="3.4"/>`;
-    const sel=['1111','1101','1011','1102'];
-    sel.forEach((row,i)=>[...row].forEach((v,j)=>{
-      const x=36.5+j*12.2, y=36.5+i*12.2;
-      if(v==='1') main+=R(x,y,10,10); else if(v==='2') accent+=R(x,y,10,10);
-    }));
-    for(const y of [5,14,23]) { main+=C(60,y,2.7); main+=C(60,120-y,2.7); }  // N/S streams: dots
-    for(const x of [3,15]) { main+=R(x,58.3,8,3.4); main+=R(120-x-8,58.3,8,3.4); } // E/W streams: dashes
-    line += lozenge(0,0,15,15) + lozenge(0,0,0,0);
-    accent += C(0,0,4.2);
-    return {w:120,h:120,layers:{main,accent,line},order:['line','main','accent']};
+    line+=`<rect x="4" y="8" width="232" height="64" fill="none" stroke="currentColor" stroke-width="3.4"/>`;
+    const y0=15, h=50;
+    main+=R(11,y0,34,h);                                                   // system instructions
+    for(let r=0;r<4;r++)for(let c=0;c<3;c++){ const x=51+c*12, y=y0+2+r*12.4;  // memory: chevrons
+      main+=`<polyline points="${x},${y} ${x+7},${f(y+4.6)} ${x},${f(y+9.2)}" fill="none" stroke="currentColor" stroke-width="2.8"/>`; }
+    for(let r=0;r<4;r++)for(let c=0;c<5;c++) main+=C(95+c*11.5,y0+6+r*12.6,3.4);   // retrieved chunks: dots
+    for(let k=0;k<8;k++) main+=R(155,y0+1+k*6.3,52,3.2);                    // tool output: stripes
+    accent+=R(213,y0,17,h);                                                 // the query
+    return {w:240,h:80,layers:{line,main,accent},order:['line','main','accent'],
+      arr:(c,r)=>(r%2?'translate(360 0) scale(-1 1)':'')};
   },
 
   /* Mathematical Foundations — contour ellipses of a quadratic bowl (the
@@ -264,57 +265,73 @@ const BLOCKS = {
     return {w:120,h:120,layers:{line,main,accent},order:['line','main','accent']};
   },
 
-  /* 5D Parallelism — a GPipe pipeline schedule: 4 stages (rows) x 12 time slots.
-     Forward micro-batches (white) run down one diagonal, backward (madder) back up
-     the other; each stage is split in two (tensor parallel); the idle bubble is
-     left as a dot. The block stamped again and again is data parallelism. */
+  /* 5D Parallelism — all five axes in one block. A GPipe schedule: 4 pipeline
+     stages (rows) x 12 time slots, 3 micro-batches; forward (white) runs down one
+     diagonal, backward (madder) back up the other; idle slots are dots.
+       tensor   — every cell is split top/bottom
+       sequence — and left/right, so each micro-batch is a 2x2 of shards
+       expert   — stage 3 is a mixture-of-experts layer: its four sub-cells are four
+                  experts and each micro-batch is routed to one (the same one on the
+                  way back); the others stay idle dots
+       data     — the block stamped again and again across the cloth. */
   pipeline(){
-    let main='',accent='',line='';
+    let main='',accent='';
+    const route=[2,0,3];                       // expert chosen for micro-batch 0,1,2
+    const cw=3.6, ch=10.6;
     for(let s=0;s<4;s++)for(let t=0;t<12;t++){
-      const F=t>=s&&t<=s+2, B=t>=9-s&&t<=11-s, x=t*10+1.6;
-      for(const y of [s*30+3.5,s*30+16]){
-        if(F) main+=R(x,y,6.8,10.5); else if(B) accent+=R(x,y,6.8,10.5); else main+=C(x+3.4,y+5.25,1.25);
+      const F=t>=s&&t<=s+2, B=t>=9-s&&t<=11-s, x=t*10+1;
+      const m = F? t-s : B? 2-(t-(9-s)) : -1;
+      for(let e=0;e<4;e++){
+        const sx=x+(e%2)*(cw+.9), sy=s*30+3.4+Math.floor(e/2)*(ch+1.4);
+        const idle = m<0 || (s===2 && route[m]!==e);
+        if(idle) main+=C(sx+cw/2,sy+ch/2,.95);
+        else if(F) main+=R(sx,sy,cw,ch); else accent+=R(sx,sy,cw,ch);
       }
     }
-    return {w:120,h:120,layers:{main,accent},order:['main','accent']};
+    return {w:120,h:120,scale:1.5,layers:{main,accent},order:['main','accent']};
   },
 
-  /* Pi vs Hermes vs Codex — context over time, three agents in three lanes.
-     Each column is the context at one turn: a madder summary cell (the memory that
-     survives) with the turns stacked above it. The stack grows a step per turn until
-     compaction collapses it back to the summary. A stepped sawtooth — the dant
-     border of printed cloth — and the three lanes compact at different moments. */
+  /* Pi vs Hermes vs Codex — context over time under a fixed budget (7 cells),
+     three canonical compaction strategies in three lanes (deliberately not
+     attributed to any one agent). Each column is one turn: turns in white, the
+     surviving summary / memory in madder.
+       lane 1  summarise and reset — a sawtooth
+       lane 2  accumulating memory — each compaction leaves one more summary cell,
+               so the base climbs and the cycles shorten until memory is full
+       lane 3  rolling window — the stack reaches the budget and holds flat; the
+               evicted oldest turn drops out below as a dot */
   compaction(){
-    let main='',accent='',line='';
-    const cellH=4.6, gap=1.6, pitch=cellH+gap;
-    [[0,0],[40,2],[80,4]].forEach(([y0,ph])=>{
-      const base=y0+37;
-      for(let c=0;c<12;c++){
-        const n=(c+ph)%6, x=c*10+1;
-        accent+=R(x,base-cellH,8,cellH);
-        for(let k=1;k<=n;k++) main+=R(x,base-cellH-k*pitch,8,cellH);
-      }
-    });
-    return {w:120,h:120,scale:1.6,layers:{main,accent},order:['main','accent']};
+    let main='',accent='';
+    const cellH=3.9, pitch=5.1, col=(x,y0,base,turns,drop)=>{
+      const b=y0+36;
+      for(let k=0;k<base;k++) accent+=R(x,b-cellH-k*pitch,8,cellH);
+      for(let k=0;k<turns;k++) main+=R(x,b-cellH-(base+k)*pitch,8,cellH);
+      if(drop) main+=C(x+4,b+2.4,1.1);
+    };
+    for(let c=0;c<28;c++) col(c*10+1,0,1,c%7,false);
+    let c=0; for(let base=1;base<=7;base++) for(let n=0;n<=7-base;n++,c++) col(c*10+1,40,base,n,false);
+    for(let c=0;c<28;c++) col(c*10+1,80,0,Math.min(7,c+1),c>=7);
+    return {w:280,h:120,scale:1.25,layers:{main,accent},order:['main','accent']};
   },
 
   /* CNN Fundamentals — the block IS the kernel: a 5x5 Laplacian-of-Gaussian
-     edge filter carved as a Hinton diagram (square size grows with |weight|;
-     white positive, black negative, zero a dot). Its symmetry makes a buti. */
+     edge filter carved as a Hinton diagram. Square AREA is proportional to |weight|
+     (side = 27·√(|w|/16)): the +16 centre is a big reserved-white square, the -2 and
+     -1 ring small black squares — and since the kernel sums to zero, the black ring
+     carries exactly as much ink as the white centre. Indigo corners mark the
+     receptive field; where four impressions meet they print a cross. */
   log(){
     let main='',accent='',line='';
     const K=[[0,0,-1,0,0],[0,-1,-2,-1,0],[-1,-2,16,-2,-1],[0,-1,-2,-1,0],[0,0,-1,0,0]];
-    const c=144/5, sz=(v)=>({16:27,2:21,1:14})[Math.abs(v)];
+    const c=144/5, sz=(v)=>27*Math.sqrt(Math.abs(v)/16);
     K.forEach((row,i)=>row.forEach((v,j)=>{
-      const cx=j*c+c/2, cy=i*c+c/2;
-      if(v>0) main+=R(cx-sz(v)/2,cy-sz(v)/2,sz(v),sz(v));
-      else if(v<0) line+=R(cx-sz(v)/2,cy-sz(v)/2,sz(v),sz(v));
+      const cx=j*c+c/2, cy=i*c+c/2, d=sz(v);
+      if(v>0) main+=R(cx-d/2,cy-d/2,d,d);
+      else if(v<0) line+=R(cx-d/2,cy-d/2,d,d);
     }));
-    // the receptive field: corners of the 5x5 window, and the centre weight marked
     for(const [x,y,sx,sy] of [[3,3,1,1],[141,3,-1,1],[3,141,1,-1],[141,141,-1,-1]])
-      accent+=R(Math.min(x,x+sx*22),Math.min(y,y+sy*3.2),22,3.2)+R(Math.min(x,x+sx*3.2),Math.min(y,y+sy*22),3.2,22);
-    accent+=R(72-5.5,72-5.5,11,11);
-    return {w:144,h:144,layers:{line,main,accent},order:['line','main','accent']};
+      accent+=R(Math.min(x,x+sx*20),Math.min(y,y+sy*2.8),20,2.8)+R(Math.min(x,x+sx*2.8),Math.min(y,y+sy*20),2.8,20);
+    return {w:144,h:144,scale:240/144,keyline:['accent','line'],layers:{line,main,accent},order:['line','main','accent']};
   },
 
   /* Decision Trees — a depth-3 binary tree: split nodes as squares, leaves as
@@ -362,7 +379,7 @@ const BLOCKS = {
       const cx=j*15+7.5, cy=t*15+7.5;
       if(rank[j]<t) main+=C(cx,cy,5.4); else if(rank[j]===t) accent+=C(cx,cy,5.4); else main+=C(cx,cy,1.6);
     }
-    return {w:120,h:120,scale:1.5,layers:{main,accent},order:['main','accent']};
+    return {w:120,h:120,scale:2,layers:{main,accent},order:['main','accent']};
   },
 
   /* Kernel Engineering — tiled matrix multiply. A row panel of A and a column
@@ -445,7 +462,7 @@ const IKAT = {
       if(nx<0||ny<0||nx>=CW||ny>=CH||wall.has(k)||k in dist)continue;dist[k]=dist[key(x,y)]+1;q.push([nx,ny]);}}
     const chev=['11000','01100','00110','01100','11000'];
     const rot=(m,dir)=>{ const o=[];for(let y=0;y<5;y++){o.push('');for(let x=0;x<5;x++){
-        let sx,sy; if(dir==='r'){sx=x;sy=y;} else if(dir==='l'){sx=4-x;sy=y;} else if(dir==='d'){sx=y;sy=x;} else {sx=y;sy=4-x;}
+        let sx,sy; if(dir==='r'){sx=x;sy=y;} else if(dir==='l'){sx=4-x;sy=y;} else if(dir==='d'){sx=y;sy=x;} else {sx=4-y;sy=x;}   /* 'u' is the transpose read from the right: a '^' */
         o[y]+=m[sy][sx];}} return o; };
     function set(x,y,v){ if(x>=0&&y>=0&&x<W&&y<H) g[y][x]=v; }
     for(let cy=0;cy<CH;cy++)for(let cx=0;cx<CW;cx++){
@@ -466,19 +483,19 @@ const IKAT = {
    ===================================================================== */
 const BOOKS = [
   {slug:'ai-context-engineering', lines:['AI Context','Engineering'], level:'intermediate', capsules:43, hours:10, block:'context',
-   why:'A jaal of context windows: each node packs a 4×4 grid of chosen tokens (one is the query), fed by four streams — instructions, tools, retrieval, memory.'},
+   why:'The packed window: one context window of fixed budget, filled end to end with what was chosen — system instructions (solid), memory (chevrons), retrieved chunks (dots), tool output (stripes) — and the query last, in indigo. Stamped as a course of bricks; each course packs from the other end.'},
   {slug:'mathematical-foundations-for-ml', lines:['Mathematical','Foundations for','Machine Learning'], level:'beginner', capsules:43, hours:10, block:'gradient',
    why:'Contour ellipses of a quadratic bowl, tilted by its eigen-axes, with gradient descent zig-zagging down the valley. Alternate stamps turned 90°.'},
   {slug:'neural-networks-from-scratch', lines:['Neural Networks','from Scratch'], level:'beginner', capsules:33, hours:7, block:'mlp',
    why:'One fully-connected layer. Stamped edge to edge, every block\'s outputs are the next block\'s inputs, so the net becomes a literal net.'},
-  {slug:'build-llms-from-scratch', lines:['Build Large Language','Models (LLMs)','from Scratch'], level:'intermediate', capsules:20, hours:6, block:'causal',
+  {slug:'build-llms-from-scratch', lines:['Build Large','Language Models','(LLMs) from Scratch'], level:'intermediate', capsules:20, hours:6, block:'causal',
    why:'The causal attention mask, 8×8: the past printed white, each token\'s own position in indigo, the masked future a dot. Stamped in a straight repeat it prints as a sawtooth.'},
-  {slug:'5d-parallelism', lines:['5D Parallelism','for Large Model','Training'], level:'advanced', capsules:40, hours:9, block:'pipeline',
-   why:'A pipeline schedule — forward micro-batches down one diagonal, backward (madder) back up; each stage split in two for tensor parallelism; the block repeated is data parallelism.'},
+  {slug:'5d-parallelism', lines:['5D Parallelism for','Large Model Training'], level:'advanced', capsules:40, hours:9, block:'pipeline',
+   why:'All five axes of one block. A pipeline schedule (4 stages × 12 steps; forward white, backward madder); every cell split top/bottom for tensor and left/right for sequence parallelism; stage three an expert layer where each micro-batch is routed to one of four experts; the block repeated is data parallelism.'},
   {slug:'pi-vs-hermes-vs-codex', lines:['Pi vs Hermes','vs Codex'], sub2:'Context Compaction and Memory', level:'advanced', capsules:9, hours:1, block:'compaction',
-   why:'Context over time, three agents in three lanes: each turn stacks a row on a madder summary cell until compaction collapses it back — a stepped sawtooth whose lanes reset at different moments.'},
+   why:'Three compaction strategies under one fixed budget, one per lane and deliberately unattributed: summarise-and-reset (a sawtooth), accumulating memory (the madder base climbs with each compaction) and a rolling window (holds flat; the evicted turn drops out as a dot).'},
   {slug:'cnn-fundamentals', lines:['Convolutional','Neural Networks','Fundamentals'], level:'intermediate', capsules:34, hours:8, block:'log',
-   why:'The block is the kernel: a 5×5 Laplacian-of-Gaussian edge filter carved as a Hinton diagram — white positive centre, black negative ring. Indigo corners mark its receptive field; where four impressions meet they print a cross. Stamping a block across cloth is convolution.'},
+   why:'The block is the kernel: a 5×5 Laplacian-of-Gaussian edge filter as a true Hinton diagram — area proportional to |weight|, so the white centre (+16) and the black ring (−2s and −1s) carry equal ink, as a zero-sum kernel should. Indigo corners mark the receptive field.'},
   {slug:'decision-trees-from-scratch', lines:['Build Decision Trees','from Scratch'], level:'beginner', capsules:23, hours:5, block:'dtree',
    why:'A depth-3 binary tree: split tests as squares, leaves as class-coloured discs. Alternate rows hang inverted so leaves meet leaves.'},
   {slug:'transformers-from-scratch', lines:['Transformers'], sub2:'Theory, Intuition, and Building<br>from Scratch', level:'intermediate', capsules:20, hours:5, block:'arcs',
@@ -494,7 +511,7 @@ const BOOKS = [
   {slug:'charlie-sound-room', lines:['Charlie and the','Sound Room'], series:'III', sub:'Audio — Voice Agents', level:'intermediate', capsules:20, hours:6, ikat:'sound',
    why:'Two spoken phrases as waveforms: words are bursts of energy, the loudest peaks dyed yellow, silences a single indigo thread.'},
   {slug:'charlie-reasoning-room', lines:['Charlie and the','Reasoning Room'], series:'IV', sub:'Reason — Reinforcement Learning,<br>from bandits to reasoning models', level:'advanced', capsules:21, hours:6, ikat:'reasoning',
-   why:'A solved gridworld: each cell a chevron along the optimal policy, flowing around madder walls to the yellow goals.'},
+   why:'A solved gridworld: breadth-first search from the goals gives each cell its chevron along the optimal policy, flowing around madder walls into the yellow goals.'},
 ];
 
 /* =====================================================================
@@ -532,11 +549,27 @@ function clothDefs(id,seed){
    780 on the print wrap, so the field runs on round the spine and the back). */
 function stampField(B, lv, rand, id, W=720, x0=0){
   const k=B.scale||1, BW=B.w*k, BH=B.h*k;
-  const ox=x0+(720-Math.floor(720/BW)*BW)/2 - (B.ox||0), oy=B.oy||0;
+  const ox=x0+(720-Math.floor(720/BW)*BW)/2 - (B.ox||0);
+  // the printer starts from the border: a whole row of blocks sits on the kinar,
+  // the partial row falls at the top edge where trim and bleed take it
+  const oy=KINAR_Y-Math.ceil(FIELD_H/BH)*BH;
   const cMin=Math.floor((-BW-ox)/BW), cMax=Math.ceil((W-ox)/BW), rows=Math.ceil(FIELD_H/BH)+1;
   let defs='', out='';
-  B.order.forEach((role,li)=>{
-    defs+=`<g id="${id}-${role}" fill="currentColor" stroke="currentColor" stroke-width="0">${B.layers[role]}</g>`;
+  // Ajrakh's own device: on a dyed ground every accent shape is first reserved in
+  // kora a little larger than itself, so the colour sits in a white keyline and
+  // still reads in greyscale print.
+  const dyed = lv.ground!==P.kora, keyed = dyed ? (B.keyline||['accent']) : [];
+  const order=[], layers={...B.layers};
+  B.order.forEach(role=>{
+    if(keyed.includes(role)){
+      layers[role+'K']=B.layers[role].replace(/stroke-width="([\d.]+)"/g,(m,w)=>`stroke-width="${(+w+3.4).toFixed(2)}"`);
+      order.push(role+'K');
+    }
+    order.push(role);
+  });
+  order.forEach((role,li)=>{
+    const reserve=role.endsWith('K');
+    defs+=`<g id="${id}-${role}" fill="currentColor" stroke="currentColor" stroke-width="${reserve?3.4:0}" stroke-linejoin="round">${layers[role]}</g>`;
     defs+=inkFilter(`${id}-ink-${role}`, (hash(id)%500)+li*31, role==='line'?2.2:2.8, role==='ground'?.78:.68);
     let g='', n=0;
     for(let r=-1;r<rows;r++)for(let c=cMin;c<cMax;c++){
@@ -545,7 +578,7 @@ function stampField(B, lv, rand, id, W=720, x0=0){
       const op=[1,.94,.88][n++%3]-rand()*.04;                               // re-ink every third impression
       g+=`<use href="#${id}-${role}" transform="translate(${f(x+dx)} ${f(y+dy)}) rotate(${f(rot)} ${BW/2} ${BH/2}) scale(${k}) ${B.arr?B.arr(c,r):''}" opacity="${f(op)}"/>`;
     }
-    const col = role==='ground'?lv.ground: role==='kora'?P.kora: role==='haldi'?P.haldi: lv[role];
+    const col = reserve?P.kora: role==='ground'?lv.ground: role==='kora'?P.kora: role==='haldi'?P.haldi: lv[role];
     out+=`<g color="${col}" filter="url(#${id}-ink-${role})">${g}</g>`;
   });
   return {defs,out};
@@ -626,7 +659,12 @@ function cloth(b, id, rand, W=720, x0=0){
   defs+=inkFilter(`${id}-ink-k`,11,1.8,.72);
   defs+=`<clipPath id="${id}-field"><rect x="0" y="0" width="${W}" height="${KINAR_Y+2}"/></clipPath>`;
   body+=`<rect width="${W}" height="888" fill="${lv.ground}"/>`;
-  body+=`<rect width="${W}" height="${FIELD_H}" filter="url(#${id}-mottle)" opacity="${b.level==='beginner'?.14:.36}"/>`;
+  { // uneven take-up of the dye: soft vector blooms, no raster
+    const mr=mulberry(hash(b.slug)+17); let e='';
+    defs+=`<radialGradient id="${id}-mg"><stop offset="0" stop-color="#1b0f08" stop-opacity=".55"/><stop offset=".55" stop-color="#1b0f08" stop-opacity=".22"/><stop offset="1" stop-color="#1b0f08" stop-opacity="0"/></radialGradient>`;
+    for(let i=0;i<W/40;i++) e+=`<ellipse cx="${f(mr()*W)}" cy="${f(mr()*FIELD_H)}" rx="${f(90+mr()*170)}" ry="${f(60+mr()*110)}" opacity="${f(.25+mr()*.75)}"/>`;
+    body+=`<g fill="url(#${id}-mg)" opacity="${b.level==='beginner'?.1:.26}">${e}</g>`;
+  }
   if(b.block){
     const st=stampField(BLOCKS[b.block](), lv, rand, id, W, x0);
     defs+=st.defs; body+=`<g clip-path="url(#${id}-field)">${st.out}</g>`;
@@ -662,7 +700,7 @@ function naksha(b){
     const B=BLOCKS[b.block]();
     const col=(role)=> role==='ground'?lv.ground: role==='kora'?P.kora: role==='haldi'?P.haldi: lv[role];
     const layers=B.order.map(r=>`<g fill="${col(r)}" stroke="${col(r)}" stroke-width="0" color="${col(r)}">${B.layers[r]}</g>`).join('');
-    return `<svg viewBox="0 0 ${B.w} ${B.h}" preserveAspectRatio="xMidYMid slice"><rect width="${B.w}" height="${B.h}" fill="${lv.ground}"/>${layers}</svg>`;
+    return `<svg viewBox="0 0 ${B.w} ${B.h}" preserveAspectRatio="xMidYMid meet" style="background:${lv.ground}"><rect width="${B.w}" height="${B.h}" fill="${lv.ground}"/>${layers}</svg>`;
   }
   const d=IKAT[b.ikat](mulberry(hash(b.slug))), n=24, c=5, colOf=[lv.ground,P.kora,lv.accent,P.iron,P.haldi];
   const x0=Math.max(0,Math.floor(d.W/2-n/2)), y0=Math.max(0,Math.floor(d.H/2-n/2));
@@ -699,7 +737,7 @@ document.getElementById('shelf-range').innerHTML = BOOKS.filter(b=>!GROUPS.core.
 document.getElementById('shelf-charlie').innerHTML = BOOKS.filter(b=>b.series).map(cover).join('');
 document.getElementById('wrap').innerHTML = wrap(BOOKS.find(b=>b.slug==='5d-parallelism'), {
   blurb:'A model too large for any one GPU has to be split along several axes at once — across the data, the tensors, the pipeline of layers, the sequence and the experts. This book builds each of them and then combines them.',
-  colo:'<b>About the cover.</b> The block is a pipeline schedule — four stages down, twelve time steps across; forward micro-batches in white, backward passes in madder, each stage split in two for tensor parallelism. Stamped again and again, the same block is data parallelism.',
+  colo:'<b>About the cover.</b> One block carries all five axes: a pipeline schedule (forward white, backward madder); each cell split top and bottom for tensor, left and right for sequence parallelism; stage three routes each micro-batch to one of four experts. Stamped again and again, the same block is data parallelism.',
   spine:'5D Parallelism for<br>Large Model Training'});
 
 /* ---------- fit titles: widest line fills the measure, capped; never collide with the foot ---------- */
