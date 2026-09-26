@@ -222,8 +222,8 @@
 
   // material tone for a face normal
   function tone(m, n, L, lit) {
-    if (m.flat) return m.flat;
     const k = dot(n, L);
+    if (m.flat && ((lit && k > 0) || !m.sh)) return m.flat;
     if (lit && k > 0) return mix(m.lo, m.hi, Math.min(1, Math.pow(k, m.g || 0.8)));
     return mix(m.sh, m.shUp || m.sh, Math.max(0, n[2]));
   }
@@ -244,7 +244,7 @@
     const out = []; const sw = opts.seam == null ? 0.42 : opts.seam;
     for (const f of order) {
       const k = dot(f.n, L);
-      const lit = k > 1e-6 && !f.mat.flat;
+      const lit = k > 1e-6 && !(f.mat.flat && !f.mat.sh);
       const P2 = f.pts.map(cam.P);
       if (Math.abs(area2(P2)) < 0.02) continue;
       const col = tone(f.mat, f.n, L, lit);

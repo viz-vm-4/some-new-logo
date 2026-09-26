@@ -63,7 +63,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:'Anek Latin',
         if (dot(n, sub(centroid(pts), c)) < 0) { pts.reverse(); n = mul(n, -1); }
         const mat = typeof o.mat === 'function' ? o.mat(n, pts) : o.mat;
         if (mat === null) continue;
-        this.faces.push({ pts, n, mat, cast: o.cast !== false, recv: o.recv !== false, sid: id, hide: o.hide });
+        this.faces.push({ pts, n, mat, cast: o.cast !== false, recv: o.recv !== false, sid: id, hide: o.hide, noTrim: o.noTrim });
       }
       return id;
     }
@@ -103,6 +103,53 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:'Anek Latin',
     decal(pts, n, mat, off = 0.35) {
       this.face(pts.map(p => add(p, mul(n, off))), n, { mat, cast: false, decal: true });
     }
+  }
+
+  // remove coincident internal areas between touching axis-aligned rectangular faces
+  function trimInternal(faces) {
+    const info = new Map(); const groups = new Map();
+    faces.forEach((f, idx) => {
+      if (f.noTrim || f.decal || f.pts.length !== 4) return;
+      const k = [0, 1, 2].find(a => Math.abs(Math.abs(f.n[a]) - 1) < 1e-9); if (k == null) return;
+      const [i, j] = [0, 1, 2].filter(a => a !== k);
+      const us = f.pts.map(p => p[i]), vs = f.pts.map(p => p[j]);
+      const r = [Math.min(...us), Math.min(...vs), Math.max(...us), Math.max(...vs)];
+      const c = Math.round(f.pts[0][k] * 1000) / 1000;
+      info.set(idx, { k, i, j, c, r, sub: [] });
+      const key = k + ':' + c; if (!groups.has(key)) groups.set(key, []); groups.get(key).push(idx);
+    });
+    for (const g of groups.values()) {
+      for (let a = 0; a < g.length; a++) for (let b = a + 1; b < g.length; b++) {
+        const A = faces[g[a]], B = faces[g[b]]; if (dot(A.n, B.n) > -0.5) continue;
+        const ra = info.get(g[a]).r, rb = info.get(g[b]).r;
+        const x0 = Math.max(ra[0], rb[0]), y0 = Math.max(ra[1], rb[1]), x1 = Math.min(ra[2], rb[2]), y1 = Math.min(ra[3], rb[3]);
+        if (x1 - x0 > 1e-6 && y1 - y0 > 1e-6) { info.get(g[a]).sub.push([x0, y0, x1, y1]); info.get(g[b]).sub.push([x0, y0, x1, y1]); }
+      }
+    }
+    const out = [];
+    faces.forEach((f, idx) => {
+      const I = info.get(idx); if (!I || !I.sub.length) { out.push(f); return; }
+      let rects = [I.r];
+      for (const s of I.sub) {
+        const nx = [];
+        for (const r of rects) {
+          if (s[0] >= r[2] || s[2] <= r[0] || s[1] >= r[3] || s[3] <= r[1]) { nx.push(r); continue; }
+          if (s[1] > r[1]) nx.push([r[0], r[1], r[2], s[1]]);
+          if (s[3] < r[3]) nx.push([r[0], s[3], r[2], r[3]]);
+          const yy0 = Math.max(r[1], s[1]), yy1 = Math.min(r[3], s[3]);
+          if (s[0] > r[0]) nx.push([r[0], yy0, s[0], yy1]);
+          if (s[2] < r[2]) nx.push([s[2], yy0, r[2], yy1]);
+        }
+        rects = nx.filter(r => r[2] - r[0] > 1e-6 && r[3] - r[1] > 1e-6);
+      }
+      for (const r of rects) {
+        const mk = (u, v) => { const p = [0, 0, 0]; p[I.k] = I.c; p[I.i] = u; p[I.j] = v; return p; };
+        let pts = [mk(r[0], r[1]), mk(r[2], r[1]), mk(r[2], r[3]), mk(r[0], r[3])];
+        if (dot(newell(pts), f.n) < 0) pts.reverse();
+        out.push(Object.assign({}, f, { pts }));
+      }
+    });
+    return out;
   }
 
   // ---------- clipping ----------
@@ -198,8 +245,8 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:'Anek Latin',
 
   // material tone for a face normal
   function tone(m, n, L, lit) {
-    if (m.flat) return m.flat;
     const k = dot(n, L);
+    if (m.flat && ((lit && k > 0) || !m.sh)) return m.flat;
     if (lit && k > 0) return mix(m.lo, m.hi, Math.min(1, Math.pow(k, m.g || 0.8)));
     return mix(m.sh, m.shUp || m.sh, Math.max(0, n[2]));
   }
@@ -209,17 +256,18 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:'Anek Latin',
 
   function render(scene, cam, L, opts = {}) {
     const vis = [];
-    for (const f of scene.faces) {
+    const faces = trimInternal(scene.faces);
+    for (const f of faces) {
       if (f.hide) continue;
       if (dot(f.n, cam.v) < -1e-7) { const P2 = f.pts.map(cam.P); f.area = Math.abs(area2(P2)); vis.push(Object.assign({}, f)); }
     }
     vis.sort((a, b) => b.area - a.area);
     const order = traverse(bsp(vis), cam.v, []);
-    const casters = scene.faces.filter(f => f.cast && !f.decal && dot(f.n, L) > 1e-6);
-    const out = []; const sw = opts.seam == null ? 0.55 : opts.seam;
+    const casters = faces.filter(f => f.cast && !f.decal && dot(f.n, L) > 1e-6);
+    const out = []; const sw = opts.seam == null ? 0.42 : opts.seam;
     for (const f of order) {
       const k = dot(f.n, L);
-      const lit = k > 1e-6 && !f.mat.flat;
+      const lit = k > 1e-6 && !(f.mat.flat && !f.mat.sh);
       const P2 = f.pts.map(cam.P);
       if (Math.abs(area2(P2)) < 0.02) continue;
       const col = tone(f.mat, f.n, L, lit);
@@ -254,105 +302,106 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:'Anek Latin',
   const HOURS = {
     beginner: {
       label: 'Beginner', hour: 'Morning', n: 1,
-      L: nrm([0.78, -0.25, 0.52]),
+      L: nrm([-0.62, -0.55, 0.56]),
       sky: '#EFE6D7', ink: '#26140E', sub: '#7A3A28',
       stone: STONE,
-      ground: { hi: '#EFE6D7', lo: '#EFE6D7', sh: '#C7AE9A', shUp: '#C7AE9A' },
+      ground: { flat: '#EFE6D7', sh: '#C4A38D', shUp: '#C4A38D' },
       marble: { hi: '#FFFAF2', lo: '#F4ECE1', sh: '#C49C8C', shUp: '#CCA697' },
       cut: { flat: '#5B1D18' },
     },
     intermediate: {
       label: 'Intermediate', hour: 'Noon', n: 2,
-      L: nrm([0.5, -0.32, 0.86]),
+      L: nrm([0.45, -0.3, 0.84]),
       sky: '#D9A546', ink: '#26140E', sub: '#5B2616',
       stone: STONE,
-      ground: { hi: '#D9A546', lo: '#D9A546', sh: '#A9732B', shUp: '#A9732B' },
+      ground: { flat: '#D9A546', sh: '#A9732B', shUp: '#A9732B' },
       marble: { hi: '#FFFBF5', lo: '#F2E8DB', sh: '#BF9A86', shUp: '#C8A492' },
       cut: { flat: '#5B1D18' },
     },
     advanced: {
       label: 'Advanced', hour: 'Evening', n: 3,
-      L: nrm([-0.72, 0.52, 0.30]),
-      sky: '#1F2143', ink: '#F6EDE0', sub: '#E3A57E',
-      stone: { hi: '#F7B583', lo: '#DE7A50', sh: '#5A2731', shUp: '#65303A', g: 0.8 },
-      ground: { hi: '#1F2143', lo: '#1F2143', sh: '#121329', shUp: '#121329' },
+      L: nrm([0.76, 0.5, 0.29]),
+      sky: '#23264F', ink: '#F6EDE0', sub: '#E3A57E',
+      stone: { hi: '#FBBD86', lo: '#E07B4C', sh: '#5A2731', shUp: '#65303A', g: 0.8 },
+      ground: { flat: '#23264F', sh: '#0F1026', shUp: '#0F1026' },
       marble: { hi: '#FFE4CC', lo: '#F4C5A3', sh: '#7B4A55', shUp: '#86525C' },
       cut: { flat: '#5B1D18' },
     },
   };
 
   // ---------- helpers ----------
-  const CAM = (s = 1, ox = 360, mirror = false) => oblique(0.6, mirror ? 150 : 30, s, ox, PL);
+  const CAM = (s = 1, ox = 360, mirror = false) => oblique(0.5, mirror ? 140 : 40, s, ox, PL);
   function ground(S, hr, yB = 3000) {
-    S.box(-4000, 0, -1200, 4000, yB, 0, { mat: (n) => (n[1] < -0.5 ? hr.cut : hr.ground), cast: false });
+    S.box(-4000, 0, -1200, 4000, yB, 0, { mat: (n) => (n[1] < -0.5 ? hr.cut : n[2] > 0.5 ? hr.ground : null), cast: false, noTrim: true });
   }
   const tanD = (a) => Math.tan(a * D);
 
   // ---------- scenes ----------
   const SCENES = {};
 
-  // Samrat Yantra — the right triangle as instrument (gnomon runs away from the viewer)
+  // Samrat Yantra — the right triangle as instrument. Triangle faces the viewer; quadrant in front.
   SCENES.samrat = (hr) => {
     const S = new Scene(); ground(S, hr);
     const phi = 27, tp = tanD(phi), cp = Math.cos(phi * D), sp = Math.sin(phi * D);
-    const y0 = 40, Lg = 760, Hg = Lg * tp, w = 56, par = 10;
-    const tri = (x) => [[x, y0, 0], [x, y0 + Lg, 0], [x, y0 + Lg, Hg]];
-    S.extrude(tri(-w / 2), [par, 0, 0], { mat: hr.stone });
-    S.extrude(tri(w / 2 - par), [par, 0, 0], { mat: hr.stone });
-    const run = 16;
-    for (let y = y0; y < y0 + Lg - 0.1; y += run) {
-      const ye = Math.min(y0 + Lg, y + run); const z = Math.max(3, (ye - y0) * tp - 8);
-      S.box(-w / 2 + par, y, 0, w / 2 - par, ye, z, { mat: hr.stone });
+    const x0 = -560, x1 = 330, Hg = (x1 - x0) * tp, yg0 = 250, w = 60, par = 10;
+    const tri = (y) => [[x0, y, 0], [x1, y, 0], [x1, y, Hg]];
+    S.extrude(tri(yg0), [0, par, 0], { mat: hr.stone });
+    S.extrude(tri(yg0 + w - par), [0, par, 0], { mat: hr.stone });
+    const run = 15;
+    for (let x = x0; x < x1 - 0.1; x += run) {
+      const xe = Math.min(x1, x + run); const z = Math.max(3, (xe - x0) * tp - 8);
+      S.box(x, yg0 + par, 0, xe, yg0 + w - par, z, { mat: hr.stone });
     }
-    // quadrants: quarter-cylinders about the gnomon edge (axis a), each side
-    const R = 230, a = [0, cp, sp], d = [0, sp, -cp];
-    const zc = R * cp + 14, yc = y0 + zc / tp, bw = 90, N = 36;
+    // north end: a plain block under the top
+    // quadrants about the gnomon edge; axis a along the hypotenuse, arcs sweep toward/away from viewer
+    const R = 220, a = [cp, 0, sp], d = [sp, 0, -cp];
+    const zc = R * cp + 16, xc = x0 + zc / tp, bw = 96, N = 40;
     for (const sg of [-1, 1]) {
-      const C = [sg * w / 2, yc, zc];
-      const P = (t, s) => [C[0] + sg * R * Math.cos(t), C[1] + R * Math.sin(t) * d[1] + s * a[1], C[2] + R * Math.sin(t) * d[2] + s * a[2]];
-      const Nn = (t) => nrm([-sg * Math.cos(t), -Math.sin(t) * d[1], -Math.sin(t) * d[2]]);
+      const yf = sg < 0 ? yg0 : yg0 + w;
+      const P = (t, s) => [xc + R * Math.sin(t) * d[0] + s * a[0], yf + sg * R * Math.cos(t), zc + R * Math.sin(t) * d[2] + s * a[2]];
+      const Nn = (t) => nrm([-Math.sin(t) * d[0], -sg * Math.cos(t), -Math.sin(t) * d[2]]);
       for (let i = 0; i < N; i++) {
         const t0 = (i / N) * Math.PI / 2, t1 = ((i + 1) / N) * Math.PI / 2;
         S.slab([P(t0, -bw / 2), P(t1, -bw / 2), P(t1, bw / 2), P(t0, bw / 2)], 0, { mat: hr.stone });
         const nn = Nn((t0 + t1) / 2);
-        S.decal([P(t0, bw / 2 - 14), P(t1, bw / 2 - 14), P(t1, bw / 2 - 4), P(t0, bw / 2 - 4)], nn, hr.marble);
-        S.decal([P(t0, -bw / 2 + 4), P(t1, -bw / 2 + 4), P(t1, -bw / 2 + 14), P(t0, -bw / 2 + 14)], nn, hr.marble);
+        S.decal([P(t0, bw / 2 - 15), P(t1, bw / 2 - 15), P(t1, bw / 2 - 4), P(t0, bw / 2 - 4)], nn, hr.marble);
+        S.decal([P(t0, -bw / 2 + 4), P(t1, -bw / 2 + 4), P(t1, -bw / 2 + 15), P(t0, -bw / 2 + 15)], nn, hr.marble);
       }
       for (let h = 1; h < 24; h++) {
-        const t = (h / 24) * Math.PI / 2, ww = h % 4 === 0 ? 0.006 : 0.003, ln = h % 4 === 0 ? 14 : 30;
+        const t = (h / 24) * Math.PI / 2, ww = h % 4 === 0 ? 0.007 : 0.0035, ln = h % 4 === 0 ? 15 : 32;
         S.decal([P(t - ww, -bw / 2 + ln), P(t + ww, -bw / 2 + ln), P(t + ww, bw / 2 - ln), P(t - ww, bw / 2 - ln)], Nn(t), hr.marble, 0.5);
       }
     }
-    return { S, cam: CAM(0.92, 330) };
+    return { S, cam: CAM(0.78, 470) };
   };
 
   // A wall with one window — the context window
   SCENES.aperture = (hr) => {
     const S = new Scene(); ground(S, hr);
-    const xw = 60, t = 70, Hh = 420, Y0 = 60, Y1 = 900, wy0 = 330, wy1 = 470, wz0 = 150, wz1 = 290;
+    const xw = 40, t = 56, Hh = 360, Y0 = 60, Y1 = 700, wy0 = 300, wy1 = 440, wz0 = 120, wz1 = 260;
     S.box(xw, Y0, 0, xw + t, wy0, Hh, { mat: hr.stone });
     S.box(xw, wy1, 0, xw + t, Y1, Hh, { mat: hr.stone });
     S.box(xw, wy0, 0, xw + t, wy1, wz0, { mat: hr.stone });
     S.box(xw, wy0, wz1, xw + t, wy1, Hh, { mat: hr.stone });
-    for (let i = 0; i < 16; i++) { const y = 70 + i * 48; S.box(-150, y, 0, -122, y + 28, 28, { mat: hr.marble }); }
-    return { S, cam: CAM(1, 470, true) };
+    for (let i = 0; i < 17; i++) { const y = 30 + i * 44; S.box(-160, y, 0, -128, y + 32, 32, { mat: hr.marble }); }
+    return { S, cam: CAM(0.9, 470, true), L: nrm([0.62, -0.08, 0.78]) };
   };
 
-  // Field of gnomons — parallel instruments
+  // Field of gnomons — identical instruments in parallel
   SCENES.field = (hr) => {
     const S = new Scene(); ground(S, hr);
     for (let r = 0; r < 5; r++) for (let c = 0; c < 5; c++) {
-      const x = -330 + c * 150, y = 120 + r * 190;
-      S.extrude([[x, y, 0], [x + 100, y, 0], [x + 100, y, 92]], [0, 34, 0], { mat: hr.stone });
+      const x = -330 + c * 150, y = 120 + r * 170;
+      S.extrude([[x, y, 0], [x + 96, y, 0], [x, y, 96 * 0.9]], [0, 30, 0], { mat: hr.stone });
     }
-    return { S, cam: CAM(1, 300) };
+    return { S, cam: CAM(1, 330) };
   };
 
   // Stair to the sky — autoregression
   SCENES.stair = (hr) => {
     const S = new Scene(); ground(S, hr);
-    const n = 14, run = 42, rise = 34, y0 = 160, y1 = 290;
-    for (let i = 0; i < n; i++) S.box(-340 + i * run, y0, 0, -340 + (i + 1) * run, y1, (i + 1) * rise, { mat: hr.stone });
+    const n = 15, run = 38, rise = 32, y0 = 120, y1 = 250;
+    for (let i = 0; i < n; i++) S.box(-300 + i * run, y0, 0, -300 + (i + 1) * run, y1, (i + 1) * rise, { mat: hr.stone });
     return { S, cam: CAM(1, 360) };
   };
 
@@ -376,8 +425,8 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:'Anek Latin',
 
   function build(b) {
     const hr = HOURS[b.level];
-    const { S, cam } = SCENES[b.scene](hr);
-    const art = render(S, cam, hr.L);
+    const sc = SCENES[b.scene](hr);
+    const art = render(sc.S, sc.cam, sc.L || hr.L);
     const el = document.createElement('div');
     el.className = 'cover lv-' + b.level; el.dataset.slug = b.slug;
     el.style.setProperty('--sky', hr.sky); el.style.setProperty('--ink', hr.ink); el.style.setProperty('--sub', hr.sub);

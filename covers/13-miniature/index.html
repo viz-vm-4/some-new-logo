@@ -46,7 +46,7 @@ const P = {
   saffron:'#E4A42E', lac:'#8C1F35', pink:'#E7B09C', sky:'#9DBBD0'
 };
 const LEVEL = {
-  beginner:     {margin:P.saffron,   n:1, label:'Beginner',     text:P.ink,   fleck:'#F6DC97'},
+  beginner:     {margin:P.saffron,   n:1, label:'Beginner',     text:P.ink,   fleck:'#B98320'},
   intermediate: {margin:P.malachite, n:2, label:'Intermediate', text:P.ivory, fleck:P.gold},
   advanced:     {margin:P.lapis,     n:3, label:'Advanced',     text:P.ivory, fleck:P.gold},
 };
@@ -76,12 +76,12 @@ M.h = (B.y+B.h-JT) - M.y;
 function zarAfshan(r, col){
   let s='';
   const inBlock=(x,y)=> x>B.x-30 && x<B.x+B.w+30 && y>B.y-30 && y<B.y+B.h+30;
-  const inImprint=(x,y)=> y>B.y+B.h+34 && y<H-22 && x>90 && x<630;
-  for(let i=0;i<900;i++){
+  const inImprint=(x,y)=> y>B.y+B.h+30 && y<H-20 && x>150 && x<570;
+  for(let i=0;i<420;i++){
     const x=r()*W, y=r()*H; if(inBlock(x,y)||inImprint(x,y)) continue;
-    const sz=0.5+Math.pow(r(),3)*2.4, k=3+Math.floor(r()*3), a0=r()*6.28;
-    let d=''; for(let j=0;j<k;j++){const a=a0+j*6.283/k+(r()-.5)*.9, rr=sz*(.5+r()*.7); d+=(j?'L':'M')+f(x+Math.cos(a)*rr)+','+f(y+Math.sin(a)*rr);}
-    s+=`<path d="${d}Z" fill="${col}" opacity="${f(.5+r()*.5)}"/>`;
+    const sz=0.9+Math.pow(r(),2.6)*3.6, k=3+Math.floor(r()*2), a0=r()*6.28;
+    let d=''; for(let j=0;j<k;j++){const a=a0+j*6.283/k+(r()-.5)*1.1, rr=sz*(.45+r()*.8); d+=(j?'L':'M')+f(x+Math.cos(a)*rr)+','+f(y+Math.sin(a)*rr);}
+    s+=`<path d="${d}Z" fill="${col}"/>`;
   }
   return s;
 }
@@ -94,8 +94,6 @@ function lobePath(x,y,w,h,p,a,b){
 }
 function cartouche(x,y,w,h,ground){
   let s=rect(x,y,w,h,ground);
-  // fine gold tooling: a lattice of tiny gold points in the spandrels
-  s+=rect(x,y,w,h,`url(#tool)`);
   s+=`<path d="${lobePath(x,y,w,h,10,16,20)}" fill="${P.gold}" stroke="${P.ink}" stroke-width="1.2"/>`;
   s+=`<path d="${lobePath(x,y,w,h,14.5,11.5,20)}" fill="${P.ivory}" stroke="${P.ink}" stroke-width="1.1"/>`;
   s+=`<path d="${lobePath(x,y,w,h,20,6,20)}" fill="none" stroke="${P.vermilion}" stroke-width="1.1"/>`;
@@ -129,12 +127,10 @@ function arrow(x1,y1,x2,y2,col,wd=3){ // flat painted arrow with ink edge
 }
 /* a tiny abstract "glyph" for a token tile — deterministic, never real text */
 function glyph(x,y,w,h,r,col=P.ink){
-  const k=Math.floor(r()*5); const cx=x+w/2, cy=y+h/2;
-  if(k===0) return line(x+w*.22,cy,x+w*.78,cy,col,2);
-  if(k===1) return circ(cx,cy,Math.min(w,h)*.16,col);
-  if(k===2) return line(x+w*.25,cy-3,x+w*.75,cy-3,col,1.8)+line(x+w*.25,cy+3,x+w*.6,cy+3,col,1.8);
-  if(k===3) return poly([[cx,y+h*.25],[x+w*.72,y+h*.72],[x+w*.28,y+h*.72]],col);
-  return rect(cx-w*.14,cy-h*.2,w*.28,h*.4,'none',`stroke="${col}" stroke-width="1.6"`);
+  const n=1+Math.floor(r()*3), lh=Math.min(6,h/(n+1.6)); let s='';
+  for(let i=0;i<n;i++){ const L=w*(.26+r()*.4), yy=y+h/2+(i-(n-1)/2)*lh; s+=line(x+(w-L)/2,yy,x+(w+L)/2,yy,col,1.9,'stroke-linecap="round"'); }
+  if(r()<.35) s+=circ(x+w*.5,y+h/2-((n-1)/2)*lh-lh*.95,1.3,col);
+  return s;
 }
 
 /* ======================= emblems ======================= */
@@ -544,7 +540,7 @@ function coverEl(b){
   const meta = b.soon ? 'In preparation' : `${b.capsules} capsules · ${b.hours} ${b.hours===1?'hour':'hours'}`;
   d.innerHTML = coverSVG(b) +
     `<div class="title" style="left:${tx}px;top:${C.y+24}px;width:${tw}px;height:${CART_H-48}px;font-size:${b.size}px">${rub}${lines}${sub}</div>`+
-    `<div class="imprint" style="top:${B.y+B.h+52}px;color:${L.text}"><div class="l">Vizuara<br><span style="display:block;margin-top:6px">Books</span></div><div class="r">${L.label}<small>${meta}</small></div></div>`;
+    `<div class="imprint" style="top:${B.y+B.h+52}px;color:${L.text}"><div class="l">Vizuara Books<small>books.vizuara.ai</small></div><div class="r">${L.label}<small>${meta}</small></div></div>`;
   return d;
 }
 function build(){
