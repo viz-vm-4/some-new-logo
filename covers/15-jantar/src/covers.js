@@ -120,7 +120,7 @@
         S.decal([P(t - ww, -bw / 2 + ln), P(t + ww, -bw / 2 + ln), P(t + ww, bw / 2 - ln), P(t - ww, bw / 2 - ln)], Nn(t), hr.marble, 0.5);
       }
     }
-    return { S, cam, L: sunRel(cam, 30, 50) };
+    return { S, cam, L: sunRel(cam, 152, 46) };
   };
 
   // Stepwell in section (after Chand Baori, Abhaneri): the section plane cuts the pit open;

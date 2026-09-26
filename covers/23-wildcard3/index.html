@@ -1,0 +1,903 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blazon — the Vizuara Roll of Arms</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --argent: #F8F5EE; --or: #D4A236; --gules: #B3261E; --azure: #213F93; --vert: #1D6946; --purpure: #5E2B5F; --sable: #161517;
+    --paper: #ECE6D9;
+    --page: #D8D2C5;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { background: var(--page); color: var(--sable); font-family: 'Newsreader', Georgia, serif; font-optical-sizing: auto; }
+
+  /* ================= THE COVER ================= */
+  .cover {
+    width: 720px; height: 888px; position: relative; overflow: hidden; flex: none;
+    background: var(--ground); color: var(--ink);
+    font-family: 'Newsreader', Georgia, serif; font-optical-sizing: auto;
+  }
+  .cover.beginner     { --ground: var(--paper); --ink: var(--sable); --label: var(--sable); }
+  .cover.intermediate { --ground: var(--or);    --ink: var(--sable); --label: var(--sable); }
+  .cover.advanced     { --ground: var(--sable); --ink: var(--argent); --label: var(--or); }
+
+  .cover .imprint {
+    position: absolute; left: 44px; top: 34px; height: 26px;
+    display: flex; align-items: center; gap: 11px;
+    font-size: 12.5px; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; line-height: 1;
+    font-variation-settings: 'opsz' 12;
+  }
+  .cover .imprint .mark { display: block; }
+  .cover .roll {
+    position: absolute; right: 44px; top: 34px; height: 26px; display: flex; align-items: center;
+    font-size: 12.5px; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; line-height: 1;
+    font-variation-settings: 'opsz' 12; font-variant-numeric: lining-nums;
+  }
+  .cover .head { position: absolute; left: 44px; top: 86px; width: 632px; }
+  .cover .series {
+    font-size: 12.5px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; line-height: 1;
+    font-variation-settings: 'opsz' 12; margin: 4px 0 18px; color: var(--label);
+  }
+  .cover .title {
+    margin: 0; font-weight: 600; line-height: .99; letter-spacing: -0.018em;
+    font-variation-settings: 'opsz' 72; font-variant-numeric: lining-nums;
+  }
+  .cover .title span { display: block; white-space: nowrap; }
+  .cover .sub {
+    margin: 14px 0 0; font-style: italic; font-weight: 400; font-size: 25px; line-height: 1.18; max-width: 600px;
+    font-variation-settings: 'opsz' 36;
+  }
+  .cover .arms { position: absolute; left: 276px; top: 340px; width: 400px; height: 480px; overflow: visible; }
+  .cover .register {
+    position: absolute; left: 44px; top: 348px; width: 206px; height: 472px;
+    display: flex; flex-direction: column;
+  }
+  .cover .lab {
+    font-size: 10.5px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; line-height: 1;
+    color: var(--label); margin: 0 0 8px; font-variation-settings: 'opsz' 10;
+  }
+  .cover .blazon { margin: 0 0 22px; font-style: italic; font-size: 16px; line-height: 1.3; font-weight: 400; }
+  .cover .symb { margin: 0; font-size: 13.5px; line-height: 1.4; font-weight: 400; }
+  .cover .meta { margin-top: auto; border-top: 2px solid currentColor; padding-top: 10px; }
+  .cover .meta .lvl { font-size: 12.5px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; line-height: 1.2; font-variation-settings: 'opsz' 12; }
+  .cover .meta .ext { font-size: 14px; line-height: 1.3; margin-top: 3px; font-variant-numeric: lining-nums; }
+
+  /* coming soon: arms in trick */
+  .cover .trick text { font-family: 'Newsreader', serif; font-style: italic; font-size: 26px; }
+
+  /* ================= THE PRESENTATION ================= */
+  .wrapall { max-width: 1520px; margin: 0 auto; padding: 72px 40px 120px; }
+  .mast { display: grid; grid-template-columns: 1.1fr 1fr; gap: 56px; align-items: end; border-bottom: 3px solid var(--sable); padding-bottom: 36px; }
+  .mast h1 { font-size: 168px; line-height: .86; margin: 0; font-weight: 600; letter-spacing: -0.03em; font-variation-settings: 'opsz' 72; }
+  .mast .kick { font-size: 15px; letter-spacing: .22em; text-transform: uppercase; font-weight: 600; margin: 0 0 18px; }
+  .mast .pitch { font-size: 25px; line-height: 1.3; margin: 0; font-variation-settings: 'opsz' 30; }
+  .mast .pitch em { font-style: italic; }
+  .cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin: 40px 0 56px; }
+  .cols p { font-size: 17.5px; line-height: 1.5; margin: 0 0 12px; }
+  .cols h3, .sec h2 { font-size: 13px; letter-spacing: .22em; text-transform: uppercase; font-weight: 700; margin: 0 0 14px; }
+  .sec { margin: 0 0 64px; }
+  .sec h2 { border-top: 2px solid var(--sable); padding-top: 12px; }
+  .tinctures { display: grid; grid-template-columns: repeat(7, 1fr); gap: 16px; }
+  .tinc .sw { height: 120px; border: 2.5px solid var(--sable); position: relative; overflow: hidden; }
+  .tinc .sw svg { position: absolute; right: 0; bottom: 0; width: 44%; height: 44%; border-left: 2.5px solid var(--sable); border-top: 2.5px solid var(--sable); background: #fff; }
+  .tinc b { display: block; font-size: 20px; margin-top: 10px; font-weight: 600; }
+  .tinc span { display: block; font-size: 14.5px; line-height: 1.35; }
+  .tinc code { font-family: 'Newsreader', serif; font-size: 14px; font-variant-numeric: lining-nums; letter-spacing: .04em; }
+  .levels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .levels div { height: 110px; border: 2.5px solid var(--sable); padding: 16px 18px; display: flex; flex-direction: column; justify-content: space-between; }
+  .levels b { font-size: 26px; font-weight: 600; }
+  .levels span { font-size: 15px; }
+  .ordinary { display: grid; grid-template-columns: repeat(6, 1fr); gap: 18px 16px; }
+  .ordinary figure { margin: 0; }
+  .ordinary svg { width: 100%; height: auto; display: block; }
+  .ordinary figcaption { font-size: 15px; line-height: 1.3; margin-top: 8px; }
+  .ordinary figcaption b { display: block; font-style: italic; font-weight: 500; font-size: 17px; }
+  .typeset { display: grid; grid-template-columns: 1.3fr 1fr; gap: 40px; align-items: start; }
+  .typeset .big { font-size: 76px; line-height: .99; font-weight: 600; letter-spacing: -0.018em; font-variation-settings: 'opsz' 72; }
+  .typeset .it { font-style: italic; font-size: 22px; line-height: 1.35; margin: 8px 0 0; }
+  .typeset p { font-size: 16.5px; line-height: 1.5; margin: 0 0 10px; }
+  .shelf { display: flex; flex-wrap: wrap; gap: 56px 48px; justify-content: flex-start; }
+  .shelf figure { margin: 0; width: 720px; }
+  .shelf figcaption { font-size: 15px; margin-top: 12px; display: flex; justify-content: space-between; letter-spacing: .02em; }
+  .shelf figcaption b { font-weight: 600; }
+  .note { font-size: 16px; line-height: 1.5; max-width: 900px; }
+  .hatch-row { display: flex; gap: 28px; align-items: flex-end; flex-wrap: wrap; }
+  .hatch-row figure { margin: 0; }
+  .hatch-row figcaption { font-size: 14.5px; margin-top: 8px; font-style: italic; }
+  .cadency { display: flex; gap: 22px; flex-wrap: wrap; }
+  .cadency figure { margin: 0; text-align: center; width: 120px; }
+  .cadency figcaption { font-size: 14.5px; line-height: 1.3; margin-top: 6px; }
+  .wrapwrap { overflow-x: auto; padding-bottom: 10px; }
+  .wrap { display: flex; width: max-content; box-shadow: 0 1px 0 rgba(0,0,0,.1); }
+  .wrap .back, .wrap .spine, .wrap .front { height: 888px; position: relative; overflow: hidden; flex: none; }
+
+  /* back cover and spine of the wrap */
+  .back .bk { position: absolute; left: 44px; top: 112px; width: 580px; }
+  .bk-lab { font-size: 11px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; margin: 0 0 12px; font-variation-settings: 'opsz' 10; }
+  .bk-blazon { font-style: italic; font-size: 38px; line-height: 1.12; margin: 0 0 20px; font-variation-settings: 'opsz' 48; }
+  .bk-sym, .bk-body { font-size: 18.5px; line-height: 1.45; margin: 0 0 12px; }
+  .bk-facts { font-size: 15px; letter-spacing: .02em; margin: 14px 0 0; font-weight: 600; }
+  .bk-roll { position: absolute; left: 44px; right: 44px; bottom: 96px; }
+  .bk-shields { display: flex; gap: 12px; flex-wrap: wrap; }
+  .bk-shields svg { display: block; }
+  .bk-foot { position: absolute; left: 44px; right: 44px; bottom: 38px; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; border-top: 2px solid currentColor; padding-top: 12px; }
+  .spine { display: flex; flex-direction: column; align-items: center; padding: 34px 0 30px; color: var(--sable); border-left: 1px dashed rgba(0,0,0,.25); border-right: 1px dashed rgba(0,0,0,.25); }
+  .sp-title { flex: 1; writing-mode: vertical-rl; display: flex; align-items: center; justify-content: center; font-size: 23px; font-weight: 600; letter-spacing: -0.005em; white-space: nowrap; font-variation-settings: 'opsz' 36; }
+  .sp-arms svg, .sp-mark svg { display: block; }
+  .sp-arms { margin-bottom: 26px; } .sp-mark { margin-top: 26px; }
+</style>
+</head>
+<body>
+<div class="wrapall">
+
+  <header class="mast">
+    <div>
+      <p class="kick">Vizuara Books · a cover system</p>
+      <h1>Blazon</h1>
+    </div>
+    <p class="pitch">Every Vizuara book is <em>granted arms</em>. Its shield is drawn from the mechanism it teaches, in heraldry’s own grammar, and printed beside its <em>blazon</em> — the eight-hundred-year-old formal language that compiles to exactly one picture.</p>
+  </header>
+
+  <section class="cols">
+    <div>
+      <h3>The idea</h3>
+      <p>Heraldry is the oldest identity system that works at a distance: flat tinctures, a hard outline, a few bold charges, and a rule of contrast (never metal on metal) that is seven centuries older than WCAG. It was built to tell a thousand houses apart across a field. Fifty books across a library grid is an easier job.</p>
+    </div>
+    <div>
+      <p style="margin-top:31px">And its grammar is uncannily computational. Heraldic divisions are recursive axis-aligned cuts, so a decision tree <em>is</em> a blazon. A line <em>grady</em> (stepped) is the causal mask. Marshalling is composition: parallelism is quartering, a SQL join is impalement, and a distilled student bears its teacher’s arms <em>in pretence</em>.</p>
+    </div>
+    <div>
+      <p style="margin-top:31px">The drawing follows mid-century civic heraldry — the reduced municipal arms of Finland and Switzerland — not Gothic pastiche: no helms, lions or blackletter. One shield, placed the same way on every cover, the blazon set beside it like source code beside its output, and a quiet publisher’s mark.</p>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2>Tinctures — the field of the shield names the field of study</h2>
+    <div class="tinctures" id="tinctures"></div>
+    <p class="note" style="margin-top:18px">Each small square is the tincture’s <em>Petra Sancta</em> hatching (1638), heraldry’s own system for printing every colour in one ink. The shields can be reproduced in black alone for a one-colour spine, a stamp or a fax-grade printout and still be read correctly, and the covers’ three grounds are light, middle and dark in greyscale.</p>
+  </section>
+
+  <section class="sec">
+    <h2>Level is the ground the shield is displayed on</h2>
+    <div class="levels">
+      <div style="background:var(--paper)"><b>Argent</b><span>Beginner — the shield on bare paper.</span></div>
+      <div style="background:var(--or)"><b>Or</b><span>Intermediate — displayed on gold.</span></div>
+      <div style="background:var(--sable);color:var(--argent)"><b style="color:var(--or)">Sable</b><span>Advanced — displayed on black.</span></div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2>The Ordinary — one meaning per charge, across the whole library</h2>
+    <p class="note" style="margin:-4px 0 22px">An <em>ordinary of arms</em> is the heraldic reference that indexes shields by what is on them. This is Vizuara’s: every new book is blazoned from the same vocabulary, so a reader who has learnt that a pile is a context window can read the next shield unaided.</p>
+    <div class="ordinary" id="ordinary"></div>
+  </section>
+
+  <section class="sec">
+    <h2>Type</h2>
+    <div class="typeset">
+      <div>
+        <div class="big">Newsreader, Semibold at display size</div>
+        <p class="it">and its italic, at text size, for the blazon: <em>Per bend grady of eight Argent and Gules.</em></p>
+      </div>
+      <div>
+        <p>One family, Production Type’s Newsreader, used through its optical-size axis: the 72pt master for titles (tight, sharp, high contrast), the text masters for the register and letter-spaced capitals for the imprint. It is a reading face for a publisher of reading; nothing on the cover is set in a “tech” font.</p>
+        <p>Titles are set left, broken by sense, never leaving a short word alone, and sized in three steps (two, three or four lines) so a shelf of fifty keeps one voice.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2>The Roll — sixteen books</h2>
+    <div class="shelf" id="shelf"></div>
+  </section>
+
+  <section class="sec" id="cadency-sec">
+    <h2>A family of rooms — the Charlie books share a chief and are differenced like brothers</h2>
+    <p class="note" style="margin:-4px 0 20px">All four <em>Charlie and the Intelligence Factory</em> shields carry the Factory’s sawtoothed chief — its north-light roof — over the room’s own device. On the chief sits the heraldic mark of cadency that distinguished a first, second, third and fourth son: the label, crescent, mullet and martlet. Book numbers you can see at a glance, in a language that already existed.</p>
+    <div class="cadency" id="cadency"></div>
+  </section>
+
+  <section class="sec">
+    <h2>Printed in one ink</h2>
+    <p class="note" style="margin:-4px 0 20px">The same arms hatched in Petra Sancta: the monochrome fallback for a stamped spine, an ex-libris or a black-only reprint.</p>
+    <div class="hatch-row" id="hatch"></div>
+  </section>
+
+  <section class="sec">
+    <h2>Full wrap — back, spine, front</h2>
+    <div class="wrapwrap"><div class="wrap" id="wrap"></div></div>
+  </section>
+
+</div>
+
+<script>
+/* Blazon — the Vizuara Roll of Arms.
+   A small heraldic drawing engine: tinctures, lines of partition, ordinaries and charges,
+   all drawn as flat SVG in a 400 x 480 shield space. Every book's arms are built from these. */
+
+const T = {
+  argent: '#F8F5EE',
+  or: '#D4A236',
+  gules: '#B3261E',
+  azure: '#213F93',
+  vert: '#1D6946',
+  purpure: '#5E2B5F',
+  sable: '#161517',
+};
+const GROUND = { beginner: '#ECE6D9', intermediate: T.or, advanced: T.sable };
+const S = T.sable;
+const W = 400, H = 480;
+const SHIELD = 'M0 0H400V250C400 360 320 440 200 480C80 440 0 360 0 250Z';
+const SHIELD_IN = 'M3 3H397V250C397 358 318 437 200 477C82 437 3 358 3 250Z';
+const LW = 3.5;   // line of partition
+const CW = 3;     // charge outline
+
+const n = (v) => +v.toFixed(2);
+const pathOf = (pts) => 'M' + pts.map((p) => n(p[0]) + ' ' + n(p[1])).join('L') + 'Z';
+const openPath = (pts) => 'M' + pts.map((p) => n(p[0]) + ' ' + n(p[1])).join('L');
+const poly = (pts, fill, sw = LW) =>
+  `<path d="${pathOf(pts)}" fill="${fill}" stroke="${S}" stroke-width="${sw}" stroke-linejoin="miter" stroke-miterlimit="8"/>`;
+
+/* ---------- lines of partition ----------
+   pattern(type, L) -> [[u, v]] along a line of length L; v is the offset to one side. */
+function pattern(type, L, o = {}) {
+  const p = o.p || 40, a = o.a || 12, ph = o.phase || 0;
+  const pts = [];
+  if (type === 'plain') return [[0, 0], [L, 0]];
+  // start one period early so the pattern is centred on the shield
+  const start = ((L / 2 + ph) % p) - p * 2;
+  if (type === 'indented') {
+    for (let u = start, k = 0; u <= L + p; u += p / 2, k++) pts.push([u, k % 2 ? a / 2 : -a / 2]);
+  } else if (type === 'embattled') {
+    for (let u = start; u <= L + p; u += p) {
+      pts.push([u, -a / 2], [u + p / 2, -a / 2], [u + p / 2, a / 2], [u + p, a / 2]);
+    }
+  } else if (type === 'wavy') {
+    for (let u = start; u <= L + p; u += 2) pts.push([u, (a / 2) * Math.sin((2 * Math.PI * (u - start)) / p)]);
+  } else if (type === 'dovetailed') {
+    for (let u = start; u <= L + p; u += p) {
+      pts.push([u, -a / 2], [u + 0.36 * p, -a / 2], [u + 0.26 * p, a / 2], [u + 0.74 * p, a / 2], [u + 0.64 * p, -a / 2]);
+    }
+    pts.push([L + 2 * p, -a / 2]);
+  }
+  return pts;
+}
+// map pattern from A to B
+function along(type, A, B, o) {
+  const dx = B[0] - A[0], dy = B[1] - A[1], L = Math.hypot(dx, dy);
+  const ux = dx / L, uy = dy / L, px = -uy, py = ux;
+  return pattern(type, L, o).map(([u, v]) => [A[0] + ux * u + px * v, A[1] + uy * u + py * v]);
+}
+// half-planes (drawn big, the shield clip trims them)
+const below = (y, type = 'plain', o) => [...along(type, [-60, y], [460, y], o), [460, 560], [-60, 560]];
+const rightOf = (x, type = 'plain', o) => [...along(type, [x, -60], [x, 560], o), [-60 + 520 + 60, 560], [520, -60]].map((p, i, arr) => p);
+function rightOfPts(x, type = 'plain', o) {
+  const line = along(type, [x, -60], [x, 560], o);
+  return [...line, [520, 560], [520, -60]];
+}
+
+/* ---------- charges ---------- */
+const roundel = (x, y, r, fill) => `<circle cx="${n(x)}" cy="${n(y)}" r="${r}" fill="${fill}" stroke="${S}" stroke-width="${CW}"/>`;
+const circ = (x, y, r) => `M${n(x - r)} ${n(y)}a${r} ${r} 0 1 0 ${2 * r} 0a${r} ${r} 0 1 0 ${-2 * r} 0Z`;
+const annulet = (x, y, r, t, fill) =>
+  `<path d="${circ(x, y, r)}${circ(x, y, r - t)}" fill="${fill}" fill-rule="evenodd" stroke="${S}" stroke-width="${CW}"/>`;
+const billet = (x, y, w, h, fill) =>
+  `<rect x="${n(x - w / 2)}" y="${n(y - h / 2)}" width="${w}" height="${h}" fill="${fill}" stroke="${S}" stroke-width="${CW}"/>`;
+const lozenge = (x, y, w, h, fill) => poly([[x, y - h / 2], [x + w / 2, y], [x, y + h / 2], [x - w / 2, y]], fill, CW);
+function mullet(x, y, r, fill, sw = CW) {
+  const pts = [];
+  for (let i = 0; i < 10; i++) {
+    const ang = (-90 + i * 36) * Math.PI / 180, rr = i % 2 ? r * 0.40 : r;
+    pts.push([x + rr * Math.cos(ang), y + rr * Math.sin(ang)]);
+  }
+  return poly(pts, fill, sw);
+}
+function estoile(x, y, r, fill) {
+  // six wavy rays
+  let d = '';
+  const ri = r * 0.26;
+  for (let i = 0; i < 6; i++) {
+    const a = (-90 + i * 60) * Math.PI / 180, a1 = a - 0.30, a2 = a + 0.30;
+    const tip = [x + r * Math.cos(a), y + r * Math.sin(a)];
+    const b1 = [x + ri * Math.cos(a1), y + ri * Math.sin(a1)];
+    const b2 = [x + ri * Math.cos(a2), y + ri * Math.sin(a2)];
+    // wave: control points pushed sideways alternately
+    const m = 0.55, s = r * 0.16;
+    const cx1 = x + (r * m) * Math.cos(a) + s * Math.cos(a + Math.PI / 2), cy1 = y + (r * m) * Math.sin(a) + s * Math.sin(a + Math.PI / 2);
+    const cx2 = x + (r * m) * Math.cos(a) + s * Math.cos(a + Math.PI / 2) * 0.2, cy2 = y + (r * m) * Math.sin(a) + s * Math.sin(a + Math.PI / 2) * 0.2;
+    d += (i === 0 ? `M${n(b1[0])} ${n(b1[1])}` : `L${n(b1[0])} ${n(b1[1])}`);
+    d += `Q${n(cx1 - (r * 0.10) * Math.cos(a + Math.PI / 2))} ${n(cy1 - (r * 0.10) * Math.sin(a + Math.PI / 2))} ${n(tip[0])} ${n(tip[1])}`;
+    d += `Q${n(cx2 + (r * 0.02) * Math.cos(a + Math.PI / 2))} ${n(cy2 + (r * 0.02) * Math.sin(a + Math.PI / 2))} ${n(b2[0])} ${n(b2[1])}`;
+  }
+  return `<path d="${d}Z" fill="${fill}" stroke="${S}" stroke-width="${CW}" stroke-linejoin="round"/>`;
+}
+function crescent(x, y, R, fill) {
+  const r2 = 0.8 * R, d = 0.34 * R;
+  const yy = (r2 * r2 - R * R - d * d) / (2 * d), xx = Math.sqrt(R * R - yy * yy);
+  const L = [x - xx, y + yy], Rr = [x + xx, y + yy];
+  return `<path d="M${n(L[0])} ${n(L[1])}A${R} ${R} 0 1 0 ${n(Rr[0])} ${n(Rr[1])}A${r2} ${r2} 0 1 1 ${n(L[0])} ${n(L[1])}Z" fill="${fill}" stroke="${S}" stroke-width="${CW}"/>`;
+}
+function label(x, y, w, fill) {
+  const h = w * 0.13, pw = w * 0.15, ph = w * 0.26, top = y - (h + ph) / 2;
+  let d = `M${n(x - w / 2)} ${n(top)}H${n(x + w / 2)}V${n(top + h)}`;
+  const cs = [x + w * 0.3, x, x - w * 0.3];
+  for (const c of cs) d += `H${n(c + pw / 2)}L${n(c + pw * 0.62)} ${n(top + h + ph)}H${n(c - pw * 0.62)}L${n(c - pw / 2)} ${n(top + h)}`;
+  d += `H${n(x - w / 2)}Z`;
+  return `<path d="${d}" fill="${fill}" stroke="${S}" stroke-width="${CW}" stroke-linejoin="miter"/>`;
+}
+function martlet(x, y, w, fill) {
+  // a heraldic martlet facing dexter, drawn in a 100 x 60 box
+  const s = w / 100;
+  const body = 'M3 30C5 22 12 18 20 18C31 18 42 11 58 13C66 14 72 17 77 20L99 7L88 27L99 45L74 34C66 40 56 44 44 45C34 46 26 43 20 41C12 39 5 37 3 30Z';
+  const tuft = 'M30 42L27 54L35 46L38 56L43 45Z';
+  const wing = 'M24 27C36 24 52 24 70 27';
+  const tf = `translate(${n(x - 50 * s)} ${n(y - 30 * s)}) scale(${n(s)})`;
+  return `<g transform="${tf}"><path d="${tuft}" fill="${fill}" stroke="${S}" stroke-width="${n(CW / s)}" stroke-linejoin="round"/><path d="${body}" fill="${fill}" stroke="${S}" stroke-width="${n(CW / s)}" stroke-linejoin="round"/><path d="${wing}" fill="none" stroke="${S}" stroke-width="${n(CW / s)}" stroke-linecap="round"/><circle cx="14" cy="25" r="2.2" fill="${S}"/></g>`;
+}
+function escutcheon(x, y, w, inner, id) {
+  // a small shield (same outline as the main one) with arbitrary contents drawn in 400x480 space
+  const s = w / 400;
+  return `<g transform="translate(${n(x - w / 2)} ${n(y - (480 * s) / 2)}) scale(${n(s)})"><clipPath id="${id}"><path d="${SHIELD}"/></clipPath><g clip-path="url(#${id})">${inner}</g><path d="${SHIELD_IN}" fill="none" stroke="${S}" stroke-width="${n(5 / s)}"/></g>`;
+}
+
+/* Sawtoothed chief — the Intelligence Factory's north-light roof */
+function factoryChief(fill, eaves = 132, ridge = 84, bays = 5) {
+  const bw = W / bays, pts = [[-20, -20], [420, -20], [420, eaves]];
+  for (let k = bays - 1; k >= 0; k--) {
+    const x0 = k * bw;
+    pts.push([x0 + bw, eaves], [x0 + bw, eaves]); // eaves at right of bay
+    pts.push([x0, ridge]);                       // slope up to the left ridge
+    pts.push([x0, eaves]);                        // vertical glazed face
+  }
+  pts.push([-20, eaves]);
+  return poly(pts, fill);
+}
+
+/* ---------- the arms of each book ---------- */
+const ARMS = {};
+
+// Neural Networks from Scratch — XOR solved by a hidden layer: the class between two lines is the bend
+ARMS['neural-networks-from-scratch'] = () => {
+  const c = [200, 214], hw = 62;           // centre of the bend, half width
+  const d = [Math.SQRT1_2, Math.SQRT1_2], p = [-Math.SQRT1_2, Math.SQRT1_2];
+  const e = (s, t) => [c[0] + d[0] * s + p[0] * t, c[1] + d[1] * s + p[1] * t];
+  const bend = [e(-500, -hw), e(500, -hw), e(500, hw), e(-500, hw)];
+  const on1 = e(-118, 0), on2 = e(118, 0);
+  return `<rect width="400" height="480" fill="${T.azure}"/>` + poly(bend, T.or) +
+    roundel(on1[0], on1[1], 40, T.gules) + roundel(on2[0], on2[1], 40, T.gules) +
+    roundel(318, 104, 40, T.argent) + roundel(94, 322, 40, T.argent);
+};
+
+// Mathematical Foundations — a convex loss and gradient descent walking down it
+ARMS['mathematical-foundations-for-ml'] = () => {
+  const vx = 200, vy = 352, k = 292 / (200 * 200); // vertex; reaches y=60 at the edges
+  const f = (x) => vy - k * (x - vx) * (x - vx);
+  const pts = [];
+  for (let x = -20; x <= 420; x += 4) pts.push([x, f(x)]);
+  const curve = openPath(pts);
+  // gradient descent on f with a fixed step: x <- x - eta * f'(x); here each step halves the distance
+  const xs = [-166, -83, -41.5].map((u) => vx + u);
+  const rs = [30, 24, 19];
+  let out = `<rect width="400" height="480" fill="${T.azure}"/>`;
+  out += `<path d="${curve}" fill="none" stroke="${S}" stroke-width="58"/><path d="${curve}" fill="none" stroke="${T.or}" stroke-width="51"/>`;
+  xs.forEach((x, i) => { out += roundel(x, f(x), rs[i], T.argent); });
+  out += roundel(vx, vy, 17, T.gules);
+  return out;
+};
+
+// Decision trees — Fisher's iris, split at petal length 2.45 cm, then petal width 1.75 cm
+ARMS['decision-trees-from-scratch'] = () => {
+  // petal length axis 0.6..7.0 cm across; petal width axis 0..2.6 cm up
+  const X = (cm) => ((cm - 0.6) / 6.4) * 400, Y = (cm) => 480 - (cm / 2.6) * 480;
+  const x0 = X(2.45), y0 = Y(1.75);
+  let out = `<rect width="400" height="480" fill="${T.azure}"/>`;
+  out += poly([[-10, -10], [x0, -10], [x0, 500], [-10, 500]], T.or);
+  out += poly([[x0, -10], [410, -10], [410, y0], [x0, y0]], T.argent);
+  // setosa: three hurts in pale
+  [96, 196, 296].forEach((y) => { out += roundel(x0 / 2 + 2, y, 26, T.azure); });
+  // virginica: two mullets in fess
+  const cx = (x0 + 400) / 2;
+  out += mullet(cx - 68, y0 / 2 + 4, 40, T.azure) + mullet(cx + 68, y0 / 2 + 4, 40, T.azure);
+  // versicolor: three lozenges two and one
+  out += lozenge(cx - 66, y0 + 88, 52, 76, T.argent) + lozenge(cx + 66, y0 + 88, 52, 76, T.argent) + lozenge(cx, y0 + 196, 52, 76, T.argent);
+  return out;
+};
+
+// Build LLMs from Scratch — the causal mask: per bend grady of eight
+ARMS['build-llms-from-scratch'] = () => {
+  const n8 = 8, cw = 400 / n8, rh = 480 / n8;
+  const pts = [[420, -20]];
+  for (let i = 0; i < n8; i++) pts.push([(i + 1) * cw, i * rh], [(i + 1) * cw, (i + 1) * rh]);
+  pts.push([420, 500]);
+  pts.splice(1, 0, [cw, -20]);
+  return `<rect width="400" height="480" fill="${T.gules}"/>` + poly(pts, T.argent);
+};
+
+// AI Context Engineering — the pile is the context window
+ARMS['ai-context-engineering'] = () => {
+  let out = `<rect width="400" height="480" fill="${T.purpure}"/>`;
+  const top = 56, bot = 344, apex = 440; // pile from the chief (x 56..344) to a point
+  const inPile = (x, y) => { const t = (y + 10) / (apex + 10); const hw = 144 * (1 - t); return Math.abs(x - 200) < hw + 22; };
+  for (let r = 0; r < 12; r++) for (let c = 0; c < 10; c++) {
+    const x = 14 + c * 44 + (r % 2 ? 22 : 0), y = 20 + r * 40;
+    if (!inPile(x, y)) out += roundel(x, y, 8, T.argent);
+  }
+  out += poly([[top, -10], [bot, -10], [200, apex]], T.or);
+  [[62, 40, T.sable], [150, 33, T.gules], [228, 27, T.azure], [296, 21, T.argent]].forEach(([y, r, f]) => { out += roundel(200, y, r, f); });
+  return out;
+};
+
+// Pi vs Hermes vs Codex — three harnesses, three shapes of compaction (turns are bars, a summary is plain)
+ARMS['pi-vs-hermes-vs-codex'] = (slug) => {
+  const barry = (y0, y1, k) => { let o = ''; const h = (y1 - y0) / k; for (let i = 0; i < k; i++) o += poly([[-10, y0 + i * h], [410, y0 + i * h], [410, y0 + (i + 1) * h], [-10, y0 + (i + 1) * h]], i % 2 ? T.purpure : T.or, 7); return o; };
+  const plain = (y0, y1) => poly([[-10, y0], [410, y0], [410, y1], [-10, y1]], T.argent, 7);
+  const pi = barry(150, 500, 6) + plain(-10, 150) + `<path d="M200 -10V150" stroke="${S}" stroke-width="7"/>`;
+  const hermes = barry(-10, 150, 3) + plain(150, 300) + barry(300, 500, 4);
+  const codex = plain(-10, 318) + barry(318, 500, 3);
+  return `<rect width="400" height="480" fill="${T.purpure}"/>` +
+    escutcheon(106, 132, 156, pi, slug + '-e1') + escutcheon(294, 132, 156, hermes, slug + '-e2') + escutcheon(200, 328, 156, codex, slug + '-e3');
+};
+
+// 5D Parallelism — chequy of 32; each axis of the mesh is its own line of partition
+ARMS['5d-parallelism'] = () => {
+  const subs = [];
+  subs.push(rightOfPts(200, 'plain'));                                  // data
+  subs.push(rightOfPts(100, 'indented', { p: 28, a: 13 }), rightOfPts(300, 'indented', { p: 28, a: 13 })); // tensor
+  subs.push(below(240, 'embattled', { p: 40, a: 14 }));                 // pipeline
+  subs.push(below(120, 'wavy', { p: 50, a: 14 }), below(360, 'wavy', { p: 50, a: 14 })); // context
+  for (const y of [60, 180, 300, 420]) subs.push(below(y, 'dovetailed', { p: 44, a: 12 })); // expert
+  const d = subs.map(pathOf).join('');
+  return `<rect width="400" height="480" fill="${T.or}"/><path d="${d}" fill="${T.sable}" fill-rule="evenodd"/>` +
+    `<path d="${d}" fill="none" stroke="${S}" stroke-width="2.5"/>`;
+};
+
+// Git & GitHub — a pall: one trunk of commits parting into two branches
+ARMS['git-github-masterclass'] = () => {
+  const w = 88, c = [200, 214];
+  // pall: arms to the chief corners, tail to the base
+  const pall = [
+    [-40, -40 + 0], [0 - 40 + w * 0.9, -40], [c[0], c[1] - w * 0.62], [440 - w * 0.9, -40], [440, -40], [440, 30],
+    [c[0] + w / 2, c[1] + w * 0.2], [c[0] + w / 2, 520], [c[0] - w / 2, 520], [c[0] - w / 2, c[1] + w * 0.2], [-40, 30],
+  ];
+  let out = `<rect width="400" height="480" fill="${T.azure}"/>` + poly(pall, T.or);
+  const r = 22;
+  [[200, 420], [200, 338], [200, 256]].forEach(([x, y]) => { out += roundel(x, y, r, T.azure); });
+  [[126, 150], [62, 86], [274, 150], [338, 86]].forEach(([x, y]) => { out += roundel(x, y, r, T.azure); });
+  return out;
+};
+
+// SQL Masterclass — a join is an impalement
+ARMS['sql-masterclass'] = () => {
+  let out = `<rect width="400" height="480" fill="${T.azure}"/>`;
+  out += poly([[200, -10], [410, -10], [410, 500], [200, 500]], T.argent);
+  const bh = 48;
+  for (let i = 1; i < 10; i += 2) {
+    out += poly([[-10, i * bh], [200, i * bh], [200, (i + 1) * bh], [-10, (i + 1) * bh]], T.argent);
+    out += poly([[200, i * bh], [410, i * bh], [410, (i + 1) * bh], [200, (i + 1) * bh]], T.azure);
+  }
+  out += poly([[184, -10], [216, -10], [216, 500], [184, 500]], T.gules);
+  return out;
+};
+
+// CNN Fundamentals — the image is chequy; the canton is the kernel in its first position
+ARMS['cnn-fundamentals'] = () => {
+  const cols = 8, rows = 10, cw = 400 / cols, rh = 480 / rows;
+  let out = `<rect width="400" height="480" fill="${T.argent}"/>`;
+  let d = '';
+  for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) if ((r + c) % 2) d += `M${c * cw} ${r * rh}h${cw}v${rh}h${-cw}Z`;
+  out += `<path d="${d}" fill="${T.vert}"/>`;
+  let g = '';
+  for (let c = 1; c < cols; c++) g += `M${c * cw} 0V480`;
+  for (let r = 1; r < rows; r++) g += `M0 ${r * rh}H400`;
+  out += `<path d="${g}" stroke="${S}" stroke-width="2"/>`;
+  out += poly([[-10, -10], [3 * cw, -10], [3 * cw, 3 * rh], [-10, 3 * rh]], T.or, 5);
+  out += `<path d="M${cw} 0V${3 * rh}M${2 * cw} 0V${3 * rh}M0 ${rh}H${3 * cw}M0 ${2 * rh}H${3 * cw}" stroke="${S}" stroke-width="2.5"/>`;
+  return out;
+};
+
+// RAG in Production — documents strewn; the query's neighbourhood holds the three nearest
+ARMS['rag-in-production'] = () => {
+  let out = `<rect width="400" height="480" fill="${T.purpure}"/>`;
+  const c = [200, 222], R = 118;
+  const inside = [];
+  for (let r = 0; r < 9; r++) for (let k = 0; k < 7; k++) {
+    const x = 28 + k * 58 + (r % 2 ? 29 : 0), y = 26 + r * 56;
+    const dd = Math.hypot(x - c[0], y - c[1]);
+    if (dd < R - 30) inside.push([x, y]);
+    else if (dd > R + 30) out += billet(x, y, 20, 32, T.argent);
+  }
+  out += annulet(c[0], c[1], R, 26, T.or);
+  inside.forEach(([x, y]) => { out += billet(x, y, 20, 32, T.or); });
+  out += mullet(c[0], c[1] + 2, 26, T.or);
+  return out;
+};
+
+// DeiT — patch tokens with class and distillation tokens; the CNN teacher borne in pretence
+ARMS['deit-from-scratch'] = (slug) => {
+  let out = `<rect width="400" height="480" fill="${T.vert}"/>`;
+  const top = 0, h = 118, n8 = 8, x0 = 0, cw = 400 / n8;
+  for (let i = 0; i < n8; i++) out += poly([[x0 + i * cw, top - 10], [x0 + (i + 1) * cw, top - 10], [x0 + (i + 1) * cw, h], [x0 + i * cw, h]], i % 2 ? T.or : T.argent);
+  out += roundel(cw / 2 + 6, h / 2 + 4, 20, T.gules) + roundel(400 - cw / 2 - 6, h / 2 + 4, 20, T.sable);
+  out += escutcheon(200, 300, 200, ARMS['cnn-fundamentals'](), slug + '-pretence');
+  return out;
+};
+
+// Kernel Engineering (coming soon) — a tiled matrix multiply; drawn in trick
+ARMS['kernel-engineering'] = () => {
+  const cols = 5, rows = 6, cw = 80, rh = 80;
+  let out = '';
+  let g = '';
+  for (let c = 1; c < cols; c++) g += `M${c * cw} 0V480`;
+  for (let r = 1; r < rows; r++) g += `M0 ${r * rh}H400`;
+  out += `<path d="${g}" stroke="currentColor" stroke-width="2" fill="none" opacity="1"/>`;
+  out += `<path d="M0 160H400M0 240H400M240 0V480M320 0V480" stroke="currentColor" stroke-width="5" fill="none"/>`;
+  out += `<rect x="240" y="160" width="80" height="80" fill="none" stroke="currentColor" stroke-width="5"/>`;
+  return out;
+};
+
+/* The Intelligence Factory — four rooms, four sons differenced by cadency */
+ARMS['charlie-language-room'] = () => {
+  let out = `<rect width="400" height="480" fill="${T.gules}"/>` + factoryChief(T.or) + label(200, 50, 128, T.gules);
+  const y = 262, xs = [60, 130, 200, 270];
+  xs.forEach((x) => { out += roundel(x, y, 27, T.argent); });
+  out += annulet(344, y, 29, 11, T.argent);
+  return out;
+};
+ARMS['charlie-vision-room'] = () => {
+  let out = `<rect width="400" height="480" fill="${T.vert}"/>` + factoryChief(T.or) + crescent(200, 50, 28, T.vert);
+  const s = 116, x0 = 200 - s, y0 = 164, cols = [T.or, T.argent, T.argent, T.or];
+  // the image, quarterly
+  out += poly([[x0, y0], [x0 + s, y0], [x0 + s, y0 + s], [x0, y0 + s]], cols[0]);
+  out += poly([[x0 + s, y0], [x0 + 2 * s, y0], [x0 + 2 * s, y0 + s], [x0 + s, y0 + s]], cols[1]);
+  out += poly([[x0, y0 + s], [x0 + s, y0 + s], [x0 + s, y0 + 2 * s], [x0, y0 + 2 * s]], cols[2]);
+  out += poly([[x0 + s, y0 + s], [x0 + 2 * s, y0 + s], [x0 + 2 * s, y0 + 2 * s], [x0 + s, y0 + 2 * s]], cols[3]);
+  // the same patches as a row of tokens
+  const bw = 58, bx = 200 - 2 * bw, by = 424;
+  cols.forEach((col, i) => { out += poly([[bx + i * bw, by - 26], [bx + (i + 1) * bw, by - 26], [bx + (i + 1) * bw, by + 26], [bx + i * bw, by + 26]], col); });
+  return out;
+};
+ARMS['charlie-sound-room'] = () => {
+  let out = `<rect width="400" height="480" fill="${T.azure}"/>` + factoryChief(T.or) + mullet(200, 50, 32, T.azure);
+  const band = (y, fill) => {
+    const top = along('wavy', [-60, y - 26], [460, y - 26], { p: 100, a: 44 });
+    const bot = along('wavy', [460, y + 26], [-60, y + 26], { p: 100, a: 44, phase: 0 });
+    // keep bottom edge parallel to the top edge
+    const botPar = top.slice().reverse().map(([x, yy]) => [x, yy + 52]);
+    return poly([...top, ...botPar], fill);
+  };
+  out += band(240, T.argent) + band(352, T.or);
+  return out;
+};
+ARMS['charlie-reasoning-room'] = () => {
+  let out = `<rect width="400" height="480" fill="${T.purpure}"/>` + factoryChief(T.or) + martlet(200, 50, 96, T.purpure);
+  // a staircase rising to the sinister: four steps
+  const pts = [[-20, 500], [-20, 420], [80, 420], [80, 350], [170, 350], [170, 280], [260, 280], [260, 210], [420, 210], [420, 500]];
+  out += poly(pts, T.or);
+  out += estoile(338, 170, 34, T.argent);
+  return out;
+};
+
+/* The publisher's own arms: Sable, a chevron reversed Or (a V; the chevron is heraldry's builder's charge) */
+function imprintMark(fg, bg, h = 26) {
+  const w = h * 400 / 480;
+  return `<svg class="mark" viewBox="0 0 400 480" width="${n(w)}" height="${h}" aria-hidden="true"><path d="${SHIELD}" fill="${fg}"/>` +
+    `<path d="M40 0H150L200 190L250 0H360L230 330H170Z" fill="${bg}"/></svg>`;
+}
+
+/* The Roll. Each entry: the book's facts (from books.json), its arms, blazon and symbolism.
+   Tincture of the shield's field follows the book's field of study; the cover's ground follows level. */
+const ROLL = [
+  {
+    slug: 'ai-context-engineering', no: 1, level: 'intermediate', capsules: 43, hours: 10, field: 'purpure',
+    title: 'AI Context|Engineering',
+    blazon: 'Purpure, semé of plates, a pile Or charged in pale with four roundels diminishing: a pellet, a torteau, a hurt and a plate.',
+    symbolism: 'Everything a model could be shown is strewn across the field. The pile is the context window, and only what is set on it reaches the model: instructions, tools, retrieved knowledge and memory, selected, ordered and compressed to fit.',
+  },
+  {
+    slug: 'mathematical-foundations-for-ml', no: 2, level: 'beginner', capsules: 43, hours: 10, field: 'azure',
+    title: 'Mathematical|Foundations for|Machine Learning',
+    blazon: 'Azure, a chevron reversed ployé Or, thereon three plates diminishing in descent and a torteau at the point.',
+    symbolism: 'A convex loss, and gradient descent walking down it in ever shorter steps to the minimum: calculus, linear algebra and probability doing their one shared job.',
+  },
+  {
+    slug: 'neural-networks-from-scratch', no: 3, level: 'beginner', capsules: 33, hours: 7, field: 'azure',
+    title: 'Neural Networks|from Scratch',
+    blazon: 'Azure, on a bend Or two torteaux, between two plates.',
+    symbolism: 'XOR, the problem one neuron cannot solve. A hidden layer draws two parallel lines, and the class that lies between them becomes the bend: red within, white without.',
+  },
+  {
+    slug: 'build-llms-from-scratch', no: 4, level: 'intermediate', capsules: 20, hours: 6, field: 'gules',
+    title: 'Build Large|Language Models|(LLMs) from Scratch',
+    blazon: 'Per bend grady of eight Argent and Gules.',
+    symbolism: 'The causal mask. Read row by row, each token may attend only to itself and to what came before it. Everything above the stair is the future, and is masked out.',
+  },
+  {
+    slug: '5d-parallelism', no: 5, level: 'advanced', capsules: 40, hours: 9, field: 'sable',
+    title: '5D Parallelism|for Large|Model Training',
+    blazon: 'Chequy of thirty-two Or and Sable, parted per pale for data, per pale indented for tensor, per fess embattled for pipeline, per fess wavy for context and per fess dovetailed for expert.',
+    symbolism: 'The smallest five-dimensional mesh: two ways along each axis, thirty-two GPUs, one square each. Every kind of split has its own line, so you can read which axis divides any two neighbours.',
+  },
+  {
+    slug: 'pi-vs-hermes-vs-codex', no: 6, level: 'advanced', capsules: 9, hours: 1, field: 'purpure',
+    title: 'Pi vs Hermes|vs Codex', subtitle: 'Context Compaction and Memory',
+    blazon: 'Purpure, three escutcheons: the first barry Or and Purpure, a chief per pale Argent; the second barry, a fess Argent; the third Argent, a base barry.',
+    symbolism: 'Three harnesses, three ways to compact a conversation. Its turns are bars; a summary is plain silver. Pi cuts once and writes two summaries above the cut; Hermes keeps the head and tail and compresses the middle; Codex hands on a single summary.',
+  },
+  {
+    slug: 'decision-trees-from-scratch', no: 14, level: 'beginner', capsules: 23, hours: 5, field: 'azure',
+    title: 'Build Decision|Trees from Scratch',
+    blazon: 'Per pale Or and per fess Argent and Azure; in dexter three hurts in pale, in sinister chief two mullets Azure, in sinister base three lozenges Argent.',
+    symbolism: 'Fisher’s irises, split twice: at petal length 2.45 cm, then petal width 1.75 cm, one charge for each species. Every heraldic division is an axis-aligned cut; the decision tree is the most heraldic algorithm there is.',
+  },
+  {
+    slug: 'git-github-masterclass', no: 18, level: 'beginner', capsules: 40, hours: 9, field: 'azure',
+    title: 'Git & GitHub|Masterclass',
+    blazon: 'Azure, a pall Or charged with seven hurts.',
+    symbolism: 'One trunk of commits rising from the first, parting into two branches. Every commit is a roundel; every branch is an arm of the pall.',
+  },
+  {
+    slug: 'sql-masterclass', no: 21, level: 'beginner', capsules: 36, hours: 8, field: 'azure',
+    title: 'SQL|Masterclass',
+    blazon: 'Azure impaling Argent, barry of ten counterchanged, over the line of impalement a pallet Gules.',
+    symbolism: 'Impalement is how heraldry joins two houses in one shield; a join is how SQL marries two tables. Each row of one sits beside its match in the other, along the key that runs between them.',
+  },
+  {
+    slug: 'rag-in-production', no: 13, level: 'intermediate', capsules: 42, hours: 10, field: 'purpure',
+    title: 'RAG in|Production',
+    blazon: 'Purpure, billetty Argent, an annulet Or, within it a mullet and three billets Or.',
+    symbolism: 'A store of documents strewn across the field. The mullet is the query and the annulet its neighbourhood; the three billets inside are the nearest documents, retrieved and handed to the model.',
+  },
+  {
+    slug: 'cnn-fundamentals', no: 24, level: 'intermediate', capsules: 34, hours: 8, field: 'vert',
+    title: 'Convolutional|Neural Networks|Fundamentals',
+    blazon: 'Chequy Argent and Vert, a canton Or gridded of nine.',
+    symbolism: 'An image is a chequy of pixels. The canton is the 3 × 3 kernel in its first position, top left, before it slides across every square to make the next layer.',
+  },
+  {
+    slug: 'deit-from-scratch', no: 37, level: 'advanced', capsules: 42, hours: 10, field: 'vert',
+    title: 'Build a Data-Efficient|Image Transformer|(DeiT) from Scratch',
+    blazon: 'Vert, a chief compony Argent and Or charged with a torteau and a pellet; over all an escutcheon of the arms of Convolution.',
+    symbolism: 'Image patches become a row of tokens, a class token at one end and a distillation token at the other. The student bears its teacher’s arms in pretence: a convolutional network, whose knowledge the distillation token learns to carry.',
+  },
+  {
+    slug: 'kernel-engineering', no: 51, level: 'advanced', field: 'sable', soon: true,
+    title: 'Kernel|Engineering', subtitle: 'From silicon to speculative decoding — GPU kernels for modern LLMs.',
+    blazon: 'Sable, a bar and a pallet Or, at their crossing a square Gules, the field latticed in tiles.',
+    symbolism: 'A tiled matrix multiply: one row of tiles from A, one column from B, and where they cross, the output tile. Shown in trick — drafted, the tinctures written in — until the book is out.',
+  },
+  {
+    slug: 'charlie-language-room', no: 46, level: 'advanced', capsules: 22, hours: 5, field: 'gules',
+    series: 'Charlie and the Intelligence Factory', book: 'I',
+    title: 'Charlie and the|Language Room', subtitle: 'Language — Inference Engineering',
+    blazon: 'Gules, a chief sawtoothed Or charged with a label Gules; in fess four plates and an annulet Argent.',
+    symbolism: 'The Factory’s roof over every room; the label marks the first son. Here language is made one token at a time: four already spoken, and the ring of the next, being decoded.',
+  },
+  {
+    slug: 'charlie-vision-room', no: 47, level: 'intermediate', capsules: 20, hours: 6, field: 'vert',
+    series: 'Charlie and the Intelligence Factory', book: 'II',
+    title: 'Charlie and the|Vision Room', subtitle: 'Vision — Vision Transformers',
+    blazon: 'Vert, a chief sawtoothed Or charged with a crescent Vert; a square quarterly Or and Argent, in base a bar compony of the same.',
+    symbolism: 'The crescent marks the second son. A vision transformer cuts the picture into patches and reads them as a sentence: the same four squares, above as an image, below as a row of tokens.',
+  },
+  {
+    slug: 'charlie-sound-room', no: 48, level: 'intermediate', capsules: 20, hours: 6, field: 'azure',
+    series: 'Charlie and the Intelligence Factory', book: 'III',
+    title: 'Charlie and the|Sound Room', subtitle: 'Audio — Voice Agents',
+    blazon: 'Azure, a chief sawtoothed Or charged with a mullet Azure; two bars wavy, Argent and Or.',
+    symbolism: 'The mullet marks the third son. Two waves, one after the other: the caller speaks, and the agent listens, thinks and answers in kind.',
+  },
+  {
+    slug: 'charlie-reasoning-room', no: 49, level: 'advanced', capsules: 21, hours: 6, field: 'purpure',
+    series: 'Charlie and the Intelligence Factory', book: 'IV',
+    title: 'Charlie and the|Reasoning Room', subtitle: 'Reason — Reinforcement Learning, from bandits to reasoning models',
+    blazon: 'Purpure, a chief sawtoothed Or charged with a martlet Purpure; a base of four steps Or, above the highest an estoile Argent.',
+    symbolism: 'The martlet marks the fourth son. A chain of steps is climbed, and only at the top is the reward, the estoile, paid out: reinforcement learning from bandits to reasoning models.',
+  },
+];
+
+/* Page builder: covers, the Ordinary, tinctures, cadency, hatching, and the full wrap. */
+
+const LEVEL = { beginner: 'Beginner', intermediate: 'Intermediate', advanced: 'Advanced' };
+const pad2 = (k) => String(k).padStart(2, '0');
+
+function shieldSVG(inner, id, { rim = null, cls = 'arms', w = 400, outline = S, sw = 6 } = {}) {
+  const h = w * 1.2;
+  const rimPath = rim ? `<path d="${SHIELD}" fill="none" stroke="${rim}" stroke-width="12"/>` : '';
+  return `<svg class="${cls}" viewBox="0 0 400 480" width="${w}" height="${n(h)}" overflow="visible" aria-hidden="true">${rimPath}` +
+    `<clipPath id="${id}"><path d="${SHIELD}"/></clipPath><g clip-path="url(#${id})">${inner}</g>` +
+    `<path d="${SHIELD_IN}" fill="none" stroke="${outline}" stroke-width="${sw}"/></svg>`;
+}
+
+function armsFor(b, suffix = '', w = 400, cls = 'arms') {
+  if (b.soon) return trickSVG(b, suffix, w, cls);
+  const id = 'c-' + b.slug + suffix;
+  return shieldSVG(ARMS[b.slug](b.slug + suffix), id, { rim: b.level === 'advanced' ? T.or : null, w, cls });
+}
+
+// Coming soon: the arms "in trick" — drafted in outline with the tinctures written in
+function trickSVG(b, suffix = '', w = 400, cls = 'arms') {
+  const ink = b.level === 'advanced' ? T.argent : T.sable;
+  const id = 'c-' + b.slug + suffix;
+  const lab = (x, y, t) => `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" fill="${ink}">${t}</text>`;
+  const inner = `<g style="color:${ink}">${ARMS[b.slug]()}</g>` +
+    lab(40, 40, 'sa') + lab(120, 120, 'sa') + lab(360, 360, 'sa') + lab(40, 440, 'sa') + lab(120, 360, 'sa') + lab(360, 40, 'sa') +
+    lab(120, 200, 'or') + lab(360, 200, 'or') + lab(280, 80, 'or') + lab(280, 360, 'or') + lab(280, 200, 'gu');
+  return `<svg class="${cls} trick" viewBox="0 0 400 480" width="${w}" height="${n(w * 1.2)}" overflow="visible" aria-hidden="true">` +
+    `<clipPath id="${id}"><path d="${SHIELD}"/></clipPath><g clip-path="url(#${id})">${inner}</g>` +
+    `<path d="${SHIELD_IN}" fill="none" stroke="${ink}" stroke-width="6"/></svg>`;
+}
+
+function titleHTML(b) {
+  return b.title.split('|').map((l) => `<span>${l.replace(/&(?!amp;)/g, '&amp;')}</span>`).join('');
+}
+
+function coverInner(b, suffix = '') {
+  const adv = b.level === 'advanced';
+  const fg = adv ? T.argent : T.sable, bg = adv ? T.sable : (b.level === 'intermediate' ? T.or : GROUND.beginner);
+  const lines = b.title.split('|').length;
+  const size = { 1: 86, 2: 86, 3: 70, 4: 58 }[lines];
+  const ext = b.soon ? 'Coming soon' : `${b.capsules} capsules · ${b.hours} hours`;
+  return `
+    <div class="imprint">${imprintMark(fg, bg)}<span>Vizuara Books</span></div>
+    <div class="roll">Nº ${pad2(b.no)}</div>
+    <div class="head">
+      ${b.series ? `<div class="series">${b.series} · Book ${b.book}</div>` : ''}
+      <h2 class="title" style="font-size:${size}px" data-max="${size}">${titleHTML(b)}</h2>
+      ${b.subtitle ? `<p class="sub">${b.subtitle}</p>` : ''}
+    </div>
+    ${armsFor(b, suffix)}
+    <div class="register">
+      <div class="lab">${b.soon ? 'Blazon, in trick' : 'Blazon'}</div>
+      <p class="blazon">${b.blazon}</p>
+      <div class="lab">Symbolism</div>
+      <p class="symb">${b.symbolism}</p>
+      <div class="meta"><div class="lvl">${LEVEL[b.level]}</div><div class="ext">${ext}</div></div>
+    </div>`;
+}
+
+function buildShelf() {
+  const shelf = document.getElementById('shelf');
+  shelf.innerHTML = ROLL.map((b) => `
+    <figure>
+      <div class="cover ${b.level}" data-slug="${b.slug}">${coverInner(b)}</div>
+      <figcaption><b>${b.slug}</b><span>${LEVEL[b.level]} · field ${b.field}</span></figcaption>
+    </figure>`).join('');
+}
+
+// Fit every title line inside the 632px measure without ever growing past its step size
+function fitTitles(root = document) {
+  root.querySelectorAll('.cover .title').forEach((h) => {
+    const max = +h.dataset.max;
+    h.style.fontSize = max + 'px';
+    const widest = Math.max(...[...h.children].map((s) => s.getBoundingClientRect().width));
+    const room = h.parentElement.getBoundingClientRect().width;
+    if (widest > room) h.style.fontSize = Math.floor(max * room / widest * 10) / 10 + 'px';
+  });
+}
+
+/* ---------- presentation extras ---------- */
+function buildTinctures() {
+  const rows = [
+    ['Argent', 'argent', 'The metal white. Beginner ground (as paper), and silver on shields.', '#F8F5EE · paper #ECE6D9'],
+    ['Or', 'or', 'The metal gold. Intermediate ground; the metal of most charges.', '#D4A236'],
+    ['Gules', 'gules', 'Language: LLMs, transformers, prompting, finetuning.', '#B3261E'],
+    ['Azure', 'azure', 'Foundations: mathematics, classical ML, code and data.', '#213F93'],
+    ['Vert', 'vert', 'Vision and embodiment: CNNs, ViTs, VLMs, robots.', '#1D6946'],
+    ['Purpure', 'purpure', 'Agents, context and memory; reinforcement learning.', '#5E2B5F'],
+    ['Sable', 'sable', 'Compute and systems: parallelism, kernels, serving. Advanced ground.', '#161517'],
+  ];
+  document.getElementById('tinctures').innerHTML = rows.map(([name, k, role, hex]) => `
+    <div class="tinc"><div class="sw" style="background:${T[k]}"><svg viewBox="0 0 40 40" preserveAspectRatio="none"><rect width="40" height="40" fill="url(#h-${k})"/></svg></div>
+    <b>${name}</b><span>${role}</span><code>${hex}</code></div>`).join('');
+}
+
+function miniShield(inner, id, w = 150) { return shieldSVG(inner, id, { w, cls: 'mini' }); }
+const fieldRect = (c) => `<rect width="400" height="480" fill="${c}"/>`;
+
+function buildOrdinary() {
+  const items = [
+    ['Roundel', 'a token; a data point', fieldRect(T.argent) + roundel(200, 200, 90, T.gules)],
+    ['Annulet', 'the token still to come; a neighbourhood', fieldRect(T.azure) + annulet(200, 200, 100, 34, T.or)],
+    ['Billet', 'a document', fieldRect(T.purpure) + billet(200, 210, 130, 200, T.argent)],
+    ['Mullet', 'a query, the question', fieldRect(T.argent) + mullet(200, 210, 120, T.azure)],
+    ['Estoile', 'a reward', fieldRect(T.purpure) + estoile(200, 210, 120, T.or)],
+    ['Lozenge', 'another class of data', fieldRect(T.or) + lozenge(200, 210, 150, 240, T.vert)],
+    ['Bend', 'a boundary drawn by a line', fieldRect(T.argent) + poly([[-60, -20], [40, -80], [480, 360], [380, 420]], T.azure)],
+    ['Grady', 'causality: one step at a time', ARMS['build-llms-from-scratch']()],
+    ['Pile', 'the context window', fieldRect(T.purpure) + poly([[70, -10], [330, -10], [200, 430]], T.or)],
+    ['Pall', 'a branch', fieldRect(T.azure) + poly([[-40, -40], [39, -40], [200, 159], [361, -40], [440, -40], [440, 30], [244, 232], [244, 520], [156, 520], [156, 232], [-40, 30]], T.or)],
+    ['Chequy', 'a matrix; an image of pixels', (() => { let d = ''; for (let r = 0; r < 6; r++) for (let c = 0; c < 5; c++) if ((r + c) % 2) d += `M${c * 80} ${r * 80}h80v80h-80Z`; return fieldRect(T.argent) + `<path d="${d}" fill="${T.vert}" stroke="${S}" stroke-width="3"/>`; })()],
+    ['Canton', 'a kernel; a local window', fieldRect(T.vert) + poly([[-10, -10], [170, -10], [170, 180], [-10, 180]], T.or)],
+    ['Barry', 'the turns of a conversation', (() => { let o = ''; for (let i = 0; i < 8; i++) o += poly([[-10, i * 60], [410, i * 60], [410, i * 60 + 60], [-10, i * 60 + 60]], i % 2 ? T.purpure : T.or); return o; })()],
+    ['Plain', 'a summary: what is kept, without the detail', fieldRect(T.argent) + poly([[-10, 300], [410, 300], [410, 500], [-10, 500]], T.purpure)],
+    ['Escutcheon', 'a whole system; borne in pretence, a teacher', fieldRect(T.vert) + escutcheon(200, 230, 200, fieldRect(T.or), 'ord-esc')],
+    ['Quartering', 'work shared out: parallelism', fieldRect(T.or) + poly([[200, -10], [410, -10], [410, 240], [200, 240]], T.sable) + poly([[-10, 240], [200, 240], [200, 500], [-10, 500]], T.sable)],
+    ['Impalement', 'a join', fieldRect(T.azure) + poly([[200, -10], [410, -10], [410, 500], [200, 500]], T.argent)],
+    ['Wavy', 'a signal; a voice', fieldRect(T.azure) + poly([...along('wavy', [-60, 170], [460, 170], { p: 130, a: 60 }), ...along('wavy', [460, 290], [-60, 290], { p: 130, a: 60, phase: 0 }).map(([x, y]) => [x, y])], T.argent)],
+  ];
+  document.getElementById('ordinary').innerHTML = items.map(([name, m, inner], i) =>
+    `<figure>${miniShield(inner, 'ord' + i, 150)}<figcaption><b>${name}</b>${m}</figcaption></figure>`).join('');
+}
+
+function buildCadency() {
+  const marks = [['Label', 'first son · Book I', label(200, 220, 260, T.gules)], ['Crescent', 'second son · Book II', crescent(200, 230, 110, T.vert)],
+    ['Mullet', 'third son · Book III', mullet(200, 225, 120, T.azure)], ['Martlet', 'fourth son · Book IV', martlet(200, 230, 300, T.purpure)]];
+  document.getElementById('cadency').innerHTML = marks.map(([nm, m, inner], i) =>
+    `<figure>${miniShield(fieldRect(T.or) + inner, 'cad' + i, 110)}<figcaption><i>${nm}</i><br>${m}</figcaption></figure>`).join('') +
+    ROLL.filter((b) => b.series).map((b) => `<figure style="width:170px">${armsFor(b, '-cad', 150, 'mini')}<figcaption>${b.title.replace('|', ' ')}</figcaption></figure>`).join('');
+}
+
+function buildHatching() {
+  const keep = { ...T };
+  const pick = ['neural-networks-from-scratch', 'build-llms-from-scratch', 'decision-trees-from-scratch', 'charlie-reasoning-room', 'rag-in-production'];
+  for (const k of Object.keys(T)) T[k] = `url(#h-${k})`;
+  const html = pick.map((s) => `<figure>${shieldSVG(ARMS[s](s + '-h'), 'h-' + s, { w: 200, cls: 'mini' })}<figcaption>${ROLL.find((b) => b.slug === s).title.replace(/\|/g, ' ')}</figcaption></figure>`).join('');
+  Object.assign(T, keep);
+  document.getElementById('hatch').innerHTML = html;
+}
+
+function hatchDefs() {
+  const s = 14, sw = 2.2;
+  const pat = (id, body) => `<pattern id="h-${id}" patternUnits="userSpaceOnUse" width="${s}" height="${s}"><rect width="${s}" height="${s}" fill="#fff"/>${body}</pattern>`;
+  return `<svg width="0" height="0" style="position:absolute"><defs>
+    ${pat('argent', '')}
+    ${pat('or', `<circle cx="${s / 2}" cy="${s / 2}" r="2.1" fill="${S}"/>`)}
+    ${pat('gules', `<path d="M${s / 2} 0V${s}" stroke="${S}" stroke-width="${sw}"/>`)}
+    ${pat('azure', `<path d="M0 ${s / 2}H${s}" stroke="${S}" stroke-width="${sw}"/>`)}
+    ${pat('vert', `<path d="M-2 -2L${s + 2} ${s + 2}M${-s / 2 - 2} ${s / 2 - 2}L${s / 2 + 2} ${s * 1.5 + 2}M${s / 2 - 2} ${-s / 2 - 2}L${s * 1.5 + 2} ${s / 2 + 2}" stroke="${S}" stroke-width="${sw}"/>`)}
+    ${pat('purpure', `<path d="M${s + 2} -2L-2 ${s + 2}M${s * 1.5 + 2} ${s / 2 - 2}L${s / 2 - 2} ${s * 1.5 + 2}M${s / 2 + 2} ${-s / 2 - 2}L${-s / 2 - 2} ${s / 2 + 2}" stroke="${S}" stroke-width="${sw}"/>`)}
+    ${pat('sable', `<path d="M${s / 2} 0V${s}M0 ${s / 2}H${s}" stroke="${S}" stroke-width="${sw}"/>`)}
+  </defs></svg>`;
+}
+
+function buildWrap() {
+  const b = ROLL.find((x) => x.slug === 'build-llms-from-scratch');
+  const spineW = 58;
+  const others = ROLL.filter((x) => !x.series && !x.soon && x.slug !== b.slug).slice(0, 10);
+  const back = `
+    <div class="back cover ${b.level}" style="width:720px">
+      <div class="imprint">${imprintMark(T.sable, T.or)}<span>Vizuara Books</span></div>
+      <div class="roll">Nº ${pad2(b.no)}</div>
+      <div class="bk">
+        <p class="bk-lab">The arms of this book</p>
+        <p class="bk-blazon">${b.blazon}</p>
+        <p class="bk-sym">${b.symbolism}</p>
+        <p class="bk-lab" style="margin-top:34px">The book</p>
+        <p class="bk-body">Build a GPT-style LLM from an empty file. From tokenizer to trained transformer — attention, GPT blocks, pretraining and fine-tuning — built by hand and illustrated.</p>
+        <p class="bk-facts">20 capsules · 115 figures · about 6 hours · Intermediate</p>
+      </div>
+      <div class="bk-roll">
+        <p class="bk-lab">Also in the Roll</p>
+        <div class="bk-shields">${others.map((o) => `<div>${armsFor({ ...o, level: 'beginner' }, '-bk', 52, 'mini')}</div>`).join('')}</div>
+      </div>
+      <div class="bk-foot"><span>books.vizuara.ai</span><span>A library for building things</span></div>
+    </div>`;
+  const spine = `
+    <div class="spine" style="width:${spineW}px;background:${T.or}">
+      <div class="sp-arms">${armsFor(b, '-sp', 38, 'mini')}</div>
+      <div class="sp-title">Build Large Language Models (LLMs) from Scratch</div>
+      <div class="sp-mark">${imprintMark(T.sable, T.or, 30)}</div>
+    </div>`;
+  const front = `<div class="front cover ${b.level}">${coverInner(b, '-wrap')}</div>`;
+  document.getElementById('wrap').innerHTML = back + spine + front;
+}
+
+document.body.insertAdjacentHTML('afterbegin', hatchDefs());
+buildShelf();
+buildTinctures();
+buildOrdinary();
+buildCadency();
+buildHatching();
+buildWrap();
+fitTitles();
+document.fonts.ready.then(() => fitTitles());
+
+</script>
+</body>
+</html>

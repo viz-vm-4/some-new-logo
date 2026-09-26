@@ -70,7 +70,7 @@ Charlie and the Intelligence Factory (woven double-ikat sub-series):
 - Everything is generated in `index.html` with vanilla JS and SVG: the blocks, the stamping, the ink filter (edge bleed plus voids where the cotton didn't take the dye), the woven cotton, the dye mottling and the ikat. Nothing is raster or stock. Every cover is deterministic, seeded by its slug.
 - The PDFs (`renders/pdf/`) are exact trim, 7.5 × 9.25 in. The type and the cotton weave are vector: the weave is drawn as individual seeded thread hairlines plus slubs rather than a noise filter, which keeps each PDF at about 4 MB. The printed dye layers go through the ink filter, which the browser rasterizes at about 300 dpi (2252 px across the trim), which is print resolution. A production pipeline would swap the ink filter for scans of real prints.
 - Print wrap (on the page as `.wrap`): back, a 0.625 in spine and front are one continuous length of cloth. The field runs round the spine and the kinar crosses all three at the same height. The back carries a short description and an "About the cover" note explaining the block. Bleed is not drawn, but the field is procedural, so extending it by 0.125 in is trivial.
-- The full-page `--sheet` screenshot times out in the headless renderer, because fifteen covers of SVG filters at 2× are too heavy for one capture. Per-cover renders and PDFs are unaffected.
+- The page is heavy: fifteen covers of SVG ink filters, generated on load. A full-page `--sheet` capture at 2× can time out in the headless renderer. Per-cover renders, the wrap render and the PDFs are unaffected.
 
 ## What I'd do next
 

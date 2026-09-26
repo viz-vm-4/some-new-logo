@@ -186,30 +186,28 @@ function catmull(pts,n=12){ // smooth polyline through points
   out.push(pts[pts.length-1]); return out;
 }
 
+// ─── real data, computed offline (see NOTES.md): GPT-2 attention, MNIST, iris
+/*DATA*/const DATA={"attn":{"toks":["A"," language"," model"," reads"," the"," tokens"," that"," came"," before"," and"," predicts"," the"," one"," that"," comes"," next","."," It"," learns"," this"," from"," text",","," one"," token"," at"," a"," time",","," until"," the"," patterns"," of"," language"," are"," stored"," in"," its"," weights","."," Then"," it"," writes"," text",","," one"," token"," at"," a"," time","."],"rows":["9","90","901","9024","90247","912575","9125759","81257595","712464749","5123446479","61245474797","612454647989","5124546479887","41233343566659","412333435666696","4123334356655966","31122232345446449","311233324454475598","3123333244544644869","21122232334336447698","211222323343354476989","3112223234433644869798","21121221233234336576779","211212212232243365757798","2112222123322433547566869","11111111223223224464567798","211112112232232243545676977","1111111122322322436456769878","11111111122122223353455576569","111111111121121122323333543469","1111111111211211223233335444696","11111111112112113232334354446959","111111111121111122322333433458596","1111111111211111223223324333574859","10110111111111112132223243234648599","111111111111111121222232432357475978","1111011011111111212122223323464749789","11110110111111112121222232234647498889","100101001110011111111121221234253555559","1001010000101111112111112112242425555599","10010100101011111121111121122424244545879","000000000010010011111111211123242444458789","0000000000100100111111111111121313333355659","00000000001001001111111111111213133333656698","000000000010000010111111111112121333235455998","0000000000100000101011111111121213332355559888","00000000001000001011111111111212132323544487769","000000000000000000100111111112121222224444776698","0000000000000000001001111111121212222244446766977","00000000000000000010011111111212122222444477769769","000000000000000000100110111111121222123343555575569"]},"iris":{"X":[[1.4,0.2],[1.4,0.2],[1.3,0.2],[1.5,0.2],[1.4,0.2],[1.7,0.4],[1.4,0.3],[1.5,0.2],[1.4,0.2],[1.5,0.1],[1.5,0.2],[1.6,0.2],[1.4,0.1],[1.1,0.1],[1.2,0.2],[1.5,0.4],[1.3,0.4],[1.4,0.3],[1.7,0.3],[1.5,0.3],[1.7,0.2],[1.5,0.4],[1.0,0.2],[1.7,0.5],[1.9,0.2],[1.6,0.2],[1.6,0.4],[1.5,0.2],[1.4,0.2],[1.6,0.2],[1.6,0.2],[1.5,0.4],[1.5,0.1],[1.4,0.2],[1.5,0.2],[1.2,0.2],[1.3,0.2],[1.4,0.1],[1.3,0.2],[1.5,0.2],[1.3,0.3],[1.3,0.3],[1.3,0.2],[1.6,0.6],[1.9,0.4],[1.4,0.3],[1.6,0.2],[1.4,0.2],[1.5,0.2],[1.4,0.2],[4.7,1.4],[4.5,1.5],[4.9,1.5],[4.0,1.3],[4.6,1.5],[4.5,1.3],[4.7,1.6],[3.3,1.0],[4.6,1.3],[3.9,1.4],[3.5,1.0],[4.2,1.5],[4.0,1.0],[4.7,1.4],[3.6,1.3],[4.4,1.4],[4.5,1.5],[4.1,1.0],[4.5,1.5],[3.9,1.1],[4.8,1.8],[4.0,1.3],[4.9,1.5],[4.7,1.2],[4.3,1.3],[4.4,1.4],[4.8,1.4],[5.0,1.7],[4.5,1.5],[3.5,1.0],[3.8,1.1],[3.7,1.0],[3.9,1.2],[5.1,1.6],[4.5,1.5],[4.5,1.6],[4.7,1.5],[4.4,1.3],[4.1,1.3],[4.0,1.3],[4.4,1.2],[4.6,1.4],[4.0,1.2],[3.3,1.0],[4.2,1.3],[4.2,1.2],[4.2,1.3],[4.3,1.3],[3.0,1.1],[4.1,1.3],[6.0,2.5],[5.1,1.9],[5.9,2.1],[5.6,1.8],[5.8,2.2],[6.6,2.1],[4.5,1.7],[6.3,1.8],[5.8,1.8],[6.1,2.5],[5.1,2.0],[5.3,1.9],[5.5,2.1],[5.0,2.0],[5.1,2.4],[5.3,2.3],[5.5,1.8],[6.7,2.2],[6.9,2.3],[5.0,1.5],[5.7,2.3],[4.9,2.0],[6.7,2.0],[4.9,1.8],[5.7,2.1],[6.0,1.8],[4.8,1.8],[4.9,1.8],[5.6,2.1],[5.8,1.6],[6.1,1.9],[6.4,2.0],[5.6,2.2],[5.1,1.5],[5.6,1.4],[6.1,2.3],[5.6,2.4],[5.5,1.8],[4.8,1.8],[5.4,2.1],[5.6,2.4],[5.1,2.3],[5.1,1.9],[5.9,2.3],[5.7,2.5],[5.2,2.3],[5.0,1.9],[5.2,2.0],[5.4,2.3],[5.1,1.8]],"y":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]}};/*/DATA*/
+
 // ─── emblems: each fills rows 0..FR-1 with its own data ─────────────────
 const EMBLEM={};
 
-// Causal self-attention, quantised to one digit per weight
+// Causal self-attention from GPT-2 small (layer 1, head 2), each weight printed as one digit, row max = 9
 EMBLEM['build-llms-from-scratch']=function(g){
-  const toks=('<bos>|a|lang|uage|model|reads|the|tokens|that|came|before|and|pred|icts|the|one|that|comes|next|.|it|learns|this|from|text|,|one|token|at|a|time|,|until|the|pattern|s|of|lang|uage|live|in|its|weights|.|then|it|writes|,|token|by|token').split('|');
-  const N=Math.min(toks.length,FR), C0=12, R=rng(11);
-  const key=new Set([4,7,12,17,24,27,34,42]);
+  const {toks,rows}=DATA.attn, N=toks.length, C0=14;
   for(let i=0;i<N;i++){
-    g.text(i,0,toks[i].padStart(10,' ')+' ',.62);
-    const lg=[];
-    for(let j=0;j<=i;j++) lg.push(2.3*Math.exp(-(i-j)/1.8)+(j===0?2.4:0)+(key.has(j)?1.1:0)+.45*gauss(R));
-    const m=Math.max(...lg), ex=lg.map(v=>Math.exp(v-m)), s=ex.reduce((a,b)=>a+b,0);
-    const mx=Math.max(...ex);
+    const lab=toks[i].trim().slice(0,8);
+    g.text(i,12-lab.length,lab,.62);
     for(let j=0;j<N;j++){
       const c=C0+2*j;
       if(j>i){ g.text(i,c,(i+j)%2?'  ':'· ',.05); continue; }
-      const d=Math.round(9*ex[j]/mx);
+      const d=+rows[i][j];
       if(j===i){ g.text(i,c,d+' ',.95,1); continue; }
-      g.text(i,c,d+' ', d>=6?.95: d===0?.48:.55+d*.06);
+      g.text(i,c,d+' ', d>=6?.95: d===0?.3:.34+d*.085);
     }
-    for(let c=C0+2*N;c<COLS;c++) g.put(i,c,(i+c)%2?' ':'·',.04);
+    for(let c=C0+2*N;c<COLS;c++) g.put(i,c,(i+c)%2?' ':'·',.05);
   }
-  return {cap:['attn','= softmax(q @ k.T / sqrt(d) + causal_mask)   # row-max = 9']};
+  return {cap:['attn','= softmax(q @ k.T / 8 + mask)   # GPT-2 small, layer 1, head 2; each row scaled to max 9']};
 };
 
 // Hex dump of a handwritten seven, and the network's answer
@@ -393,53 +391,62 @@ EMBLEM['pi-vs-hermes-vs-codex']=function(g){
   return {cap:['ctx','= compact(history) if tokens(history) > limit else history']};
 };
 
-// Decision tree on iris: every leaf region is textured with its own rule
+// Decision tree on the real iris data: depth-3 CART on petal length x width.
+// Leaves are textured with their own rule; every sample is printed as its class id (0 setosa, 1 versicolor, 2 virginica).
 EMBLEM['decision-trees-from-scratch']=function(g){
-  const col=pl=>Math.round((pl-1)/6*COLS), row=pw=>Math.round(FR-pw/2.6*FR);
+  const col=pl=>Math.round((pl-.95)/6.1*COLS), row=pw=>Math.round((FR-1)-(pw-.05)/2.55*(FR-1));
   const a=col(2.45), b=row(1.75), c=col(4.95), d=col(4.85);
   const leaves=[
-    {r0:0,r1:FR,c0:0,c1:a,cls:'setosa',t:.26,rule:'petal_length <= 2.45 -> setosa'},
-    {r0:b+1,r1:FR,c0:a+2,c1:c,cls:'versicolor',t:.5,rule:'length > 2.45 & width <= 1.75 & length <= 4.95 -> versicolor'},
-    {r0:b+1,r1:FR,c0:c+2,c1:COLS,cls:'virginica',t:.74,rule:'length > 4.95 & width <= 1.75 -> virginica'},
-    {r0:0,r1:b,c0:a+2,c1:d,cls:'virginica',t:.74,rule:'width > 1.75 & length <= 4.85 -> virginica'},
-    {r0:0,r1:b,c0:d+2,c1:COLS,cls:'virginica',t:.74,rule:'width > 1.75 & length > 4.85 -> virginica'},
+    {r0:0,r1:FR,c0:0,c1:a,t:.16,rule:'petal_length <= 2.45 -> 0',chip:' setosa [50, 0, 0] ',cr:FR-3,cc:3},
+    {r0:b+1,r1:FR,c0:a+2,c1:c,t:.5,rule:'length > 2.45 & width <= 1.75 & length <= 4.95 -> 1',chip:' versicolor [0, 47, 1] ',cr:FR-3,cc:a+4},
+    {r0:b+1,r1:FR,c0:c+2,c1:COLS,t:.95,rule:'length > 4.95 & width <= 1.75 -> 2',chip:' virginica [0, 2, 4] ',cr:FR-3,cc:c+4},
+    {r0:0,r1:b,c0:a+2,c1:d,t:.95,rule:'width > 1.75 & length <= 4.85 -> 2',chip:' virginica [0, 1, 2] ',cr:1,cc:a+4},
+    {r0:0,r1:b,c0:d+2,c1:COLS,t:.95,rule:'width > 1.75 & length > 4.85 -> 2',chip:' virginica [0, 0, 43] ',cr:1,cc:d+4},
   ];
   for(const L of leaves) g.stream(L.r0,L.c0,L.r1,L.c1,L.rule+'  ·  ',L.t);
-  // splits
+  // splits are paper gaps; the root split is selected
   for(let r=0;r<FR;r++){ g.put(r,a,' ',.95,1); g.put(r,a+1,' ',.95,1); }
-  for(let c=a+2;c<COLS;c++) g.put(b,c,' ',.95);
-  for(let r=b+1;r<FR;r++){ g.put(r,c,' ',.95); g.put(r,c+1,' ',.95); }
-  for(let r=0;r<b;r++){ g.put(r,d,' ',.95); g.put(r,d+1,' ',.95); }
-  // split labels
+  for(let cc=a+2;cc<COLS;cc++) g.put(b,cc,' ',-1);
+  for(let r=b+1;r<FR;r++){ g.put(r,c,' ',-1); g.put(r,c+1,' ',-1); }
+  for(let r=0;r<b;r++){ g.put(r,d,' ',-1); g.put(r,d+1,' ',-1); }
+  // the 150 samples
+  const {X,y}=DATA.iris;
+  X.forEach(([pl,pw],i)=>{ const rr=row(pw), cc=col(pl), q=g.get(rr,cc); if(!q) return;
+    const inDark=q.t>=.86&&!q.s;
+    g.put(rr,cc,String(y[i]),inDark?.8:.95); });
+  // labels: split thresholds and leaf counts, as export_text / tree_.value print them
   g.text(3,a+3,' petal_length <= 2.45 ',.95,1);
-  g.text(b,a+4,' petal_width <= 1.75 ',.95);
-  g.text(b+3,c+3,' petal_length <= 4.95 ',.95);
-  g.text(3,d+3,' petal_length <= 4.85 ',.95);
-  return {cap:['tree','= DecisionTreeClassifier(max_depth=3).fit(iris[["petal_length", "petal_width"]], y)']};
+  g.text(b,a+4,' petal_width <= 1.75 ',.62);
+  g.text(b+2,c+3,' petal_length <= 4.95 ',.62);
+  g.text(3,d-21,' petal_length <= 4.85 ',.62);
+  for(const L of leaves) g.text(L.cr,Math.max(6,L.cc),L.chip,L.t>=.86?.5:.95);
+  return {cap:['tree','= DecisionTreeClassifier(max_depth=3).fit(iris.data[:, 2:], iris.target)   # sklearn\'s splits']};
 };
 
-// Kernel engineering: one tile of a tiled GEMM
+// Kernel engineering: one step of a tiled GEMM. A, B are fp16; C holds the real products A @ B.
+function f16hex(v){ // round-to-nearest fp16, printed as its 4 hex digits
+  const f=new Float32Array(1), u=new Uint32Array(f.buffer); f[0]=v; const x=u[0];
+  const sgn=(x>>>16)&0x8000; let e=((x>>>23)&0xff)-127+15; let m=x&0x7fffff;
+  if(e<=0) return (sgn).toString(16).padStart(4,'0');
+  let h=sgn|(e<<10)|(m>>>13); if(m&0x1000) h++; return (h&0xffff).toString(16).padStart(4,'0');
+}
 EMBLEM['kernel-engineering']=function(g){
-  const R=rng(9);
-  const h16=()=>{ const v=(R()*2-1)*1.5; const sgn=v<0?0x8000:0; const a=Math.abs(v)||1e-3; let e=Math.floor(Math.log2(a)); const m=Math.round((a/Math.pow(2,e)-1)*1024)&1023; return ((sgn|((e+15)<<10)|m)>>>0).toString(16).padStart(4,'0'); };
-  // tile geometry: values are 5 cols wide; a tile is 3 values x 4 rows, gutters 1 col / 1 row
-  const TW=16, TH=5; // tile pitch
-  const mat=(r0,c0,nr,nc,tone)=>{ // nr, nc in tiles
-    for(let ti=0;ti<nr;ti++)for(let tj=0;tj<nc;tj++){
-      const t=tone(ti,tj);
-      for(let rr=0;rr<TH-1;rr++)for(let v=0;v<3;v++) g.text(r0+ti*TH+rr,c0+tj*TW+v*5,h16()+' ',typeof t==='number'?t:t[0],typeof t==='number'?0:t[1]);
-    }
-  };
-  const I=2, J=3, K=0; // active output tile, current k-step
-  // B: top right, 3 tile-rows x 5 tile-cols ; A: bottom left, 6 x 2 ; C: bottom right 6 x 5
-  // wait: A is M x K, B is K x N. K tiles = 3 here.
-  const cB=40, rA=19;
-  const BLUE=[.95,1], BLK=.95;
-  mat(2,cB,3,5,(ti,tj)=> tj===J ? (ti===K?BLUE:BLK) : .3);
-  mat(rA,0,6,2,(ti,tj)=> ti===I ? (tj===K?BLUE:BLK) : .3);
-  mat(rA,cB,6,5,(ti,tj)=> ti===I&&tj===J ? BLUE : ti<I||(ti===I&&tj<J) ? .56 : .1);
-  g.text(rA-2,0,' A[M, K] ',.95); g.text(2,cB-10,' B[K, N] ',.95); g.text(rA-2,cB,' C[M, N] ',.95); g.text(rA-2,cB+10,'+= A[i, k] @ B[k, j]',.62);
-  return {cap:['acc','+= tl.dot(a_tile, b_tile)   # fp16 tiles, fp32 accumulator, one C tile per program']};
+  const R=rng(9), TV=3, TW=16, TP=4; // a tile is 3 x 3 values; pitch 16 cols x 4 rows
+  const MT=9, KT=2, NT=5, M=MT*TV, K=KT*TV, N=NT*TV;
+  const rnd=()=>Math.round((R()*2-1)*64)/32; // exactly representable in fp16
+  const A=[...Array(M)].map(()=>[...Array(K)].map(rnd)), B=[...Array(K)].map(()=>[...Array(N)].map(rnd));
+  const I=4, J=2, KS=0; // this program owns C tile (I, J); k-step 0 is in shared memory
+  const dot=(i,j,k1)=>{ let s=0; for(let k=0;k<k1;k++) s+=A[i][k]*B[k][j]; return s; };
+  const cB=40, rB=2, rA=13;
+  const put=(r0,c0,ti,tj,val,t,s)=>{ for(let a=0;a<TV;a++)for(let b=0;b<TV;b++) g.text(r0+ti*TP+a,c0+tj*TW+b*5,val(ti*TV+a,tj*TV+b)+' ',t,s); };
+  for(let tk=0;tk<KT;tk++)for(let tj=0;tj<NT;tj++){ const on=tj===J, hot=on&&tk===KS; put(rB,cB,tk,tj,(r,c)=>f16hex(B[r][c]),on?.95:.3,hot?1:0); }
+  for(let ti=0;ti<MT;ti++)for(let tk=0;tk<KT;tk++){ const on=ti===I, hot=on&&tk===KS; put(rA,0,ti,tk,(r,c)=>f16hex(A[r][c]),on?.95:.3,hot?1:0); }
+  for(let ti=0;ti<MT;ti++)for(let tj=0;tj<NT;tj++){
+    const done=ti<I||(ti===I&&tj<J), hot=ti===I&&tj===J;
+    put(rA,cB,ti,tj,(r,c)=> hot? f16hex(dot(r,c,(KS+1)*TV)) : done? f16hex(dot(r,c,K)) : '0000', hot?.95:done?.56:.1, hot?1:0);
+  }
+  g.text(rA-2,6,' A[M, K] ',.95); g.text(rB,cB-11,' B[K, N] ',.95); g.text(rA-2,cB,' C[M, N] ',.95); g.text(rA-2,cB+10,'+= A[i, k] @ B[k, j]   k = 0 of 2',.62);
+  return {cap:['acc','+= tl.dot(a_tile, b_tile)   # fp16 in, fp32 accumulate; C tiles above are the real A @ B']};
 };
 
 // ─── Charlie and the Intelligence Factory: a sub-series, one tmux window per room
