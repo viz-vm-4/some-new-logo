@@ -620,10 +620,6 @@ figure{margin:0}
       S.box(A.a0, A.b1 - g, 0, A.a1, A.b1, A.zt, { mat: sm });
       S.box(A.a0, Y0, 0, A.a0 + g, A.b1 - g, A.zt, { mat: sm });
       S.box(A.a1 - g, Y0, 0, A.a1, A.b1 - g, A.zt, { mat: sm });
-      if (i > 0) { // marble nosing on the terrace lip
-        const c = 3;
-        S.box(A.a0 + g - c, Y0, A.zt, A.a1 - g + c, A.b1 - g + c, A.zt + 2.5, { mat: (nn) => nn, hide: true });
-      }
     }
     const B = lv(n);
     S.box(B.a0, Y0, 0, B.a1, B.b1, Zw - 6, { mat: sm });
