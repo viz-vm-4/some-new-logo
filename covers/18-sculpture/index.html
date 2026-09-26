@@ -29,15 +29,17 @@ body{font-family:"Instrument Sans",system-ui,sans-serif;-webkit-font-smoothing:a
 .imprint svg{width:13px;height:19px;display:block;fill:currentColor}
 .catno{position:absolute;right:44px;top:40px;font:500 11.5px/1 "Instrument Sans";letter-spacing:.14em;text-transform:uppercase;
   font-variant-numeric:tabular-nums}
-.series{position:absolute;left:44px;top:74px;font:italic 400 17px/1.2 "Newsreader";letter-spacing:.005em;opacity:.92}
+.head{position:absolute;left:40px;right:40px;top:80px}
+.series{margin:0 0 14px 4px;font:600 11.5px/1.2 "Instrument Sans";letter-spacing:.2em;text-transform:uppercase}
+.tag{margin:18px 60px 0 3px;font:italic 400 22px/1.28 "Newsreader";letter-spacing:.003em}
+.tag.small{font-size:20px}
 
-h2.title{position:absolute;left:40px;right:40px;top:78px;margin:0;
+h2.title{margin:0;
   font-family:"Newsreader";font-optical-sizing:auto;font-variation-settings:"opsz" 72;
   font-weight:430;font-size:78px;line-height:.98;letter-spacing:-.018em;text-wrap:balance}
 h2.title .sub{display:block;font-style:italic;font-weight:360;font-size:.56em;line-height:1.08;letter-spacing:-.005em;margin-top:.28em}
 h2.title.s1{font-size:70px}
 h2.title.s2{font-size:62px}
-.has-series h2.title{top:112px}
 
 .label{position:absolute;left:44px;bottom:40px;width:430px}
 .label .obj{font:italic 400 19px/1.2 "Newsreader";margin:0 0 7px;letter-spacing:.003em}
@@ -88,7 +90,7 @@ uniform vec3 uPaper; uniform vec3 uKeyPos; uniform float uKeyPow; uniform float 
 uniform vec3 uSpotDir; uniform vec2 uSpotCone;
 uniform vec3 uGlowPos; uniform float uGlow; uniform float uGlowRad;
 uniform float uFill; uniform float uBoxLum; uniform vec2 uBoxSize; uniform float uEnvDark;
-uniform vec3 uRimDir; uniform float uRim; uniform float uScrim; uniform float uCard;
+uniform vec4 uPan[4]; uniform vec2 uPanS[4];
 uniform vec4 uBound; uniform float uWallZ, uCoveR; uniform float uExpo; uniform float uVig;
 
 struct Mat { vec3 alb; float rough; float metal; float coat; float wrap; };
@@ -126,12 +128,20 @@ float marchObj(vec3 ro, vec3 rd, float tmax){
   for(int i=0;i<STEPS;i++){ if(t>t1) break; float d=map(ro+rd*t); if(d<0.00012*t) return t; t+=d*STEPK; }
   return -1.; }
 
-float softShadow(vec3 ro, vec3 rd, float tmax, float k){
+float softShadow(vec3 ro, vec3 rd, float tmax, float k, float ts){
+  float t0,t1; if(!sphereSpan(ro,rd,uBound.w+0.9,t0,t1)) return 1.;
+  if(t1<0.) return 1.;
+  float t=max(t0,ts); t1=min(t1,tmax);
+  float res=1.;
+  for(int i=0;i<SSTEPS;i++){ if(t>t1) break; float h=map(ro+rd*t); res=min(res,k*h/t); if(res<0.002) break; t+=clamp(h,0.008,0.4); }
+  res=clamp(res,0.,1.); return res*res*(3.-2.*res); }
+
+float softShadowC(vec3 ro, vec3 rd, float tmax, float k){
   float t0,t1; if(!sphereSpan(ro,rd,uBound.w+0.9,t0,t1)) return 1.;
   if(t1<0.) return 1.;
   float t=max(t0,0.004); t1=min(t1,tmax);
   float res=1.;
-  for(int i=0;i<SSTEPS;i++){ if(t>t1) break; float h=map(ro+rd*t); res=min(res,k*h/t); if(res<0.002) break; t+=clamp(h,0.008,0.4); }
+  for(int i=0;i<26;i++){ if(t>t1) break; float h=map(ro+rd*t); res=min(res,k*h/t); if(res<0.004) break; t+=clamp(h,0.025,0.5); }
   res=clamp(res,0.,1.); return res*res*(3.-2.*res); }
 
 float calcAO(vec3 p, vec3 n, float s){ float occ=0., sca=1.;
@@ -151,6 +161,13 @@ float keyAtten(vec3 p, out vec3 L, out float dist){
   if(uSpotCone.y>0.){ float c=dot(-L,uSpotDir); a*=smoothstep(uSpotCone.x,uSpotCone.y,c); }
   return a; }
 
+float panel(vec3 r, vec3 d, vec2 sz, float soft){
+  float cz=dot(r,d); if(cz<0.05) return 0.;
+  vec3 ref=abs(d.y)>0.9?vec3(0,0,1):vec3(0,1,0);
+  vec3 bu=normalize(cross(ref,d)); vec3 bv=cross(d,bu);
+  vec2 q=vec2(dot(r,bu),dot(r,bv))/cz;
+  vec2 dd=abs(q)-sz; float db=length(max(dd,0.))+min(max(dd.x,dd.y),0.);
+  return 1.-smoothstep(-soft,soft,db); }
 vec3 envMap(vec3 r, float rough){
   vec3 kd=uKeyPos-uBound.xyz; float kf=uKeyPow/dot(kd,kd);
   vec3 floorC=uPaper*(kf*0.9+uFill);
@@ -158,16 +175,9 @@ vec3 envMap(vec3 r, float rough){
   vec3 c=mix(floorC,wallC,smoothstep(-0.22,0.1,r.y));
   c=mix(c,vec3(uEnvDark),smoothstep(0.3,0.85,r.y));
   c*=mix(1.,0.35,smoothstep(0.0,-0.8,r.z));
-  vec3 Ld=normalize(kd); vec3 bu=normalize(cross(vec3(0,1,0),Ld)); vec3 bv=cross(Ld,bu);
-  float cz=dot(r,Ld);
-  if(cz>0.05){ vec2 q=vec2(dot(r,bu),dot(r,bv))/cz; float soft=0.015+rough*0.9;
-    vec2 dd=abs(q)-uBoxSize; float db=length(max(dd,0.))+min(max(dd.x,dd.y),0.);
-    float pan=1.-smoothstep(-soft,soft,db);
-    c+=uBoxLum*pan*mix(1.,0.2,sqrt(rough))*(0.8+0.2*smoothstep(0.,-0.25,db)); }
-  float sr=rough*0.35;
-  c+=uScrim*smoothstep(0.6-sr,0.9,dot(r,normalize(vec3(-0.25,1.,0.45))))*mix(1.,0.5,rough);
-  c+=uCard*smoothstep(0.72-sr,0.93,dot(r,normalize(vec3(1.,0.1,-0.25))))*mix(1.,0.5,rough);
-  if(uRim>0.){ float cr=dot(r,uRimDir); c+=uRim*smoothstep(0.93-sr*0.8,0.975,cr)*mix(1.,0.3,rough); }
+  float soft=0.012+rough*0.9; float dim=mix(1.,0.22,sqrt(rough));
+  c+=uBoxLum*vec3(1.,0.97,0.92)*panel(r,normalize(kd),uBoxSize,soft)*dim;
+  for(int i=0;i<4;i++){ if(uPan[i].w>0.) c+=uPan[i].w*panel(r,uPan[i].xyz,uPanS[i],soft)*dim; }
   return c; }
 
 vec3 shadeObj(vec3 p, vec3 rd){
@@ -175,7 +185,7 @@ vec3 shadeObj(vec3 p, vec3 rd){
   float id=scene(p).y;
   Mat m=material(id,p,n);
   vec3 L; float dist; float ka=keyAtten(p,L,dist);
-  float sh=softShadow(p+n*0.003,L,dist,uKeySoft);
+  float sh=dot(n,L)+m.wrap<0.?0.:softShadow(p+n*0.004,L,dist,uKeySoft,0.03);
   float ao=calcAO(p,n,0.35);
   float ndl=dot(n,L);
   float diff=max((ndl+m.wrap)/(1.+m.wrap),0.);
@@ -201,14 +211,14 @@ vec3 shadeObj(vec3 p, vec3 rd){
 vec3 shadeBackdrop(vec3 p, vec3 n){
   vec3 L; float dist; float ka=keyAtten(p,L,dist);
   float ndl=max(dot(n,L),0.);
-  float sh=softShadow(p+n*0.002,L,dist,uKeySoft);
+  float sh=ka*ndl<1e-4?1.:softShadowC(p+n*0.002,L,dist,uKeySoft);
   float near=length(p-uBound.xyz)-uBound.w;
   float ao=1.;
   if(near<1.2){ ao=mix(calcAO(p,n,0.6),1.,smoothstep(0.,1.2,near)); ao=ao*ao; }
   float g=exp(-dot(p-uGlowPos,p-uGlowPos)/(uGlowRad*uGlowRad));
   return uPaper*(ka*ndl*sh*mix(0.72,1.,ao) + uFill*ao + uGlow*g*mix(0.6,1.,sh)); }
 
-vec3 tone(vec3 x){ vec3 a=min(x,vec3(0.8)); vec3 b=0.8+0.2*(1.-exp(-(max(x-0.8,0.))/0.2)); return mix(a,b,step(0.8,x)); }
+vec3 tone(vec3 x){ vec3 a=min(x,vec3(0.62)); vec3 b=0.62+0.38*(1.-exp(-(max(x-0.62,0.))/0.38)); return mix(a,b,step(0.62,x)); }
 
 void main(){
   vec2 uv=(gl_FragCoord.xy-0.5*uRes)/uRes.y+uShift;
@@ -230,16 +240,21 @@ void main(){
 
 /* ------------------------------------------------------------------ */
 /* lighting presets = level. key 0 high (beginner), 1 mid, 2 low       */
+/* panels: [dirx,diry,dirz, luminance, halfWidth, halfHeight] (tangent units) */
 const KEYS = {
-  0:{ paper:'#ECE8E0', keyPos:[-7,10,-7], keyPow:230, keySoft:5, spot:null, glow:.30, glowRad:6, fill:.32, boxLum:3.2, boxSize:[.55,.42], envDark:.35, scrim:.9, card:.5, rim:0, expo:1.0, vig:.35 },
-  1:{ paper:'#ABA498', keyPos:[-7,9,-6],  keyPow:230, keySoft:6, spot:null, glow:.28, glowRad:5, fill:.22, boxLum:3.0, boxSize:[.5,.4], envDark:.14, scrim:.6, card:.3, rim:0, expo:1.0, vig:.45 },
-  2:{ paper:'#46423E', keyPos:[-5,9,-5],  keyPow:250, keySoft:7, spot:[.88,.975], glow:.55, glowRad:2.8, fill:.03, boxLum:4.0, boxSize:[.45,.34], envDark:.012, scrim:.35, card:.12, rim:1.4, expo:1.0, vig:.6 },
+  0:{ paper:'#E9E5DC', keyPos:[-7,10,-7], keyPow:230, keySoft:5, spot:null, glow:.30, glowRad:6, fill:.32, boxLum:3.0, boxSize:[.7,.55], envDark:.35, expo:1.0, vig:.35,
+      panels:[[-0.2,1,0.3, 1.1, 1.0,0.8],[1,0.15,-0.3, 0.7, 0.35,0.8],[-0.8,0.2,0.6, 0.5, 0.3,0.9]] },
+  1:{ paper:'#ABA498', keyPos:[-7,9,-6],  keyPow:230, keySoft:6, spot:null, glow:.28, glowRad:5, fill:.22, boxLum:2.8, boxSize:[.65,.5], envDark:.14, expo:1.0, vig:.45,
+      panels:[[-0.2,1,0.3, 0.8, 0.9,0.7],[1,0.15,-0.3, 0.4, 0.35,0.8],[0.7,0.25,0.7, 0.6, 0.12,0.9]] },
+  2:{ paper:'#46423E', keyPos:[-5,9,-5],  keyPow:250, keySoft:7, spot:[.88,.975], glow:.55, glowRad:2.8, fill:.03, boxLum:3.6, boxSize:[.6,.45], envDark:.012, expo:1.0, vig:.6,
+      panels:[[-0.1,1,0.2, 0.55, 0.7,0.5],[0.75,0.3,0.6, 1.6, 0.10,1.0],[-0.8,0.3,0.5, 0.9, 0.10,1.0],[1,0.1,-0.4, 0.18, 0.4,0.8]] },
 };
 const srgb2lin = (h)=>[1,3,5].map(i=>Math.pow(parseInt(h.substr(i,2),16)/255,2.2));
 
 /* ------------------------------------------------------------------ */
+const ORDER='ai-context-engineering mathematical-foundations-for-ml neural-networks-from-scratch build-llms-from-scratch 5d-parallelism pi-vs-hermes-vs-codex deepseek-harness how-to-host-kimi-k3 machine-learning-fundamentals pretraining-mini-kimi-k3 prompt-engineering python-for-data-science rag-in-production decision-trees-from-scratch deep-learning-fundamentals foundations-for-ai-ml generative-ai-fundamentals git-github-masterclass modern-software-developer r-masterclass sql-masterclass ai-agents-bootcamp claude-certified-architect cnn-fundamentals computer-vision-bootcamp dsa-in-python llm-finetuning llm-production-deployment memory-in-ai-systems mini-clawdbot ml-dl-mastery nlp-cv-mastery reinforcement-learning transformers-from-scratch vit-from-scratch writing-papers deit-from-scratch diffusion-lm-from-scratch kimi-k3-from-scratch modern-robot-learning nanovlm-from-scratch rlhf-from-scratch sciml transformers-vision-multimodal vla-world-models charlie-language-room charlie-vision-room charlie-sound-room charlie-reasoning-room harness-engineering kernel-engineering inference-engineering'.split(' ');
 const BOOKS = [];
-function book(o){ BOOKS.push(o); }
+function book(o){ o.no=String(ORDER.indexOf(o.slug)+1).padStart(2,'0'); BOOKS.push(o); }
 
 /* ============ 5D PARALLELISM ============ */
 /* Zonohedron generated by five icosahedral axes = the rhombic icosahedron,
@@ -265,19 +280,26 @@ const ZONO=zonohedron([[0,1,PHI],[0,-1,PHI],[1,PHI,0],[-1,PHI,0],[PHI,0,1]],0.78
 book({ slug:'5d-parallelism', key:2, no:'05',
   title:'5D Parallelism<span class="sub">for Large Model Training</span>', size:'',
   obj:'Shadow of a five-dimensional cube: every edge runs in one of five parallel directions',
-  med:'Cast bronze, facets polished', dim:'40 capsules · 9 hours',
+  med:'Carrara marble, polished', dim:'40 capsules · 9 hours',
   cam:{ look:[0,ZONO.rest,0], dist:19, el:12, yaw:-6, frame:[0.5,0.62] }, bound:[0,ZONO.rest,0,ZONO.rest*1.9], steps:110,
+  light:{ keyPos:[-9,6,-2.5], keyPow:120 },
   glsl: ZONO.glsl+`
 vec2 scene(vec3 p){
   p.y-=ZC;
-  float d=-1e9; for(int i=0;i<${ZONO.n};i++){ d=max(d,abs(dot(p,ZN[i]))-ZH[i]); }
+  float d=abs(dot(p,ZN[0]))-ZH[0];
+  for(int i=1;i<${ZONO.n};i++){ d=smax(d,abs(dot(p,ZN[i]))-ZH[i],0.012); }
   return vec2(d,1.);
 }
 Mat material(float id, vec3 p, vec3 n){
-  float gr=noise(p*40.);
+  vec3 q=p*1.7+vec3(3.1,0.,1.7);
+  float w=fbm(q*1.3);
+  float vein=abs(sin((q.x*0.8+q.y*1.3-q.z*0.5)*3.2+w*7.5));
+  float v2=1.-smoothstep(0.0,0.09,vein);
+  float v3=1.-smoothstep(0.0,0.35,vein);
   Mat m;
-  m.alb=vec3(0.86,0.64,0.42)*(0.97+0.05*gr);
-  m.rough=0.11+0.03*gr; m.metal=1.; m.coat=0.; m.wrap=0.;
+  m.alb=vec3(0.9,0.89,0.87)*(0.97+0.04*fbm(p*12.));
+  m.alb=mix(m.alb,vec3(0.62,0.63,0.65),v3*0.18+v2*0.22);
+  m.rough=0.18; m.metal=0.; m.coat=0.9; m.wrap=0.25;
   return m;
 }`});
 
@@ -313,6 +335,336 @@ Mat material(float id, vec3 p, vec3 n){
   m.rough=0.85; m.metal=0.; m.coat=0.; m.wrap=0.4; return m;
 }`});
 
+/* ============ AI CONTEXT ENGINEERING ============ */
+book({ slug:'ai-context-engineering', key:1,
+  title:'AI Context<br>Engineering',
+  obj:'Window, packed by hand; one block left out', med:'Travertine, slate, marble, terracotta', dim:'43 capsules · 10 hours',
+  cam:{ look:[0.25,1.2,0], dist:21, el:9, yaw:-16, frame:[0.5,0.625] }, bound:[0.3,1.2,0,2.25], steps:130,
+  light:{ keyPos:[-8,8,-6] },
+  glsl:`
+// frame: outer half (1.0,1.2,0.2); opening half (0.8,1.0)
+const vec4 BL[9]=vec4[9](
+  vec4(-0.49,0.46,0.31,0.26), vec4(0.08,0.46,0.26,0.26), vec4(0.57,0.46,0.23,0.26),
+  vec4(-0.60,0.92,0.20,0.20), vec4(-0.01,0.92,0.39,0.20), vec4(0.59,0.92,0.21,0.20),
+  vec4(-0.325,1.26,0.475,0.14), vec4(0.35,1.26,0.20,0.14),
+  vec4(-0.525,1.51,0.275,0.11));
+vec2 scene(vec3 p){
+  vec3 q=p; q.xz=rot(0.0)*q.xz; q.y-=1.2;
+  float fr=max(sdRBox(q,vec3(1.0,1.2,0.2),0.02),-sdBox(q,vec3(0.8,1.0,0.5)));
+  vec2 r=vec2(fr,1.);
+  vec3 b=p; b.y-=0.0;
+  if(sdBox(q-vec3(0,-0.1,0),vec3(0.82,0.9,0.22))<r.x){
+    for(int i=0;i<9;i++){ float d=sdRBox(b-vec3(BL[i].x,BL[i].y,0.),vec3(BL[i].z-0.008,BL[i].w-0.008,0.17),0.012); if(d<r.x) r=vec2(d,2.+float(i)); }
+  }
+  vec3 o=p-vec3(1.72,0.17,-0.35); o.xz=rot(0.5)*o.xz;
+  float dout=sdRBox(o,vec3(0.26,0.17,0.17),0.012); if(dout<r.x) r=vec2(dout,11.);
+  return r;
+}
+Mat material(float id, vec3 p, vec3 n){
+  Mat m; m.metal=0.; m.coat=0.; m.wrap=0.15; m.rough=0.75;
+  float f=fbm(p*6.); float g=noise(p*55.);
+  if(id<1.5){ // travertine
+    float band=0.5+0.5*sin(p.y*34.+f*5.);
+    m.alb=vec3(0.80,0.72,0.60)*(0.9+0.12*band)*(0.95+0.08*f);
+    float pore=smoothstep(0.78,0.86,noise(p*vec3(38.,90.,38.)));
+    m.alb*=1.-0.45*pore; m.rough=0.8;
+  } else {
+    int k=int(id+0.5)-2;
+    vec3 c=vec3(0.8);
+    if(k==0||k==5) c=vec3(0.24,0.26,0.28)*(0.85+0.3*f);           // slate
+    else if(k==1||k==7) c=vec3(0.86,0.85,0.82)*(0.95+0.07*f);      // marble
+    else if(k==2||k==4||k==9) c=vec3(0.66,0.36,0.22)*(0.85+0.25*f); // terracotta
+    else if(k==3||k==8) c=vec3(0.78,0.66,0.42)*(0.9+0.15*f);      // sandstone
+    else c=vec3(0.36,0.42,0.36)*(0.85+0.3*f);                     // serpentine
+    m.alb=c*(0.97+0.05*g);
+    m.rough=(k==1||k==7)?0.35:0.75; m.coat=(k==1||k==7)?0.4:0.;
+  }
+  return m;
+}`});
+
+/* ============ NEURAL NETWORKS FROM SCRATCH ============ */
+book({ slug:'neural-networks-from-scratch', key:0,
+  title:'Neural Networks<span class="sub">from Scratch</span>',
+  obj:'Three layers, fully connected, modelled by hand', med:'Terracotta', dim:'33 capsules · 7 hours',
+  cam:{ look:[0,1.25,0], dist:20, el:10, yaw:-10, frame:[0.52,0.62] }, bound:[0,1.3,0,1.75], steps:140,
+  light:{ keyPos:[-8,9,-5] },
+  glsl:`
+const float R0=0.19; const float R1=0.17; const float R2=0.22; const float RR=0.036;
+vec3 n0(int i){ float a=float(i)*1.5708+0.785; return vec3(0.82*cos(a),R0,0.82*sin(a)); }
+vec3 n1(int i){ float a=float(i)*1.5708; return vec3(0.62*cos(a),1.32,0.62*sin(a)); }
+const vec3 N2=vec3(0.,2.42,0.);
+vec2 scene(vec3 p){
+  p.xz=rot(0.3)*p.xz;
+  float wob=0.006*(noise(p*9.)-0.5);
+  float d=1e9;
+  for(int i=0;i<4;i++){ d=min(d,length(p-n0(i))-R0); d=min(d,length(p-n1(i))-R1); }
+  d=min(d,length(p-N2)-R2);
+  float rd=1e9;
+  if(p.y<1.55){ for(int i=0;i<4;i++) for(int j=0;j<4;j++) rd=min(rd,sdCapsule(p,n0(i),n1(j),RR)); }
+  if(p.y>1.1){ for(int j=0;j<4;j++) rd=min(rd,sdCapsule(p,n1(j),N2,RR)); }
+  d=smin(d,rd,0.05);
+  return vec2(d+wob,1.);
+}
+Mat material(float id, vec3 p, vec3 n){
+  Mat m; float f=fbm(p*5.); float g=noise(p*70.);
+  m.alb=vec3(0.66,0.34,0.20)*(0.82+0.3*f)*(0.94+0.1*g);
+  m.rough=0.85; m.metal=0.; m.coat=0.; m.wrap=0.25; return m;
+}`});
+
+/* ============ BUILD LLMS FROM SCRATCH ============ */
+book({ slug:'build-llms-from-scratch', key:1,
+  title:'Build Large Language Models<span class="sub">(LLMs) from Scratch</span>', size:'s1',
+  obj:'Column of twelve identical blocks', med:'Stoneware, oxblood glaze', dim:'20 capsules · 6 hours',
+  cam:{ look:[0,1.6,0], dist:22, el:6, yaw:-8, frame:[0.62,0.61] }, bound:[0,1.62,0,1.75], steps:140,
+  light:{ keyPos:[-8,8,-5] },
+  glsl:`
+const float HM=0.265; const float WW=0.36; const float WN=0.19;
+vec2 scene(vec3 p){
+  p.xz=rot(0.62)*p.xz;
+  float id=clamp(floor(p.y/HM),0.,11.);
+  float y=p.y-(id+0.5)*HM;
+  float w=mix(WW,WN,abs(y)/(0.5*HM));
+  float s=(WW-WN)/(0.5*HM);
+  float d=max(max(abs(p.x),abs(p.z))-w, abs(p.y-6.*HM)-6.*HM)/sqrt(1.+s*s);
+  d=max(d,max(abs(p.x),abs(p.z))-WW);
+  return vec2(d*0.9,1.);
+}
+Mat material(float id, vec3 p, vec3 n){
+  Mat m; float f=fbm(p*vec3(3.,9.,3.)); float g=fbm(p*18.);
+  vec3 deep=vec3(0.30,0.03,0.03), bright=vec3(0.62,0.10,0.06);
+  float pool=smoothstep(0.35,0.75,f);
+  m.alb=mix(bright,deep,pool)*(0.92+0.1*g);
+  float up=abs(n.y);
+  m.alb=mix(m.alb,vec3(0.55,0.34,0.24),(1.-up)*0.0);
+  m.rough=0.07+0.05*g; m.metal=0.; m.coat=1.; m.wrap=0.05; return m;
+}`});
+
+/* ============ PI VS HERMES VS CODEX ============ */
+book({ slug:'pi-vs-hermes-vs-codex', key:2,
+  title:'Pi vs Hermes<br>vs Codex<span class="sub">Context Compaction and Memory</span>', size:'s1',
+  obj:'Three stacks of nine wax tablets, each pressed to its own height', med:'Beeswax, steel weights', dim:'9 capsules · 1 hour',
+  cam:{ look:[0,0.5,0], dist:20, el:13, yaw:-4, frame:[0.5,0.69] }, bound:[0,0.55,0,2.1], steps:130,
+  light:{ keyPos:[-8,7,-4], keyPow:150 },
+  glsl:`
+const float TH0=0.105, TH1=0.07, TH2=0.042;
+float stackD(vec3 p, float th, out float isCap){
+  float h=9.*th;
+  float bul=(0.105-th)*0.35;
+  float yy=clamp(floor(p.y/th),0.,8.);
+  vec3 q=p; q.y-=(yy+0.5)*th;
+  float d=sdRBox(q,vec3(0.4+bul,th*0.5-0.002,0.4+bul),min(0.02,th*0.3));
+  vec3 c=p; c.y-=h+0.16;
+  float dc=sdRBox(c,vec3(0.43,0.16,0.43),0.025);
+  isCap=dc<d?1.:0.;
+  return min(d,dc);
+}
+vec2 scene(vec3 p){
+  float c0,c1,c2;
+  vec3 a=p-vec3(-1.3,0.,0.15); a.xz=rot(0.12)*a.xz;
+  vec3 b=p-vec3(0.,0.,-0.1);  b.xz=rot(-0.08)*b.xz;
+  vec3 e=p-vec3(1.3,0.,0.1);  e.xz=rot(0.2)*e.xz;
+  float d0=stackD(a,TH0,c0), d1=stackD(b,TH1,c1), d2=stackD(e,TH2,c2);
+  vec2 r=vec2(d0,1.+c0);
+  if(d1<r.x) r=vec2(d1,1.+c1);
+  if(d2<r.x) r=vec2(d2,1.+c2);
+  return r;
+}
+Mat material(float id, vec3 p, vec3 n){
+  Mat m;
+  if(id>1.5){ float g=noise(p*vec3(200.,4.,200.)); m.alb=vec3(0.62,0.62,0.63)*(0.95+0.08*g); m.rough=0.2; m.metal=1.; m.coat=0.; m.wrap=0.; }
+  else { float f=fbm(p*9.); m.alb=vec3(0.80,0.52,0.14)*(0.85+0.25*f); m.rough=0.42; m.metal=0.; m.coat=0.25; m.wrap=0.65; }
+  return m;
+}`});
+
+/* ============ PROMPT ENGINEERING ============ */
+book({ slug:'prompt-engineering', key:0,
+  title:'Prompt<br>Engineering',
+  obj:'Slab, raised by a wedge', med:'Slate and red lacquer', dim:'31 capsules · 7 hours',
+  cam:{ look:[0,0.35,0], dist:20, el:12, yaw:-18, frame:[0.5,0.66] }, bound:[0,0.4,0,1.85], steps:130,
+  light:{ keyPos:[-8,9,-6] },
+  glsl:`
+const float TA=0.16;
+vec2 scene(vec3 p){
+  // slab pivots on its left lower edge at x=-1.35
+  vec3 q=p-vec3(-1.35,0.,0.); q.xy=rot(TA)*q.xy; q-=vec3(1.35,0.16,0.);
+  float ds=sdRBox(q,vec3(1.35,0.16,0.72),0.015);
+  float tl=sin(TA)/cos(TA);
+  float xe=1.05, xs=0.3; float hh=(xe+1.35)*tl-0.004;
+  float sl=hh/(xe-xs);
+  vec3 w=p;
+  float dw=max(max(-w.y, w.x-xe), (w.y-(w.x-xs)*sl)/sqrt(1.+sl*sl));
+  dw=max(dw,abs(w.z-0.05)-0.2);
+  vec2 r=vec2(ds,1.); if(dw<r.x) r=vec2(dw,2.);
+  return r;
+}
+Mat material(float id, vec3 p, vec3 n){
+  Mat m; m.metal=0.; m.wrap=0.;
+  if(id<1.5){ float f=fbm(p*vec3(3.,14.,3.)); float g=fbm(p*25.);
+    m.alb=vec3(0.19,0.205,0.225)*(0.8+0.35*f)*(0.92+0.12*g); m.rough=0.6; m.coat=0.15; }
+  else { m.alb=vec3(0.62,0.07,0.045); m.rough=0.12; m.coat=1.; }
+  return m;
+}`});
+
+/* ============ RAG IN PRODUCTION ============ */
+book({ slug:'rag-in-production', key:1,
+  title:'RAG in<br>Production',
+  obj:'Cabinet of twelve drawers, one drawn', med:'Oak, oiled', dim:'42 capsules · 10 hours',
+  cam:{ look:[0,0.95,0], dist:20, el:11, yaw:-22, frame:[0.5,0.64] }, bound:[0,0.95,-0.2,1.75], steps:130,
+  light:{ keyPos:[-8,8,-6] },
+  glsl:`
+const vec3 CB=vec3(0.95,0.9,0.55); const float DW=0.3, DH=0.21;
+vec2 scene(vec3 p){
+  p.xz=rot(0.0)*p.xz;
+  vec3 q=p-vec3(0.,0.9,0.);
+  float d=sdRBox(q,CB,0.02);
+  // drawer grid on front face z=-0.55: 3 cols (w .6) x 4 rows (h .42)
+  vec2 cell=vec2(0.6,0.42);
+  vec2 g=q.xy; vec2 id=clamp(floor(g/cell+vec2(1.5,2.)),vec2(0.),vec2(2.,3.));
+  vec2 lc=g-(id-vec2(1.5,2.)+0.5)*cell;
+  float groove=max(min(0.5*cell.x-abs(lc.x),0.5*cell.y-abs(lc.y))-0.012, q.z+CB.z-0.03);
+  d=max(d,-groove);
+  // knobs
+  float kn=length(vec3(lc.x,lc.y,q.z+CB.z+0.03))-0.045;
+  // the drawn drawer: col 0,row 2
+  vec2 did=vec2(0.,2.); vec2 dc=(did-vec2(1.5,2.)+0.5)*cell;
+  vec3 dq=q-vec3(dc,0.); 
+  float hole=sdBox(dq-vec3(0,0,-CB.z),vec3(0.5*cell.x-0.012,0.5*cell.y-0.012,0.5));
+  d=max(d,-hole);
+  float pulled=0.46;
+  vec3 dr=dq-vec3(0.,0.,-CB.z+0.5-pulled);
+  float drawer=sdRBox(dr,vec3(0.5*cell.x-0.016,0.5*cell.y-0.016,0.5),0.01);
+  drawer=max(drawer,-sdBox(dr-vec3(0,0.05,0.03),vec3(0.5*cell.x-0.05,0.5*cell.y-0.03,0.47)));
+  float dkn=length(dr-vec3(0.,0.,-0.53))-0.045;
+  if(all(equal(id,did))) kn=1e9;
+  vec2 r=vec2(d,1.);
+  if(drawer<r.x) r=vec2(drawer,1.);
+  kn=min(kn,dkn);
+  if(kn<r.x) r=vec2(kn,2.);
+  return r;
+}
+Mat material(float id, vec3 p, vec3 n){
+  Mat m; m.metal=0.; m.wrap=0.1;
+  if(id<1.5){ float w=fbm(p*vec3(2.,8.,8.)); float rings=0.5+0.5*sin((p.y*26.+p.z*9.)+w*9.);
+    float fine=noise(p*vec3(3.,120.,120.));
+    m.alb=vec3(0.60,0.42,0.25)*(0.78+0.22*rings)*(0.9+0.15*fine); m.rough=0.45; m.coat=0.35; }
+  else { m.alb=vec3(0.72,0.56,0.32); m.rough=0.22; m.metal=1.; m.coat=0.; }
+  return m;
+}`});
+
+/* ============ CHARLIE AND THE INTELLIGENCE FACTORY ============ */
+const CHARLIE_MAT=`
+Mat material(float id, vec3 p, vec3 n){
+  Mat m; m.wrap=0.3;
+  if(id<1.5){ float f=fbm(p*8.); m.alb=vec3(0.90,0.885,0.86)*(0.97+0.04*f); m.rough=0.1; m.metal=0.; m.coat=0.85; }
+  else { float g=noise(p*60.); m.alb=vec3(0.98,0.76,0.38)*(0.95+0.06*g); m.rough=0.24; m.metal=1.; m.coat=0.; m.wrap=0.; }
+  return m;
+}`;
+const CHARLIE_CAM={ look:[0,0.72,0], dist:18.5, el:12, yaw:-10, frame:[0.5,0.655] };
+const CUBE=`const float S=0.72;
+vec3 cubeP(vec3 p){ p.y-=S; p.xz=rot(0.42)*p.xz; return p; }
+`;
+book({ slug:'charlie-language-room', key:2, series:'Charlie and the Intelligence Factory · I',
+  title:'Charlie and the<br>Language Room', tag:'Language — Inference Engineering',
+  obj:'Room I: a cube with a mouth', med:'Porcelain, gilded interior', dim:'22 capsules · 5 hours',
+  cam:CHARLIE_CAM, bound:[0,0.72,0,1.35], steps:120,
+  glsl: CUBE+`
+vec2 scene(vec3 p){ vec3 q=cubeP(p);
+  float d=sdRBox(q,vec3(S),0.03);
+  float slot=sdRBox(q-vec3(0,-0.05,-0.2),vec3(0.46,0.055,1.0),0.02);
+  float dd=max(d,-slot);
+  return vec2(dd, abs(slot)<0.008?2.:1.);
+}`+CHARLIE_MAT });
+book({ slug:'charlie-vision-room', key:1, series:'Charlie and the Intelligence Factory · II',
+  title:'Charlie and the<br>Vision Room', tag:'Vision — Vision Transformers',
+  obj:'Room II: a cube with an eye', med:'Porcelain, gilded interior', dim:'20 capsules · 6 hours',
+  cam:CHARLIE_CAM, bound:[0,0.72,0,1.35], steps:120,
+  glsl: CUBE+`
+vec2 scene(vec3 p){ vec3 q=cubeP(p);
+  float d=sdRBox(q,vec3(S),0.03);
+  float hole=length(q.xy-vec2(0.,0.02))-0.32;
+  float dd=smax(d,-hole,0.02);
+  return vec2(dd, abs(hole)<0.006?2.:1.);
+}`+CHARLIE_MAT });
+book({ slug:'charlie-sound-room', key:1, series:'Charlie and the Intelligence Factory · III',
+  title:'Charlie and the<br>Sound Room', tag:'Audio — Voice Agents',
+  obj:'Room III: a cube with an ear', med:'Porcelain, gilded interior', dim:'20 capsules · 6 hours',
+  cam:CHARLIE_CAM, bound:[0,0.72,0,1.35], steps:130,
+  glsl: CUBE+`
+vec2 scene(vec3 p){ vec3 q=cubeP(p);
+  float d=sdRBox(q,vec3(S),0.03);
+  float r=length(q.xy);
+  // stepped horn: 5 terraces, each 0.07 wide, 0.09 deep, from the front face z=-S
+  float k=clamp(floor((0.46-r)/0.075),-1.,5.);
+  float depth=(k+1.)*0.085;
+  float horn=max(r-0.46, (q.z+S)-depth);
+  horn=max(horn,-(q.z+S)+(-0.2));
+  // make it a proper cavity: inside radius and in front of depth
+  float cav=max(r-0.46,-1.);
+  float dd=max(d,-horn);
+  return vec2(dd, abs(horn)<0.008?2.:1.);
+}`+CHARLIE_MAT });
+book({ slug:'charlie-reasoning-room', key:2, series:'Charlie and the Intelligence Factory · IV',
+  title:'Charlie and the<br>Reasoning Room', tag:'Reason — Reinforcement Learning, from bandits to reasoning models', tagSmall:true,
+  obj:'Room IV: a cube with a stair', med:'Porcelain, gilded interior', dim:'21 capsules · 6 hours',
+  cam:CHARLIE_CAM, bound:[0,0.72,0,1.35], steps:130,
+  glsl: CUBE+`
+vec2 scene(vec3 p){ vec3 q=cubeP(p);
+  float d=sdRBox(q,vec3(S),0.03);
+  float u=q.z+S; float n=6.; float st=0.2;
+  float k=clamp(floor(u/st),0.,n-1.);
+  float stair=max(abs(q.x)-0.34, max(u-n*st, (S-(n-k)*0.165)-q.y));
+  float dd=max(d,-stair);
+  return vec2(dd, abs(stair)<0.008?2.:1.);
+}`+CHARLIE_MAT });
+
+/* ============ KERNEL ENGINEERING (forthcoming) ============ */
+book({ slug:'kernel-engineering', key:2, forthcoming:true,
+  title:'Kernel<br>Engineering', tag:'From silicon to speculative decoding — GPU kernels for modern LLMs.',
+  obj:'Maquette for a tiled block, one tile lifted', med:'Plaster maquette · to be cast in silicon bronze', dim:'Forthcoming',
+  cam:{ look:[0,0.3,0], dist:19, el:22, yaw:-20, frame:[0.5,0.67] }, bound:[0,0.35,0,1.75], steps:130,
+  glsl:`
+const float TS=0.36; const float TH=0.3;
+vec2 scene(vec3 p){
+  p.xz=rot(0.3)*p.xz;
+  vec3 q=p-vec3(0.,TH*0.5,0.);
+  float d=sdRBox(q,vec3(4.*TS*0.5,TH*0.5,4.*TS*0.5),0.012);
+  vec2 g=q.xz; vec2 id=clamp(floor(g/TS+2.),0.,3.); vec2 lc=g-(id-2.+0.5)*TS;
+  float groove=max(min(0.5*TS-abs(lc.x),0.5*TS-abs(lc.y))-0.008, -(q.y-TH*0.5+0.05));
+  d=max(d,-groove);
+  vec2 hid=vec2(2.,1.); vec2 hc=(hid-2.+0.5)*TS;
+  float hole=sdBox(q-vec3(hc.x,0.1,hc.y),vec3(0.5*TS-0.008,TH*0.5,0.5*TS-0.008));
+  d=max(d,-hole);
+  vec3 t=p-vec3(-0.25,TH+TH*0.5,-0.28); t.xz=rot(-0.45)*t.xz;
+  float tile=sdRBox(t,vec3(0.5*TS-0.01,TH*0.5,0.5*TS-0.01),0.012);
+  return vec2(min(d,tile),1.);
+}
+Mat material(float id, vec3 p, vec3 n){
+  Mat m; float f=fbm(p*14.); float pits=smoothstep(0.8,0.88,noise(p*70.));
+  m.alb=vec3(0.88,0.87,0.84)*(0.95+0.06*f)*(1.-0.18*pits); m.rough=0.9; m.metal=0.; m.coat=0.; m.wrap=0.35; return m;
+}`});
+
+/* ============ DEIT FROM SCRATCH ============ */
+book({ slug:'deit-from-scratch', key:2,
+  title:'Build a Data-<br>Efficient Image<br>Transformer (DeiT)<span class="sub">from Scratch</span>', size:'s1',
+  obj:'Sixteen patches in a row, led by a distillation token', med:'Limestone and gilt bronze', dim:'42 capsules · 10 hours',
+  cam:{ look:[0.2,0.3,0], dist:19, el:14, yaw:-34, frame:[0.5,0.73] }, bound:[0.2,0.3,0,2.3], steps:130,
+  glsl:`
+const float SP=0.2; const float HT=0.3;
+vec2 scene(vec3 p){
+  p.xz=rot(-0.35)*p.xz;
+  float x=p.x+1.6;
+  float i=clamp(floor(x/SP+0.5),0.,16.);
+  vec3 q=vec3(x-i*SP,p.y-HT,p.z);
+  float d=sdRBox(q,vec3(0.035,HT,HT),0.012);
+  return vec2(d, i<0.5?2.:1.);
+}
+Mat material(float id, vec3 p, vec3 n){
+  Mat m;
+  if(id>1.5){ m.alb=vec3(0.98,0.76,0.38); m.rough=0.22; m.metal=1.; m.coat=0.; m.wrap=0.; }
+  else { float f=fbm(p*9.); float pits=smoothstep(0.82,0.9,noise(p*60.)); m.alb=vec3(0.80,0.77,0.70)*(0.9+0.14*f)*(1.-0.2*pits); m.rough=0.85; m.metal=0.; m.coat=0.; m.wrap=0.3; }
+  return m;
+}`});
+
 /* ------------------------------------------------------------------ */
 function buildCover(b, idx){
   const fig=document.createElement('figure'); fig.className='plate';
@@ -321,8 +673,11 @@ function buildCover(b, idx){
   c.innerHTML=`<canvas width="${W}" height="${H}"></canvas><div class="t">
     <div class="imprint"><svg viewBox="0 0 26 38"><use href="#vmark"/></svg>Vizuara Books</div>
     <div class="catno">No.&thinsp;${b.no}</div>
-    ${b.series?`<div class="series">${b.series}</div>`:''}
-    <h2 class="title ${b.size||''}">${b.title}</h2>
+    <div class="head">
+      ${b.series?`<p class="series">${b.series}</p>`:''}
+      <h2 class="title ${b.size||''}">${b.title}</h2>
+      ${b.tag?`<p class="tag${b.tagSmall?' small':''}">${b.tag}</p>`:''}
+    </div>
     <div class="label"><p class="obj">${b.obj}</p><p class="med">${b.med}</p><p class="dim">${b.dim}</p></div>
     <div class="level"><div class="scale"><i class="${b.key==0?'on':''}"></i><i class="${b.key==1?'on':''}"></i><i class="${b.key==2?'on':''}"></i></div><span>${lv}</span></div>
   </div>`;
@@ -373,7 +728,9 @@ function renderBook(b, canvas){
   const gp=k.glowPos||[bc[0]+0.4,bc[1]+1.6,(b.wallZ||5)];
   gl.uniform3fv(U('uGlowPos'),gp); gl.uniform1f(U('uGlow'),k.glow); gl.uniform1f(U('uGlowRad'),k.glowRad);
   gl.uniform1f(U('uFill'),k.fill); gl.uniform1f(U('uBoxLum'),k.boxLum); gl.uniform2fv(U('uBoxSize'),k.boxSize); gl.uniform1f(U('uEnvDark'),k.envDark);
-  const rd=k.rimDir||[0.75,0.35,0.55]; const rl=Math.hypot(...rd); gl.uniform3f(U('uRimDir'),rd[0]/rl,rd[1]/rl,rd[2]/rl); gl.uniform1f(U('uRim'),k.rim); gl.uniform1f(U('uScrim'),k.scrim); gl.uniform1f(U('uCard'),k.card);
+  const pans=(k.panels||[]).slice(0,4); const PD=new Float32Array(16), PS=new Float32Array(8);
+  pans.forEach((p,i)=>{ const l=Math.hypot(p[0],p[1],p[2]); PD.set([p[0]/l,p[1]/l,p[2]/l,p[3]],i*4); PS.set([p[4],p[5]],i*2); });
+  gl.uniform4fv(U('uPan'),PD); gl.uniform2fv(U('uPanS'),PS);
   gl.uniform4fv(U('uBound'),bc); gl.uniform1f(U('uWallZ'),b.wallZ||5); gl.uniform1f(U('uCoveR'),b.coveR||2.6);
   gl.uniform1f(U('uExpo'),k.expo); gl.uniform1f(U('uVig'),k.vig);
   gl.viewport(0,0,W,H); gl.enable(gl.SCISSOR_TEST);

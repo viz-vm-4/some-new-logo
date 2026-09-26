@@ -359,6 +359,30 @@
       }
       return nodes;
     });
+    if (o.compactStart) paths.forEach((nodes, i) => {
+      // choose where to begin so the first `compactStart` share of the line stays in one region
+      const n = nodes.length, m = Math.max(2, Math.round(n * o.compactStart));
+      let best = null;
+      for (let dir = 0; dir < 2; dir++) for (let k = 0; k < n; k++) {
+        let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+        for (let j = 0; j < m; j++) { const nd = nodes[(k + (dir ? -j : j) + n * 2) % n].p; x0 = Math.min(x0, nd[0]); x1 = Math.max(x1, nd[0]); y0 = Math.min(y0, nd[1]); y1 = Math.max(y1, nd[1]); }
+        const sc = (x1 - x0) * (y1 - y0) + (o.biasX || 0) * (x0 + x1);
+        if (!best || sc < best.sc) best = { sc, k, dir };
+      }
+      let rot = nodes.slice(best.k).concat(nodes.slice(0, best.k)); // rot[0] = nodes[k]
+      if (best.dir) { rot = [rot[0]].concat(rot.slice(1).reverse()); rot.forEach((nd) => { nd.t = [-nd.t[0], -nd.t[1]]; }); }
+      // pathD starts at the last node; move rot[0] to the end
+      rot.push(rot.shift());
+      paths[i] = rot;
+    });
+    if (o.start) paths.forEach((nodes, i) => {
+      // rotate so the path begins at the node nearest o.start (model coords), optionally reversed
+      let bi = 0, bd = Infinity;
+      nodes.forEach((nd, k) => { const d = Math.hypot(nd.p[0] - o.start[0], nd.p[1] - o.start[1]); if (d < bd) { bd = d; bi = k; } });
+      const rot = nodes.slice(bi + 1).concat(nodes.slice(0, bi + 1));
+      if (o.reverse) { rot.reverse(); rot.forEach((nd) => { nd.t = [-nd.t[0], -nd.t[1]]; }); rot.push(rot.shift()); }
+      paths[i] = rot;
+    });
     return paths.map((nodes) => ({ nodes, toSvg: (X) => pathD(nodes, X, hX, hT, r) }));
   }
   function pathD(nodes, X, hX, hT, r) {
@@ -405,7 +429,9 @@
     G.forEach((g, i) => {
       const col = (o.accentLoop != null && i === o.accentLoop) ? o.accent : (o.loopColors ? o.loopColors[i % o.loopColors.length] : o.color);
       const dash = o.partial != null ? ` pathLength="1000" stroke-dasharray="${Math.round(o.partial * 1000)} 2000" stroke-dashoffset="${o.partialOffset || 0}"` : '';
-      out += `<path d="${g.toSvg(X)}" fill="none" stroke="${col}" stroke-width="${o.stroke}" stroke-linecap="round" stroke-linejoin="round"${dash}/>`;
+      const d = g.toSvg(X);
+      out += `<path d="${d}" fill="none" stroke="${col}" stroke-width="${o.stroke}" stroke-linecap="round" stroke-linejoin="round"${dash}/>`;
+      if (o.hollow) out += `<path d="${d}" fill="none" stroke="${o.hollow}" stroke-width="${o.stroke - 2 * o.wall}" stroke-linecap="round" stroke-linejoin="round"${dash}/>`;
     });
     if (o.dot > 0) sol.M.shape.cells.forEach((c) => { const p = X(c.u, c.v); out += `<circle cx="${p[0].toFixed(2)}" cy="${p[1].toFixed(2)}" r="${o.dot}" fill="${o.dotColor || o.color}"/>`; });
     return { svg: out, box: lay.box, ox, oy };

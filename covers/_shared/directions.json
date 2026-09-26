@@ -34,5 +34,9 @@
   "02-plates": {
     "name": "Specimen Plates",
     "pitch": "Every book is a numbered plate in one atlas of machine learning: a single engraved specimen of its actual mechanism, lettered a, b, c with an italic legend, the way Gray or Haeckel documented theirs. The drawings are computed, not decorated (descent paths integrated on the real surface, the real 2⁵ device mesh). Paper tone gives level: sage, Ingres blue, sanguine. Everything prints as one spot tint plus black."
+  },
+  "13-miniature": {
+    "name": "Muraqqa",
+    "pitch": "Every cover is a folio from one Mughal album (a muraqqa) with its page architecture held fixed. The coloured margin (hashiya) and the number of gold, vermilion and black rules (jadval) give the level, and a lobed cartouche carries the title. The central miniature is a flat, jewel-toned diagram of the book's real mechanism, such as the causal mask, the 5D device mesh or the paged KV cache, painted in the Basohli manner. A shamsa rosette is the imprint."
   }
 }

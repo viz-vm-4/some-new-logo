@@ -29,7 +29,9 @@
 
   // ---------- scene ----------
   class Scene {
-    constructor() { this.faces = []; this.nsolid = 0; this.overlays = []; }
+    constructor() { this.faces = []; this.nsolid = 0; this.overlays = []; this.E = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]; }
+    // local frame -> world
+    W(x, y, z) { const E = this.E; return [x * E[0][0] + y * E[1][0] + z * E[2][0], x * E[0][1] + y * E[1][1] + z * E[2][1], x * E[0][2] + y * E[1][2] + z * E[2][2]]; }
     // faces: array of point arrays; normals oriented outward from the solid's centroid
     solid(faces, o = {}) {
       const id = this.nsolid++;
@@ -51,7 +53,7 @@
       this.faces.push({ pts, n, mat: o.mat, cast: o.cast !== false, recv: o.recv !== false, sid: this.nsolid++, decal: o.decal });
     }
     box(x0, y0, z0, x1, y1, z1, o = {}) {
-      const P = (x, y, z) => [x, y, z];
+      const P = (x, y, z) => this.W(x, y, z);
       const f = [
         [P(x0, y0, z0), P(x1, y0, z0), P(x1, y1, z0), P(x0, y1, z0)],
         [P(x0, y0, z1), P(x1, y0, z1), P(x1, y1, z1), P(x0, y1, z1)],
@@ -83,15 +85,15 @@
   }
 
   // remove coincident internal areas between touching axis-aligned rectangular faces
-  function trimInternal(faces) {
+  function trimInternal(faces, E) {
     const info = new Map(); const groups = new Map();
     faces.forEach((f, idx) => {
       if (f.noTrim || f.decal || f.pts.length !== 4) return;
-      const k = [0, 1, 2].find(a => Math.abs(Math.abs(f.n[a]) - 1) < 1e-9); if (k == null) return;
+      const k = [0, 1, 2].find(a => Math.abs(Math.abs(dot(f.n, E[a])) - 1) < 1e-7); if (k == null) return;
       const [i, j] = [0, 1, 2].filter(a => a !== k);
-      const us = f.pts.map(p => p[i]), vs = f.pts.map(p => p[j]);
+      const us = f.pts.map(p => dot(p, E[i])), vs = f.pts.map(p => dot(p, E[j]));
       const r = [Math.min(...us), Math.min(...vs), Math.max(...us), Math.max(...vs)];
-      const c = Math.round(f.pts[0][k] * 1000) / 1000;
+      const c = Math.round(dot(f.pts[0], E[k]) * 1000) / 1000;
       info.set(idx, { k, i, j, c, r, sub: [] });
       const key = k + ':' + c; if (!groups.has(key)) groups.set(key, []); groups.get(key).push(idx);
     });
@@ -120,7 +122,7 @@
         rects = nx.filter(r => r[2] - r[0] > 1e-6 && r[3] - r[1] > 1e-6);
       }
       for (const r of rects) {
-        const mk = (u, v) => { const p = [0, 0, 0]; p[I.k] = I.c; p[I.i] = u; p[I.j] = v; return p; };
+        const mk = (u, v) => add(add(mul(E[I.k], I.c), mul(E[I.i], u)), mul(E[I.j], v));
         let pts = [mk(r[0], r[1]), mk(r[2], r[1]), mk(r[2], r[3]), mk(r[0], r[3])];
         if (dot(newell(pts), f.n) < 0) pts.reverse();
         out.push(Object.assign({}, f, { pts }));
@@ -233,26 +235,61 @@
 
   function render(scene, cam, L, opts = {}) {
     const vis = [];
-    const faces = trimInternal(scene.faces);
+    const faces = trimInternal(scene.faces, scene.E);
     for (const f of faces) {
       if (f.hide) continue;
       if (dot(f.n, cam.v) < -1e-7) { const P2 = f.pts.map(cam.P); f.area = Math.abs(area2(P2)); vis.push(Object.assign({}, f)); }
     }
     vis.sort((a, b) => b.area - a.area);
     const order = traverse(bsp(vis), cam.v, []);
+    // casters, bucketed in sun-space
+    const e1 = nrm(Math.abs(L[2]) > 0.999 ? [1, 0, 0] : cross(L, [0, 0, 1])), e2 = cross(L, e1);
+    const GS = opts.grid || 30;
     const casters = faces.filter(f => f.cast && !f.decal && dot(f.n, L) > 1e-6);
-    const out = []; const sw = opts.seam == null ? 0.42 : opts.seam;
+    const grid = new Map();
+    const sbb = (P) => { let a = 1e9, b = 1e9, c = -1e9, d = -1e9; for (const p of P) { const u = dot(p, e1), v = dot(p, e2); if (u < a) a = u; if (u > c) c = u; if (v < b) b = v; if (v > d) d = v; } return [a, b, c, d]; };
+    casters.forEach((c, ci) => {
+      c.ci = ci; const bb = sbb(c.pts);
+      for (let i = Math.floor(bb[0] / GS); i <= Math.floor(bb[2] / GS); i++) for (let j = Math.floor(bb[1] / GS); j <= Math.floor(bb[3] / GS); j++) {
+        const key = i + ',' + j; let l = grid.get(key); if (!l) grid.set(key, l = []); l.push(c);
+      }
+    });
+    const query = (bb) => {
+      const i0 = Math.floor(bb[0] / GS), i1 = Math.floor(bb[2] / GS), j0 = Math.floor(bb[1] / GS), j1 = Math.floor(bb[3] / GS);
+      if ((i1 - i0 + 1) * (j1 - j0 + 1) > 4000) return casters;
+      const seen = new Set(), res = [];
+      for (let i = i0; i <= i1; i++) for (let j = j0; j <= j1; j++) { const l = grid.get(i + ',' + j); if (l) for (const c of l) if (!seen.has(c.ci)) { seen.add(c.ci); res.push(c); } }
+      return res;
+    };
+    const inShadow = (p, sid) => {
+      const u = dot(p, e1), v = dot(p, e2); const l = grid.get(Math.floor(u / GS) + ',' + Math.floor(v / GS)); if (!l) return false;
+      for (const c of l) {
+        if (c.sid === sid) continue;
+        const den = dot(c.n, L); if (den < 1e-9) continue;
+        const t = (dot(c.n, c.pts[0]) - dot(c.n, p)) / den; if (t <= 0.2) continue;
+        const q = add(p, mul(L, t)); let inside = true;
+        for (let i = 0; i < c.pts.length; i++) { const a = c.pts[i], b = c.pts[(i + 1) % c.pts.length]; if (dot(cross(sub(b, a), sub(q, a)), c.n) < -1e-6) { inside = false; break; } }
+        if (inside) return true;
+      }
+      return false;
+    };
+    const out = []; const sw = opts.seam == null ? 0.42 : opts.seam, ssw = opts.shadowSeam || 0.7;
     for (const f of order) {
       const k = dot(f.n, L);
-      const lit = k > 1e-6 && !(f.mat.flat && !f.mat.sh);
+      let lit = k > 1e-6 && !(f.mat.flat && !f.mat.sh);
       const P2 = f.pts.map(cam.P);
-      if (Math.abs(area2(P2)) < 0.02) continue;
+      const A2 = Math.abs(area2(P2)); if (A2 < 0.02) continue;
+      if (lit && f.recv !== false && A2 < (opts.smallArea || 900)) {
+        // small receivers entirely in shadow are painted as shadow (avoids seams between many slivers)
+        const c = centroid(f.pts); const pts = f.pts.map(p => lerp3(p, c, 0.02));
+        if (pts.every(p => inShadow(p, f.sid))) lit = false;
+      }
       const col = tone(f.mat, f.n, L, lit);
       out.push(`<path d="${pathD(P2)}" fill="${col}" stroke="${col}" stroke-width="${sw}" stroke-linejoin="round"/>`);
-      if (!lit || f.recv === false) continue;
+      if (lit && f.recv !== false) {
       const d0 = dot(f.n, f.pts[0]); const shCol = tone(f.mat, f.n, L, false);
       const shs = [];
-      for (const c of casters) {
+      for (const c of query(sbb(f.pts))) {
         if (c.sid === f.sid) continue;
         let any = false; for (const p of c.pts) if (dot(f.n, p) - d0 > 0.05) { any = true; break; }
         if (!any) continue;
@@ -261,7 +298,20 @@
         const cl = clip2(pr, P2); if (cl.length < 3 || Math.abs(area2(cl)) < 0.05) continue;
         shs.push(area2(cl) < 0 ? cl.reverse() : cl);
       }
-      if (shs.length) out.push(`<path d="${shs.map(pathD).join('')}" fill="${shCol}" stroke="${shCol}" stroke-width="${sw}" stroke-linejoin="round"/>`);
+      if (shs.length) out.push(`<path d="${shs.map(pathD).join('')}" fill="${shCol}" stroke="${shCol}" stroke-width="${ssw}" stroke-linejoin="round"/>`);
+      }
+      // masonry coursing on vertical faces
+      const cs = f.mat.course;
+      if (cs && Math.abs(f.n[2]) < 0.2 && !f.decal) {
+        let z0 = 1e9, z1 = -1e9; for (const p of f.pts) { z0 = Math.min(z0, p[2]); z1 = Math.max(z1, p[2]); }
+        const segs = [];
+        for (let z = Math.ceil((z0 + 0.5) / cs) * cs; z < z1 - 0.5; z += cs) {
+          const hit = [];
+          for (let i = 0; i < f.pts.length; i++) { const a = f.pts[i], b = f.pts[(i + 1) % f.pts.length]; if ((a[2] - z) * (b[2] - z) < 0) { const t = (z - a[2]) / (b[2] - a[2]); hit.push(cam.P(lerp3(a, b, t))); } }
+          if (hit.length === 2) segs.push('M' + f1(hit[0][0]) + ' ' + f1(hit[0][1]) + 'L' + f1(hit[1][0]) + ' ' + f1(hit[1][1]));
+        }
+        if (segs.length) out.push(`<path d="${segs.join('')}" stroke="${f.mat.courseCol || '#3a0d05'}" stroke-opacity="${f.mat.courseOp || 0.16}" stroke-width="${f.mat.courseW || 0.7}" fill="none"/>`);
+      }
     }
     return out.join('');
   }

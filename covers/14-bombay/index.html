@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Signboard — Vizuara Books cover system</title>
+<title>Signboard — Vizuara Books</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anek+Latin:wdth,wght@75,600;75,700;75,800;100,500;100,600;100,700&family=Anek+Devanagari:wdth,wght@100,600;100,700&family=Yellowtail&display=block" rel="stylesheet">
@@ -11,17 +11,93 @@
 :root{
   --red:#CF2A1E; --oxblood:#7E1710; --yellow:#F3B21B; --green:#0E6641; --blue:#1F3A93;
   --firozi:#11837E; --maroon:#6D1A24; --coal:#16120F; --chuna:#F4EBD6; --paper:#FBF4E4;
+  --wall:#E9E1CF;
 }
 *{box-sizing:border-box}
-html,body{margin:0;background:#E9E2D2;color:var(--coal)}
-body{font-family:'Anek Latin',system-ui,sans-serif;font-stretch:100%}
-.covers{display:flex;flex-wrap:wrap;gap:56px 48px;padding:24px 64px 80px}
-.cover{width:720px;height:888px;position:relative;overflow:hidden;flex:none;box-shadow:0 2px 0 rgba(0,0,0,.08),0 18px 40px -18px rgba(40,20,0,.45)}
-.cover svg{display:block}
+html,body{margin:0;background:var(--wall);color:var(--coal)}
+body{font-family:'Anek Latin',system-ui,sans-serif;font-stretch:100%;font-size:18px;line-height:1.5}
+.intro{padding:56px 48px 24px;max-width:1600px}
+.masthead{display:grid;grid-template-columns:minmax(0,760px) minmax(0,1fr);gap:48px;align-items:start}
+.mast-board{background:var(--coal);padding:0;line-height:0}
+.lede{font-size:21px;line-height:1.45;margin:0 0 14px;max-width:62ch}
+.lede b{font-weight:700}
+.kicker{font-stretch:75%;font-weight:700;letter-spacing:.18em;font-size:14px;text-transform:uppercase;margin:0 0 10px}
+.facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:28px;margin:40px 0 8px;border-top:3px solid var(--coal);padding-top:22px}
+.facts h3{font-stretch:75%;font-weight:800;letter-spacing:.14em;font-size:14px;text-transform:uppercase;margin:0 0 10px}
+.facts p{margin:0 0 8px;font-size:16px;line-height:1.45}
+.swatches{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+.sw{width:96px}
+.sw i{display:block;height:54px;border:2px solid var(--coal)}
+.sw span{display:block;font-size:12.5px;line-height:1.25;margin-top:5px;font-stretch:75%;font-weight:700;letter-spacing:.04em}
+.sw em{font-style:normal;font-weight:500;opacity:.8}
+.specimen{background:var(--paper);border:2px solid var(--coal);padding:14px 16px;margin-top:8px}
+.specimen .yt{font-family:Yellowtail;font-size:40px;line-height:1;color:var(--red)}
+.specimen .an{font-stretch:75%;font-weight:800;letter-spacing:.16em;font-size:15px}
+.specimen .dv{font-family:'Anek Devanagari';font-weight:600;font-size:24px;line-height:1.2}
+.legend{display:flex;gap:18px;align-items:center;margin-top:8px}
+.section-title{padding:28px 48px 0;margin:0;font-stretch:75%;font-weight:800;letter-spacing:.18em;font-size:15px;text-transform:uppercase;display:flex;gap:16px;align-items:center}
+.section-title:after{content:"";flex:1;border-top:3px solid var(--coal)}
+.covers{display:flex;flex-wrap:wrap;gap:56px 48px;padding:28px 48px 40px}
+figure{margin:0}
+figcaption{font-stretch:75%;font-weight:700;letter-spacing:.08em;font-size:14px;margin-top:12px;text-transform:uppercase;max-width:720px;display:flex;justify-content:space-between;gap:12px}
+figcaption span:last-child{font-weight:500;letter-spacing:.02em;text-transform:none;font-stretch:100%;opacity:.75;text-align:right}
+.cover{width:720px;height:888px;position:relative;overflow:hidden;flex:none;box-shadow:0 2px 0 rgba(0,0,0,.08),0 22px 44px -22px rgba(40,20,0,.5)}
+.cover svg,.wrap svg{display:block}
+.wrap{width:1500px;height:888px;position:relative;overflow:hidden;box-shadow:0 22px 44px -22px rgba(40,20,0,.5)}
+.wrap-holder{padding:28px 48px 90px}
+.foot{padding:0 48px 80px;max-width:1100px;font-size:15.5px}
 </style>
 </head>
 <body>
-<section class="covers" id="covers"></section>
+
+<header class="intro">
+  <div class="masthead">
+    <div class="mast-board" id="mast"></div>
+    <div>
+      <p class="kicker">Direction 14 · Vizuara Books cover system</p>
+      <p class="lede"><b>Signboard.</b> Every Vizuara book is lettered like a Bombay shop board and labelled like a Sivakasi matchbox: one bespoke, hand-built display letter — outline, inline, split-colour fill and block shadow — painted on a flat enamel ground, with a printed label that carries the one object the book is about.</p>
+      <p class="lede">The street supplies the craft, the publisher supplies the discipline. The board colour tells you the shelf, the perforated stamp tells you the level, the label tells you the idea, and the imprint signs off quietly at the foot — in Latin and Devanagari at equal size, the way Maharashtra's shop-sign rule asks Marathi to stand beside English.</p>
+      <div class="legend" id="legend"></div>
+    </div>
+  </div>
+  <div class="facts">
+    <div>
+      <h3>Enamel palette</h3>
+      <div class="swatches" id="swatches"></div>
+    </div>
+    <div>
+      <h3>Board colour = shelf</h3>
+      <p>Seven tins, one per part of the library: <b>Chrome</b> Foundations · <b>Signal Red</b> Neural Networks · <b>Maroon</b> Language Models · <b>Bottle Green</b> Agents &amp; Context · <b>Post Blue</b> Systems &amp; Scale · <b>Firozi</b> Vision &amp; Robotics · <b>Coal</b> for the Charlie sub-series.</p>
+      <p>Letters are always Chuna over Chrome with a Signal Red inline and a coal keyline; the yellow shelf inverts to red letters.</p>
+    </div>
+    <div>
+      <h3>Level = the stamp</h3>
+      <p>A perforated stamp pasted on the label's corner. It heats up with difficulty: <b>1</b> Chrome (Beginner), <b>2</b> Signal Red (Intermediate), <b>3</b> Coal (Advanced). Legible at 180px; survives greyscale because the three fields are light, mid and dark.</p>
+      <h3 style="margin-top:18px">Grid</h3>
+      <p>24px safe edge, painted double rule at 16/25px, title board 58–436, label 96–624 × 470–788, imprint baseline 842.</p>
+    </div>
+    <div>
+      <h3>Type</h3>
+      <div class="specimen">
+        <div id="spec-board"></div>
+        <div class="yt">from Scratch · and the · vs</div>
+        <div class="an">ANEK LATIN — EK TYPE, MUMBAI</div>
+        <div class="dv">विज़ुआरा बुक्स · अनेक देवनागरी</div>
+      </div>
+      <p style="margin-top:10px"><b>Board Block</b>: a skeleton alphabet drawn in code for this system. <b>Yellowtail</b> for sign-painter connectives only. <b>Anek Latin / Devanagari</b> (Ek Type, Mumbai) for everything that has to be read rather than seen.</p>
+    </div>
+  </div>
+</header>
+
+<h2 class="section-title">The covers — core set</h2>
+<section class="covers" id="covers-core"></section>
+<h2 class="section-title">Range — sub-series, long titles, short titles, coming soon</h2>
+<section class="covers" id="covers-range"></section>
+<h2 class="section-title">Print wrap — back · spine · front</h2>
+<div class="wrap-holder" id="wrap-holder"></div>
+<section class="foot">
+  <p><b>Credits &amp; production.</b> Board Block is a code-drawn homage to the working method of Mumbai's sign painters, not a copy of any painter's hand. A production run should commission a working signboard painter to paint each series lockup (and the Vizuara imprint) by hand for the special editions and launch boards, credited on the copyright page by name and shop; and a Sivakasi label printer for a limited run of litho labels.</p>
+</section>
 
 <script src="board.js"></script>
 <script>
@@ -29,24 +105,29 @@ body{font-family:'Anek Latin',system-ui,sans-serif;font-stretch:100%}
    SIGNBOARD — the cover system
    ========================================================================== */
 const P = {
-  red:'#CF2A1E', oxblood:'#7E1710', yellow:'#F3B21B', yellowLt:'#F7CF63', green:'#0E6641', greenDk:'#07402A', greenLt:'#1E7A52',
-  blue:'#1F3A93', blueDk:'#12235C', blueLt:'#3050A8', firozi:'#11837E', firoziDk:'#0A5553', maroon:'#6D1A24', maroonDk:'#420D14',
-  coal:'#16120F', chuna:'#F4EBD6', paper:'#FBF4E4', redDk:'#9B1D14',
+  red:'#CF2A1E', redDk:'#9B1D14', oxblood:'#7E1710', yellow:'#F3B21B', yellowLt:'#F7CF63',
+  green:'#0E6641', greenDk:'#07402A', blue:'#1F3A93', blueDk:'#12235C', firozi:'#11837E', firoziDk:'#0A5553',
+  maroon:'#6D1A24', maroonDk:'#420D14', coal:'#16120F', chuna:'#F4EBD6', paper:'#FBF4E4',
 };
-// Shelves: the board colour tells you which part of the library a book is from.
+const LETTER = {fillTop:P.chuna, fillBot:P.yellow, outline:P.coal, inline:P.red};
 const SHELF = {
-  foundations:{name:'Foundations', board:P.yellow, rule:P.coal, ink:P.coal, ray:[P.yellow,'#F6C84A'],
-    letter:{fillTop:P.red, fillBot:P.redDk, outline:P.coal, shadow:P.coal, inline:P.chuna}, script:P.red},
-  deep:{name:'Neural Networks', board:P.red, rule:P.chuna, ink:P.chuna, ray:[P.red,'#DA4A36'],
-    letter:{fillTop:P.chuna, fillBot:P.yellow, outline:P.coal, shadow:P.oxblood, inline:P.red}, script:P.yellow},
-  language:{name:'Language Models', board:P.maroon, rule:P.chuna, ink:P.chuna, ray:[P.maroon,'#86303A'],
-    letter:{fillTop:P.chuna, fillBot:P.yellow, outline:P.coal, shadow:P.maroonDk, inline:P.red}, script:P.yellow},
-  agents:{name:'Agents & Context', board:P.green, rule:P.chuna, ink:P.chuna, ray:[P.green,'#2A8358'],
-    letter:{fillTop:P.chuna, fillBot:P.yellow, outline:P.coal, shadow:P.greenDk, inline:P.red}, script:P.yellow},
-  systems:{name:'Systems & Scale', board:P.blue, rule:P.chuna, ink:P.chuna, ray:[P.blue,'#3A57AE'],
-    letter:{fillTop:P.chuna, fillBot:P.yellow, outline:P.coal, shadow:P.blueDk, inline:P.red}, script:P.yellow},
-  vision:{name:'Vision & Robotics', board:P.firozi, rule:P.chuna, ink:P.chuna, ray:[P.firozi,'#2C9790'],
-    letter:{fillTop:P.chuna, fillBot:P.yellow, outline:P.coal, shadow:P.firoziDk, inline:P.red}, script:P.yellow},
+  foundations:{name:'Foundations', board:P.yellow, rule:P.coal, ink:P.coal, ray:[P.yellow,'#F7C544'],
+    letter:{fillTop:P.red, fillBot:P.redDk, outline:P.coal, shadow:P.coal, inline:P.chuna}, script:P.red, tag:P.chuna},
+  deep:{name:'Neural Networks', board:P.red, rule:P.chuna, ink:P.chuna, ray:[P.red,'#D8402F'],
+    letter:{...LETTER, shadow:P.oxblood}, script:P.yellow, tag:P.yellow},
+  language:{name:'Language Models', board:P.maroon, rule:P.chuna, ink:P.chuna, ray:[P.maroon,'#80293A'],
+    letter:{...LETTER, shadow:P.maroonDk}, script:P.yellow, tag:P.yellow},
+  agents:{name:'Agents & Context', board:P.green, rule:P.chuna, ink:P.chuna, ray:[P.green,'#227954'],
+    letter:{...LETTER, shadow:P.greenDk}, script:P.yellow, tag:P.yellow},
+  systems:{name:'Systems & Scale', board:P.blue, rule:P.chuna, ink:P.chuna, ray:[P.blue,'#3150A6'],
+    letter:{...LETTER, shadow:P.blueDk}, script:P.yellow, tag:P.yellow},
+  vision:{name:'Vision & Robotics', board:P.firozi, rule:P.chuna, ink:P.chuna, ray:[P.firozi,'#26958E'],
+    letter:{...LETTER, shadow:P.firoziDk}, script:P.yellow, tag:P.yellow},
+  charlie:{name:'The Intelligence Factory', board:P.coal, rule:P.yellow, ink:P.yellow, ray:null,
+    letter:{...LETTER, shadow:P.red}, script:P.yellow, tag:P.yellow},
+};
+const ROOM = { // Charlie sub-series: the label carries the room's colour
+  language:[P.red,'#D8402F'], vision:[P.firozi,'#26958E'], sound:[P.blue,'#3150A6'], reasoning:[P.green,'#227954'],
 };
 const LEVEL = {
   1:{word:'BEGINNER', field:P.yellow, num:P.coal},
@@ -59,91 +140,134 @@ const textW = (t, font) => { ctx2d.font = font; return ctx2d.measureText(t).widt
 const esc = (s) => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
 const F = (n) => Math.round(n*100)/100;
 let SEQ = 0; const uid = (p='u') => p + (SEQ++);
+const SCRIPT = 'Yellowtail';
+const ANEK = `font-family="Anek Latin" font-stretch="75%"`;
 
-/* ---------- frame: painted double rule with ticket-notch corners ---------- */
 function notchRect(x, y, w, h, r){
   return `M${x+r} ${y}H${x+w-r}A${r} ${r} 0 0 0 ${x+w} ${y+r}V${y+h-r}A${r} ${r} 0 0 0 ${x+w-r} ${y+h}H${x+r}A${r} ${r} 0 0 0 ${x} ${y+h-r}V${y+r}A${r} ${r} 0 0 0 ${x+r} ${y}Z`;
 }
 
-/* ---------- title typesetting ---------- */
-const SCRIPT = 'Yellowtail';
-function scriptText(txt, x, y, size, fill, anchor='middle'){
-  const sh = Math.max(1.5, size*0.05);
-  return `<g font-family="${SCRIPT}" font-size="${size}" text-anchor="${anchor}">
-    <text x="${F(x+sh)}" y="${F(y+sh)}" fill="${P.coal}" stroke="${P.coal}" stroke-width="${F(size*0.09)}" stroke-linejoin="round">${esc(txt)}</text>
-    <text x="${F(x)}" y="${F(y)}" fill="${fill}" stroke="${P.coal}" stroke-width="${F(size*0.09)}" stroke-linejoin="round" paint-order="stroke">${esc(txt)}</text></g>`;
+/* ---------- lettering pieces ---------- */
+function scriptText(txt, x, y, size, fill, anchor='start'){
+  const sh = Math.max(1.5, size*0.055), sw = F(Math.max(2, size*0.085));
+  return `<g font-family="${SCRIPT}" font-size="${F(size)}" text-anchor="${anchor}" stroke-linejoin="round">
+    <text x="${F(x+sh)}" y="${F(y+sh)}" fill="${P.coal}" stroke="${P.coal}" stroke-width="${sw}">${esc(txt)}</text>
+    <text x="${F(x)}" y="${F(y)}" fill="${fill}" stroke="${P.coal}" stroke-width="${sw}" paint-order="stroke">${esc(txt)}</text></g>`;
+}
+function tradeStyle(sh, H){
+  const L = sh.letter;
+  return {fillTop:L.fillTop, fillBot:L.fillBot, outline:P.coal, shadow:L.shadow, depth:Math.max(2,H*0.1), o:Math.max(1.5,H*0.055)};
+}
+// an acronym tag: the sign-painter's small cartouche ("Regd.", "Estd.") used for (LLMs), (DeiT) ...
+function tagPiece(txt, H, sh){
+  const size = H*0.4, pad = size*0.55;
+  const w = textW(txt, `800 ${size}px "Anek Latin"`) * 0.86 + pad*2, h = size*1.3;
+  const y0 = H*0.5 - h/2;
+  const svg = `<rect x="${F(2)}" y="${F(y0+3)}" width="${F(w)}" height="${F(h)}" rx="${F(h/2)}" fill="${P.coal}"/>
+    <rect x="0" y="${F(y0)}" width="${F(w)}" height="${F(h)}" rx="${F(h/2)}" fill="${sh.tag}" stroke="${P.coal}" stroke-width="${F(Math.max(2,H*0.035))}"/>
+    <text x="${F(w/2)}" y="${F(y0 + h*0.7)}" text-anchor="middle" ${ANEK} font-weight="800" font-size="${F(size)}" letter-spacing="${F(size*0.04)}" fill="${P.coal}">${esc(txt)}</text>`;
+  return {svg, w: w + 3};
+}
+// one mixed line: [{t:'BLOCK'},{s:'script'},{tt:'TRADE'},{tag:'LLMs'}] on a shared cap height H
+function mixLine(items, H0, sh, measure){
+  let H = H0;
+  for (let pass = 0; pass < 4; pass++) {
+    let x = 0, depth = 0; const parts = [];
+    items.forEach((it, i) => {
+      if (i) x += H * (it.s || (items[i-1] && items[i-1].s) ? 0.16 : 0.24);
+      if (it.t || it.tt) {
+        const txt = it.t || it.tt;
+        const u = (it.r || 0.56) * H;
+        const st = it.t ? sh.letter : tradeStyle(sh, H);
+        const p = Board.paint(txt, u, H, st, it.tt ? {track:0.7, space:0.7} : {});
+        parts.push(`<g transform="translate(${F(x)} 0)">${p.svg}</g>`);
+        x += p.w; depth = Math.max(depth, p.depth);
+      } else if (it.s) {
+        const size = H * (it.k || 1.0);
+        const w = textW(it.s, `${size}px ${SCRIPT}`);
+        parts.push(scriptText(it.s, x, H * (it.base || 0.94), size, sh.script));
+        x += w;
+      } else if (it.tag) {
+        const tg = tagPiece(it.tag, H, sh);
+        parts.push(`<g transform="translate(${F(x)} 0)">${tg.svg}</g>`);
+        x += tg.w;
+      }
+    });
+    const w = x + depth;
+    if (w <= measure || pass === 3) return {svg: parts.join(''), w, h: H, depth};
+    H *= (measure / w) * 0.995;
+  }
 }
 
-// lays out title lines; returns {svg, h}
+// lays out title lines, centred on x=0; returns {svg, h}
 function titleBlock(lines, sh, measure){
   const parts = []; let y = 0;
-  const L = sh.letter;
-  lines.forEach((ln, i) => {
+  for (const ln of lines) {
+    const gap = ln.gap != null ? ln.gap : null;
     if (ln.t) {
       const ft = Board.fit(ln.t, ln.H, ln.m || measure, {rmax: ln.rmax || 0.74, rmin: ln.rmin || 0.36});
-      const p = Board.paint(ln.t, ft.u, ft.H, L);
-      parts.push({svg:p.svg, w:p.w + p.depth, y, h:ft.H});
-      y += ft.H + p.depth + (ln.gap != null ? ln.gap : 14);
+      const p = Board.paint(ln.t, ft.u, ft.H, sh.letter);
+      parts.push({svg:p.svg, w:p.w + p.depth, y});
+      y += ft.H + p.depth + (gap != null ? gap : ft.H*0.12);
     } else if (ln.s) {
       const size = ln.size || 46;
       const w = textW(ln.s, `${size}px ${SCRIPT}`);
-      parts.push({svg:scriptText(ln.s, w/2, size*0.72, size, sh.script), w, y: y - size*0.12 + (ln.dy||0), h:size*0.6});
-      y += size*0.6 + (ln.gap != null ? ln.gap : 12);
+      parts.push({svg:scriptText(ln.s, 0, size*0.6, size, sh.script), w, y: y - size*0.08});
+      y += size*0.62 + (gap != null ? gap : 10);
     } else if (ln.tr) {
-      // trade line: small block letters, same enamel, between painted rules
       const H = ln.H || 28;
-      const st = {fillTop:L.fillTop, fillBot:L.fillBot, outline:P.coal, shadow:L.shadow, depth:H*0.1, o:Math.max(1.5,H*0.05)};
-      const ft = Board.fit(ln.tr, H, ln.m || measure*0.86, {rmax:0.62, rmin:0.34});
-      const p = Board.paint(ln.tr, ft.u, ft.H, st, {track:0.7});
-      parts.push({svg:p.svg, w:p.w, y, h:ft.H, rules:true});
-      y += ft.H + p.depth + (ln.gap != null ? ln.gap : 12);
-    } else if (ln.scratch) {
-      // the recurring "from SCRATCH" lockup
-      const H = ln.H || 50, size = H*1.05;
-      const ft = {u:H*0.6, H};
-      const p = Board.paint('SCRATCH', ft.u, ft.H, L);
-      const sw = textW('from', `${size}px ${SCRIPT}`);
-      const gapx = 12;
-      const tot = sw + gapx + p.w + p.depth;
-      const svg = scriptText('from', sw, H*0.92, size, sh.script, 'end') +
-        `<g transform="translate(${F(sw+gapx)} 0)">${p.svg}</g>`;
-      parts.push({svg, w:tot, y, h:H});
-      y += H + p.depth + (ln.gap != null ? ln.gap : 10);
+      const ft = Board.fit(ln.tr, H, ln.m || measure*0.9, {rmax:0.6, rmin:0.3, track:0.7, space:0.7});
+      const p = Board.paint(ln.tr, ft.u, ft.H, tradeStyle(sh, ft.H), {track:0.7, space:0.7});
+      parts.push({svg:p.svg, w:p.w + p.depth, y});
+      y += ft.H + p.depth + (gap != null ? gap : 12);
+    } else if (ln.mix) {
+      const m = mixLine(ln.mix, ln.H, sh, ln.m || measure);
+      parts.push({svg:m.svg, w:m.w, y});
+      y += m.h + m.depth + (gap != null ? gap : m.h*0.14);
     }
-  });
-  const h = y - 12;
+  }
+  const last = lines[lines.length-1];
+  const h = y - (last.gap != null ? last.gap : 12);
   const svg = parts.map((p) => `<g transform="translate(${F(-p.w/2)} ${F(p.y)})">${p.svg}</g>`).join('');
   return {svg, h};
 }
 
-/* ---------- label (the matchbox-label emblem panel) ---------- */
+/* ---------- label: the matchbox-label emblem panel ---------- */
 function rays(cx, cy, n, c1, c2, R=900){
   let s = `<rect x="-2000" y="-2000" width="4000" height="4000" fill="${c1}"/>`;
   for (let i = 0; i < n; i += 2) {
-    const a0 = (i/n)*Math.PI*2, a1 = ((i+1)/n)*Math.PI*2;
+    const a0 = (i/n)*Math.PI*2 - Math.PI/2, a1 = ((i+1)/n)*Math.PI*2 - Math.PI/2;
     s += `<path d="M${F(cx)} ${F(cy)}L${F(cx+R*Math.cos(a0))} ${F(cy+R*Math.sin(a0))}L${F(cx+R*Math.cos(a1))} ${F(cy+R*Math.sin(a1))}Z" fill="${c2}"/>`;
   }
   return s;
 }
 function label(book, sh, x, y, w, h){
   const id = uid('lb');
-  const capH = 44, footH = 34, pad = 12;
+  const capH = 46, footH = 34, pad = 12;
   const px = pad, py = capH, pw = w - pad*2, ph = h - capH - footH;
   const em = EMBLEM[book.emblem](pw, ph, sh, book);
-  const cap = Board.fit(book.cap, 21, pw - 40, {rmax:0.62, rmin:0.3});
+  const ray = book.room ? ROOM[book.room] : sh.ray;
+  const cap = Board.fit(book.cap, 21, pw - 110, {rmax:0.6, rmin:0.3, track:0.8, space:0.8});
   const capP = Board.paint(book.cap, cap.u, cap.H, {fillTop:P.coal, outline:P.coal, o:0, depth:0}, {track:0.8, space:0.8});
   const ctr = em.center || [pw/2, ph/2];
+  const foot = `${book.capsules ? `CONTENTS&#8195;${book.capsules} CAPSULES&#8194;·&#8194;${book.hours} HOUR${book.hours===1?'':'S'}` : 'CONTENTS&#8195;IN PREPARATION'}`;
   return `<g transform="translate(${x} ${y})">
     <defs><clipPath id="${id}"><rect x="${px}" y="${py}" width="${pw}" height="${ph}"/></clipPath></defs>
+    <path d="${notchRect(3,4,w,h,16)}" fill="${P.coal}" opacity=".45"/>
     <path d="${notchRect(0,0,w,h,16)}" fill="${P.paper}" stroke="${P.coal}" stroke-width="3"/>
     <path d="${notchRect(5,5,w-10,h-10,12)}" fill="none" stroke="${P.coal}" stroke-width="1.2"/>
-    <g transform="translate(${F((w-capP.w)/2)} ${F((capH-cap.H)/2+2)})">${capP.svg}</g>
+    <g transform="translate(${px + 12} ${F((capH-cap.H)/2+2)})">${capP.svg}</g>
     <g clip-path="url(#${id})"><g transform="translate(${px} ${py})">
-      ${rays(ctr[0], ctr[1], em.rays || 40, sh.ray[0], sh.ray[1])}
+      ${rays(ctr[0], ctr[1], em.rays || 44, ray[0], ray[1])}
       ${em.svg}
     </g></g>
     <rect x="${px}" y="${py}" width="${pw}" height="${ph}" fill="none" stroke="${P.coal}" stroke-width="3"/>
-    <text x="${w/2}" y="${h - footH/2 + 5}" text-anchor="middle" font-family="Anek Latin" font-stretch="75%" font-weight="700" font-size="14.5" letter-spacing="2.4" fill="${P.coal}">CONTENTS&#8195;${book.capsules} CAPSULES&#8194;·&#8194;${book.hours} HOURS</text>
+    <text x="${w/2}" y="${h - footH/2 + 5}" text-anchor="middle" ${ANEK} font-weight="700" font-size="14.5" letter-spacing="2.4" fill="${P.coal}">${foot}</text>
+    ${book.soon ? `<defs><clipPath id="${id}s"><path d="${notchRect(0,0,w,h,16)}"/></clipPath></defs>
+      <g clip-path="url(#${id}s)"><g transform="translate(0 ${h}) rotate(45)">
+        <rect x="-160" y="-86" width="320" height="38" fill="${P.yellow}" stroke="${P.coal}" stroke-width="3"/>
+        <text x="0" y="-60" text-anchor="middle" ${ANEK} font-weight="800" font-size="17" letter-spacing="3.4" fill="${P.coal}">COMING SOON</text>
+      </g></g>` : ''}
   </g>`;
 }
 
@@ -154,29 +278,32 @@ function stamp(level, x, y){
   let holes = '';
   for (let i = step/2; i < w; i += step) holes += `<circle cx="${F(i)}" cy="0" r="${pr}"/><circle cx="${F(i)}" cy="${h}" r="${pr}"/>`;
   for (let j = step/2; j < h; j += step) holes += `<circle cx="0" cy="${F(j)}" r="${pr}"/><circle cx="${w}" cy="${F(j)}" r="${pr}"/>`;
-  const num = Board.fit(String(level), 50, 60, {rmax:0.7});
+  const num = Board.fit(String(level), 48, 60, {rmax:0.72});
   const nP = Board.paint(String(level), num.u, num.H, {fillTop:Lv.num, outline:Lv.field, o:0, depth:0});
   return `<g transform="translate(${x} ${y})">
-    <defs><mask id="${id}"><rect x="-10" y="-10" width="${w+20}" height="${h+20}" fill="#fff"/><g fill="#000">${holes}</g></mask></defs>
-    <g mask="url(#${id})">
-      <rect x="1.5" y="1.5" width="${w}" height="${h}" fill="${P.coal}" opacity=".35"/>
-      <rect width="${w}" height="${h}" fill="${P.paper}"/>
-    </g>
+    <defs><mask id="${id}" maskUnits="userSpaceOnUse" x="-10" y="-10" width="${w+24}" height="${h+24}"><rect x="-10" y="-10" width="${w+24}" height="${h+24}" fill="#fff"/><g fill="#000">${holes}</g></mask></defs>
+    <rect x="3" y="4" width="${w}" height="${h}" fill="${P.coal}" opacity=".45" mask="url(#${id})"/>
+    <rect width="${w}" height="${h}" fill="${P.paper}" mask="url(#${id})"/>
     <rect x="8" y="8" width="${w-16}" height="${h-16}" fill="${Lv.field}" stroke="${P.coal}" stroke-width="1.5"/>
-    <text x="${w/2}" y="24" text-anchor="middle" font-family="Anek Latin" font-stretch="75%" font-weight="700" font-size="11" letter-spacing="2" fill="${Lv.num}">LEVEL</text>
+    <text x="${w/2}" y="24" text-anchor="middle" ${ANEK} font-weight="800" font-size="11" letter-spacing="2.2" fill="${Lv.num}">LEVEL</text>
     <g transform="translate(${F((w-nP.w)/2)} 31)">${nP.svg}</g>
-    <text x="${w/2}" y="${h-15}" text-anchor="middle" font-family="Anek Latin" font-stretch="75%" font-weight="700" font-size="${Lv.word.length>9?8.6:10.5}" letter-spacing="${Lv.word.length>9?0.8:1.6}" fill="${Lv.num}">${Lv.word}</text>
+    <text x="${w/2}" y="${h-15}" text-anchor="middle" ${ANEK} font-weight="800" font-size="${Lv.word.length>9?8.8:10.5}" letter-spacing="${Lv.word.length>9?0.7:1.6}" fill="${Lv.num}">${Lv.word}</text>
   </g>`;
 }
 
-/* ---------- imprint ---------- */
+/* ---------- imprint: bilingual, equal size ---------- */
+function vBadge(size, bg, fg){
+  const v = Board.paint('V', size*0.46, size*0.64, {fillTop:fg, outline:bg, o:0, depth:0});
+  return `<rect width="${size}" height="${size}" rx="${F(size*0.09)}" fill="${bg}"/>
+    <g transform="translate(${F(size/2 - v.w/2)} ${F(size*0.18)})">${v.svg}</g>`;
+}
 function imprint(sh, x, y){
-  const v = Board.paint('V', 17, 24, {fillTop:sh.board, outline:sh.board, o:0, depth:0});
+  const lat = 'VIZUARA BOOKS', dev = 'विज़ुआरा बुक्स';
+  const lw = textW(lat, `700 16px "Anek Latin"`) + 12*3.0;
   return `<g transform="translate(${x} ${y})">
-    <rect x="0" y="-26" width="36" height="36" rx="3" fill="${sh.ink}"/>
-    <g transform="translate(${F(18 - v.w/2)} -20)">${v.svg}</g>
-    <text x="48" y="-2" font-family="Anek Latin" font-stretch="100%" font-weight="700" font-size="17" letter-spacing="3.2" fill="${sh.ink}">VIZUARA BOOKS</text>
-    <text x="209" y="0" font-family="Anek Devanagari" font-weight="600" font-size="18" fill="${sh.ink}">विज़ुआरा</text>
+    <g transform="translate(0 -27)">${vBadge(36, sh.ink, sh.board)}</g>
+    <text x="48" y="-3" font-family="Anek Latin" font-weight="700" font-size="16" letter-spacing="3" fill="${sh.ink}">${lat}</text>
+    <text x="${F(48 + lw + 14)}" y="-1" font-family="Anek Devanagari" font-weight="600" font-size="19" fill="${sh.ink}">${dev}</text>
   </g>`;
 }
 
@@ -184,19 +311,27 @@ function imprint(sh, x, y){
 function cover(book){
   const sh = SHELF[book.shelf];
   const W = 720, H = 888;
+  let top = 58;
+  let series = '';
+  if (book.series) {
+    top = 86;
+    series = `<text x="${W/2}" y="64" text-anchor="middle" ${ANEK} font-weight="800" font-size="15" letter-spacing="3.4" fill="${sh.ink}">CHARLIE AND THE INTELLIGENCE FACTORY&#8195;·&#8195;BOOK ${book.series}</text>
+      <path d="M190 78H530" stroke="${sh.ink}" stroke-width="2"/>`;
+  }
   const tb = titleBlock(book.title, sh, 612);
-  const top = 58, bottom = 436;
+  const bottom = 428;
   const ty = top + Math.max(0, (bottom - top - tb.h)/2);
   const Lx = 96, Ly = 470, Lw = 528, Lh = 318;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
     <rect width="${W}" height="${H}" fill="${sh.board}"/>
     <path d="${notchRect(16,16,W-32,H-32,22)}" fill="none" stroke="${sh.rule}" stroke-width="4"/>
     <path d="${notchRect(25,25,W-50,H-50,16)}" fill="none" stroke="${sh.rule}" stroke-width="1.5"/>
+    ${series}
     <g transform="translate(${W/2} ${F(ty)})">${tb.svg}</g>
     ${label(book, sh, Lx, Ly, Lw, Lh)}
-    ${stamp(book.level, Lx + Lw - 58, Ly - 38)}
-    ${imprint(sh, 48, 842)}
-    <text x="${W-48}" y="840" text-anchor="end" font-family="Anek Latin" font-stretch="75%" font-weight="700" font-size="15" letter-spacing="2.6" fill="${sh.ink}">${esc(sh.name.toUpperCase())}</text>
+    ${stamp(book.level, Lx + Lw - 58, Ly - 32)}
+    ${imprint(sh, 48, 846)}
+    <text x="${W-48}" y="843" text-anchor="end" ${ANEK} font-weight="700" font-size="15" letter-spacing="2.6" fill="${sh.ink}">${esc(sh.name.toUpperCase())}</text>
   </svg>`;
 }
 
@@ -205,129 +340,488 @@ function cover(book){
    Litho-label rules: flat enamel colours, 3px coal keyline, one object.
    ========================================================================== */
 const K = 3;
+const R_ = (x,y,w,h,fill,sw=K,extra='') => `<rect x="${F(x)}" y="${F(y)}" width="${F(w)}" height="${F(h)}" fill="${fill}" stroke="${P.coal}" stroke-width="${sw}" ${extra}/>`;
+const C_ = (x,y,r,fill,sw=K) => `<circle cx="${F(x)}" cy="${F(y)}" r="${F(r)}" fill="${fill}" stroke="${P.coal}" stroke-width="${sw}"/>`;
+const Ln = (x1,y1,x2,y2,sw=K,col=P.coal,extra='') => `<line x1="${F(x1)}" y1="${F(y1)}" x2="${F(x2)}" y2="${F(y2)}" stroke="${col}" stroke-width="${sw}" ${extra}/>`;
+const tagT = (x,y,t,anchor='middle',size=14) => {
+  const w = textW(t, `800 ${size}px "Anek Latin"`)*0.8 + 14, h = size + 9;
+  const x0 = anchor==='middle' ? x - w/2 : anchor==='end' ? x - w : x;
+  return `<rect x="${F(x0)}" y="${F(y - h/2)}" width="${F(w)}" height="${F(h)}" fill="${P.paper}" stroke="${P.coal}" stroke-width="2.4"/>
+    <text x="${F(x0 + w/2)}" y="${F(y + size*0.36)}" text-anchor="middle" ${ANEK} font-weight="800" font-size="${size}" letter-spacing="1.2" fill="${P.coal}">${t}</text>`;
+};
+const arrowHead = (x,y,ang,sz=13,col=P.coal) =>
+  `<path d="M${F(x)} ${F(y)}L${F(x - Math.cos(ang-0.5)*sz)} ${F(y - Math.sin(ang-0.5)*sz)}L${F(x - Math.cos(ang+0.5)*sz)} ${F(y - Math.sin(ang+0.5)*sz)}Z" fill="${col}"/>`;
+const arrow = (x1,y1,x2,y2,sw=4.5,col=P.coal,dash='') => {
+  const a = Math.atan2(y2-y1, x2-x1);
+  return Ln(x1,y1,x2-Math.cos(a)*9,y2-Math.sin(a)*9,sw,col,dash?`stroke-dasharray="${dash}"`:'') + arrowHead(x2,y2,a,15,col);
+};
+
 const EMBLEM = {
-  contextWindow(pw, ph, sh){
-    const cx = pw/2 + 60, cy = ph/2;
-    const ww = 150, wh = 184, wx = cx - ww/2, wy = cy - wh/2;
-    const slips = [[P.red,16],[P.blue,24],[P.green,20],[P.yellow,22],[P.yellow,16],[P.chuna,30],[P.red,14]];
+  /* AI Context Engineering — an overflowing pile of candidate context, and the
+     curated window it is packed into, with its token-budget gauge. */
+  contextWindow(pw, ph){
+    const wx = 268, wy = 22, ww = 150, wh = ph - 44, cx = wx + ww/2;
     let s = '';
-    // the pile (everything that could go in)
-    const px = 58, py = cy + 64;
-    const pile = [P.chuna,P.yellow,P.chuna,P.blue,P.chuna,P.red,P.chuna,P.green,P.chuna,P.yellow];
-    pile.forEach((c,i)=>{
-      const a = (i%2?1:-1)*(i*1.3), yy = py - i*13;
-      s += `<rect x="${px-44}" y="${yy}" width="88" height="11" fill="${c}" stroke="${P.coal}" stroke-width="2.4" transform="rotate(${a} ${px} ${yy+5})"/>`;
+    const cols = [P.paper,P.yellow,P.paper,P.blue,P.paper,P.paper,P.red,P.paper,P.green,P.paper,P.yellow,P.paper,P.paper,P.blue,P.paper,P.red,P.paper];
+    const jit = [0,6,-5,3,-7,5,-2,7,-4,2,-6,4,-3,6,-1,5,-5];
+    cols.forEach((c,i)=>{ const yy = ph - 22 - i*15; s += R_(40 + jit[i], yy, 104 - (i%3)*8, 12, c, 2.4); });
+    s += `<path d="M170 ${ph/2 - 6} C 198 ${ph/2 - 44}, 230 ${ph/2 - 44}, 252 ${ph/2 - 14}" fill="none" stroke="${P.coal}" stroke-width="5" stroke-linecap="round"/>` + arrowHead(258, ph/2 - 6, 0.95, 17);
+    s += `<rect x="${wx-10}" y="${wy-10}" width="${ww+20}" height="${wh+20}" fill="${P.coal}"/>`;
+    s += R_(wx, wy, ww, wh, P.paper);
+    const slips = [[P.red,14],[P.blue,24],[P.green,18],[P.yellow,26],[P.yellow,16],[P.paper,32],[P.red,14]];
+    let yy = wy + 7;
+    slips.forEach(([c,h])=>{
+      s += R_(wx+7, yy, ww-14, h, c, 2.4);
+      if (c === P.paper) for (let k=0;k<3;k++) s += Ln(wx+15, yy+8+k*7.5, wx+ww-(24+k*20), yy+8+k*7.5, 2);
+      yy += h + 4.5;
     });
-    // arrow into the window
-    s += `<path d="M${px+52} ${cy-40} C ${px+90} ${cy-78}, ${wx-40} ${cy-80}, ${wx-8} ${cy-50}" fill="none" stroke="${P.coal}" stroke-width="5" stroke-linecap="round"/>`;
-    s += `<path d="M${wx-4} ${cy-44} l-20 -2 l10 -16 z" fill="${P.coal}"/>`;
-    // window frame
-    s += `<rect x="${wx-9}" y="${wy-9}" width="${ww+18}" height="${wh+18}" fill="${P.coal}"/>`;
-    s += `<rect x="${wx}" y="${wy}" width="${ww}" height="${wh}" fill="${P.paper}" stroke="${P.coal}" stroke-width="${K}"/>`;
-    let yy = wy + 6;
-    slips.forEach(([c,h],i)=>{
-      s += `<rect x="${wx+7}" y="${yy}" width="${ww-14}" height="${h}" fill="${c}" stroke="${P.coal}" stroke-width="2.4"/>`;
-      if (c === P.chuna) for (let k=0;k<3;k++) s += `<line x1="${wx+15}" x2="${wx+ww-(20+k*18)}" y1="${yy+7+k*8}" y2="${yy+7+k*8}" stroke="${P.coal}" stroke-width="2"/>`;
-      yy += h + 4;
-    });
-    // budget gauge
-    const gx = wx + ww + 22;
-    s += `<rect x="${gx-5}" y="${wy}" width="10" height="${wh}" fill="${P.paper}" stroke="${P.coal}" stroke-width="2.4"/>`;
-    s += `<rect x="${gx-5}" y="${wy + wh*0.12}" width="10" height="${wh*0.88}" fill="${P.red}" stroke="${P.coal}" stroke-width="2.4"/>`;
-    for (let k=0;k<=8;k++) s += `<line x1="${gx+5}" x2="${gx+11}" y1="${wy + k*wh/8}" y2="${wy + k*wh/8}" stroke="${P.coal}" stroke-width="2"/>`;
-    return {svg:s, center:[cx, cy], rays:44};
+    const gx = wx + ww + 32;
+    s += R_(gx-6, wy, 12, wh, P.paper, 2.4) + R_(gx-6, wy + wh*0.08, 12, wh*0.92, P.red, 2.4);
+    for (let k=0;k<=8;k++) s += Ln(gx+6, wy + k*wh/8, gx+13, wy + k*wh/8, 2.2);
+    return {svg:s, center:[cx, ph/2], rays:44};
   },
-  network(pw, ph, sh){
+
+  /* Mathematical Foundations — gradient descent: a ball on a curve, its tangent,
+     and the shrinking steps down to the minimum. */
+  gradient(pw, ph){
+    const cx = pw/2 + 56, bottom = ph - 36, a = 0.0046;
+    const f = (x) => bottom - a*(x - cx)*(x - cx);
+    const fp = (x) => -2*a*(x - cx);
+    let d = '';
+    for (let x = -20; x <= pw + 20; x += 4) d += (d ? 'L' : 'M') + `${F(x)} ${F(f(x))}`;
+    let s = `<path d="${d}L${pw+20} ${ph+20}L-20 ${ph+20}Z" fill="${P.paper}" stroke="${P.coal}" stroke-width="4.5" stroke-linejoin="round"/>`;
+    for (let k = 1; k <= 3; k++) {
+      let dd = '';
+      for (let x = -20; x <= pw+20; x += 4) dd += (dd?'L':'M') + `${F(x)} ${F(f(x) + k*13)}`;
+      s += `<path d="${dd}" fill="none" stroke="${P.coal}" stroke-width="2" stroke-dasharray="2 7" stroke-linecap="round"/>`;
+    }
+    const xs = [cx-150, cx-94, cx-56, cx-30, cx-14, cx-5];
+    const lift = (x, r) => { const sl = fp(x), n = Math.hypot(sl, 1); return [x + sl/n*r, f(x) - 1/n*r]; };
+    for (let i = 0; i < xs.length-1; i++) {
+      const [x1,y1] = lift(xs[i], i ? 8 : 20), [x2,y2] = lift(xs[i+1], 8);
+      const mx = (x1+x2)/2, my = Math.min(y1,y2) - 30 + i*4;
+      s += `<path d="M${F(x1)} ${F(y1)}Q${F(mx)} ${F(my)} ${F(x2)} ${F(y2)}" fill="none" stroke="${P.coal}" stroke-width="3" stroke-dasharray="6 5"/>`;
+    }
+    xs.slice(1).forEach((x)=>{ const [bx,by] = lift(x, 7); s += C_(bx, by, 6.5, P.yellow, 2.4); });
+    // flag at the minimum
+    s += Ln(cx + 26, f(cx+26) + 1, cx + 26, f(cx+26) - 58, 3) + `<path d="M${cx+26} ${F(f(cx+26)-58)}l28 9l-28 9z" fill="${P.red}" stroke="${P.coal}" stroke-width="2.4" stroke-linejoin="round"/>`;
+    // the ball and its tangent
+    const x0 = xs[0], sl = fp(x0), n = Math.hypot(1, sl), tx = 1/n, ty = sl/n, L = 118;
+    s += Ln(x0 - tx*L, f(x0) - ty*L, x0 + tx*L, f(x0) + ty*L, 5, P.red, 'stroke-linecap="round"');
+    // rise over run
+    const px = x0 + tx*52, py = f(x0) + ty*52;
+    s += `<path d="M${F(px)} ${F(py)}H${F(px + 40)}V${F(py + sl*40)}" fill="none" stroke="${P.coal}" stroke-width="3"/>`;
+    const [bx, by] = lift(x0, 20);
+    s += C_(bx, by, 20, P.red) + `<circle cx="${F(bx-7)}" cy="${F(by-7)}" r="5" fill="${P.paper}"/>`;
+    return {svg:s, center:[cx, f(cx) - 20], rays:44};
+  },
+
+  /* Neural Networks from Scratch — a 3-4-4-2 multilayer perceptron; weight shown
+     by line weight, each hidden unit carrying its activation curve. */
+  network(pw, ph){
     const cx = pw/2, cy = ph/2;
-    const layers = [3,4,4,2], gapx = 104, r = 17;
+    const layers = [3,4,4,2], gapx = 112, r = 18;
     const X = (i) => cx + (i - (layers.length-1)/2)*gapx;
-    const Y = (n, j) => cy + (j - (n-1)/2)*48;
-    let e = '', nodes = '';
-    const wts = [0.9,-0.4,0.2,0.7,-0.8,0.3,0.5,-0.2,0.8,0.1,-0.6,0.4,0.6,-0.3,0.9,0.2,-0.7,0.5,0.3,-0.4,0.8,-0.1,0.6,0.2,-0.5,0.7,0.4,-0.9,0.3,0.6,-0.2,0.5,0.1,-0.6,0.8,0.3];
-    let q = 0;
+    const Y = (n, j) => cy + (j - (n-1)/2)*50;
+    const wts = [0.9,0.3,0.2,0.7,0.1,0.3,0.5,0.2,0.8,0.1,0.6,0.4,0.6,0.1,0.9,0.2,0.2,0.5,0.3,0.4,0.8,0.1,0.6,0.2,0.2,0.7,0.4,0.9,0.3,0.6,0.2,0.5,0.1,0.6,0.8,0.3];
+    let e = '', nodes = '', q = 0;
     for (let i = 0; i < layers.length-1; i++)
       for (let a = 0; a < layers[i]; a++) for (let b = 0; b < layers[i+1]; b++) {
         const wv = wts[(q++)%wts.length];
-        e += `<line x1="${F(X(i))}" y1="${F(Y(layers[i],a))}" x2="${F(X(i+1))}" y2="${F(Y(layers[i+1],b))}" stroke="${wv<0?P.coal:P.coal}" stroke-width="${F(1.5+Math.abs(wv)*4)}" ${wv<0?'stroke-dasharray="5 4"':''}/>`;
+        e += Ln(X(i), Y(layers[i],a), X(i+1), Y(layers[i+1],b), F(1.6 + wv*4.6));
       }
     layers.forEach((n,i)=>{ for (let j=0;j<n;j++){
       const x = X(i), y = Y(n,j);
-      const fill = i===0?P.paper : i===layers.length-1?P.red : P.yellow;
-      nodes += `<circle cx="${F(x)}" cy="${F(y)}" r="${r}" fill="${fill}" stroke="${P.coal}" stroke-width="${K}"/>`;
-      if (i>0 && i<layers.length-1) nodes += `<path d="M${F(x-10)} ${F(y+6)} C ${F(x-2)} ${F(y+6)}, ${F(x+2)} ${F(y-6)}, ${F(x+10)} ${F(y-6)}" fill="none" stroke="${P.coal}" stroke-width="2.4"/>`;
+      const last = i === layers.length-1;
+      nodes += C_(x, y, r, i===0?P.paper : last?P.coal : P.yellow);
+      if (i>0 && !last) nodes += `<path d="M${F(x-11)} ${F(y+6)} C ${F(x-1)} ${F(y+7)}, ${F(x+1)} ${F(y-7)}, ${F(x+11)} ${F(y-6)}" fill="none" stroke="${P.coal}" stroke-width="2.6"/>`;
+      if (last) nodes += `<circle cx="${F(x)}" cy="${F(y)}" r="6" fill="${P.yellow}"/>`;
     }});
-    return {svg:e+nodes, rays:40};
+    return {svg:e+nodes, rays:44};
   },
-  cube5d(pw, ph, sh){
-    const cx = pw/2, cy = ph/2 + 14, s = 38;
-    const c30 = Math.cos(Math.PI/6), s30 = 0.5;
-    const iso = (x,y,z) => [cx + (x - y)*c30*s, cy + (x + y)*s30*s - z*s];
+
+  /* Build LLMs from Scratch — the causal attention mask: each token may attend only
+     to itself and what came before; the future is struck out. */
+  causalMask(pw, ph){
+    const n = 7, c = 26, gx = pw/2 - (n*c)/2 + 6, gy = ph/2 - (n*c)/2;
+    const wt = [[3],[2,3],[1,2,3],[1,1,3,2],[2,1,1,2,3],[1,2,1,1,2,3],[1,1,2,1,1,2,3]];
+    const col = {1:P.paper, 2:P.yellow, 3:P.red};
+    let s = `<rect x="${gx-8}" y="${gy-8}" width="${n*c+16}" height="${n*c+16}" fill="${P.coal}"/>`;
+    for (let i=0;i<n;i++) for (let j=0;j<n;j++) {
+      const x = gx + j*c, y = gy + i*c;
+      if (j <= i) s += R_(x, y, c, c, col[wt[i][j]], 2.2);
+      else s += R_(x, y, c, c, P.chuna, 2.2) + Ln(x+7, y+c-7, x+c-7, y+7, 2.4, P.coal, 'opacity=".6"');
+    }
+    for (let i=0;i<n;i++) s += R_(gx - 44, gy + i*c + 3, 24, c-6, i===n-1?P.yellow:P.paper, 2.2);
+    const tx = gx + n*c + 70, ty = gy + n*c - 40;
+    s += `<path d="M${tx} ${ty-14}V${gy+34}H${gx+n*c-2}" fill="none" stroke="${P.coal}" stroke-width="3"/>` + arrowHead(gx + n*c - 4, gy + 34, Math.PI, 13);
+    s += tagT(tx, ty, 'FUTURE', 'middle', 13);
+    return {svg:s, center:[gx + n*c/2, gy + n*c/2], rays:44};
+  },
+
+  /* 5D Parallelism — the device mesh: two pipeline stages, each split four ways
+     by data and tensor; two further splits (expert, context) run off the drawing. */
+  mesh5d(pw, ph){
+    const O = [pw/2, ph/2 + 26];
+    const c30 = Math.cos(Math.PI/6);
+    const iso = (x,y,z) => [O[0] + (x - y)*c30, O[1] + (x + y)*0.5 - z];
     const pt = (a) => `${F(a[0])} ${F(a[1])}`;
-    const quad = (a,b,c,d,fill) => `<path d="M${pt(a)}L${pt(b)}L${pt(c)}L${pt(d)}Z" fill="${fill}" stroke="${P.coal}" stroke-width="${K}" stroke-linejoin="round"/>`;
-    const n = 2, off = -n/2;
-    let s1 = '';
-    // top face z = n (shifted to centre)
-    for (let i=0;i<n;i++) for (let j=0;j<n;j++){
-      const x = i+off, y = j+off, z = n/2;
-      s1 += quad(iso(x,y,z),iso(x+1,y,z),iso(x+1,y+1,z),iso(x,y+1,z), (i+j)%2?P.yellow:'#F7CF63');
-    }
-    // left face y = +n/2 (front-left)
-    for (let i=0;i<n;i++) for (let k=0;k<n;k++){
-      const x = i+off, y = n/2, z = k - n/2;
-      s1 += quad(iso(x,y,z),iso(x+1,y,z),iso(x+1,y,z+1),iso(x,y,z+1), (i+k)%2?P.red:'#E0493A');
-    }
-    // right face x = +n/2
-    for (let j=0;j<n;j++) for (let k=0;k<n;k++){
-      const x = n/2, y = j+off, z = k - n/2;
-      s1 += quad(iso(x,y,z),iso(x,y+1,z),iso(x,y+1,z+1),iso(x,y,z+1), (j+k)%2?P.paper:P.chuna);
-    }
-    // five axes
-    const axes = [
-      [iso(0,0,1)[0], iso(0,0,1)[1]-10, 0, -1, 'PIPELINE'],
-      [iso(-1.9,1,0)[0], iso(-1.9,1,0)[1], -1, 0.45, 'TENSOR'],
-      [iso(1,-1.9,0)[0], iso(1,-1.9,0)[1], 1, 0.45, 'DATA'],
-    ];
-    let ax = '';
-    const arrow = (x1,y1,x2,y2,lab,anchor) => {
-      const a = Math.atan2(y2-y1,x2-x1), hl = 13;
-      return `<line x1="${F(x1)}" y1="${F(y1)}" x2="${F(x2 - Math.cos(a)*hl*0.8)}" y2="${F(y2 - Math.sin(a)*hl*0.8)}" stroke="${P.coal}" stroke-width="4"/>` +
-        `<path d="M${F(x2)} ${F(y2)}L${F(x2 - Math.cos(a-0.45)*hl)} ${F(y2 - Math.sin(a-0.45)*hl)}L${F(x2 - Math.cos(a+0.45)*hl)} ${F(y2 - Math.sin(a+0.45)*hl)}Z" fill="${P.coal}"/>`;
+    const poly = (pts, fill, sw=K) => `<path d="M${pts.map(pt).join('L')}Z" fill="${fill}" stroke="${P.coal}" stroke-width="${sw}" stroke-linejoin="round"/>`;
+    const seg = (a, b, sw=2.4) => `<path d="M${pt(a)}L${pt(b)}" stroke="${P.coal}" stroke-width="${sw}"/>`;
+    const L = 76, hz = 28, gz = 20, x0 = -L/2, y0 = -L/2;
+    const slab = (z) => {
+      const x1 = x0 + L, y1 = y0 + L, z1 = z + hz, xm = x0 + L/2, ym = y0 + L/2;
+      return poly([iso(x0,y0,z1),iso(x1,y0,z1),iso(x1,y1,z1),iso(x0,y1,z1)], P.yellow) +
+        poly([iso(x0,y1,z),iso(x1,y1,z),iso(x1,y1,z1),iso(x0,y1,z1)], P.red) +
+        poly([iso(x1,y0,z),iso(x1,y1,z),iso(x1,y1,z1),iso(x1,y0,z1)], P.paper) +
+        seg(iso(xm,y0,z1), iso(xm,y1,z1)) + seg(iso(x0,ym,z1), iso(x1,ym,z1)) +
+        seg(iso(xm,y1,z), iso(xm,y1,z1)) + seg(iso(x1,ym,z), iso(x1,ym,z1));
     };
-    const top = iso(0,0,1), lf = iso(-1,1,-1), rt = iso(1,-1,-1);
-    ax += arrow(top[0], top[1]-6, top[0], top[1]-52);
-    const fl = iso(-1, 1, 0), fr = iso(1, -1, 0);
-    ax += arrow(fl[0]-4, fl[1]+2, fl[0]-62, fl[1]+32);
-    ax += arrow(fr[0]+4, fr[1]+2, fr[0]+62, fr[1]+32);
-    ax += arrow(cx - 150, cy - 30, cx - 214, cy - 30);
-    ax += arrow(cx + 150, cy - 30, cx + 214, cy - 30);
-    const lab = (x,y,t,a='middle') => `<text x="${F(x)}" y="${F(y)}" text-anchor="${a}" font-family="Anek Latin" font-stretch="75%" font-weight="800" font-size="15" letter-spacing="1.5" fill="${P.coal}">${t}</text>`;
-    ax += lab(top[0]+10, top[1]-40, 'PIPELINE', 'start');
-    ax += lab(fl[0]-66, fl[1]+52, 'TENSOR', 'middle');
-    ax += lab(fr[0]+66, fr[1]+52, 'DATA', 'middle');
-    ax += lab(cx - 214, cy - 40, 'EXPERT', 'start');
-    ax += lab(cx + 214, cy - 40, 'CONTEXT', 'end');
-    return {svg: ax + s1, center:[cx, cy], rays:40};
+    const zb = -(2*hz + gz)/2;
+    let ax = '';
+    const px = iso(118,0,zb+hz*0.5), py = iso(0,118,zb+hz*0.5), pz = iso(0,0,zb + 2*hz + gz + 44);
+    const o1 = iso(0,0,zb+hz*0.5);
+    ax += arrow(o1[0], o1[1], px[0], px[1], 4.5) + arrow(o1[0], o1[1], py[0], py[1], 4.5);
+    const top = iso(0,0,zb+2*hz+gz);
+    const body = slab(zb) + slab(zb + hz + gz);
+    const zAx = arrow(top[0], top[1] - 6, pz[0], pz[1], 4.5);
+    const ey = O[1] - 58;
+    ax += arrow(O[0] - 92, ey, O[0] - 200, ey, 4.5, P.coal, '9 6') + arrow(O[0] + 92, ey, O[0] + 200, ey, 4.5, P.coal, '9 6');
+    const lab = tagT(px[0] - 4, px[1] + 22, 'DATA', 'start') + tagT(py[0] + 4, py[1] + 22, 'TENSOR', 'end') +
+      tagT(pz[0] + 12, pz[1] + 12, 'PIPELINE', 'start') + tagT(O[0] - 200, ey - 24, 'EXPERT', 'start') + tagT(O[0] + 200, ey - 24, 'CONTEXT', 'end');
+    return {svg: ax + body + zAx + lab, center:[O[0], O[1] - 10], rays:40};
+  },
+
+  /* Pi vs Hermes vs Codex — the compaction press: a long history squeezed into a
+     dense block, and the block filed away in a memory drawer. */
+  press(pw, ph){
+    let s = '';
+    const base = ph - 14;
+    // the long history
+    const hist = [P.paper,P.yellow,P.paper,P.blue,P.paper,P.red,P.paper,P.paper,P.green,P.paper,P.yellow];
+    hist.forEach((c,i)=>{ s += R_(18 + (i%2)*4, base - 12 - i*16, 62, 12, c, 2.4); });
+    s += arrow(88, 124, 116, 124, 4.5);
+    // the press
+    const cx = 214;
+    s += R_(cx-100, 40, 14, base-40, P.coal, 0) + R_(cx+86, 40, 14, base-40, P.coal, 0);
+    s += R_(cx-112, 30, 224, 22, P.red);
+    s += R_(cx-8, 2, 16, 108, P.paper, 2.6);
+    for (let k=0;k<7;k++) s += Ln(cx-8, 60+k*7, cx+8, 64+k*7, 2.2);
+    s += R_(cx-62, 0, 124, 9, P.coal, 0) + C_(cx-66, 4.5, 9, P.yellow, 2.6) + C_(cx+66, 4.5, 9, P.yellow, 2.6);
+    s += R_(cx-80, 108, 160, 16, P.yellow);
+    s += R_(cx-70, 128, 140, base-128-10, P.paper);
+    for (let y = 133; y < base-12; y += 4.6) s += Ln(cx-70, y, cx+70, y, 1.6);
+    s += R_(cx-110, base-10, 220, 10, P.coal, 0);
+    // the drawer
+    const dx = 372, dy = 44, dw = 112, dh = base - dy;
+    s += R_(dx, dy, dw, dh, P.green);
+    const rh = (dh - 16)/3;
+    for (let k=0;k<3;k++) {
+      const yy = dy + 8 + k*rh;
+      if (k === 1) continue;
+      s += R_(dx+8, yy, dw-16, rh-6, P.yellow, 2.4) + R_(dx+dw/2-14, yy + rh/2 - 8, 28, 8, P.coal, 0);
+    }
+    // middle drawer pulled out, block going in
+    const my = dy + 8 + rh;
+    s += R_(dx - 34, my, dw - 16 + 26, rh - 6, P.yellow, 2.6) + R_(dx - 34 + 10, my + 8, dw - 50, rh - 22, P.paper, 2.2);
+    for (let y = my + 12; y < my + rh - 16; y += 4.4) s += Ln(dx - 24, y, dx + dw - 70, y, 1.4);
+    s += arrow(cx + 106, my + rh/2 - 3, dx - 40, my + rh/2 - 3, 4.5);
+    return {svg:s, center:[cx, 120], rays:44};
+  },
+
+  /* Charlie I · Language — the decode loop: tokens stamped out one at a time,
+     each new one fed back in. */
+  decodeLoop(pw, ph){
+    let s = '';
+    const beltY = ph - 56, mx = 58, mw = 132;
+    s += R_(mx, 44, mw, beltY - 44, P.yellow);
+    s += R_(mx + 16, 60, mw - 32, 42, P.paper, 2.6);
+    for (let k=0;k<4;k++) s += R_(mx + 26 + k*21, 72, 12, 18, k===3?P.red:P.coal, 0);
+    s += C_(mx + 36, 130, 13, P.red) + C_(mx + 96, 130, 13, P.paper);
+    s += R_(mx + mw - 4, beltY - 44, 24, 30, P.coal, 0);
+    s += R_(mx - 12, beltY, pw - mx - 16, 16, P.coal, 0);
+    for (let x = mx; x < pw - 30; x += 38) s += C_(x, beltY + 22, 8, P.paper, 2.4);
+    for (let i = 0; i < 6; i++) {
+      const x = mx + mw + 28 + i*44;
+      s += R_(x, beltY - 36, 34, 34, i===0?P.red:P.paper, 2.6);
+      s += Ln(x + 8, beltY - 19, x + 26 - (i%3)*5, beltY - 19, 3, i===0?P.paper:P.coal);
+    }
+    const ex = pw - 40;
+    s += `<path d="M${ex} ${beltY-44} C ${ex} 8, ${mx+mw/2+70} 4, ${mx+mw/2+20} 34" fill="none" stroke="${P.coal}" stroke-width="5" stroke-dasharray="11 7"/>` + arrowHead(mx+mw/2+15, 41, 2.15, 17);
+    s += tagT(pw - 160, 42, 'NEXT TOKEN', 'middle', 13);
+    return {svg:s, center:[mx + mw/2, 110], rays:44};
+  },
+
+  /* Charlie II · Vision — a picture cut into a 4×4 grid of patches, read off as a
+     sequence behind a class token. */
+  patches(pw, ph){
+    let s = '';
+    const g = 4, c = 38, gp = 5, ix = 30, iy = ph/2 - (g*c + (g-1)*gp)/2;
+    const W0 = g*c;
+    const pic = `<rect width="${W0}" height="${W0}" fill="${P.paper}"/>
+      <circle cx="${W0*0.7}" cy="${W0*0.3}" r="${W0*0.2}" fill="${P.red}"/>
+      <path d="M${-10} ${W0*0.86}L${W0*0.34} ${W0*0.36}L${W0*0.72} ${W0*0.86}Z" fill="${P.green}"/>
+      <path d="M${W0*0.44} ${W0*0.86}L${W0*0.74} ${W0*0.52}L${W0*1.08} ${W0*0.86}Z" fill="${P.blue}"/>
+      <rect y="${W0*0.8}" width="${W0}" height="${W0*0.2}" fill="${P.yellow}"/>`;
+    const id = uid('pt');
+    let defs = `<defs><g id="${id}">${pic}</g>`;
+    for (let i=0;i<g;i++) for (let j=0;j<g;j++) defs += `<clipPath id="${id}c${i}${j}"><rect x="${j*c}" y="${i*c}" width="${c}" height="${c}"/></clipPath>`;
+    s += defs + `</defs>`;
+    for (let i=0;i<g;i++) for (let j=0;j<g;j++) {
+      const x = ix + j*(c+gp), y = iy + i*(c+gp);
+      s += `<g transform="translate(${F(x - j*c)} ${F(y - i*c)})"><use href="#${id}" clip-path="url(#${id}c${i}${j})"/></g>`;
+      s += `<rect x="${F(x)}" y="${F(y)}" width="${c}" height="${c}" fill="none" stroke="${P.coal}" stroke-width="2.6"/>`;
+    }
+    const sx = 250, sc = 22, st = 26;
+    s += arrow(ix + g*(c+gp) + 4, ph/2, sx - 10, ph/2, 5);
+    for (let k=0;k<17;k++) {
+      const row = k < 9 ? 0 : 1, col = k < 9 ? k : k - 8;
+      const x = sx + col*st, y = ph/2 - 34 + row*44;
+      if (k === 0) { s += R_(x, y, sc, sc, P.red, 2.6); continue; }
+      const pi = k-1, i = Math.floor(pi/g), j = pi % g;
+      s += `<g transform="translate(${F(x)} ${F(y)}) scale(${F(sc/c)}) translate(${-j*c} ${-i*c})"><use href="#${id}" clip-path="url(#${id}c${i}${j})"/></g>`;
+      s += `<rect x="${F(x)}" y="${F(y)}" width="${sc}" height="${sc}" fill="none" stroke="${P.coal}" stroke-width="2.4"/>`;
+    }
+    s += `<path d="M${sx + 8*st + sc/2} ${ph/2 - 34 + sc + 2}V${ph/2 + 1}H${sx + st + sc/2}V${ph/2 + 8}" fill="none" stroke="${P.coal}" stroke-width="2.4" stroke-dasharray="4 4"/>`;
+    s += tagT(sx + sc/2, ph/2 - 60, 'CLS', 'middle', 12);
+    return {svg:s, center:[ix + W0/2 + 8, ph/2], rays:44};
+  },
+
+  /* Charlie III · Sound — the voice loop: a waveform heard, its spectrogram read,
+     and a street horn-speaker that answers. */
+  voice(pw, ph){
+    let s = '';
+    const cy = ph/2;
+    let d = `M12 ${cy}`;
+    for (let x = 12; x <= 128; x += 2.5) {
+      const env = Math.sin((x-12)/116*Math.PI);
+      d += `L${F(x)} ${F(cy + Math.sin(x*0.45)*Math.sin(x*0.12 + 0.6)*46*env)}`;
+    }
+    s += `<path d="${d}" fill="none" stroke="${P.coal}" stroke-width="4" stroke-linejoin="round"/>`;
+    s += arrow(134, cy, 160, cy, 4.5);
+    const gx = 170, cols = 10, rows = 8, cw = 12.5, chh = 15.5, gy = cy - rows*chh/2;
+    s += R_(gx-6, gy-6, cols*cw+12, rows*chh+12, P.coal, 0);
+    const pal = [null, P.blue, P.paper, P.yellow, P.red];
+    for (let c=0;c<cols;c++) {
+      const env = Math.pow(Math.sin(Math.PI*(c+0.5)/cols), 0.6);
+      const Fm = [6.1 - 0.7*Math.sin(c*0.7), 3.9 + 1.2*Math.sin(c*0.55 + 1), 1.6 + 0.9*Math.sin(c*0.45 + 2.2)];
+      for (let r=0;r<rows;r++) {
+        let e = 0; Fm.forEach((fm, k) => { e += Math.exp(-Math.pow(r - fm, 2)/0.55) * [1, 0.85, 0.6][k]; });
+        e *= env;
+        const v = e > 0.75 ? 4 : e > 0.45 ? 3 : e > 0.22 ? 2 : e > 0.08 ? 1 : 0;
+        if (v) s += `<rect x="${F(gx + c*cw + 1.3)}" y="${F(gy + r*chh + 1.3)}" width="${F(cw-2.6)}" height="${F(chh-2.6)}" fill="${pal[v]}"/>`;
+      }
+    }
+    s += arrow(gx + cols*cw + 12, cy, gx + cols*cw + 36, cy, 4.5);
+    const hx = gx + cols*cw + 46;
+    s += Ln(hx+11, cy+16, hx+11, cy+78, 5) + Ln(hx - 16, cy + 80, hx + 40, cy + 80, 5);
+    s += R_(hx, cy - 17, 22, 34, P.coal, 0);
+    s += `<path d="M${hx+20} ${cy-12}L${hx+100} ${cy-54}V${cy+54}L${hx+20} ${cy+12}Z" fill="${P.paper}" stroke="${P.coal}" stroke-width="${K}" stroke-linejoin="round"/>`;
+    s += `<ellipse cx="${hx+100}" cy="${cy}" rx="11" ry="54" fill="${P.yellow}" stroke="${P.coal}" stroke-width="${K}"/>`;
+    for (let k=0;k<3;k++) s += `<path d="M${hx+122+k*15} ${cy-28-k*9} Q ${hx+138+k*18} ${cy} ${hx+122+k*15} ${cy+28+k*9}" fill="none" stroke="${P.coal}" stroke-width="4" stroke-linecap="round"/>`;
+    return {svg:s, center:[gx + cols*cw/2, cy], rays:44};
+  },
+
+  /* Charlie IV · Reasoning — the multi-armed bandit: three one-armed machines,
+     the value each is believed to pay, and the arm being pulled. */
+  bandit(pw, ph){
+    let s = '';
+    const n = 3, bw = 96, bh = 128, gap = 50, gx = pw/2 - (n*bw + (n-1)*gap + 26)/2, top = 36, base = top + bh;
+    const val = [0.45, 0.85, 0.3], pulled = 1;
+    const sym = [[P.red,P.yellow,P.red],[P.yellow,P.yellow,P.yellow],[P.blue,P.red,P.paper]];
+    s += R_(gx - 18, base - 4, n*bw + (n-1)*gap + 62, 22, P.coal, 0);
+    for (let i=0;i<n;i++) {
+      const x = gx + i*(bw+gap), on = i===pulled;
+      s += `<path d="M${x} ${base}V${top+18}Q${x} ${top} ${x+18} ${top}H${x+bw-18}Q${x+bw} ${top} ${x+bw} ${top+18}V${base}Z" fill="${on?P.yellow:P.paper}" stroke="${P.coal}" stroke-width="${K}"/>`;
+      s += R_(x + 12, top + 18, bw - 24, 36, P.coal, 0);
+      for (let k=0;k<3;k++) s += R_(x + 16 + k*((bw-32)/3), top + 22, (bw-32)/3 - 4, 28, P.paper, 0) + `<circle cx="${F(x + 16 + k*((bw-32)/3) + ((bw-32)/3 - 4)/2)}" cy="${top + 36}" r="7" fill="${sym[i][k]}" stroke="${P.coal}" stroke-width="2"/>`;
+      // believed value
+      s += R_(x + 12, top + 70, bw - 24, 16, P.chuna, 2.4) + R_(x + 12, top + 70, (bw - 24)*val[i], 16, on?P.red:P.coal, 2.4);
+      s += R_(x + 30, top + 98, bw - 60, 10, P.coal, 0);
+      // lever
+      const pxl = x + bw, pyl = top + 62;
+      s += R_(pxl - 2, pyl - 8, 12, 16, P.coal, 0);
+      const ex = on ? pxl + 26 : pxl + 22, ey = on ? pyl + 44 : pyl - 48;
+      s += Ln(pxl + 8, pyl, ex, ey, 5) + C_(ex, ey, 9, P.red);
+    }
+    const px = gx + pulled*(bw+gap) + bw + 26;
+    s += tagT(px + 6, top + 124, 'PULL', 'start', 13);
+    return {svg:s, center:[pw/2, top + 60], rays:44};
+  },
+
+  /* Kernel Engineering — the tiled matrix multiply: a row-block of A and a
+     column-block of B are staged through fast on-chip memory to fill one tile of C. */
+  tiledMatmul(pw, ph){
+    let s = '';
+    const n = 4, c = 23, M = n*c;
+    const cxg = 296, cyg = 128, axg = cxg - M - 24, byg = cyg - M - 24;
+    const grid = (x, y, on, fill) => {
+      let g = R_(x, y, M, M, P.paper);
+      for (let i=0;i<n;i++) for (let j=0;j<n;j++) if (on(i,j)) g += R_(x + j*c, y + i*c, c, c, fill, 2.2);
+      for (let k=1;k<n;k++) g += Ln(x + k*c, y, x + k*c, y + M, 2) + Ln(x, y + k*c, x + M, y + k*c, 2);
+      return g + R_(x, y, M, M, 'none');
+    };
+    const lt = (x,y,t,a='middle') => `<text x="${x}" y="${y}" text-anchor="${a}" ${ANEK} font-weight="800" font-size="28" fill="${P.coal}" stroke="${P.paper}" stroke-width="5" paint-order="stroke">${t}</text>`;
+    // guides: row of A and column of B meet at the C tile
+    s += Ln(axg + M, cyg + 2.5*c, cxg + 1*c, cyg + 2.5*c, 3, P.coal, 'stroke-dasharray="5 5"');
+    s += Ln(cxg + 1.5*c, byg + M, cxg + 1.5*c, cyg + 2*c, 3, P.coal, 'stroke-dasharray="5 5"');
+    s += grid(axg, cyg, (i)=>i===2, P.red) + grid(cxg, byg, (i,j)=>j===1, P.red) + grid(cxg, cyg, (i,j)=>i===2&&j===1, P.yellow);
+    s += lt(axg - 10, cyg + M/2 + 10, 'A', 'end') + lt(cxg + M + 10, byg + M/2 + 10, 'B', 'start') + lt(cxg + M + 10, cyg + M/2 + 10, 'C', 'start');
+    // on-chip memory
+    const sx = 44, sy = 22, sw = 84;
+    s += R_(sx, sy, sw, sw, P.coal, 0) + R_(sx + 13, sy + 13, sw - 26, sw - 26, P.yellow, 2.4);
+    for (let k=0;k<6;k++) { const t = sy + 9 + k*13.2; s += Ln(sx - 10, t, sx, t, 3) + Ln(sx + sw, t, sx + sw + 10, t, 3); }
+    for (let k=0;k<6;k++) { const t = sx + 9 + k*13.2; s += Ln(t, sy - 10, t, sy, 3) + Ln(t, sy + sw, t, sy + sw + 10, 3); }
+    s += `<text x="${sx+sw/2}" y="${sy+sw/2+5}" text-anchor="middle" ${ANEK} font-weight="800" font-size="14" letter-spacing="1" fill="${P.coal}">SRAM</text>`;
+    s += `<path d="M${axg + 10} ${cyg + 2.5*c}C ${axg - 30} ${cyg + 2.5*c}, ${sx + sw/2} ${sy + sw + 60}, ${sx + sw/2} ${sy + sw + 16}" fill="none" stroke="${P.coal}" stroke-width="3.5" stroke-dasharray="7 5"/>` + arrowHead(sx + sw/2, sy + sw + 12, -Math.PI/2, 13);
+    s += `<path d="M${cxg + 1.5*c} ${byg + 6}C ${cxg + 1.5*c} ${sy + 10}, ${sx + sw + 60} ${sy + sw/2}, ${sx + sw + 16} ${sy + sw/2}" fill="none" stroke="${P.coal}" stroke-width="3.5" stroke-dasharray="7 5"/>` + arrowHead(sx + sw + 12, sy + sw/2, Math.PI, 13);
+    return {svg:s, center:[cxg + M/2, cyg + M/2], rays:44};
+  },
+
+  /* SQL Masterclass — the join: two tables matched row to row on a shared key. */
+  join(pw, ph){
+    let s = '';
+    const rows = 5, rh = 27;
+    const table = (x, y, cw, keyCol) => {
+      const tw = cw.reduce((a,b)=>a+b,0);
+      let t = R_(x, y, tw, rows*rh, P.paper) + R_(x, y, tw, rh, P.coal, 0);
+      let cx = x;
+      cw.forEach((w, j) => {
+        if (j === keyCol) t += R_(cx, y + rh, w, (rows-1)*rh, P.yellow, 2.4);
+        if (j) t += Ln(cx, y + rh, cx, y + rows*rh, 2.2);
+        cx += w;
+      });
+      for (let i=2;i<rows;i++) t += Ln(x, y + (i)*rh, x + tw, y + i*rh, 2.2);
+      for (let i=1;i<rows;i++) { let c2 = x; cw.forEach((w,j)=>{ t += Ln(c2 + 8, y + i*rh + rh/2, c2 + w - 10 - ((i+j)%3)*6, y + i*rh + rh/2, 2.6); c2 += w; }); }
+      return {svg: t + R_(x, y, tw, rows*rh, 'none'), tw};
+    };
+    const y0 = ph/2 - rows*rh/2 + 12;
+    const L = table(28, y0, [64, 44, 38], 2);
+    const Rt = table(0, 0, [38, 56, 44], 0);
+    const rx = pw - 28 - Rt.tw;
+    s += L.svg + table(rx, y0, [38, 56, 44], 0).svg;
+    const lx = 28 + L.tw;
+    const map = [[1,3],[2,1],[3,4],[4,2]];
+    map.forEach(([a,b], k) => {
+      const y1 = y0 + a*rh + rh/2, y2 = y0 + b*rh + rh/2;
+      s += `<path d="M${lx} ${F(y1)}H${lx + 16}L${rx - 16} ${F(y2)}H${rx}" fill="none" stroke="${k===0?P.red:P.coal}" stroke-width="${k===0?5:3}" stroke-linejoin="round"/>`;
+      s += C_(lx, y1, 4, P.coal, 0) + C_(rx, y2, 4, P.coal, 0);
+    });
+    // the bow-tie join symbol, painted on a tag
+    const bx = pw/2, by = y0 - 26;
+    s += R_(bx - 30, by - 17, 60, 34, P.paper, 2.6);
+    s += `<path d="M${bx-18} ${by-10}V${by+10}L${bx} ${by}ZM${bx+18} ${by-10}V${by+10}L${bx} ${by}Z" fill="${P.coal}" stroke="${P.coal}" stroke-width="2.4" stroke-linejoin="round"/>`;
+    return {svg:s, center:[pw/2, ph/2], rays:44};
+  },
+
+  /* DeiT from Scratch — the distillation token: a convnet teacher's prediction is
+     matched by one extra token that rides through the student beside the class token. */
+  distill(pw, ph){
+    let s = '';
+    // teacher: a convnet drawn as shrinking feature maps
+    const maps = [[18, 116, 22],[48, 92, 22],[76, 70, 20],[100, 50, 18]];
+    const my = 96;
+    maps.forEach(([x, h, w], k) => {
+      s += `<path d="M${x} ${my - h/2 + 8}L${x + w} ${my - h/2}V${my + h/2 - 8}L${x} ${my + h/2}Z" fill="${[P.paper,P.yellow,P.paper,P.yellow][k]}" stroke="${P.coal}" stroke-width="${K}" stroke-linejoin="round"/>`;
+    });
+    s += R_(128, my - 11, 22, 22, P.red, 2.6);
+    s += tagT(78, my + 84, 'TEACHER', 'middle', 13);
+    // student: transformer blocks over a token row
+    const tx0 = 214, st = 27, tc = 22, rowY = ph - 64;
+    const sx = tx0 - 12, sw = 9*st + 14;
+    for (let k=0;k<3;k++) s += R_(sx, 62 + k*28, sw, 22, k%2?P.yellow:P.paper, 2.6);
+    for (let k=0;k<9;k++) {
+      const x = tx0 + k*st;
+      s += Ln(x + tc/2, rowY - 2, x + tc/2, 62 + 3*28 - 4, 2.2);
+      s += R_(x, rowY, tc, tc, k===0?P.yellow : k===1?P.red : P.paper, 2.6);
+      if (k > 1) s += R_(x + 6, rowY + 6, tc - 12, tc - 12, [P.green,P.blue,P.yellow][k%3], 1.6);
+    }
+    s += tagT(tx0 + tc/2, rowY + tc + 20, 'CLS', 'middle', 12) + tagT(tx0 + st + tc/2 + 18, rowY + tc + 20, 'DIST', 'start', 12);
+    // outputs of the two special tokens
+    const oy = 18;
+    s += Ln(tx0 + tc/2, 62, tx0 + tc/2, oy + tc, 2.6) + Ln(tx0 + st + tc/2, 62, tx0 + st + tc/2, oy + tc, 2.6);
+    s += R_(tx0, oy, tc, tc, P.yellow, 2.6) + R_(tx0 + st, oy, tc, tc, P.red, 2.6);
+    s += tagT(tx0 + 2*st + 6, oy + tc/2, 'STUDENT', 'start', 12);
+    // the match: teacher's prediction <-> distillation output
+    s += `<path d="M150 ${my}C 190 ${my}, 180 ${oy + tc/2}, ${tx0 + st - 14} ${oy + tc/2}" fill="none" stroke="${P.red}" stroke-width="5" stroke-dasharray="10 6"/>` + arrowHead(tx0 + st - 3, oy + tc/2, 0, 16, P.red);
+    return {svg:s, center:[tx0 + st, oy + 10], rays:44};
   },
 };
 
 /* ==========================================================================
    THE BOOKS
    ========================================================================== */
-const BOOKS = [
+const CORE = [
   {slug:'ai-context-engineering', shelf:'agents', level:2, capsules:43, hours:10, emblem:'contextWindow', cap:'THE CONTEXT WINDOW',
-    title:[{t:'AI CONTEXT', H:108},{t:'ENGINEERING', H:108}]},
-  {slug:'neural-networks-from-scratch', shelf:'deep', level:1, capsules:33, hours:7, emblem:'network', cap:'THE PERCEPTRON STACK',
-    title:[{t:'NEURAL', H:112},{t:'NETWORKS', H:112},{scratch:true, H:50}]},
-  {slug:'5d-parallelism', shelf:'systems', level:3, capsules:40, hours:9, emblem:'cube5d', cap:'FIVE AXES OF SCALE',
-    title:[{t:'5D', H:150, rmax:0.8},{t:'PARALLELISM', H:92},{tr:'FOR LARGE MODEL TRAINING', H:28}]},
+    title:[{t:'AI CONTEXT', H:116},{t:'ENGINEERING', H:116}]},
+  {slug:'mathematical-foundations-for-ml', shelf:'foundations', level:1, capsules:43, hours:10, emblem:'gradient', cap:'THE GRADIENT',
+    title:[{t:'MATHEMATICAL', H:82},{t:'FOUNDATIONS', H:82, gap:4},{mix:[{s:'for'},{t:'MACHINE LEARNING', r:0.5}], H:58}]},
+  {slug:'neural-networks-from-scratch', shelf:'deep', level:1, capsules:33, hours:7, emblem:'network', cap:'THE MULTILAYER PERCEPTRON',
+    title:[{t:'NEURAL', H:112},{t:'NETWORKS', H:112},{mix:[{s:'from'},{t:'SCRATCH', r:0.6}], H:52}]},
+  {slug:'build-llms-from-scratch', shelf:'language', level:2, capsules:20, hours:6, emblem:'causalMask', cap:'THE CAUSAL MASK',
+    title:[{t:'BUILD LARGE', H:78},{t:'LANGUAGE', H:78},{mix:[{t:'MODELS', r:0.62},{tag:'LLMs'}], H:78},{mix:[{s:'from'},{t:'SCRATCH', r:0.6}], H:46}]},
+  {slug:'5d-parallelism', shelf:'systems', level:3, capsules:40, hours:9, emblem:'mesh5d', cap:'THE DEVICE MESH',
+    title:[{t:'5D', H:150, rmax:0.82},{t:'PARALLELISM', H:92},{mix:[{s:'for'},{tt:'LARGE MODEL TRAINING', r:0.46}], H:34}]},
+  {slug:'pi-vs-hermes-vs-codex', shelf:'agents', level:3, capsules:9, hours:1, emblem:'press', cap:'THE COMPACTION PRESS',
+    title:[{mix:[{t:'PI', r:0.6},{s:'vs'},{t:'HERMES', r:0.56}], H:98},{mix:[{s:'vs'},{t:'CODEX', r:0.6}], H:98},{tr:'CONTEXT COMPACTION', H:34, m:520, gap:6},{mix:[{s:'and'},{tt:'MEMORY', r:0.5}], H:34}]},
+];
+const RANGE = [
+  {slug:'charlie-language-room', shelf:'charlie', room:'language', series:'I', level:3, capsules:22, hours:5, emblem:'decodeLoop', cap:'THE DECODE LOOP',
+    title:[{mix:[{t:'CHARLIE', r:0.56},{s:'and the'}], H:54},{t:'LANGUAGE', H:96},{t:'ROOM', H:96, rmax:0.74},{tr:'INFERENCE ENGINEERING', H:26, m:420}]},
+  {slug:'charlie-vision-room', shelf:'charlie', room:'vision', series:'II', level:2, capsules:20, hours:6, emblem:'patches', cap:'THE PATCH GRID',
+    title:[{mix:[{t:'CHARLIE', r:0.56},{s:'and the'}], H:54},{t:'VISION', H:96},{t:'ROOM', H:96, rmax:0.74},{tr:'VISION TRANSFORMERS', H:26, m:420}]},
+  {slug:'charlie-sound-room', shelf:'charlie', room:'sound', series:'III', level:2, capsules:20, hours:6, emblem:'voice', cap:'THE VOICE LOOP',
+    title:[{mix:[{t:'CHARLIE', r:0.56},{s:'and the'}], H:54},{t:'SOUND', H:96},{t:'ROOM', H:96, rmax:0.74},{tr:'VOICE AGENTS', H:26, m:420}]},
+  {slug:'charlie-reasoning-room', shelf:'charlie', room:'reasoning', series:'IV', level:3, capsules:21, hours:6, emblem:'bandit', cap:'THE MULTI-ARMED BANDIT',
+    title:[{mix:[{t:'CHARLIE', r:0.56},{s:'and the'}], H:54},{t:'REASONING', H:96},{t:'ROOM', H:96, rmax:0.74},{tr:'FROM BANDITS TO REASONING MODELS', H:24, m:450}]},
+  {slug:'deit-from-scratch', shelf:'vision', level:3, capsules:42, hours:10, emblem:'distill', cap:'THE DISTILLATION TOKEN',
+    title:[{t:'BUILD A DATA-EFFICIENT', H:52},{t:'IMAGE', H:96},{t:'TRANSFORMER', H:96},{mix:[{tag:'DeiT'},{s:'from'},{t:'SCRATCH', r:0.6}], H:46}]},
+  {slug:'sql-masterclass', shelf:'foundations', level:1, capsules:36, hours:8, emblem:'join', cap:'THE INNER JOIN',
+    title:[{t:'SQL', H:190, rmax:0.9},{t:'MASTERCLASS', H:84}]},
+  {slug:'kernel-engineering', shelf:'systems', level:3, soon:true, emblem:'tiledMatmul', cap:'THE TILED MATMUL',
+    title:[{t:'KERNEL', H:132},{t:'ENGINEERING', H:98},{tr:'FROM SILICON TO SPECULATIVE DECODING', H:24, m:540}]},
 ];
 
-function build(){
-  const host = document.getElementById('covers');
-  host.innerHTML = BOOKS.map((b) => `<div class="cover" data-slug="${b.slug}">${cover(b)}</div>`).join('');
+function fig(b){
+  const sh = SHELF[b.shelf];
+  return `<figure><div class="cover" data-slug="${b.slug}">${cover(b)}</div>
+    <figcaption><span>${esc(sh.name)} · Level ${b.level}</span><span>${esc(b.slug)}</span></figcaption></figure>`;
 }
-const faces = ['40px Yellowtail','700 17px "Anek Latin"','600 18px "Anek Devanagari"'];
-Promise.all(faces.map((f) => document.fonts.load(f, 'Aav विज़ुआरा'))).catch(()=>{}).then(build);
+
+function mast(){
+  // the direction's own name, painted on its own board
+  const W = 760, H = 330;
+  const sh = {letter:{fillTop:P.chuna, fillBot:P.yellow, outline:P.coal, shadow:P.red, inline:P.red}, script:P.yellow};
+  const ft = Board.fit('SIGNBOARD', 150, W - 110, {rmax:0.7});
+  const p = Board.paint('SIGNBOARD', ft.u, ft.H, sh.letter);
+  const x0 = (W - p.w - p.depth)/2;
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+    <rect width="${W}" height="${H}" fill="${P.coal}"/>
+    <path d="${notchRect(14,14,W-28,H-28,20)}" fill="none" stroke="${P.yellow}" stroke-width="4"/>
+    <path d="${notchRect(22,22,W-44,H-44,14)}" fill="none" stroke="${P.yellow}" stroke-width="1.5"/>
+    <g transform="translate(${W/2} 62)">${scriptText('the Vizuara Books', 0, 22, 44, P.yellow, 'middle')}</g>
+    <g transform="translate(${F(x0)} 92)">${p.svg}</g>
+    <text x="${W/2}" y="${H-44}" text-anchor="middle" ${ANEK} font-weight="800" font-size="17" letter-spacing="5" fill="${P.yellow}">COVER SYSTEM&#8195;·&#8195;DIRECTION 14&#8195;·&#8195;BOMBAY</text>
+  </svg>`;
+}
+
+function build(){
+  document.getElementById('covers-core').innerHTML = CORE.map(fig).join('');
+  document.getElementById('covers-range').innerHTML = RANGE.map(fig).join('');
+  document.getElementById('mast').innerHTML = mast();
+  // swatches
+  const sw = [['Chrome Yellow',P.yellow],['Signal Red',P.red],['Maroon',P.maroon],['Bottle Green',P.green],['Post Blue',P.blue],['Firozi',P.firozi],['Coal',P.coal],['Chuna',P.chuna]];
+  document.getElementById('swatches').innerHTML = sw.map(([n,c])=>`<div class="sw"><i style="background:${c}"></i><span>${n}<br><em>${c}</em></span></div>`).join('');
+  // board block specimen
+  const sp = Board.fit('ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789', 30, 330, {rmax:0.55});
+  const pp = Board.paint('ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789', sp.u, sp.H, {fillTop:P.chuna, fillBot:P.yellow, outline:P.coal, shadow:P.red, inline:null, depth:3, o:1.6});
+  document.getElementById('spec-board').innerHTML = `<svg width="340" height="${F(sp.H+10)}"><g transform="translate(2 3)">${pp.svg}</g></svg>`;
+  document.getElementById('legend').innerHTML = [1,2,3].map((l)=>`<svg width="90" height="110" viewBox="-3 -3 92 112">${stamp(l,0,0)}</svg>`).join('');
+  buildWrap();
+}
+function buildWrap(){ /* filled in below */ }
+const faces = ['40px Yellowtail','700 17px "Anek Latin"','800 15px "Anek Latin"','600 18px "Anek Devanagari"'];
+Promise.all(faces.map((f) => document.fonts.load(f, 'Aav विज़ुआरा बुक्स'))).catch(()=>{}).then(build);
 </script>
 </body>
 </html>

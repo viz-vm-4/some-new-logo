@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vizuara Folios</title>
+<title>Muraqqa — Vizuara Books</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Eczar:wght@400..800&family=Anek+Latin:wdth,wght@75..125,300..800&display=swap" rel="stylesheet">
@@ -13,9 +13,45 @@
   --vermilion:#CF3B22; --saffron:#E4A42E; --lac:#8C1F35;
 }
 *{box-sizing:border-box}
-html,body{margin:0;background:#EDE6D6;color:var(--ink)}
-body{font-family:'Anek Latin',system-ui,sans-serif;font-stretch:100%}
-.covers{display:flex;flex-wrap:wrap;gap:48px;padding:48px}
+html,body{margin:0;background:#EEE6D3;color:var(--ink)}
+body{font-family:'Anek Latin',system-ui,sans-serif;font-stretch:100%;font-size:16px;line-height:1.5}
+.page{max-width:1584px;margin:0 auto;padding:0 48px}
+.covers{display:flex;flex-wrap:wrap;gap:48px 48px;padding:8px 0 24px}
+.intro{padding:64px 0 24px;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:56px;align-items:start}
+.kicker{font-stretch:112%;font-weight:600;font-size:12.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--vermilion)}
+h1{font-family:'Eczar',serif;font-weight:600;font-size:112px;line-height:.92;letter-spacing:-.02em;margin:14px 0 10px}
+h1 small{display:block;font-weight:500;font-size:30px;letter-spacing:-.005em;margin-top:18px;color:#4A3A2C}
+.lede{font-family:'Eczar',serif;font-size:21px;line-height:1.5;max-width:40em;margin:22px 0 0}
+.lede p{margin:0 0 .8em}
+.lede i,.secnote i,.notes i{font-style:normal;color:#8C1F35}
+.secnote i{font-weight:600}
+.anat{background:var(--ivory);border:1.5px solid var(--ink);box-shadow:inset 0 0 0 5px var(--ivory),inset 0 0 0 9px var(--gold),inset 0 0 0 10.5px var(--ink);padding:30px 30px 24px}
+.anat h3,.spec h3{font-stretch:112%;font-weight:600;font-size:12.5px;letter-spacing:.22em;text-transform:uppercase;margin:0 0 14px;color:var(--ink)}
+.anat svg{display:block;width:100%;height:auto}
+.specs{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:40px;padding:36px 0 44px;border-top:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink);margin:12px 0 0;position:relative}
+.specs:before{content:"";position:absolute;left:0;right:0;top:3px;border-top:4px solid var(--gold)}
+.specs:after{content:"";position:absolute;left:0;right:0;bottom:3px;border-top:4px solid var(--gold)}
+.sw{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.sw div{font-size:12.5px;line-height:1.3}
+.sw i{display:block;height:54px;border:1.2px solid var(--ink);margin-bottom:6px}
+.sw b{display:block;font-weight:600}
+.sw span{color:#5b4a3b;font-variant-numeric:tabular-nums}
+.type p{margin:0 0 14px;font-size:14.5px}
+.type .e{font-family:'Eczar';font-weight:600;font-size:40px;line-height:1;margin:0 0 4px;letter-spacing:-.01em}
+.type .a{font-family:'Anek Latin';font-stretch:112%;font-weight:600;font-size:15px;letter-spacing:.22em;text-transform:uppercase;margin:0 0 4px}
+.lv{display:grid;gap:12px}
+.lv div{display:flex;gap:14px;align-items:center;font-size:14.5px}
+.lv svg{flex:0 0 auto}
+h2.sec{font-family:'Eczar',serif;font-weight:600;font-size:34px;letter-spacing:-.01em;margin:56px 0 6px}
+p.secnote{margin:0 0 22px;max-width:62em;color:#4A3A2C}
+.wrapbox{padding:8px 0 24px}
+.wrap{position:relative;width:1488px;height:888px;box-shadow:0 1px 2px rgba(0,0,0,.18),0 12px 40px rgba(40,25,10,.18)}
+.wrap svg.art{position:absolute;left:0;top:0;display:block}
+.wrap .blurb{position:absolute;font-family:'Eczar',serif;color:var(--ink)}
+.notes{display:grid;grid-template-columns:1fr 1fr;gap:48px;padding:40px 0 80px;font-size:15px}
+.notes h3{font-family:'Eczar';font-weight:600;font-size:22px;margin:0 0 8px}
+.notes p{margin:0 0 12px}
+@media (max-width:1100px){.intro,.specs,.notes{grid-template-columns:1fr}}
 
 /* ---------- the cover ---------- */
 .cover{position:relative;width:720px;height:888px;overflow:hidden;flex:0 0 auto;
@@ -35,7 +71,42 @@ body{font-family:'Anek Latin',system-ui,sans-serif;font-stretch:100%}
 </style>
 </head>
 <body>
-<main class="covers" id="covers"></main>
+<div class="page">
+<header class="intro">
+  <div>
+    <div class="kicker">Vizuara Books · a cover system · direction 13</div>
+    <h1>Muraqqa<small>Every book is a folio from one album.</small></h1>
+    <div class="lede">
+      <p>A Mughal <i>muraqqa</i> — the imperial album of the Delhi, Agra and Lahore ateliers — gives every painting the same architecture: a coloured margin (<i>hashiya</i>), a stack of ruled borders in gold, colour and black (<i>jadval</i>), a cartouche for the words, and at the centre a small, flat, exact picture.</p>
+      <p>Vizuara Books borrows that page whole and changes only what is inside it. The margin tells you the level; the cartouche carries the title in large type; the miniature is a jewel-toned, diagrammatic painting of the book's actual mechanism — the attention mask, the device mesh, the join — painted with the flat grounds of Basohli and the tipped-up rooms of Rajput painting. The imprint is a <i>shamsa</i>, the rosette that named an album's owner.</p>
+    </div>
+  </div>
+  <div class="anat"><h3>Anatomy of a folio</h3><div id="anatomy"></div></div>
+</header>
+<section class="specs">
+  <div class="spec"><h3>Pigments</h3><div class="sw" id="swatches"></div></div>
+  <div class="spec type"><h3>Type — both made in India</h3>
+    <p class="e">Eczar 600</p><p>Titles. Vaibhav Singh for Rosetta — a Latin + Devanagari display serif with a calligraphic edge.</p>
+    <p class="a">Anek Latin</p><p>Rubrics, imprint, labels. Ek Type, Mumbai — set semi-expanded, tracked capitals.</p></div>
+  <div class="spec"><h3>Level — margin pigment × jadval count</h3><div class="lv" id="levels"></div></div>
+</section>
+<h2 class="sec">The core set</h2>
+<p class="secnote">Six folios. The page architecture never moves; the painting and its ground change with the book.</p>
+<main class="covers" id="core"></main>
+<h2 class="sec">Range</h2>
+<p class="secnote">A short title and a very long one; a forthcoming book, shown as an unfinished miniature (underdrawing complete, only the blocks already computed are painted); and the four-book <i>Charlie and the Intelligence Factory</i> as a sub-series — one pavilion, four rooms, each with its mechanism on the back wall and the floor.</p>
+<section class="covers" id="range"></section>
+<h2 class="sec">Print wrap</h2>
+<p class="secnote">Back · spine · front for <i>Neural Networks from Scratch</i> at trim (7.5 × 9.25 in, 0.5 in spine). The verso is the facing page of the folio: plain <i>wasli</i> inside the same borders, with a colophon that explains the painting. On the spine the cartouche turns on its side.</p>
+<section class="wrapbox" id="wrapHost"></section>
+<section class="notes">
+  <div><h3>What was taken, and from where</h3>
+  <p><b>Structure</b> from the Mughal album folio (Jahangir- and Shah Jahan-period muraqqa, c. 1605–1658): painting inside a jadval of gold, colour and black rules, inside a contrasting hashiya; text in a lobed cartouche; the owner's name in a shamsa. <b>Colour logic</b> from Pahari painting at Basohli (Jammu hills, late 17th century): one flat, saturated ground per picture, no modelling, no sky-gradient. <b>Space</b> from Rajput court painting (Mewar, Bundi, Kota): the pavilion drawn frontally with its floor tipped up in plan — the "rooms" of the Charlie series. <b>Process</b> from unfinished miniatures, where the sanguine underdrawing on primed paper shows beside the first laid colour.</p>
+  <p>Nothing figurative, nothing sacred, no paisley. The only "picture" the system ever shows is a small garden of cypresses and a pool, used as the input image in the vision books.</p></div>
+  <div><h3>For a production version</h3>
+  <p>Commission a working miniature painter from the living Pahari or Rajasthani ateliers (Kangra, Chamba, Jaipur, Udaipur, Kishangarh) to rule a master jadval and paint a master shamsa by hand, paid per edition and credited by name on every colophon ("Borders ruled and seal painted by …"). Print the gold as a metallic spot or foil, the grounds as spot colours; the flat grounds are chosen to survive greyscale — the three margins step light, middle, dark.</p></div>
+</section>
+</div>
 
 <script>
 const V = Object.assign({spandrel:'lapis'}, window.VARIANT||{});
@@ -92,11 +163,11 @@ function lobePath(x,y,w,h,p,a,b){
   return `M${f(xl)},${f(yt)} H${f(xr)} A${a},${a} 0 0 0 ${f(xr+a)},${f(yt+a)} V${f(ym-b)} A${b},${b} 0 0 1 ${f(xr+a)},${f(ym+b)} V${f(yb-a)} A${a},${a} 0 0 0 ${f(xr)},${f(yb)} `+
          `H${f(xl)} A${a},${a} 0 0 0 ${f(xl-a)},${f(yb-a)} V${f(ym+b)} A${b},${b} 0 0 1 ${f(xl-a)},${f(ym-b)} V${f(yt+a)} A${a},${a} 0 0 0 ${f(xl)},${f(yt)} Z`;
 }
-function cartouche(x,y,w,h,ground){
-  let s=rect(x,y,w,h,ground);
-  s+=`<path d="${lobePath(x,y,w,h,10,16,20)}" fill="${P.gold}" stroke="${P.ink}" stroke-width="1.2"/>`;
-  s+=`<path d="${lobePath(x,y,w,h,14.5,11.5,20)}" fill="${P.ivory}" stroke="${P.ink}" stroke-width="1.1"/>`;
-  s+=`<path d="${lobePath(x,y,w,h,20,6,20)}" fill="none" stroke="${P.vermilion}" stroke-width="1.1"/>`;
+function cartouche(x,y,w,h,ground,q=[10,16,20]){
+  let s=rect(x,y,w,h,ground); const [p,a,b]=q, k=p/10;
+  s+=`<path d="${lobePath(x,y,w,h,p,a,b)}" fill="${P.gold}" stroke="${P.ink}" stroke-width="1.2"/>`;
+  s+=`<path d="${lobePath(x,y,w,h,p+4.5*k,a-4.5*k,b)}" fill="${P.ivory}" stroke="${P.ink}" stroke-width="1.1"/>`;
+  if(k>.6) s+=`<path d="${lobePath(x,y,w,h,p+10*k,a-10*k,b)}" fill="none" stroke="${P.vermilion}" stroke-width="1.1"/>`;
   return s;
 }
 
@@ -133,49 +204,54 @@ function glyph(x,y,w,h,r,col=P.ink){
   return s;
 }
 
+/* pardakht-like stipple on a flat ground: one vector path of tiny dots in a darker shade of the ground (no opacity, prints as one ink) */
+function shade(hex,k){ const n=parseInt(hex.slice(1),16); const c=[n>>16,(n>>8)&255,n&255].map(v=>Math.round(v*(1-k))); return '#'+c.map(v=>v.toString(16).padStart(2,'0')).join(''); }
+function stipple(w,h,ground,step=9,rad=.9){ let d='';
+  for(let y=step/4;y<h;y+=step/2){ const row=Math.round((y-step/4)/(step/2)); for(let x=(row%2?step*.75:step/4);x<w;x+=step) d+=`M${f(x-rad)},${f(y)}a${rad},${rad} 0 1 0 ${2*rad},0a${rad},${rad} 0 1 0 ${-2*rad},0`; }
+  return `<path d="${d}" fill="${shade(ground,.16)}"/>`; }
+
 /* ======================= emblems ======================= */
 // each emblem(w,h,r,b) returns SVG in the local coords of the miniature panel (0,0,w,h)
 const EMBLEM = {};
 
 /* Mathematical Foundations — a linear map, painted as the miniaturist's own trick:
-   a square floor seen in plan, and the same floor tilted up by the matrix A. */
-EMBLEM.math = (w,h,r)=>{
-  const s0=168, n=6, t=s0/n, NS='vector-effect="non-scaling-stroke"';
+   a square floor seen in plan, and the same floor tilted up by the matrix A = [[1, 1/2],[0, 4/5]]. */
+EMBLEM.math = (w,h,r,b)=>{
+  const s0=176, n=6, t=s0/n, NS='vector-effect="non-scaling-stroke"';
   const floor=()=>{ let g='';
     for(let i=0;i<n;i++) for(let j=0;j<n;j++) g+=rect(i*t,-(j+1)*t,t,t,(i+j)%2?P.ivory:P.sky,`stroke="${P.ink}" stroke-width="1" ${NS}`);
+    g+=`<circle cx="${s0/2}" cy="${-s0/2}" r="${s0*.31+2.6}" fill="${P.ink}"/>`;
     g+=`<circle cx="${s0/2}" cy="${-s0/2}" r="${s0*.31}" fill="${P.malachite}" stroke="${P.gold}" stroke-width="4" ${NS}/>`;
-    g+=`<circle cx="${s0/2}" cy="${-s0/2}" r="${s0*.31+2.6}" fill="none" stroke="${P.ink}" stroke-width="1.2" ${NS}/>`;
-    g+=`<circle cx="${s0/2}" cy="${-s0/2}" r="${s0*.22}" fill="none" stroke="${P.sky}" stroke-width="1.4" ${NS}/>`;
-    g+=`<rect x="0" y="${-s0}" width="${s0}" height="${s0}" fill="none" stroke="${P.ink}" stroke-width="2" ${NS}/>`;
+    g+=`<circle cx="${s0/2}" cy="${-s0/2}" r="${s0*.2}" fill="none" stroke="${P.sky}" stroke-width="1.4" ${NS}/>`;
+    g+=`<circle cx="${s0/2}" cy="${-s0/2}" r="${s0*.035}" fill="${P.ivory}" stroke="${P.ink}" stroke-width="1" ${NS}/>`;
+    g+=`<rect x="0" y="${-s0}" width="${s0}" height="${s0}" fill="none" stroke="${P.ink}" stroke-width="2.2" ${NS}/>`;
     return g; };
-  const by=h-118, sx=58, qx=w-58-s0*1.5;           // baselines
-  let s='';
-  s+=rect(0,0,w,h,'url(#stip)');
-  s+=`<g transform="translate(${sx},${by})">${floor()}</g>`;
-  // A = [[1, .5],[0, .8]] (y up)  ->  svg matrix(1,0,-.5,.8,..)
-  s+=`<g transform="matrix(1,0,-0.5,0.8,${qx+s0*.5},${by})">${floor()}</g>`;
-  // basis vectors and their images
-  s+=arrow(sx,by+16,sx+s0,by+16,P.vermilion,3.4);
-  s+=arrow(sx-16,by,sx-16,by-s0,P.saffron,3.4);
-  const ox=qx+s0*.5;
-  s+=arrow(ox,by+16,ox+s0,by+16,P.vermilion,3.4);
-  s+=arrow(ox-16,by,ox-16-s0*.5,by-s0*.8,P.saffron,3.4);
-  // the matrix, written like an inscription
-  const mx=w/2-6, my=by-s0-22;
-  s+=arrow(sx+s0+30,by-s0*.45,qx-18,by-s0*.45,P.gold,3);
-  const br=(x,dir)=>`<path d="M${x+dir*7},${my-30} h${-dir*7} v68 h${dir*7}" fill="none" stroke="${P.ivory}" stroke-width="2.4"/>`;
-  s+=br(mx-50,1)+br(mx+50,-1);
-  const num=(x,y,v)=>txt(x,y,v,{size:25,weight:600,family:'Eczar',fill:P.ivory});
-  s+=num(mx-24,my-3,'1')+num(mx+22,my-3,'½')+num(mx-24,my+29,'0')+num(mx+22,my+29,'⅘');
+  const tot=s0+70+s0*1.5, sx=(w-tot)/2, qx=sx+s0+70, by=h/2+s0/2+30;
+  let s=stipple(w,h,b.ground);
+  s+=`<g transform="translate(${f(sx)},${f(by)})">${floor()}</g>`;
+  s+=`<g transform="matrix(1,0,-0.5,0.8,${f(qx)},${f(by)})">${floor()}</g>`;
+  // basis vectors e1, e2 and their images Ae1 = (1,0), Ae2 = (1/2, 4/5)
+  s+=arrow(sx,by+18,sx+s0,by+18,P.vermilion,3.4);
+  s+=arrow(sx-18,by,sx-18,by-s0,P.saffron,3.4);
+  s+=arrow(qx,by+18,qx+s0,by+18,P.vermilion,3.4);
+  s+=arrow(qx-18,by,qx-18+s0*.5,by-s0*.8,P.saffron,3.4);
+  s+=arrow(sx+s0+14,by-s0*.42,qx-4,by-s0*.42,P.gold,3);
+  // the matrix, set like an inscription above
+  const mx=w/2, my=by-s0-78;
+  const br=(x,dir)=>`<path d="M${f(x+dir*8)},${f(my-34)} h${-dir*8} v76 h${dir*8}" fill="none" stroke="${P.ivory}" stroke-width="2.6"/>`;
+  s+=br(mx-54,1)+br(mx+54,-1);
+  const num=(x,y,v)=>txt(x,y,v,{size:27,weight:600,family:'Eczar',fill:P.ivory});
+  s+=num(mx-25,my-2,'1')+num(mx+25,my-2,'½')+num(mx-25,my+32,'0')+num(mx+25,my+32,'⅘');
+  s+=txt(mx-84,my+15,'A',{size:27,weight:600,family:'Eczar',fill:P.gold})+txt(mx-72,my+15,'=',{size:22,weight:500,family:'Eczar',fill:P.gold,anchor:'start'});
   return s;
 };
 
 /* Neural Networks from Scratch — a 3·5·5·2 perceptron; weights as gold (+) and vermilion (−) threads,
    neurons as set stones, one forward path strung with pearls. */
-EMBLEM.nn = (w,h,r)=>{
+EMBLEM.nn = (w,h,r,b)=>{
   const layers=[3,5,5,2], sp=72, xs=layers.map((_,i)=> w*.18 + i*(w*.64)/(layers.length-1));
   const pos=layers.map((n,i)=>Array.from({length:n},(_,j)=>[xs[i], h/2 + (j-(n-1)/2)*sp]));
-  let s=rect(0,0,w,h,'url(#stip)');
+  let s=stipple(w,h,b.ground);
   const wts=[];
   for(let i=0;i<layers.length-1;i++) for(const a of pos[i]) for(const b of pos[i+1]) wts.push([a,b,r()*2-1]);
   wts.sort((p,q)=>Math.abs(p[2])-Math.abs(q[2]));
@@ -193,7 +269,7 @@ EMBLEM.nn = (w,h,r)=>{
 
 /* Build LLMs — causal self-attention: the lower-triangular mask, cell by cell, and the next token it predicts. */
 EMBLEM.llm = (w,h,r)=>{
-  const N=10, cs=33, ox=(w-(N+1.5)*cs)/2, oy=(h-(N+1.1)*cs)/2-4;
+  const N=10, cs=33, ox=(w-(N+1.9)*cs)/2, oy=(h-(N+1.1)*cs)/2-4;
   const cols=[P.lapisD,P.lapis,P.sky,P.ivory,P.gold];
   let s='';
   for(let i=0;i<N;i++) for(let j=i+1;j<N;j++) s+=circ(ox+j*cs+cs/2,oy+i*cs+cs/2,1.7,P.goldL);
@@ -204,8 +280,8 @@ EMBLEM.llm = (w,h,r)=>{
   }
   const ty=oy+N*cs+12, gr=rng('tok');
   for(let j=0;j<N;j++){ s+=tile(ox+j*cs+3,ty,cs-6,cs-8,P.ivory); s+=glyph(ox+j*cs+3,ty,cs-6,cs-8,gr); }
-  const nx=ox+N*cs+cs*.5, ny=oy+(N-1)*cs;
-  s+=arrow(ox+N*cs+2,ny+cs/2,nx-3,ny+cs/2,P.ivory,2);
+  const nx=ox+N*cs+cs*.85, ny=oy+(N-1)*cs;
+  s+=arrow(ox+N*cs+1,ny+cs/2,nx-2,ny+cs/2,P.ivory,2.6);
   s+=tile(nx,ny-3,cs+6,cs+6,P.gold,1.5)+rect(nx+5,ny+2,cs-4,cs-4,'none',`stroke="${P.ink}" stroke-width="1"`)+glyph(nx,ny-3,cs+6,cs+6,gr);
   return s;
 };
@@ -280,13 +356,14 @@ EMBLEM.ace = (w,h,r)=>{
 /* Pi vs Hermes vs Codex — three vessels, one long conversation each: early turns set aside (outlined),
    a compacted summary in their place, recent turns kept whole, and a jewel of memory beside. */
 EMBLEM.pi = (w,h,r)=>{
-  const cw=124, gapx=44, x0=(w-(3*cw+2*gapx))/2, top=40, bot=h-40;
+  const cw=120, gapx=50, x0=(w-(3*cw+2*gapx))/2, top=48, bot=h-66;
   const split=[[0.30,0.12],[0.38,0.08],[0.22,0.18]];
   const role=[P.ivory,P.sky,P.pink];
   let s='';
   for(let c=0;c<3;c++){
     const x=x0+c*(cw+gapx), g=rng('pi'+c);
     s+=rect(x-6,top-6,cw+12,bot-top+12,P.ink)+rect(x-3,top-3,cw+6,bot-top+6,P.gold)+rect(x,top,cw,bot-top,P.lapisD);
+    s+=tile(x-14,top-20,cw+28,9,P.gold,1.2)+tile(x-8,top-11,cw+16,6,P.ivory,1.1)+tile(x-8,bot+5,cw+16,6,P.ivory,1.1)+tile(x-14,bot+11,cw+28,9,P.gold,1.2);
     const H0=bot-top-16, yOld=top+8, hOld=H0*split[c][0], hSum=H0*split[c][1];
     let y=yOld, i=0;
     while(y+6<yOld+hOld){ const L=(0.45+g()*0.5)*(cw-20), left=i%2===0; s+=rect(left?x+10:x+cw-10-L,y,L,6,'none',`stroke="${P.sky}" stroke-width="1" stroke-opacity=".75"`); y+=10; i++; }
@@ -298,74 +375,78 @@ EMBLEM.pi = (w,h,r)=>{
     y=yb+hSum+10; i=0;
     while(y+8<bot-8){ const L=(0.45+g()*0.5)*(cw-20), left=i%2===0; s+=rect(left?x+10:x+cw-10-L,y,L,7,role[i%3],S(.9)); y+=11.5; i++; }
     // memory jewel, set into the vessel's foot
-    s+=jewel(x+cw/2,bot+18,10,[P.vermilion,P.saffron,P.malachite][c]);
+    s+=jewel(x+cw/2,bot+40,10,[P.vermilion,P.saffron,P.malachite][c]);
   }
   return s;
 };
 
-/* SQL Masterclass — an inner join: key values are pigments; matching pigments are joined, and the result is laid out below. */
+/* SQL Masterclass — an inner join: key values are pigments; matching pigments are threaded together, and the joined rows are laid out below. */
 EMBLEM.sql = (w,h,r)=>{
-  const keys=[P.lapis,P.malachite,P.saffron,P.vermilion,P.sky,P.pink];
-  const cwA=34, rh=22;
-  const table=(x,y,ncol,rowsKeys,keyCol,tint)=>{ let s='';
-    s+=rect(x-5,y-5,ncol*cwA+10,(rowsKeys.length+1)*rh+10,P.ink)+rect(x-2.5,y-2.5,ncol*cwA+5,(rowsKeys.length+1)*rh+5,P.gold);
-    for(let c=0;c<ncol;c++) s+=tile(x+c*cwA,y,cwA,rh,P.goldL,1);
-    rowsKeys.forEach((k,ri)=>{ for(let c=0;c<ncol;c++){ const yy=y+(ri+1)*rh; s+=tile(x+c*cwA,yy,cwA,rh,c===keyCol?P.ivory:tint,1);
-      if(c===keyCol) s+=circ(x+c*cwA+cwA/2,yy+rh/2,6,k,S(1)); else s+=line(x+c*cwA+8,yy+rh/2,x+c*cwA+cwA-8-((ri+c)%3)*4,yy+rh/2,P.ink,1.4); } });
+  const cw=42, rh=27;
+  const g=rng('sql-cells');
+  const table=(x,y,ncol,rowsKeys,tints)=>{ let s='';
+    s+=rect(x-6,y-6,ncol*cw+12,(rowsKeys.length+1)*rh+12,P.ink)+rect(x-3,y-3,ncol*cw+6,(rowsKeys.length+1)*rh+6,P.gold);
+    for(let c=0;c<ncol;c++) s+=tile(x+c*cw,y,cw,rh,P.goldL,1)+line(x+c*cw+10,y+rh/2,x+c*cw+cw-10,y+rh/2,P.ink,2.2,'stroke-linecap="round"');
+    rowsKeys.forEach((k,ri)=>{ for(let c=0;c<ncol;c++){ const yy=y+(ri+1)*rh; s+=tile(x+c*cw,yy,cw,rh,c===0?P.ivory:tints[c],1);
+      if(c===0) s+=circ(x+cw/2,yy+rh/2,7,k,S(1.1)); else { const L=10+g()*14; s+=line(x+c*cw+9,yy+rh/2,x+c*cw+9+L,yy+rh/2,P.ink,1.6,'stroke-linecap="round"'); } } });
     return s; };
-  const A=[0,1,2,3,4,5], Bk=[2,5,0,3,1].map(i=>keys[i]).concat([]);
-  const Ak=[keys[0],keys[4],keys[2],keys[1],keys[3],keys[5]].slice(0,6);
-  const ax=54, ay=34, bx=w-54-3*cwA, by=56;
-  const Bkeys=[keys[2],keys[0],keys[5],keys[3]];
+  const K={a:P.lapis,b:P.malachite,c:P.saffron,d:P.lac,e:P.sky,f:P.pink};
+  const Ak=[K.a,K.e,K.c,K.b,K.d,K.f], Bk=[K.c,K.a,K.f,K.d];
+  const A_T=[0,P.sky,P.sky,P.sky], B_T=[0,P.pink,P.pink];
+  const ax=58, ay=34, bx=w-58-3*cw, by=34+rh;
   let s='';
-  // join threads (behind the tables)
-  Ak.forEach((k,ri)=>{ const bi=Bkeys.indexOf(k); if(bi<0) return;
-    const x1=ax+4*cwA+5, y1=ay+(ri+1.5)*rh, x2=bx-5, y2=by+(bi+1.5)*rh;
-    s+=`<path d="M${x1},${f(y1)} C${f((x1+x2)/2)},${f(y1)} ${f((x1+x2)/2)},${f(y2)} ${x2},${f(y2)}" fill="none" stroke="${P.ink}" stroke-width="4.6"/>`;
-    s+=`<path d="M${x1},${f(y1)} C${f((x1+x2)/2)},${f(y1)} ${f((x1+x2)/2)},${f(y2)} ${x2},${f(y2)}" fill="none" stroke="${k}" stroke-width="2.4"/>`; });
-  s+=table(ax,ay,4,Ak,0,P.sky)+table(bx,by,3,Bkeys,0,P.pink);
-  // result
-  const res=Ak.filter(k=>Bkeys.includes(k)), rx=(w-6*cwA)/2, ry=h-40-(res.length+1)*rh;
-  s+=arrow(w/2,ay+7*rh+20,w/2,ry-18,P.gold,3);
-  s+=rect(rx-5,ry-5,6*cwA+10,(res.length+1)*rh+10,P.ink)+rect(rx-2.5,ry-2.5,6*cwA+5,(res.length+1)*rh+5,P.gold);
-  for(let c=0;c<6;c++) s+=tile(rx+c*cwA,ry,cwA,rh,P.goldL,1);
-  res.forEach((k,ri)=>{ for(let c=0;c<6;c++){ const yy=ry+(ri+1)*rh; s+=tile(rx+c*cwA,yy,cwA,rh,c===0?P.ivory:(c<4?P.sky:P.pink),1);
-    if(c===0) s+=circ(rx+cwA/2,yy+rh/2,6,k,S(1)); else s+=line(rx+c*cwA+8,yy+rh/2,rx+c*cwA+cwA-8-((ri+c)%3)*4,yy+rh/2,P.ink,1.4);} });
+  Ak.forEach((k,ri)=>{ const bi=Bk.indexOf(k); if(bi<0) return;
+    const x1=ax+4*cw+6, y1=ay+(ri+1.5)*rh, x2=bx-6, y2=by+(bi+1.5)*rh, d=`M${x1},${f(y1)} C${f((x1+x2)/2)},${f(y1)} ${f((x1+x2)/2)},${f(y2)} ${x2},${f(y2)}`;
+    s+=`<path d="${d}" fill="none" stroke="${P.ink}" stroke-width="6"/><path d="${d}" fill="none" stroke="${k}" stroke-width="3.4"/>`; });
+  s+=table(ax,ay,4,Ak,A_T)+table(bx,by,3,Bk,B_T);
+  const res=Ak.filter(k=>Bk.includes(k)), rx=(w-6*cw)/2, ry=h-36-(res.length+1)*rh;
+  s+=arrow(w/2,ay+7*rh+18,w/2,ry-16,P.gold,3.4);
+  s+=table(rx,ry,6,res,[0,P.sky,P.sky,P.sky,P.pink,P.pink]);
   return s;
 };
 
+/* A small garden miniature — the one "image" the system ever shows: sky, sun, two cypresses, a terrace with a pool. (120 x 120) */
+function garden(){
+  const cyp=(x,top,wd)=>`<path d="M${x},${top} C${x+wd*.62},${top+30} ${x+wd*.55},${top+52} ${x+wd*.18},82 L${x-wd*.18},82 C${x-wd*.55},${top+52} ${x-wd*.62},${top+30} ${x},${top} Z" fill="#164B3A" stroke="${P.ink}" stroke-width="1"/>`;
+  return rect(0,0,120,120,P.sky)+circ(90,24,11,P.gold,S(1))+rect(0,62,120,22,P.malachiteL)+cyp(32,14,26)+cyp(62,30,20)+
+    rect(0,82,120,38,P.saffron,S(1))+rect(22,92,76,18,P.lapis,S(1))+line(26,101,94,101,P.sky,1.4);
+}
 /* DeiT — a student transformer learns from the image's patches and, through a distillation token, from a convolutional teacher. */
 EMBLEM.deit = (w,h,r)=>{
   let s='';
-  // the image: a small flat landscape, cut into 3x3 patches
-  const img=(x,y,sz)=>`<g transform="translate(${x},${y}) scale(${sz/90})">`+rect(0,0,90,90,P.sky)+circ(64,26,12,P.ivory,S(1))+
-    poly([[0,90],[0,58],[28,30],[56,62],[70,50],[90,68],[90,90]],P.malachite,S(1))+poly([[0,90],[0,74],[40,64],[90,82],[90,90]],P.lac,S(1))+`</g>`;
-  const ix=40, iy=h-40-150;
-  s+=rect(ix-6,iy-6,162,162,P.ink)+rect(ix-3,iy-3,156,156,P.gold)+img(ix,iy,150);
-  for(let k=1;k<3;k++){ s+=line(ix+k*50,iy,ix+k*50,iy+150,P.ivory,2.4)+line(ix,iy+k*50,ix+150,iy+k*50,P.ivory,2.4); }
-  // token row: [CLS] p1..p9 [DIST]
-  const tx0=224, ty=h-40-44, ts=30, tg=4;
-  s+=arrow(ix+160,ty+ts/2,tx0-8,ty+ts/2,P.ivory,2);
-  const toks=[];
-  for(let i=0;i<11;i++){ const x=tx0+i*(ts+tg); toks.push(x+ts/2);
-    if(i===0){ s+=tile(x,ty,ts,ts,P.ivory,1.3)+circ(x+ts/2,ty+ts/2,5,P.ink); }
-    else if(i===10){ s+=tile(x,ty,ts,ts,P.vermilion,1.3)+circ(x+ts/2,ty+ts/2,5,P.ivory,S(1)); }
-    else { const pi=i-1, px=pi%3, py=Math.floor(pi/3);
-      s+=`<svg x="${x}" y="${ty}" width="${ts}" height="${ts}" viewBox="${px*30} ${py*30} 30 30">${img(0,0,90)}</svg>`+rect(x,ty,ts,ts,'none',S(1.3)); }
-  }
-  // the student: a transformer block
-  const sx=tx0-6, sw=11*(ts+tg)-tg+12, sy=150, sh=ty-28-sy;
-  for(const t of toks) s+=line(t,ty-2,t,sy+sh+2,P.ink,1.4);
-  s+=rect(sx-5,sy-5,sw+10,sh+10,P.ink)+rect(sx-2,sy-2,sw+4,sh+4,P.gold)+rect(sx+2,sy+2,sw-4,sh-4,P.lapis);
-  const gg=rng('deit-att');
-  for(let i=0;i<11;i++) for(let j=0;j<11;j++){ if(gg()<.72) continue; s+=line(toks[i],sy+sh-12,toks[j],sy+12,P.sky,1); }
-  // outputs
-  s+=arrow(toks[0],sy-6,toks[0],sy-48,P.ivory,2.2)+tile(toks[0]-18,sy-86,36,36,P.ivory,1.4)+txt(toks[0],sy-61,'y',{size:22,family:'Eczar',fill:P.ink,weight:600});
-  s+=arrow(toks[10],sy-6,toks[10],sy-48,P.vermilion,2.2)+tile(toks[10]-18,sy-86,36,36,P.vermilion,1.4)+txt(toks[10],sy-61,'ŷ',{size:22,family:'Eczar',fill:P.ivory,weight:600});
-  // the teacher: a convolutional pyramid, feature maps shrinking and deepening
-  const cx=120, cyy=40;
-  for(let k=0;k<4;k++){ const sz=96-k*20, x=cx-sz/2+k*10, y=cyy+k*14; s+=tile(x,y,sz,sz*.62,[P.saffron,P.gold,P.goldD,P.ink][k],1.3); }
-  s+=`<path d="M${cx+60},${cyy+50} C${cx+170},${cyy+50} ${toks[10]},${cyy} ${toks[10]},${sy-92}" fill="none" stroke="${P.vermilion}" stroke-width="2.4" stroke-dasharray="2 6" stroke-linecap="round"/>`;
+  const ts=28, tg=5, N=11, x0=196, rowW=N*ts+(N-1)*tg, ty=h-78;
+  const toks=[...Array(N)].map((_,i)=>x0+i*(ts+tg)+ts/2);
+  // the image, cut into 3x3 patches
+  const isz=126, ix=40, iy=ty+ts-isz;
+  s+=rect(ix-6,iy-6,isz+12,isz+12,P.ink)+rect(ix-3,iy-3,isz+6,isz+6,P.gold)+`<svg x="${ix}" y="${iy}" width="${isz}" height="${isz}" viewBox="0 0 120 120">${garden()}</svg>`;
+  for(let k=1;k<3;k++) s+=line(ix+k*isz/3,iy,ix+k*isz/3,iy+isz,P.ivory,2.2)+line(ix,iy+k*isz/3,ix+isz,iy+k*isz/3,P.ivory,2.2);
+  s+=arrow(ix+isz+10,ty+ts/2,x0-8,ty+ts/2,P.ivory,2.2);
+  // the student: three encoder layers, token threads running through them
+  const L=3, lh=34, lg=18, top=ty-26-(L*lh+(L-1)*lg);
+  for(const t of toks) s+=line(t,ty-2,t,top-2,P.ink,1.6);
+  for(let l=0;l<L;l++){ const yy=top+l*(lh+lg);
+    s+=rect(x0-12,yy-4,rowW+24,lh+8,P.ink)+rect(x0-9,yy-1,rowW+18,lh+2,P.gold)+rect(x0-6,yy+2,rowW+12,lh-4,P.lapis);
+    toks.forEach((t,i)=>{ s+=circ(t,yy+lh/2,4.2,i===0?P.ivory:i===N-1?P.vermilion:P.sky,S(1)); }); }
+  // tokens: [CLS] 9 patches [DIST]
+  toks.forEach((t,i)=>{ const x=t-ts/2;
+    if(i===0) s+=tile(x,ty,ts,ts,P.ivory,1.4)+circ(t,ty+ts/2,5,P.ink);
+    else if(i===N-1) s+=tile(x,ty,ts,ts,P.vermilion,1.4)+circ(t,ty+ts/2,5,P.ivory,S(1));
+    else { const p=i-1; s+=`<svg x="${f(x)}" y="${ty}" width="${ts}" height="${ts}" viewBox="${(p%3)*40} ${Math.floor(p/3)*40} 40 40">${garden()}</svg>`+rect(x,ty,ts,ts,'none',S(1.4)); } });
+  // heads: class token -> the true label; distillation token -> the teacher's label
+  const hy=top-64;
+  s+=arrow(toks[0],top-8,toks[0],hy+36,P.ivory,2.2)+tile(toks[0]-17,hy,34,34,P.ivory,1.4)+glyph(toks[0]-17,hy,34,34,rng('y1'));
+  s+=arrow(toks[N-1],top-8,toks[N-1],hy+36,P.vermilion,2.2)+tile(toks[N-1]-17,hy,34,34,P.vermilion,1.4)+glyph(toks[N-1]-17,hy,34,34,rng('y1'),P.ivory);
+  // the teacher: a convnet, feature maps shrinking as they deepen
+  const tx=ix+isz/2, tb=iy-22;
+  s+=arrow(tx,iy-8,tx,tb-4,P.ivory,2);
+  const maps=[[5,78],[3,50],[1,24]]; let yy=tb;
+  maps.forEach(([k,sz],m)=>{ yy-=sz; const x=tx-sz/2;
+    for(let i=0;i<k;i++) for(let j=0;j<k;j++) s+=tile(x+i*sz/k,yy+j*sz/k,sz/k,sz/k,m===2?P.gold:((i+j)%2?P.ivory:P.goldL),1.1);
+    if(m<2) s+=line(tx,yy-2,tx,yy-12,P.ink,1.6); yy-=14; });
+  // distillation: teacher's output guides the distillation head
+  const ty0=yy+14+12;
+  s+=`<path d="M${f(tx+16)},${f(ty0)} C${f(tx+120)},${f(ty0)} ${f(toks[N-1]-60)},${f(hy+17)} ${f(toks[N-1]-22)},${f(hy+17)}" fill="none" stroke="${P.ink}" stroke-width="5" stroke-linecap="round"/>`;
+  s+=`<path d="M${f(tx+16)},${f(ty0)} C${f(tx+120)},${f(ty0)} ${f(toks[N-1]-60)},${f(hy+17)} ${f(toks[N-1]-22)},${f(hy+17)}" fill="none" stroke="${P.vermilion}" stroke-width="2.6" stroke-linecap="round"/>`;
   return s;
 };
 
@@ -374,7 +455,7 @@ function room(w,h,r,wallCol,wallArt,floorArt){
   const X0=58, X1=w-58, colW=16, roofY=62, wallY=112, floorY=300, plinthY=392, baseY=424;
   let s='';
   // parapet merlons
-  for(let x=X0+6;x<X1-18;x+=24) s+=tile(x,roofY-14,14,14,P.ivory,1.1);
+  for(let x=X0+4;x<X1-16;x+=24) s+=poly([[x,roofY],[x,roofY-9],[x+3,roofY-9],[x+3,roofY-13],[x+7,roofY-18],[x+11,roofY-13],[x+11,roofY-9],[x+14,roofY-9],[x+14,roofY]],P.ivory,S(1.1));
   s+=tile(X0-10,roofY,X1-X0+20,14,P.ivory,1.2);                                   // cornice
   s+=poly([[X0-4,roofY+14],[X1+4,roofY+14],[X1+22,wallY-12],[X0-22,wallY-12]],P.gold,S(1.2)); // chhajja (eave)
   for(let x=X0+2;x<X1;x+=14) s+=line(x,roofY+16,x-((x-(X0+X1)/2)/((X1-X0)/2))*16,wallY-14,P.goldD,1.1);
@@ -397,10 +478,10 @@ function room(w,h,r,wallCol,wallArt,floorArt){
 }
 EMBLEM.roomLanguage=(w,h,r)=> room(w,h,r,P.lapis,
   (x,y,ww,hh)=>{ // a paged KV cache: niches in the wall, filled page by page
-    let s=''; const cols=8, rows=4, gx=8, gy=10, cw=(ww-(cols-1)*gx)/cols, ch=(hh-(rows-1)*gy)/rows; let n=0; const filled=27;
+    let s=''; const cols=8, rows=4, gx=8, gy=10, cw=(ww-(cols-1)*gx)/cols, ch=(hh-(rows-1)*gy)/rows; let n=0; const filled=27, gk=rng('kv');
     for(let j=0;j<rows;j++) for(let i=0;i<cols;i++){ const nx=x+i*(cw+gx), ny=y+j*(ch+gy);
       s+=tile(nx,ny,cw,ch,P.lapisD,1.2)+rect(nx+3,ny+3,cw-6,3,P.gold);
-      if(n<filled){ const k=n%4; s+=rect(nx+cw*.22,ny+ch*.34,cw*.56,ch*.52,[P.ivory,P.saffron,P.sky,P.pink][k],S(1)); }
+      if(n<filled){ const k=Math.floor(gk()*4); s+=rect(nx+cw*.2,ny+ch*.34,cw*.6,ch*.5,[P.ivory,P.saffron,P.sky,P.pink][k],S(1))+glyph(nx+cw*.2,ny+ch*.34,cw*.6,ch*.5,gk); }
       if(i%2===1) s+=line(nx+cw+gx/2,ny+2,nx+cw+gx/2,ny+ch-2,P.goldL,1);
       n++; }
     return s; },
@@ -410,17 +491,15 @@ EMBLEM.roomLanguage=(w,h,r)=> room(w,h,r,P.lapis,
 EMBLEM.roomVision=(w,h,r)=> room(w,h,r,P.malachite,
   (x,y,ww,hh)=>{ // a picture on the wall, cut into 4x4 patches
     const sz=hh, px=x+(ww-sz)/2;
-    const pic=`<g transform="translate(${px},${y}) scale(${sz/120})">`+rect(0,0,120,120,P.sky)+circ(84,32,15,P.ivory,S(1))+poly([[0,120],[0,80],[36,40],[74,84],[92,68],[120,90],[120,120]],P.saffron,S(1))+poly([[0,120],[0,100],[54,86],[120,108],[120,120]],P.lac,S(1))+`</g>`;
-    let s=rect(px-6,y-6,sz+12,sz+12,P.ink)+rect(px-3,y-3,sz+6,sz+6,P.gold)+pic;
+    let s=rect(px-6,y-6,sz+12,sz+12,P.ink)+rect(px-3,y-3,sz+6,sz+6,P.gold)+`<svg x="${f(px)}" y="${f(y)}" width="${f(sz)}" height="${f(sz)}" viewBox="0 0 120 120">${garden()}</svg>`;
     for(let k=1;k<4;k++) s+=line(px+k*sz/4,y,px+k*sz/4,y+sz,P.ivory,1.8)+line(px,y+k*sz/4,px+sz,y+k*sz/4,P.ivory,1.8);
     return s; },
   (x,y,ww,hh)=>{ // the patches, flattened into a sequence behind a class token
     let s=''; const n=17, gap=3.5, tw=(ww-(n-1)*gap)/n, ty=y+(hh-tw)/2;
-    const pic=`${rect(0,0,120,120,P.sky)}${circ(84,32,15,P.ivory)}${poly([[0,120],[0,80],[36,40],[74,84],[92,68],[120,90],[120,120]],P.saffron)}${poly([[0,120],[0,100],[54,86],[120,108],[120,120]],P.lac)}`;
     for(let i=0;i<n;i++){ const tx=x+i*(tw+gap);
       if(i===0){ s+=tile(tx,ty,tw,tw,P.gold,1.2)+circ(tx+tw/2,ty+tw/2,3,P.ink); continue; }
-      const p=i-1, pxx=(p%4)*30, pyy=Math.floor(p/4)*30;
-      s+=`<svg x="${f(tx)}" y="${f(ty)}" width="${f(tw)}" height="${f(tw)}" viewBox="${pxx} ${pyy} 30 30">${pic}</svg>`+rect(tx,ty,tw,tw,'none',S(1.1)); }
+      const p=i-1;
+      s+=`<svg x="${f(tx)}" y="${f(ty)}" width="${f(tw)}" height="${f(tw)}" viewBox="${(p%4)*30} ${Math.floor(p/4)*30} 30 30">${garden()}</svg>`+rect(tx,ty,tw,tw,'none',S(1.1)); }
     return s; });
 EMBLEM.roomSound=(w,h,r)=> room(w,h,r,P.lac,
   (x,y,ww,hh)=>{ // a spectrogram hung like a textile: time across, frequency up
@@ -449,33 +528,25 @@ EMBLEM.roomReason=(w,h,r)=> room(w,h,r,P.ink,
     return s; });
 
 /* Kernel Engineering (forthcoming) — a tiled matrix multiply, left as an unfinished miniature:
-   the underdrawing (siyahi qalam in sanguine) is complete; only the tiles being computed are painted. */
+   the underdrawing in sanguine is complete; only the tiles being computed are painted. */
 EMBLEM.kernel=(w,h,r)=>{
-  const Q='#B4532F', ls=`stroke="${Q}" stroke-width="1.3" fill="none"`;
-  const n=6, cs=30, gap=26;
-  const Cx=w/2-n*cs/2+68, Cy=h/2-n*cs/2+56;          // C
-  const Ax=Cx-gap-n*cs, Ay=Cy;                        // A (left)
-  const Bx=Cx, By=Cy-gap-n*cs;                        // B (above)
+  const Q='#B4532F', ls=`stroke="${Q}" fill="none"`;
+  const n=6, cs=29, gap=28, tot=2*n*cs+gap;
+  const Ax=(w-tot)/2-12, Bx=Ax+n*cs+gap, Cx=Bx, By=(h-tot)/2-6, Ay=By+n*cs+gap, Cy=Ay;
   let s='';
-  // priming wash strokes
-  const g=rng('prime'); for(let i=0;i<9;i++){ const y=30+g()*(h-60); s+=`<path d="M${f(20+g()*40)},${f(y)} q${f(w*.3)},${f(g()*6-3)} ${f(w*.8)},${f(g()*8-4)}" stroke="#E9DFC6" stroke-width="${f(6+g()*10)}" fill="none" stroke-linecap="round"/>`; }
-  const grid=(x,y)=>{ let t=`<rect x="${x}" y="${y}" width="${n*cs}" height="${n*cs}" ${ls} stroke-width="2"/>`; for(let k=1;k<n;k++) t+=line(x+k*cs,y,x+k*cs,y+n*cs,Q,k%2?0.9:1.3)+line(x,y+k*cs,x+n*cs,y+k*cs,Q,k%2?0.9:1.3); return t; };
+  // construction lines, run through the whole page as the painter ruled them
+  for(let k=0;k<=n;k++){ s+=line(Ax-24,Ay+k*cs,Cx+n*cs+24,Ay+k*cs,Q,.8,'stroke-dasharray="1.5 5" stroke-opacity=".7"'); s+=line(Bx+k*cs,By-24,Bx+k*cs,Cy+n*cs+24,Q,.8,'stroke-dasharray="1.5 5" stroke-opacity=".7"'); }
+  const grid=(x,y)=>{ let t=`<rect x="${x}" y="${y}" width="${n*cs}" height="${n*cs}" ${ls} stroke-width="2"/>`; for(let k=1;k<n;k++) t+=line(x+k*cs,y,x+k*cs,y+n*cs,Q,k%2?1:1.5)+line(x,y+k*cs,x+n*cs,y+k*cs,Q,k%2?1:1.5); return t; };
   s+=grid(Ax,Ay)+grid(Bx,By)+grid(Cx,Cy);
-  // the tile being computed: row-block of A, column-block of B, one block of C (painted)
-  const ti=2, tj=3;  // 2x2 blocks of cells: block row 1 (cells 2-3), block col 1(cells 2-3)
-  s+=tile(Ax,Ay+ti*cs,n*cs,2*cs,P.lapis,1.2)+tile(Bx+tj*cs-cs,By,2*cs,n*cs,P.malachite,1.2);
-  for(let k=0;k<n;k++){ s+=rect(Ax+k*cs+cs*.3,Ay+ti*cs+cs*.3,cs*.4,cs*1.4,P.sky); s+=rect(Bx+tj*cs-cs+cs*.3,By+k*cs+cs*.3,cs*1.4,cs*.4,P.goldL); }
-  s+=tile(Cx+tj*cs-cs,Cy+ti*cs,2*cs,2*cs,P.vermilion,1.4)+rect(Cx+tj*cs-cs+6,Cy+ti*cs+6,2*cs-12,2*cs-12,'none',`stroke="${P.gold}" stroke-width="2"`);
-  // a half-laid gold rule, and the path of the k-loop (sketched)
-  s+=`<path d="M${Ax+n*cs+4},${Ay+ti*cs+cs} H${Cx+tj*cs-cs-4}" ${ls} stroke-dasharray="3 4"/>`;
-  s+=`<path d="M${Bx+tj*cs},${By+n*cs+4} V${Cy+ti*cs-4}" ${ls} stroke-dasharray="3 4"/>`;
-  // labels in the painter's hand
-  s+=txt(Ax+n*cs/2,Ay+n*cs+26,'A',{size:20,family:'Eczar',fill:Q,weight:500})+txt(Bx-18,By+n*cs/2+7,'B',{size:20,family:'Eczar',fill:Q,weight:500})+txt(Cx+n*cs/2,Cy+n*cs+26,'C',{size:20,family:'Eczar',fill:Q,weight:500});
-  // unfinished margin: a sketched chip outline behind (silicon)
-  s+=`<rect x="${Ax-30}" y="${By-30}" width="${Cx+n*cs-Ax+60}" height="${Cy+n*cs-By+68}" rx="6" ${ls} stroke-dasharray="1 5" stroke-linecap="round" stroke-width="2"/>`;
+  const bi=2, bj=2; // block row / column (cells bi..bi+1)
+  s+=tile(Ax,Ay+bi*cs,n*cs,2*cs,P.lapis,1.3)+tile(Bx+bj*cs,By,2*cs,n*cs,P.malachite,1.3);
+  for(let k=0;k<n;k++){ s+=rect(Ax+k*cs+cs*.32,Ay+bi*cs+cs*.3,cs*.36,cs*1.4,P.sky); s+=rect(Bx+bj*cs+cs*.3,By+k*cs+cs*.32,cs*1.4,cs*.36,P.goldL); }
+  // C is computed block by block, in row-major order: four blocks done, one under the brush, four still in line
+  for(let q=0;q<4;q++){ const qi=Math.floor(q/3), qj=q%3; s+=tile(Cx+qj*2*cs,Cy+qi*2*cs,2*cs,2*cs,P.saffron,1.3)+rect(Cx+qj*2*cs+6,Cy+qi*2*cs+6,2*cs-12,2*cs-12,'none',`stroke="${P.gold}" stroke-width="2.4"`)+rect(Cx+qj*2*cs+9.5,Cy+qi*2*cs+9.5,2*cs-19,2*cs-19,'none',S(1)); }
+  s+=tile(Cx+bj*cs,Cy+bi*cs,2*cs,2*cs,P.vermilion,1.5)+`<path d="M${Cx+bj*cs+6},${Cy+bi*cs+2*cs-6} V${Cy+bi*cs+6} H${Cx+bj*cs+2*cs-6}" fill="none" stroke="${P.gold}" stroke-width="2.4"/>`;
+  s+=txt(Ax+n*cs/2,Ay+n*cs+30,'A',{size:22,family:'Eczar',fill:Q,weight:500})+txt(Bx-22,By+n*cs/2+8,'B',{size:22,family:'Eczar',fill:Q,weight:500})+txt(Cx+n*cs/2,Cy+n*cs+30,'C',{size:22,family:'Eczar',fill:Q,weight:500});
   return s;
 };
-
 /* ======================= books ======================= */
 const SERIES='Charlie and the Intelligence Factory';
 const BOOKS = [
@@ -490,11 +561,11 @@ const BOOKS = [
   {slug:'5d-parallelism', level:'advanced', capsules:40, hours:9,
    title:['5D Parallelism','for Large Model Training'], size:54, ground:P.ink, emblem:'p5d'},
   {slug:'pi-vs-hermes-vs-codex', level:'advanced', capsules:9, hours:1,
-   title:['Pi vs Hermes vs Codex'], sub:['Context Compaction and Memory'], subSize:.58, size:56, ground:P.malachite, emblem:'pi'},
+   title:['Pi vs Hermes vs Codex'], sub:['Context Compaction and Memory'], subSize:.58, size:56, ground:P.lac, emblem:'pi'},
   {slug:'sql-masterclass', level:'beginner', capsules:36, hours:8,
-   title:['SQL Masterclass'], size:72, ground:P.lac, emblem:'sql'},
+   title:['SQL Masterclass'], size:72, ground:P.vermilion, emblem:'sql'},
   {slug:'deit-from-scratch', level:'advanced', capsules:42, hours:10,
-   title:['Build a Data-Efficient','Image Transformer','(DeiT) from Scratch'], size:50, ground:P.saffron, emblem:'deit'},
+   title:['Build a Data-Efficient','Image Transformer','(DeiT) from Scratch'], size:50, ground:P.malachite, emblem:'deit'},
   {slug:'kernel-engineering', level:'advanced', soon:true,
    rub:'Forthcoming', title:['Kernel Engineering'], sub:['From silicon to speculative decoding —','GPU kernels for modern LLMs.'], subSize:.42, size:62, ground:'primed', emblem:'kernel'},
   {slug:'charlie-language-room', level:'advanced', capsules:22, hours:5, series:'I',
@@ -512,14 +583,9 @@ const PRIMED='#F1E7CF';
 function coverSVG(b){
   const L=LEVEL[b.level], r=rng(b.slug);
   const ground = b.ground==='primed'?PRIMED:b.ground;
-  let s=`<svg class="art" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <pattern id="tool" width="8" height="8" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="0.85" fill="${P.gold}"/><circle cx="6" cy="6" r="0.85" fill="${P.gold}"/></pattern>
-    <pattern id="stip" width="9" height="9" patternUnits="userSpaceOnUse"><circle cx="2.25" cy="2.25" r="0.9" fill="#000" fill-opacity=".16"/><circle cx="6.75" cy="6.75" r="0.9" fill="#000" fill-opacity=".16"/></pattern>
-  </defs>`;
+  let s=`<svg class="art" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
   s+=rect(0,0,W,H,L.margin);
-  s+=zarAfshan(r, L.fleck);
-  for(let i=0;i<L.n;i++){ const o=8+i*6; s+=ring(B.x-o-1.4,B.y-o-1.4,B.w+2*o+2.8,B.h+2*o+2.8,1.4,L.margin===P.saffron?P.ink:P.gold); }
+    for(let i=0;i<L.n;i++){ const o=4.5+i*4.6; s+=ring(B.x-o-1.5,B.y-o-1.5,B.w+2*o+3,B.h+2*o+3,1.5,L.margin===P.saffron?P.ink:P.gold); }
   let o=0; for(const [col,t] of JAD){ s+=ring(B.x+o,B.y+o,B.w-2*o,B.h-2*o,t,col); o+=t; }
   s+=cartouche(C.x,C.y,C.w,CART_H,ground);
   let y=C.y+CART_H; for(const [col,t] of DIV){ s+=rect(C.x,y,C.w,t,col); y+=t; }
@@ -527,7 +593,7 @@ function coverSVG(b){
   s+=`<g transform="translate(${M.x},${M.y})">${EMBLEM[b.emblem](M.w,M.h,r,b)}</g>`;
   s+=shamsa(W/2, B.y+B.h+60, 22, L.margin, L.text===P.ink?P.ink:P.goldL);
   s+='</svg>';
-  return s.replace(/id="(tool|stip)"/g,`id="$1-${b.slug}"`).replace(/url\(#(tool|stip)\)/g,`url(#$1-${b.slug})`);
+  return s;
 }
 
 function coverEl(b){
@@ -543,9 +609,96 @@ function coverEl(b){
     `<div class="imprint" style="top:${B.y+B.h+52}px;color:${L.text}"><div class="l">Vizuara Books<small>books.vizuara.ai</small></div><div class="r">${L.label}<small>${meta}</small></div></div>`;
   return d;
 }
+/* ======================= print wrap ======================= */
+const COLOPHON = {
+  'neural-networks-from-scratch': {
+    blurb:['<b>Neural Networks from Scratch</b> is a beginner’s book in 33 short lessons — capsules — about seven hours of reading, free to read at books.vizuara.ai.',
+           'It belongs to Vizuara Books, a library of technical books on artificial intelligence and machine learning.'],
+    cover:'The miniature on the front is a 3·5·5·2 perceptron. Every thread is a weight — gold where it is positive, vermilion where it is negative, its width its magnitude. Every neuron is a set stone, its colour its activation; one forward path is strung with pearls. The folio follows the Mughal album page: a painting inside ruled borders (jadval), inside a coloured margin (hashiya). A saffron margin and a single rule mark a beginner’s book.'
+  }
+};
+function wrapEl(b){
+  const L=LEVEL[b.level], SW=48, WW=W*2+SW, r=rng(b.slug+'-wrap');
+  const d=document.createElement('div'); d.className='wrap'; d.style.width=WW+'px'; d.style.height=H+'px';
+  // back cover: same folio architecture, ivory wasli inside
+  let s=`<svg class="art" width="${WW}" height="${H}" viewBox="0 0 ${WW} ${H}" xmlns="http://www.w3.org/2000/svg">`;
+  s+=rect(0,0,WW,H,L.margin);
+  const frame=(ox)=>{ let t='';
+    for(let i=0;i<L.n;i++){ const o=4.5+i*4.6; t+=ring(ox+B.x-o-1.5,B.y-o-1.5,B.w+2*o+3,B.h+2*o+3,1.5,L.margin===P.saffron?P.ink:P.gold); }
+    let o=0; for(const [col,t2] of JAD){ t+=ring(ox+B.x+o,B.y+o,B.w-2*o,B.h-2*o,t2,col); o+=t2; } return t; };
+  s+=frame(0);
+  s+=rect(C.x,C.y,C.w,B.h-2*JT,P.ivory);
+  // a narrow cartouche band for the running title, and a divider under it
+  s+=cartouche(C.x,C.y,C.w,92,P.ivory);
+  let y=C.y+92; for(const [col,t] of DIV){ s+=rect(C.x,y,C.w,t,col); y+=t; }
+  // a small detail of the front: one set stone and its threads, as a vignette
+  const vx=W/2, vy=398;
+  s+=line(vx-86,vy-30,vx,vy,P.goldD,2.2,'stroke-linecap="round"')+line(vx-86,vy+30,vx,vy,P.vermilion,1.4,'stroke-linecap="round"')+line(vx,vy,vx+86,vy-18,P.goldD,2.8,'stroke-linecap="round"')+line(vx,vy,vx+86,vy+24,P.vermilion,1.1,'stroke-linecap="round"');
+  s+=jewel(vx,vy,16,P.saffron);
+  // barcode panel (left blank for the printer)
+  s+=rect(C.x+C.w-178,C.y+B.h-2*JT-112,156,90,'#FFFFFF',S(1.2));
+  // seal
+  s+=shamsa(W/2, B.y+B.h+60, 22, L.margin, L.text===P.ink?P.ink:P.goldL);
+  // spine
+  const sx=W, cx=W+SW/2;
+  s+=rect(sx,0,SW,H,L.margin)+line(sx+.6,0,sx+.6,H,P.ink,1.2,'stroke-opacity=".35"')+line(sx+SW-.6,0,sx+SW-.6,H,P.ink,1.2,'stroke-opacity=".35"');
+  for(let i=0;i<L.n;i++) s+=rect(sx+10,40+i*6,SW-20,2,L.margin===P.saffron?P.ink:P.gold);
+  const ct=120, cb=H-150, cw=SW-14;
+  s+=`<g transform="translate(${sx+7},${cb}) rotate(-90)">${cartouche(0,0,cb-ct,cw,L.margin,[2,6,7])}</g>`;
+  s+=shamsa(cx,H-78,15,L.margin,L.text===P.ink?P.ink:P.goldL);
+  s+='</svg>';
+  const C2=COLOPHON[b.slug];
+  const front=coverEl(b); front.removeAttribute('data-slug');
+  front.style.cssText=`position:absolute;left:${W+SW}px;top:0;box-shadow:none`;
+  d.innerHTML=s+
+    `<div class="blurb" style="left:${C.x+46}px;top:${C.y+26}px;width:${C.w-92}px;height:40px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:25px;letter-spacing:-.01em">${b.title.join(' ')}</div>`+
+    `<div class="blurb" style="left:${C.x+54}px;top:${C.y+128}px;width:${C.w-108}px;font-size:19px;line-height:1.5">${C2.blurb.map(p=>`<p style="margin:0 0 .75em">${p}</p>`).join('')}</div>`+
+    `<div class="blurb" style="left:${C.x+54}px;top:${C.y+404}px;width:${C.w-108}px;font-family:'Anek Latin';font-size:13.5px;line-height:1.5;color:#3A2C22"><div style="font-stretch:112%;font-weight:600;font-size:11.5px;letter-spacing:.22em;text-transform:uppercase;color:${P.vermilion};margin-bottom:8px">About the cover</div>${C2.cover}</div>`+
+    `<div class="blurb" style="left:${C.x+30}px;top:${C.y+B.h-2*JT-92}px;width:300px;font-family:'Anek Latin';font-size:11.5px;line-height:1.45;color:#3A2C22;letter-spacing:.02em">${L.label} · ${b.capsules} capsules · ${b.hours} hours<br>books.vizuara.ai</div>`+
+    `<div class="imprint" style="position:absolute;left:0;width:${W}px;top:${B.y+B.h+52}px;color:${L.text};font-family:'Anek Latin';text-transform:uppercase;font-weight:600;font-size:13px;letter-spacing:.24em;font-stretch:112%;line-height:1"><div style="position:absolute;right:calc(50% + 42px);text-align:right;white-space:nowrap">Vizuara Books</div><div style="position:absolute;left:calc(50% + 42px);white-space:nowrap">${L.label}</div></div>`+
+    `<div style="position:absolute;left:${sx}px;top:${ct}px;width:${SW}px;height:${cb-ct}px;display:flex;align-items:center;justify-content:center"><div style="transform:rotate(90deg);white-space:nowrap;font-family:'Eczar';font-weight:600;font-size:19px;letter-spacing:-.005em;color:${P.ink}">${b.title.join(' ')}</div></div>`;
+  d.appendChild(front);
+  return d;
+}
+
+/* ======================= presentation chrome ======================= */
+function chrome(){
+  const sw=[['Peori','Indian yellow — beginner margin',P.saffron],['Sabz','malachite — intermediate margin',P.malachite],['Lajward','lapis — advanced margin',P.lapis],
+            ['Hingul','vermilion',P.vermilion],['Lakh','lac crimson',P.lac],['Gulabi','pink',P.pink],['Asmani','sky',P.sky],['Wasli','paper ivory',P.ivory],['Sona','shell gold',P.gold],['Kajal','lamp black',P.ink]];
+  document.getElementById('swatches').innerHTML=sw.map(([n,d,c])=>`<div><i style="background:${c}"></i><b>${n}</b>${d}<br><span>${c}</span></div>`).join('');
+  document.getElementById('levels').innerHTML=Object.values(LEVEL).map(L=>{
+    let g=`<svg width="92" height="70" viewBox="0 0 92 70">`+rect(0,0,92,70,L.margin);
+    for(let i=0;i<L.n;i++){ const o=4+i*4; g+=ring(14-o,10-o,64+2*o,50+2*o,1.3,L.margin===P.saffron?P.ink:P.gold); }
+    g+=ring(14,10,64,50,3,P.gold)+rect(17,13,58,44,P.ivory)+`</svg>`;
+    return `<div>${g}<span><b>${L.label}</b><br>${L.n} ${L.n>1?'rules':'rule'} in the hashiya</span></div>`; }).join('');
+  // anatomy schematic
+  const k=.36, sx=10, sy=6; const X=v=>f(sx+v*k), Y=v=>f(sy+v*k);
+  let a=`<svg viewBox="0 0 560 336" xmlns="http://www.w3.org/2000/svg">`;
+  a+=`<rect x="${X(0)}" y="${Y(0)}" width="${f(W*k)}" height="${f(H*k)}" fill="${P.lapis}"/>`;
+  for(let i=0;i<3;i++){ const o=4.5+i*4.6; a+=ring(sx+(B.x-o-1.5)*k,sy+(B.y-o-1.5)*k,(B.w+2*o+3)*k,(B.h+2*o+3)*k,.8,P.gold); }
+  a+=ring(sx+B.x*k,sy+B.y*k,B.w*k,B.h*k,2.4,P.gold);
+  a+=`<g transform="translate(${sx},${sy}) scale(${k})">${cartouche(C.x,C.y,C.w,CART_H,P.pink)}${rect(M.x,M.y,M.w,M.h,P.pink)}</g>`;
+  a+=`<g transform="translate(${sx+M.x*k},${sy+M.y*k}) scale(${k})">${EMBLEM.llm(M.w,M.h,rng('anat'))}</g>`;
+  a+=rect(sx+C.x*k+40,sy+C.y*k+26,C.w*k-80,7,P.ink)+rect(sx+C.x*k+60,sy+C.y*k+40,C.w*k-120,7,P.ink);
+  a+=shamsa(sx+W/2*k,sy+(B.y+B.h+60)*k,8,P.lapis,P.goldL).replace(/font-size="[^"]+"/,'font-size="8"');
+  const lab=(x1,y1,y2,t,d)=>`<path d="M${f(x1)},${f(y1)} H${f(sx+W*k+14)} L${f(sx+W*k+30)},${f(y2)} H${f(sx+W*k+40)}" fill="none" stroke="${P.ink}" stroke-width="1"/>${circ(x1,y1,2.4,P.ink)}`+
+     `<text x="${f(sx+W*k+46)}" y="${f(y2+4)}" font-family="Eczar" font-weight="600" font-size="15" fill="${P.ink}">${t}</text><text x="${f(sx+W*k+46)}" y="${f(y2+21)}" font-family="Anek Latin" font-size="12" fill="#4A3A2C">${d}</text>`;
+  a+=lab(sx+(W-24)*k,sy+20*k,16,'Hashiya','margin — its pigment is the level');
+  a+=lab(sx+(C.x+C.w-70)*k,sy+(C.y+60)*k,72,'Cartouche','the title, the hero');
+  a+=lab(sx+(B.x+B.w-3)*k,sy+(B.y+390)*k,132,'Jadval','ruled borders — count = level');
+  a+=lab(sx+(M.x+M.w-60)*k,sy+(M.y+330)*k,200,'Miniature','the book’s mechanism, on its own ground');
+  a+=lab(sx+(W/2+22)*k,sy+(B.y+B.h+60)*k,272,'Shamsa','the Vizuara seal — the signature');
+  a+=`</svg>`;
+  document.getElementById('anatomy').innerHTML=a;
+}
+
+const CORE=['ai-context-engineering','mathematical-foundations-for-ml','neural-networks-from-scratch','build-llms-from-scratch','5d-parallelism','pi-vs-hermes-vs-codex'];
 function build(){
-  const host=document.getElementById('covers');
-  for(const b of BOOKS) host.appendChild(coverEl(b));
+  const bySlug=Object.fromEntries(BOOKS.map(b=>[b.slug,b]));
+  CORE.forEach(sl=>document.getElementById('core').appendChild(coverEl(bySlug[sl])));
+  BOOKS.filter(b=>!CORE.includes(b.slug)).forEach(b=>document.getElementById('range').appendChild(coverEl(b)));
+  document.getElementById('wrapHost').appendChild(wrapEl(bySlug['neural-networks-from-scratch']));
+  chrome();
 }
 function fit(){
   document.querySelectorAll('.cover .title').forEach(t=>{

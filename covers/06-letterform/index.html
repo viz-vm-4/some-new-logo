@@ -35,7 +35,7 @@ body{font-family:'Archivo',sans-serif;padding:40px 40px 120px}
 .f-serif{font-family:'Libertinus Serif'}
 .f-mono{font-family:'Chivo Mono';font-weight:400;font-variant-ligatures:none}
 figcaption .gl.f-it{font-family:'Libertinus Serif';font-style:italic}
-.cv svg.emb .hatch-line{stroke:var(--gl);stroke-width:3}
+.cv svg.emb .hatch-line{fill:var(--fg)}
 
 .cv .base{position:absolute;left:0;right:0;top:var(--base);height:2px;background:var(--rule)}
 .cv .cap{position:absolute;left:var(--m);right:var(--m);top:calc(var(--base) + 15px);
@@ -50,7 +50,10 @@ figcaption .gl.f-it{font-family:'Libertinus Serif';font-style:italic}
 .imprint{display:flex;align-items:center;gap:9px;font:700 17px/1 'Archivo';font-stretch:88%;letter-spacing:-.005em;text-transform:none}
 .vmark{display:inline-block;position:relative;width:22px;height:22px;background:var(--fg);flex:none}
 .vmark::after{content:'v';position:absolute;left:0;right:0;top:-3px;text-align:center;color:var(--bg);font:italic 400 23px/22px 'Libertinus Serif'}
-.cv .series{position:absolute;right:var(--m);top:calc(var(--base) + 44px);font:400 150px/1 'Libertinus Serif';letter-spacing:.03em}
+.cv .series{position:absolute;right:var(--m);top:calc(var(--base) + 44px);font:400 150px/1 'Libertinus Serif';letter-spacing:.03em;text-align:right}
+.cv .series small{display:block;margin-top:8px;font:500 12px/1 'Chivo Mono';letter-spacing:.06em;text-transform:uppercase}
+.cv .cap .tok{text-transform:none;letter-spacing:.02em}
+.cv .cap .tok sup{font-size:8.5px;line-height:0;vertical-align:5px;margin-left:1px}
 
 /* =========================================================
    PRESENTATION PAGE
@@ -144,16 +147,16 @@ figcaption p .mono{display:block;margin-bottom:4px;font-size:11px}
     <p class="lede">The character <em>is</em> the image; the title hangs beneath it like the caption on a type specimen, and a one-line codepoint says exactly which character you are looking at. Maths is set in the face of the equation, code in the face of the terminal, and the level of a book is simply how much ink is on its cover. Fifty books become a character set — a shelf you can read.</p>
     <div class="specs">
       <div>
-        <h3>Palette — three inks</h3>
+        <h3>Palette — four inks, two per cover</h3>
         <div class="sw"><i style="background:#F1EDE4"></i><div>Paper<b>#F1EDE4 · uncoated stock</b></div></div>
-        <div class="sw"><i style="background:#2233C8"></i><div>Vizuara Ultramarine<b>#2233C8 · spot, ≈ PMS 2728</b></div></div>
+        <div class="sw"><i style="background:#2233C8"></i><div>Vizuara Ultramarine<b>#2233C8 · spot 1 · floods &amp; characters on paper</b></div></div>
         <div class="sw"><i style="background:#121212"></i><div>Ink<b>#121212 · rich black</b></div></div>
-        <div class="sw"><i style="background:#3548EE"></i><div>Ultramarine, opened<b>#3548EE · characters on black</b></div></div>
+        <div class="sw"><i style="background:#3548EE"></i><div>Ultramarine Light<b>#3548EE · spot 2 · characters on black</b></div></div>
       </div>
       <div>
         <h3>Type — three voices</h3>
         <div class="ty"><span class="s f-math">∂ ∈ ≈ ≻ <span class="f-it">σ λ</span></span><small>Libertinus Math &amp; Serif — maths and terms</small></div>
-        <div class="ty"><span class="s" style="font:400 30px/1 'Chivo Mono'">&lt;think&gt; Ġ</span><small>Chivo Mono — code tokens &amp; captions</small></div>
+        <div class="ty"><span class="s" style="font:400 30px/1 'Chivo Mono'">[MASK] Ġ df</span><small>Chivo Mono — code tokens &amp; captions</small></div>
         <div class="ty"><span class="s" style="font:700 34px/1 Archivo;font-stretch:88%">Archivo 88</span><small>Titles · the width axis absorbs long titles</small></div>
       </div>
       <div>
@@ -166,11 +169,11 @@ figcaption p .mono{display:block;margin-bottom:4px;font-size:11px}
       </div>
     </div>
     <ol class="rules">
-      <li><span><b>The character.</b> One per book, chosen from its subject — never a picture of “AI”. It may be cropped by any edge, never distorted, and it is set in the face it lives in: Libertinus for maths, Chivo Mono for code.</span></li>
-      <li><span><b>The line.</b> Every character rests on the same rule, 560&thinsp;px (5.83&thinsp;in) from the head. Nothing crosses it; everything below it is text.</span></li>
-      <li><span><b>The codepoint.</b> A caption names the character exactly — U+2202 PARTIAL DIFFERENTIAL — so the library doubles as a character set (see the back cover).</span></li>
-      <li><span><b>Ink density = level.</b> Bare paper, a flood of ultramarine, or black. It reads at 180&thinsp;px and survives greyscale.</span></li>
-      <li><span><b>Signature, not shout.</b> The imprint is Vizuara’s own character, an italic <i>v</i>, beside a 17&thinsp;px wordmark. Forthcoming titles are hatched, not yet inked; sub-series carry a Roman numeral.</span></li>
+      <li><span><b>The character.</b> One per book, chosen from its subject — never a picture of “AI” — and set in the face it lives in: Libertinus for maths, Chivo Mono for code. A single character or a short token; exactly one book (5D Parallelism) is allowed a run of defined terms.</span></li>
+      <li><span><b>The line.</b> Every character rests on the same rule, 560&thinsp;px (5.83&thinsp;in) from the head — its ink touches the rule, or the rule cuts it. Nothing hovers, nothing crosses; everything below is text. At the edges the same law: bleed past the trim or stay 36&thinsp;px inside.</span></li>
+      <li><span><b>The codepoint.</b> One character prints its codepoint and official Unicode name (U+2202 PARTIAL DIFFERENTIAL); a token prints itself and its role ([MASK] MASK TOKEN). The library doubles as a character set — see the back cover.</span></li>
+      <li><span><b>Ink density = level.</b> Bare paper, a flood of ultramarine, or black. It reads at 180&thinsp;px and survives greyscale. Within a level, no two books share a silhouette.</span></li>
+      <li><span><b>Signature, not shout.</b> The imprint is Vizuara’s own character, an italic <i>v</i>, beside a 17&thinsp;px wordmark. Forthcoming titles are hatched in the title ink — drawn, not yet in ultramarine; sub-series carry a Roman numeral and their series name.</span></li>
     </ol>
   </div>
 </header>
@@ -212,82 +215,85 @@ const B = 560;                      // the line every character rests on
    iy/ay = ink y and fraction (0 top, 1 bottom) — default: ink bottom rests on the line.
    fitW / fitH scale the character until its ink is exactly that wide / tall.            */
 const BOOKS = [
- // ---------------- beginner: bare paper, character whole ----------------
+ // Caption grammar: a single character prints U+XXXX + its official Unicode name (cp/name);
+ // a multi-character token prints itself literally + its role (tok/name). check_captions.py verifies the names.
+ // ---------------- beginner: bare paper ----------------
  {slug:'mathematical-foundations-for-ml', title:'Mathematical Foundations|for Machine Learning', level:'beginner', capsules:43, hours:10,
-  runs:[{t:'∂', f:'math', fitH:470, ix:372}], cp:'U+2202', name:'Partial differential',
+  runs:[{t:'∂', f:'math', fitH:470, ix:372}], cp:'U+2202', name:'PARTIAL DIFFERENTIAL',
   why:'The partial derivative — calculus is the first foundation every learning algorithm stands on.'},
  {slug:'neural-networks-from-scratch', title:'Neural Networks|from Scratch', level:'beginner', capsules:33, hours:7,
-  runs:[{t:'σ', f:'it', fitW:560, ix:350}], cp:'U+03C3', name:'Greek small letter sigma',
+  runs:[{t:'σ', f:'it', fitW:560, ix:350}], cp:'U+03C3', name:'GREEK SMALL LETTER SIGMA',
   why:'σ, the sigmoid: the activation that turns a weighted sum into a neuron’s output — the first thing you build by hand.'},
  {slug:'python-for-data-science', title:'Python for|Data Science', level:'beginner', capsules:38, hours:8,
-  runs:[{t:'>>>', f:'mono', fitW:648, ix:360, iy:B-6}], cp:'U+003E U+003E U+003E', name:'The interpreter prompt',
-  why:'>>> is the Python prompt — where every data-science session starts. No snake, no logo: the prompt itself.'},
+  runs:[{t:'df', f:'mono', fitH:470, ix:52, ax:0}], tok:'df', name:'PANDAS DATAFRAME',
+  why:'df — the name the DataFrame gets in almost every data-science notebook. The f runs off the page, like the columns do.'},
  {slug:'decision-trees-from-scratch', title:'Build Decision Trees|from Scratch', level:'beginner', capsules:23, hours:5,
-  runs:[{t:'≤', f:'math', fitH:430, ix:360}], cp:'U+2264', name:'Less-than or equal to',
+  runs:[{t:'≤', f:'math', fitH:430, ix:360}], cp:'U+2264', name:'LESS-THAN OR EQUAL TO',
   why:'Every node of a decision tree asks one question: is the feature ≤ the threshold?'},
  {slug:'r-masterclass', title:'R Masterclass', level:'beginner', capsules:36, hours:8,
-  runs:[{t:'[1]', f:'mono', fitH:430, ix:360}], cp:'U+005B U+0031 U+005D', name:'Console output index',
+  runs:[{t:'[1]', f:'mono', fitH:430, fitW:640, ix:360}], tok:'[1]', name:'CONSOLE OUTPUT INDEX',
   why:'[1] is how the R console prefixes every result it prints — the first thing R ever says back to you.'},
  // ---------------- intermediate: ultramarine flood ----------------
  {slug:'ai-context-engineering', title:'AI Context|Engineering', level:'intermediate', capsules:43, hours:10,
-  runs:[{t:'∈', f:'math', s:1150, ix:450}], cp:'U+2208', name:'Element of',
+  runs:[{t:'∈', f:'math', s:1150, ix:450}], cp:'U+2208', name:'ELEMENT OF',
   why:'Context engineering is a question of membership: what is ∈ the context window, and what is left out.'},
  {slug:'build-llms-from-scratch', title:'Build Large Language|Models (LLMs)|from Scratch', level:'intermediate', capsules:20, hours:6,
-  runs:[{t:'Ġ', f:'mono', fitH:500, ix:-40, ax:0}], cp:'U+0120', name:'Latin capital G with dot above',
+  runs:[{t:'Ġ', f:'mono', fitH:500, ix:-40, ax:0}], cp:'U+0120', name:'LATIN CAPITAL LETTER G WITH DOT ABOVE',
   why:'Ġ is how GPT-2’s byte-level BPE vocabulary marks a token that begins with a space — you meet it the moment you open the tokenizer.'},
  {slug:'transformers-from-scratch', title:'Transformers: Theory,|Intuition, and Building|from Scratch', level:'intermediate', capsules:20, hours:5,
-  runs:[{t:'𝑄𝐾', f:'math', fitH:470, ix:560, ax:1},{t:'⊤', f:'serif', fitH:120, ix:580, ax:0, iy:70, ay:0}], cp:'U+1D444 U+1D43E U+22A4', name:'Q K transpose',
-  why:'QKᵀ — the query–key product at the heart of attention, softmax(QKᵀ/√d)V.'},
+  runs:[{t:'𝑄𝐾', f:'math', fitH:470, ix:548, ax:1},{t:'T', f:'serif', fitH:150, ix:683, ax:1, iy:90, ay:0}], tok:'QK^T', tokHTML:'QK<sup>T</sup>', name:'QUERY–KEY PRODUCT',
+  why:'Q times K-transpose — the query–key product at the heart of attention. The transpose is a superscript roman T, as most papers write it.'},
  {slug:'charlie-vision-room', title:'Charlie and the|Vision Room', sub:'Vision — Vision Transformers', series:'II', level:'intermediate', capsules:20, hours:6,
-  runs:[{t:'16', f:'serif', fitH:250, ix:684, ax:1, iy:262},{t:'×16', f:'serif', fitH:250, ix:684, ax:1}], cp:'U+0031 U+0036 U+00D7', name:'Sixteen by sixteen',
+  runs:[{t:'16', f:'serif', fitH:250, ix:684, ax:1, iy:38, ay:0},{t:'×16', f:'serif', fitH:250, ix:684, ax:1}], tok:'16×16', name:'PATCH SIZE',
   why:'“An Image is Worth 16x16 Words”: a Vision Transformer reads an image as 16×16 patches.'},
  {slug:'charlie-sound-room', title:'Charlie and the|Sound Room', sub:'Audio — Voice Agents', series:'III', level:'intermediate', capsules:20, hours:6,
-  runs:[{t:'∿', f:'math', s:1300, ix:360, iy:B-24}], cp:'U+223F', name:'Sine wave',
-  why:'The sine wave — sound itself, before it becomes a voice agent’s input.'},
+  runs:[{t:'ℱ', f:'math', s:990, ix:374}], cp:'U+2131', name:'SCRIPT CAPITAL F',
+  why:'ℱ, the Fourier transform: a voice agent hears the world as a spectrogram before it hears a single word.'},
  // ---------------- advanced: black ----------------
  {slug:'5d-parallelism', title:'5D Parallelism for|Large Model Training', level:'advanced', capsules:40, hours:9,
-  runs:['data','tensor','pipeline','context','expert'].map((w,i)=>({t:w, f:'it', s:190, x:150+i*140, y:B-6, r:-90, raw:true})),
-  cp:'data · tensor · pipeline · context · expert', name:'',
-  why:'The five axes of 5D parallelism, set side by side — literally in parallel — and cut off by the page like the models they split.'},
+  runs:['data','tensor','pipeline','context','expert'].map((w,i)=>({t:w, f:'it', s:190, x:174+i*140, y:B, r:-90, raw:true})),
+  tok:'data tensor pipeline context expert', name:'THE FIVE AXES',
+  why:'The one word-run in the system: the five axes of 5D parallelism, set side by side — literally in parallel — and cut off by the page like the models they split.'},
  {slug:'pi-vs-hermes-vs-codex', title:'Pi vs Hermes vs Codex:|Context Compaction|and Memory', level:'advanced', capsules:9, hours:1,
-  runs:[{t:'≈', f:'math', s:1500, ix:330, iy:B-30}], cp:'U+2248', name:'Almost equal to',
+  runs:[{t:'≈', f:'math', s:1500, ix:330, iy:B+4}], cp:'U+2248', name:'ALMOST EQUAL TO',
   why:'Compaction swaps a long history for a summary that is only approximately equal to it — the whole subject in one sign.'},
  {slug:'rlhf-from-scratch', title:'RLHF from Scratch', level:'advanced', capsules:37, hours:8,
-  runs:[{t:'≻', f:'math', s:1500, ix:400, iy:B+230}], cp:'U+227B', name:'Succeeds',
+  runs:[{t:'≻', f:'math', s:1500, ix:388, iy:B+230}], cp:'U+227B', name:'SUCCEEDS',
   why:'RLHF learns from human preferences: one response ≻ another.'},
  {slug:'diffusion-lm-from-scratch', title:'Build a Diffusion|Language Model|from Scratch', level:'advanced', capsules:35, hours:8,
-  runs:[{t:'[MASK]', f:'mono', fitH:420, ix:36, ax:0}], cp:'[MASK]', name:'Special token',
+  runs:[{t:'[MASK]', f:'mono', fitH:420, ix:38, ax:0}], tok:'[MASK]', name:'MASK TOKEN',
   why:'A masked-diffusion language model starts from a row of [MASK] tokens and denoises them into text.'},
  {slug:'charlie-language-room', title:'Charlie and the|Language Room', sub:'Language — Inference Engineering', series:'I', level:'advanced', capsules:22, hours:5,
-  runs:[{t:'λ', f:'it', s:1000, ix:300}], cp:'U+03BB', name:'Greek small letter lamda',
-  why:'λ, the initial of λόγος — “word”. The Language Room is where words are served.'},
+  runs:[{t:'λ', f:'it', s:1000, ix:300}], cp:'U+03BB', name:'GREEK SMALL LETTER LAMDA',
+  why:'λ, the request arrival rate: the number every LLM serving system is batched, queued and sized against.'},
  {slug:'charlie-reasoning-room', title:'Charlie and the|Reasoning Room', sub:'Reason — Reinforcement Learning,|from bandits to reasoning models', series:'IV', level:'advanced', capsules:21, hours:6,
-  runs:[{t:'𝔼', f:'math', fitH:470, ix:360}], cp:'U+1D53C', name:'Double-struck capital E',
+  runs:[{t:'𝔼', f:'math', fitH:470, ix:360}], cp:'U+1D53C', name:'MATHEMATICAL DOUBLE-STRUCK CAPITAL E',
   why:'𝔼, expectation: from a bandit’s arms to a reasoning model’s answers, reinforcement learning maximises an expected reward.'},
  {slug:'kernel-engineering', title:'Kernel Engineering', sub:'From silicon to speculative decoding —|GPU kernels for modern LLMs.', level:'advanced', soon:true,
-  runs:[{t:'__glo', f:'mono', fitW:700, ix:10, ax:0, iy:250},{t:'bal__', f:'mono', fitW:700, ix:710, ax:1, iy:B-8}], cp:'__global__', name:'CUDA kernel qualifier',
-  why:'__global__ is the CUDA qualifier that turns a function into a GPU kernel. Forthcoming, so it is hatched — drawn, not yet inked.'},
+  runs:[{t:'__glo', f:'mono', fitW:646, ix:37, ax:0, iy:100, ay:0},{t:'bal__', f:'mono', fitW:646, ix:683, ax:1}], tok:'__global__', name:'CUDA KERNEL QUALIFIER',
+  why:'__global__ is the CUDA qualifier that turns a function into a GPU kernel. Forthcoming, so it is hatched in the title ink — drawn, not yet in ultramarine.'},
 ];
 
 /* The rest of the catalogue, so the back cover can show the whole character set.
-   [slug, character, face (m=math, i=italic serif, s=serif, c=code), level] */
+   [slug, character, face (m=math, i=italic serif, s=serif, c=code), level]
+   Rule: within one level, no two books share a silhouette family; at most one bracketed token per level. */
 const REST = [
- ['deepseek-harness','{}','c','advanced'], ['how-to-host-kimi-k3','tok/s','c','advanced'],
+ ['deepseek-harness','↻','m','advanced'], ['how-to-host-kimi-k3','tok/s','c','advanced'],
  ['machine-learning-fundamentals','ŷ','i','beginner'], ['pretraining-mini-kimi-k3','ℒ','m','advanced'],
  ['prompt-engineering','“','s','beginner'], ['rag-in-production','⟨𝑞,𝑑⟩','m','intermediate'],
  ['deep-learning-fundamentals','∇','m','beginner'], ['foundations-for-ai-ml','∑','m','beginner'],
  ['generative-ai-fundamentals','∼','m','beginner'], ['git-github-masterclass','HEAD','c','beginner'],
  ['modern-software-developer','$','c','beginner'], ['sql-masterclass','⋈','m','beginner'],
- ['ai-agents-bootcamp','↻','m','intermediate'], ['claude-certified-architect','§','s','intermediate'],
+ ['ai-agents-bootcamp','⇄','m','intermediate'], ['claude-certified-architect','§','s','intermediate'],
  ['cnn-fundamentals','∗','m','intermediate'], ['computer-vision-bootcamp','(𝑥,𝑦)','m','intermediate'],
  ['dsa-in-python','𝑂(𝑛)','m','intermediate'], ['llm-finetuning','Δ𝑊','m','intermediate'],
- ['llm-production-deployment','p99','c','intermediate'], ['memory-in-ai-systems','↺','m','intermediate'],
- ['mini-clawdbot','>_','c','intermediate'], ['ml-dl-mastery','θ','i','intermediate'],
- ['nlp-cv-mastery','&','i','intermediate'], ['reinforcement-learning','γ','i','intermediate'],
+ ['llm-production-deployment','p99','c','intermediate'], ['memory-in-ai-systems','↦','m','intermediate'],
+ ['mini-clawdbot','@','c','intermediate'], ['ml-dl-mastery','θ','i','intermediate'],
+ ['nlp-cv-mastery','ℝ','m','intermediate'], ['reinforcement-learning','γ','i','intermediate'],
  ['vit-from-scratch','[CLS]','c','intermediate'], ['writing-papers','¶','s','intermediate'],
- ['deit-from-scratch','dist','c','advanced'], ['kimi-k3-from-scratch','𝐾3','m','advanced'],
- ['modern-robot-learning','𝑎','m','advanced'], ['nanovlm-from-scratch','<image>','c','advanced'],
- ['sciml','∂𝑢','m','advanced'], ['transformers-vision-multimodal','⊕','m','advanced'],
+ ['deit-from-scratch','dist','c','advanced'], ['kimi-k3-from-scratch','∏','m','advanced'],
+ ['modern-robot-learning','𝑎','m','advanced'], ['nanovlm-from-scratch','∘','m','advanced'],
+ ['sciml','∫','m','advanced'], ['transformers-vision-multimodal','⊕','m','advanced'],
  ['vla-world-models','𝑠′','m','advanced'], ['harness-engineering','while','c','advanced'],
  ['inference-engineering','𝐾𝑉','m','advanced'],
 ];
@@ -300,8 +306,20 @@ const FONT = {
 };
 const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 const ctx = document.createElement('canvas').getContext('2d');
-function ink(t,f,s){ ctx.font = FONT[f](s); const m = ctx.measureText(t);
-  return {l:-m.actualBoundingBoxLeft, r:m.actualBoundingBoxRight, t:-m.actualBoundingBoxAscent, b:m.actualBoundingBoxDescent}; }
+const inkCache = {};
+function ink(t,f,s){
+  const key = t+'|'+f+'|'+s; if (inkCache[key]) return inkCache[key];
+  ctx.font = FONT[f](s); const m = ctx.measureText(t);
+  const pad = Math.ceil(s*0.06)+8;
+  const L = Math.ceil(m.actualBoundingBoxLeft)+pad, R = Math.ceil(m.actualBoundingBoxRight)+pad,
+        A = Math.ceil(m.actualBoundingBoxAscent)+pad, D = Math.ceil(m.actualBoundingBoxDescent)+pad;
+  const W = L+R, H = A+D, cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  const c = cv.getContext('2d'); c.font = FONT[f](s); c.fillText(t, L, A);
+  const d = c.getImageData(0,0,W,H).data; let x0=W, x1=-1, y0=H, y1=-1;
+  for (let y=0; y<H; y++){ let row = y*W*4;
+    for (let x=0; x<W; x++) if (d[row + x*4 + 3] > 110){ if (x<x0) x0=x; if (x>x1) x1=x; if (y<y0) y0=y; y1=y; } }
+  return inkCache[key] = {l:x0-L, r:x1+1-L, t:y0-A, b:y1+1-A};
+}
 function place(g){
   if (g.raw) return {x:g.x, y:g.y, s:g.s};
   let s = g.s || 1000;
@@ -314,14 +332,14 @@ function coverHTML(b, idp){
   const id = (idp||'c') + '-' + b.slug;
   const runs = b.runs.map(g=>{ const p = place(g);
     return `<text class="f-${g.f}" x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" font-size="${p.s.toFixed(1)}" ${g.r?`transform="rotate(${g.r} ${p.x} ${p.y})"`:''}>${esc(g.t)}</text>`}).join('');
-  const hatch = b.soon ? `<pattern id="h-${id}" width="8" height="8" patternUnits="userSpaceOnUse"><line class="hatch-line" x1="0" y1="4" x2="8" y2="4"/></pattern>` : '';
+  const hatch = b.soon ? `<pattern id="h-${id}" width="5" height="5" patternUnits="userSpaceOnUse"><rect class="hatch-line" x="0" y="1" width="5" height="3"/></pattern>` : '';
   const meta = b.soon ? 'In preparation' : `${b.capsules} capsules · ${b.hours} hour${b.hours===1?'':'s'}`;
   return `
    <svg class="emb" viewBox="0 0 720 888" aria-hidden="true"><defs>${hatch}<clipPath id="k-${id}"><rect x="0" y="0" width="720" height="${B}"/></clipPath></defs><g clip-path="url(#k-${id})"${b.soon?` style="--h:url(#h-${id})"`:''}>${b.soon?runs.replace(/<text /g,`<text fill="url(#h-${id})" style="fill:url(#h-${id})" `):runs}</g></svg>
    <div class="base"></div>
-   <div class="cap"><span>${esc(b.cp)}${b.name?'&ensp;'+esc(b.name):''}</span><span>${b.level}${b.soon?' · forthcoming':''}</span></div>
+   <div class="cap"><span>${b.tok?`<span class="tok">${b.tokHTML||esc(b.tok)}</span>`:b.cp}&ensp;${esc(b.name)}</span><span>${b.level}${b.soon?' · forthcoming':''}</span></div>
    <div class="tb"><h1>${b.title.split('|').map(l=>`<span>${esc(l)}</span>`).join('<br>')}</h1>${b.sub?`<div class="sub">${b.sub.split('|').map(esc).join('<br>')}</div>`:''}</div>
-   ${b.series?`<div class="series">${b.series}</div>`:''}
+   ${b.series?`<div class="series">${b.series}<small>The Intelligence Factory</small></div>`:''}
    <div class="foot"><span>${meta}</span><span class="imprint"><span class="vmark"></span>Vizuara Books</span></div>`;
 }
 /* the width axis absorbs long lines: condense first, only then shrink */
@@ -333,7 +351,7 @@ function fitTitle(h, max){
 }
 async function build(){
   await Promise.all([FONT.math(100),FONT.it(100),FONT.serif(100),FONT.mono(100),'700 58px Archivo','500 12px "Chivo Mono"']
-    .map(f=>document.fonts.load(f,'∂σ∈≈≻λ16×<>[]_abcĠ𝑄𝐾⊤𝔼')));
+    .map(f=>document.fonts.load(f,'∂σ∈≈≻λ16×<>[]_abcdfĠ𝑄𝐾T𝔼ℱ')));
   const wall = document.getElementById('wall'), shelf = document.getElementById('shelf');
   for (const b of BOOKS){
     const fig = document.createElement('figure');
@@ -344,7 +362,7 @@ async function build(){
     fig.appendChild(el);
     const mono = b.runs[0].f==='mono';
     const glyph = b.slug==='5d-parallelism' ? '<span style="font:italic 400 24px/1.8 Libertinus Serif">data…expert</span>'
-      : b.slug==='transformers-from-scratch' ? '<span class="f-math">𝑄𝐾</span><span class="f-serif" style="font-size:.5em;vertical-align:.9em">⊤</span>'
+      : b.slug==='transformers-from-scratch' ? '<span class="f-math">𝑄𝐾</span><span class="f-serif" style="font-size:.5em;vertical-align:.9em">T</span>'
       : esc(b.runs.map(r=>r.t).join(''));
     fig.insertAdjacentHTML('beforeend', `<figcaption><div class="gl${mono?' m':''}${b.runs[0].f==='it'?' f-it':''}">${glyph}</div><p><span class="mono">${b.slug} · ${b.level}${b.soon?' · forthcoming':''}</span>${esc(b.why)}</p></figcaption>`);
     wall.appendChild(fig);
@@ -368,7 +386,7 @@ async function build(){
   const F = {math:'', it:'it', serif:'sr', mono:'m', m:'', i:'it', s:'sr', c:'m'};
   const all = BOOKS.map(b=>({slug:b.slug, level:b.level,
       g: b.slug==='5d-parallelism' ? 'data<br>tensor<br>pipeline<br>context<br>expert' : b.slug==='charlie-vision-room' ? '16×16'
-       : b.slug==='transformers-from-scratch' ? '𝑄𝐾<i class="tp">⊤</i>' : esc(b.runs.map(r=>r.t).join('')),
+       : b.slug==='transformers-from-scratch' ? '𝑄𝐾<i class="tp">T</i>' : esc(b.runs.map(r=>r.t).join('')),
       cls: b.slug==='5d-parallelism' ? 'w' : b.slug==='charlie-vision-room' ? 'sr sm' : F[b.runs[0].f], first: b.runs[0].t}))
     .concat(REST.map(([slug,g,f,level])=>({slug, level, g:esc(g), cls:F[f], first:g})));
   all.forEach(a=>{ a.cp = a.first.codePointAt(0); });
@@ -380,7 +398,15 @@ async function build(){
     cs.insertAdjacentHTML('beforeend', `<div class="cell lv-${a.level}${a.slug===mf.slug?' me':''}" title="${a.slug}"><span class="${a.cls}">${a.g}</span><small>${lab}</small></div>`);
   }
 }
-build();
+/* keep every cover on whole pixels so renders carry no hairline of page colour */
+function snap(){
+  for (const el of document.querySelectorAll('.cover')){
+    const fig = el.parentElement; fig.style.marginTop = '0px';
+    const y = el.getBoundingClientRect().top + window.scrollY, f = y - Math.floor(y);
+    if (f > 0.001) fig.style.marginTop = (1 - f).toFixed(3) + 'px';
+  }
+}
+build().then(snap);
 </script>
 </body>
 </html>

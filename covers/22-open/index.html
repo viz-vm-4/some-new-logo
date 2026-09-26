@@ -34,8 +34,10 @@
   .cover h1.title .soft { font-weight:420; font-style:italic; }
   .cover h1.title .cur { display:inline-block; width:.42em; height:.70em; margin-left:.07em;
            background:var(--A); vertical-align:-.02em; }
-  .cover .sub { position:absolute; left:36px; right:36px; margin:0;
-           font:italic 400 19px/1.3 'Fraunces', serif; font-variation-settings:'opsz' 24; color:var(--B); }
+  .cover .sub { position:absolute; left:36px; right:36px; margin:0; max-width:620px;
+           font:italic 400 27px/1.2 'Fraunces', serif; font-variation-settings:'opsz' 36; letter-spacing:-.005em; color:var(--B); }
+  .cover .kicker { position:absolute; left:36px; right:36px; top:80px;
+           font:700 11px/1 'JetBrains Mono', monospace; letter-spacing:.14em; text-transform:uppercase; color:var(--B); }
   .cover .foot { position:absolute; left:36px; right:36px; bottom:30px; height:24px;
            display:flex; align-items:center; justify-content:space-between;
            font:500 11px/1 'JetBrains Mono', monospace; letter-spacing:.06em; }
@@ -93,7 +95,7 @@ const FAM = {
   sys:     { label: 'Systems & scale',      h: 212, paper: [.955, .015], vivid: [.64, .085], deep: [.27, .045] },
   agents:  { label: 'Agents & context',     h: 152, paper: [.955, .025], vivid: [.67, .12],  deep: [.28, .055] },
   rl:      { label: 'RL & robotics',        h: 82,  paper: [.96,  .030], vivid: [.74, .135], deep: [.30, .045] },
-  code:    { label: 'Code & data',          h: 95,  paper: [.95,  .006], vivid: [.68, .010], deep: [.25, .006] },
+  code:    { label: 'Code & data',          h: 122, paper: [.955, .028], vivid: [.70, .085], deep: [.28, .045] },
   factory: { label: 'The Intelligence Factory', h: 58, paper: [.95, .025], vivid: [.62, .085], deep: [.26, .04] },
 };
 for (const k in FAM) { const f = FAM[k]; f.P = oklch(f.paper[0], f.paper[1], f.h); f.V = oklch(f.vivid[0], f.vivid[1], f.h); f.D = oklch(f.deep[0], f.deep[1], f.h); }
@@ -128,7 +130,7 @@ const colOf = (x) => Math.floor(x / CW), rowOf = (y) => Math.floor(y / CH);
 /* choose a glyph for a line passing through a cell */
 function slopeChar(dx, dy, fy) {
   const a = Math.abs(Math.atan2(dy, dx) * 180 / Math.PI), t = a > 90 ? 180 - a : a;
-  if (t < 24) return fy < 0.30 ? '¯' : fy > 0.70 ? '_' : '-';
+  if (t < 24) return '-';
   if (t > 70) return '|';
   return (dx * dy > 0) ? '\\' : '/';
 }
@@ -226,129 +228,456 @@ function gridSVG(g, K) {
 <script>
 /* =====================================================================
    EMBLEMS — one per book, each drawn from the book's actual mechanism.
-   Zone: x 36..684, y 372..804 (cols 6..113, rows 31..66) unless noted.
+   Vocabulary: glyphs, slope-drawn lines, frames, and tiles (inverse-video
+   cells that carry real numbers or labels). Zone: cols 6..113, rows 31..66.
    ===================================================================== */
-const Z = { x0: 36, y0: 372, x1: 684, y1: 804 };
 const EMBLEMS = {};
+const onTile = (g, ink) => (ink === 2 ? 4 : ink === 3 ? 2 : g.dark ? 4 : 2);
+function tileT(g, c, r, w, h, ink, txt = '', o = {}) {
+  g.clear(c, r, w, h); g.tile(c, r, w, h, ink, o.inset ?? 1);
+  if (txt !== '') { const tr = o.row ?? r + Math.floor((h - 1) / 2), tc = o.left ? c + (o.left === true ? 1 : o.left) : o.right ? c + w - 1 - txt.length : c + Math.floor((w - txt.length) / 2);
+    g.text(tc, tr, txt, o.ti ?? onTile(g, ink), 0, o.wt ?? 700); }
+}
+function frame(g, c, r, w, h, ink = 2, wt = 700, ch = '+-|') {
+  for (let x = c + 1; x < c + w - 1; x++) { g.put(x, r, ch[1], ink, 0, wt); g.put(x, r + h - 1, ch[1], ink, 0, wt); }
+  for (let y = r + 1; y < r + h - 1; y++) { g.put(c, y, ch[2], ink, 0, wt); g.put(c + w - 1, y, ch[2], ink, 0, wt); }
+  [[c, r], [c + w - 1, r], [c, r + h - 1], [c + w - 1, r + h - 1]].forEach(([x, y]) => g.put(x, y, ch[0], ink, 0, wt));
+}
+function arcPts(x0, x1, yb, h, n = 90) { const xm = (x0 + x1) / 2, a = (x1 - x0) / 2, pts = [];
+  for (let i = 0; i <= n; i++) { const t = Math.PI * i / n; pts.push([xm - a * Math.cos(t), yb - h * Math.sin(t)]); } return pts; }
+function dotGrid(g, c0, r0, c1, r1, sx = 4, sy = 2, ch = '·', ink = 3) { for (let r = r0; r <= r1; r += sy) for (let c = c0; c <= c1; c += sx) g.put(c, r, ch, ink); }
+const segDist = (x, y, ax, ay, bx, by) => { const dx = bx - ax, dy = by - ay, t = Math.max(0, Math.min(1, ((x - ax) * dx + (y - ay) * dy) / (dx * dx + dy * dy)));
+  return Math.hypot(x - ax - t * dx, y - ay - t * dy); };
+const hex = (rnd, n = 7) => Array.from({ length: n }, () => '0123456789abcdef'[Math.floor(rnd() * 16)]).join('');
+
+/* ---------------------------------------------------------------- FOUNDATIONS */
 
 /* Neural Networks from Scratch — a 3-4-4-2 perceptron; neurons are tiles holding activations, one forward pass lit */
 EMBLEMS['neural-networks-from-scratch'] = (g) => {
-  const layers = [3, 4, 4, 2], cols = [14, 44, 74, 104], gapR = 7, midR = 49, rnd = rng(5);
-  const act = [[.8, .1, .5], [.62, .07, .91, .33], [.18, .74, .96, .41], [.88, .12]];
+  const layers = [3, 4, 4, 2], cols = [17, 47, 77, 104], gapR = 8, midR = 47;
+  const act = [[.80, .10, .50], [.62, .07, .91, .33], [.18, .74, .96, .41], [.88, .12]];
   const pos = layers.map((n, li) => Array.from({ length: n }, (_, k) => [cols[li], Math.round(midR + (k - (n - 1) / 2) * gapR)]));
-  const path = [0, 2, 2, 0];
-  const ctr = ([c, r]) => [c * CW, r * CH + CH / 2];
-  // edges: faint dotted for all, solid for the lit pass
+  const path = [0, 2, 2, 0], ctr = ([c, r]) => [c * CW, r * CH + CH / 2];
   for (let li = 0; li < 3; li++) for (const [ia, a] of pos[li].entries()) for (const [ib, b] of pos[li + 1].entries()) {
-    const lit = path[li] === ia && path[li + 1] === ib; const A = ctr(a), B = ctr(b);
-    const w = rnd();
-    if (!lit) line(g, A[0] + 24, A[1], B[0] - 24, B[1], w > .6 ? 1 : 3, { ch: w > .6 ? ':' : '·', wt: 700 });
-  }
+    if (path[li] === ia && path[li + 1] === ib) continue; const A = ctr(a), B = ctr(b);
+    line(g, A[0] + 22, A[1], B[0] - 22, B[1], 1, { wt: 500 }); }
   for (let li = 0; li < 3; li++) { const A = ctr(pos[li][path[li]]), B = ctr(pos[li + 1][path[li + 1]]);
-    line(g, A[0] + 24, A[1], B[0] - 24, B[1], 2, { wt: 800 }); }
+    line(g, A[0] + 22, A[1], B[0] - 22, B[1], 2, { wt: 800 }); }
   pos.forEach((layer, li) => layer.forEach(([c, r], k) => {
-    const lit = path[li] === k, v = act[li][k];
-    g.clear(c - 4, r - 1, 8, 3);
-    g.tile(c - 3, r - 1, 6, 3, lit ? 2 : 1, 1);
-    g.text(c - 2, r, v.toFixed(2).slice(1), lit ? 4 : 2, 0, 700);
-  }));
-  pos[0].forEach(([c, r], k) => g.text(c - 8, r, 'x' + (k + 1), 2, 0, 500));
-  pos[3].forEach(([c, r], k) => g.text(c + 5, r, 'y' + (k + 1), 2, 0, 500));
-  // layer names under the columns
-  ['input', 'hidden', 'hidden', 'output'].forEach((t, li) => g.text(cols[li] - Math.floor(t.length / 2), 66, t, 3, 0, 500));
+    const lit = path[li] === k; g.clear(c - 4, r - 1, 8, 3);
+    tileT(g, c - 3, r - 1, 6, 3, lit ? 2 : 1, act[li][k].toFixed(2).slice(1)); }));
+  pos[0].forEach(([c, r], k) => g.text(c - 8, r, 'x' + (k + 1), 2, 0, 700));
+  pos[3].forEach(([c, r], k) => g.text(c + 5, r, 'y' + (k + 1), 2, 0, 700));
+  ['input', 'hidden', 'hidden', 'output'].forEach((t, li) => g.text(cols[li] - Math.floor(t.length / 2), 65, t, 1, 0, 500));
 };
+
+/* Mathematical Foundations — gradient descent zig-zagging down a quadratic bowl (level sets = ellipses of the Hessian) */
+EMBLEMS['mathematical-foundations-for-ml'] = (g) => {
+  dotGrid(g, 7, 31, 112, 66, 4, 2);
+  const X = 392, Y = 592, th = -20 * Math.PI / 180, ct = Math.cos(th), st = Math.sin(th);
+  const P = (u, v) => [X + u * ct - v * st, Y + u * st + v * ct];
+  for (let k = 1; k <= 6; k++) { const a = 50 * k, b = 19 * k, seen = new Set();
+    for (let i = 0; i <= 720; i++) { const t = 2 * Math.PI * i / 720, [x, y] = P(a * Math.cos(t), b * Math.sin(t)), c = colOf(x), r = rowOf(y);
+      if (!seen.has(c + ',' + r)) { seen.add(c + ',' + r); g.put(c, r, '•', 1, 0, 700); } } }
+  ['.5', '2', '4.5', '8', '12.5', '18'].forEach((t, i) => { const k = i + 1; if (k < 2) return;
+    const [x, y] = P(50 * k, 0), c = colOf(x) - Math.floor(t.length / 2), r = rowOf(y);
+    g.clear(c - 1, r, t.length + 2, 1); g.text(c, r, t, 2, 0, 500); });
+  let u = -262, v = 74; const S = [[u, v]];
+  for (let i = 0; i < 9; i++) { u *= .70; v *= -.62; S.push([u, v]); }
+  const pts = S.map(([a, b]) => P(a, b));
+  polyline(g, pts, 2, { wt: 800 });
+  pts.forEach(([x, y], i) => { if (i > 5) return; tileT(g, colOf(x) - 1, rowOf(y), 3, 1, 2, String(i), { inset: .5 }); });
+  const [mx, my] = P(0, 0); tileT(g, colOf(mx) - 2, rowOf(my), 4, 1, 1, 'x*', { inset: .5 });
+  g.clear(7, 31, 26, 3);
+  g.text(8, 31, 'f(x) = ½ xᵀHx', 2, 0, 700); g.text(8, 32, 'x := x - η grad f(x)', 2, 0, 500);
+};
+
+/* Build Decision Trees from Scratch — the classic iris tree, splits and leaves as tiles, elbow connectors */
+EMBLEMS['decision-trees-from-scratch'] = (g) => {
+  const N = (cc, r, txt, leaf, n) => ({ cc, r, txt, leaf, n });
+  const T = { root: N(60, 32, 'petal length <= 2.45', 0, 150), a: N(27, 41, 'setosa', 1, 50), b: N(84, 41, 'petal width <= 1.75', 0, 100),
+    c: N(64, 50, 'petal length <= 4.95', 0, 54), d: N(101, 50, 'virginica', 1, 46), e: N(46, 59, 'versicolor', 1, 48), f: N(80, 59, 'virginica', 1, 6) };
+  const E = [['root', 'a', 'yes'], ['root', 'b', 'no'], ['b', 'c', 'yes'], ['b', 'd', 'no'], ['c', 'e', 'yes'], ['c', 'f', 'no']];
+  E.forEach(([p, q, lab]) => { const P = T[p], Q = T[q], m = P.r + 3 + Math.floor((Q.r - P.r - 3) / 2);
+    for (let r = P.r + 3; r < m; r++) g.put(P.cc, r, '|', 2, 0, 700);
+    const [x0, x1] = [Math.min(P.cc, Q.cc), Math.max(P.cc, Q.cc)];
+    for (let c = x0; c <= x1; c++) g.put(c, m, '-', 2, 0, 700);
+    g.put(P.cc, m, '+', 2, 0, 700); g.put(Q.cc, m, '+', 2, 0, 700);
+    for (let r = m + 1; r < Q.r; r++) g.put(Q.cc, r, '|', 2, 0, 700);
+    g.text(Q.cc + (Q.cc < P.cc ? 2 : -2 - lab.length), m + 1, lab, 1, 0, 500); });
+  for (const k in T) { const n = T[k], w = n.txt.length + 4; tileT(g, n.cc - Math.floor(w / 2), n.r, w, 3, n.leaf ? 1 : 2, n.txt);
+    if (n.leaf) { const t = `n=${n.n}`; g.text(n.cc - Math.floor(t.length / 2), n.r + 3, t, 2, 0, 500); } }
+};
+
+/* ---------------------------------------------------------------- LANGUAGE */
 
 /* Build LLMs from Scratch — a 12-token causal attention mask, weights printed in the cells */
 EMBLEMS['build-llms-from-scratch'] = (g) => {
   const toks = ['The', 'model', 'reads', 'one', 'token', 'at', 'a', 'time', 'and', 'writes', 'the', 'next'];
   const N = 12, bw = 6, bh = 3, c0 = 30, r0 = 31, rnd = rng(7);
   for (let i = 0; i < N; i++) {
-    // plausible causal weights: recency + a few long-range heads, softmaxed
     const s = []; for (let j = 0; j <= i; j++) s.push(-(i - j) * .45 + (j === 0 ? 1.2 : 0) + rnd() * 1.6);
     const m = Math.max(...s), e = s.map((v) => Math.exp(v - m)), z = e.reduce((a, b) => a + b, 0), w = e.map((v) => v / z);
     g.text(c0 - 2 - toks[i].length, r0 + i * bh + 1, toks[i], 2, 0, 500);
-    for (let j = 0; j < N; j++) {
-      const c = c0 + j * bw, r = r0 + i * bh;
+    for (let j = 0; j < N; j++) { const c = c0 + j * bw, r = r0 + i * bh;
       if (j > i) { g.put(c + 2, r + 1, '·', 3); continue; }
       const val = w[j], txt = val >= .995 ? '1.0' : val.toFixed(2).slice(1);
-      if (val >= .28) { g.tile(c, r, bw - 1, bh, 2, 1.5); g.text(c + 1, r + 1, txt, 4, 0, 700); }
-      else if (val >= .10) { g.tile(c, r, bw - 1, bh, 1, 1.5); g.text(c + 1, r + 1, txt, 2, 0, 700); }
-      else g.text(c + 1, r + 1, txt, 2, 0, 500);
-    }
+      if (val >= .28) tileT(g, c, r, bw - 1, bh, 2, txt, { inset: 1.5 });
+      else if (val >= .10) tileT(g, c, r, bw - 1, bh, 1, txt, { inset: 1.5 });
+      else g.text(c + 1, r + 1, txt, 2, 0, 500); }
   }
-  // the prediction: next token falls out of the last row
-  const rl = r0 + (N - 1) * bh + 1;
-  g.text(c0 + N * bw + 1, rl, '->', 2, 0, 700); g.tile(c0 + N * bw + 4, rl - 1, 7, 3, 2, 1.5); g.text(c0 + N * bw + 5, rl, 'token', 4, 0, 700);
+  const rl = r0 + (N - 1) * bh;
+  g.text(c0 + N * bw + 1, rl + 1, '->', 2, 0, 700); tileT(g, c0 + N * bw + 4, rl, 7, 3, 2, 'token', { inset: 1.5 });
 };
 
-/* 5D Parallelism — the device mesh as a cube of 3x3x3 cubelets, seams left open; one pipeline stage lit */
+/* Transformers — one attention head: "it" attends back to "animal" (the classic coreference example) */
+EMBLEMS['transformers-from-scratch'] = (g) => {
+  const toks = ['the', 'animal', 'did', 'not', 'cross', 'the', 'street', 'because', 'it', 'was', 'too', 'tired'];
+  const w = [.03, .46, .02, .02, .04, .02, .09, .03, .08, .03, .04, .14], q = 8, rT = 62;
+  let c = 18; const pos = toks.map((t) => { const p = { c, w: t.length + 2 }; c += p.w + 1; return p; });
+  const mid = (j) => (pos[j].c + pos[j].w / 2) * CW, qx = mid(q), yb = rT * CH - 3;
+  const order = toks.map((_, j) => j).filter((j) => j !== q).sort((a, b) => w[a] - w[b]);
+  for (const j of order) { const x = mid(j), a = Math.abs(x - qx) / 2, h = Math.min(56 + a * 1.4, 336), lo = Math.min(x, qx), hi = Math.max(x, qx);
+    if (w[j] >= .3) { polyline(g, arcPts(lo, hi, yb, h), 2, { wt: 800 }); polyline(g, arcPts(lo + 8, hi - 8, yb, h - 14), 2, { wt: 800 }); }
+    else if (w[j] >= .08) polyline(g, arcPts(lo, hi, yb, h), 1, { wt: 700 });
+    else polyline(g, arcPts(lo, hi, yb, h), 1, { ch: '·', wt: 800 });
+    if (w[j] >= .08) { const lab = w[j].toFixed(2).slice(1), lc = colOf((lo + hi) / 2) - 1, lr = rowOf(yb - h) - 1;
+      g.clear(lc - 1, lr, 5, 1); g.text(lc, lr, lab, w[j] >= .3 ? 2 : 1, 0, 700); } }
+  toks.forEach((t, j) => tileT(g, pos[j].c, rT, pos[j].w, 3, j === q ? 2 : j === 1 ? 1 : 3, t));
+  g.text(pos[q].c, rT + 3, '^ query', 2, 0, 700);
+  const f = 'softmax(QKᵀ / √d) V'.replace('√', 'sqrt '); g.text(113 - f.length, 31, f, 2, 0, 500);
+};
+
+/* ---------------------------------------------------------------- VISION */
+
+/* CNN Fundamentals — a 14x14 "7", a 3x3 Sobel kernel, and the real 12x12 feature map it produces */
+EMBLEMS['cnn-fundamentals'] = (g) => {
+  const S = 14, px = 4, py = 2, c0 = 8, r0 = 32, img = [];
+  for (let j = 0; j < S; j++) { img.push([]); for (let i = 0; i < S; i++) { let cov = 0;
+    for (let sy = 0; sy < 4; sy++) for (let sx = 0; sx < 4; sx++) { const x = (i + (sx + .5) / 4) / S, y = (j + (sy + .5) / 4) / S;
+      const d = Math.min(segDist(x, y, .2, .22, .8, .2), segDist(x, y, .8, .2, .42, .88), segDist(x, y, .38, .55, .7, .55)); if (d < .072) cov++; }
+    img[j].push(cov / 16); } }
+  for (let j = 0; j < S; j++) for (let i = 0; i < S; i++) { const v = img[j][i], c = c0 + i * px, r = r0 + j * py;
+    if (v > .55) g.tile(c, r, px, py, 2, 1); else if (v > .15) g.tile(c, r, px, py, 1, 1); else g.put(c + 1, r, '·', 3); }
+  const K = [[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]], fc = 74, fr = 34, fx = 3, fy = 2, ki = 7, kj = 5;
+  for (let j = 0; j < S - 2; j++) for (let i = 0; i < S - 2; i++) { let v = 0;
+    for (let b = 0; b < 3; b++) for (let a = 0; a < 3; a++) v += K[b][a] * img[j + b][i + a];
+    const c = fc + i * fx, r = fr + j * fy;
+    if (v > 1.1) g.tile(c, r, fx, fy, 2, .75); else if (v < -1.1) g.tile(c, r, fx, fy, 1, .75);
+    else if (Math.abs(v) > .35) g.put(c + 1, r, ':', 1, 0, 700); else g.put(c + 1, r, '·', 3); }
+  const kc0 = c0 + ki * px - 1, kr0 = r0 + kj * py - 1, kw = 3 * px + 2, kh = 3 * py + 2;
+  frame(g, kc0, kr0, kw, kh, 2, 800);
+  const oc = fc + ki * fx - 1, or = fr + kj * fy - 1; frame(g, oc, or, fx + 2, fy + 2, 2, 800);
+  line(g, (kc0 + kw) * CW + 2, kr0 * CH + 6, oc * CW - 2, or * CH + 6, 2, { ch: '·', wt: 800 });
+  line(g, (kc0 + kw) * CW + 2, (kr0 + kh - 1) * CH + 6, oc * CW - 2, (or + fy + 1) * CH + 6, 2, { ch: '·', wt: 800 });
+  g.text(c0, 61, 'input 14 x 14', 2, 0, 700);
+  g.text(fc, 59, 'feature map 12 x 12', 2, 0, 700);
+  g.text(fc, 61, 'kernel (sobel-x)', 1, 0, 700);
+  ['-1  0  1', '-2  0  2', '-1  0  1'].forEach((t, i) => g.text(fc + 18, 61 + i, t, 2, 0, 700));
+};
+
+/* DeiT — an image cut into 16 patches, flattened into a sequence with a class token and a distillation token */
+EMBLEMS['deit-from-scratch'] = (g) => {
+  const P = 4, pw = 12, ph = 6, gx = 2, gy = 1, c0 = 33, r0 = 31, L = V3.norm([-.45, -.6, -.66]);
+  const shade = (u, v) => { const dx = (u + .02) / .80, dy = (v - .02) / .80, d2 = dx * dx + dy * dy;
+    if (d2 < 1) { const n = [dx, dy, -Math.sqrt(1 - d2)], lam = Math.max(0, V3.dot(n, L)), val = .1 + .9 * lam; return [dens(val, ' .:-=+*#%@'), val > .58 ? 2 : 1]; }
+    return null; };
+  for (let pj = 0; pj < P; pj++) for (let pi = 0; pi < P; pi++) {
+    const pc = c0 + pi * (pw + gx), pr = r0 + pj * (ph + gy);
+    for (let y = 0; y < ph; y++) for (let x = 0; x < pw; x++) { const u = (pi * pw + x + .5) / (P * pw) * 2 - 1, v = (pj * ph + y + .5) / (P * ph) * 2 - 1, s = shade(u, v);
+      if (s) g.put(pc + x, pr + y, s[0], s[1], 0, 700); else if ((x + y) % 2 === 0 && y % 2 === 0) g.put(pc + x, pr + y, '·', 3); }
+    g.text(pc, pr, String(pj * P + pi + 1), 1, 0, 500); }
+  const rs = 61; let c = 6;
+  tileT(g, c, rs, 5, 3, 1, 'cls'); c += 6; const distC = c; tileT(g, c, rs, 6, 3, 2, 'dist'); c += 7;
+  for (let k = 0; k < 16; k++) { const pi = k % P, pj = Math.floor(k / P); g.tile(c, rs, 5, 3, 3, 1);
+    for (let y = 0; y < 3; y++) for (let x = 0; x < 5; x++) { const u = (pi * pw + (x + .5) * pw / 5) / (P * pw) * 2 - 1, v = (pj * ph + (y + .5) * ph / 3) / (P * ph) * 2 - 1, s = shade(u, v);
+      if (s) g.put(c + x, rs + y, s[0], s[1], 0, 700); }
+    c += 6; }
+  g.text(distC, rs + 3, '^ distillation token: learns from a teacher', 1, 0, 700);
+  g.text(6, rs - 2, 'sequence', 1, 0, 500);
+};
+
+/* ---------------------------------------------------------------- SYSTEMS */
+
+/* 5D Parallelism — 32 GPUs as a 2x2x2x2x2 mesh; each tile's label is its coordinate (dp pp cp tp ep); rank 0 and its five partners lit */
 EMBLEMS['5d-parallelism'] = (g) => {
-  const N = 3, seam = .07;
-  const scene = (p) => [sdBox(p, [1, 1, 1]), 0];
-  const q = (u) => (u + 1) / 2 * N;               // -1..1 -> 0..N
-  const onSeam = (u) => { const t = q(u); return Math.abs(t - Math.round(t)) < seam * N / 2 && Math.round(t) > 0 && Math.round(t) < N; };
-  trace(g, [120, 360, 600, 816], scene, { scale: 150, yaw: Math.PI / 4, pitch: 0.6155 }, (c, r, h) => {
-    const [x, y, z] = h.p, n = h.n;
-    let face, u, v;
-    if (n[1] > .5) { face = 0; u = x; v = z; } else if (Math.abs(n[0]) > Math.abs(n[2])) { face = 1; u = z; v = y; } else { face = 2; u = x; v = y; }
-    if (onSeam(u) || onSeam(v)) return;
-    const lit = Math.floor(q(y - 1e-6)) === 2 || (face === 0);     // the top layer: one pipeline stage
-    const ch = face === 0 ? '#' : face === 1 ? '=' : ':';
-    g.put(c, r, ch, lit ? 2 : 1, 0, 800);
+  const tw = 10, th = 6, xs = [], ys = [];
+  for (let i = 0, x = 12; i < 8; i++) { if (i) x += tw + (i === 4 ? 6 : i % 4 === 2 ? 3 : 1); xs.push(x); }
+  for (let j = 0, y = 35; j < 4; j++) { if (j) y += th + (j === 2 ? 3 : 1); ys.push(y); }
+  const ax = ['dp', 'pp', 'cp', 'tp', 'ep'];
+  for (let dp = 0; dp < 2; dp++) for (let pp = 0; pp < 2; pp++) for (let cp = 0; cp < 2; cp++) for (let tp = 0; tp < 2; tp++) for (let ep = 0; ep < 2; ep++) {
+    const bits = [dp, pp, cp, tp, ep], code = bits.join(''), ones = bits.reduce((a, b) => a + b, 0);
+    const c = xs[dp * 4 + tp * 2 + ep], r = ys[pp * 2 + cp];
+    const ink = ones === 0 ? 2 : ones === 1 ? 1 : 3;
+    tileT(g, c, r, tw, th, ink, code, { row: r + 2 });
+    if (ones === 1) g.text(c + 4, r + 3, ax[bits.indexOf(1)], onTile(g, 1), 0, 500);
+    if (ones === 0) g.text(c + 2, r + 3, 'rank 0', 4, 0, 500);
+  }
+  const brace = (c0, c1, r, t) => { for (let c = c0; c <= c1; c++) g.put(c, r, '-', 1, 0, 500); g.put(c0, r, '+', 1, 0, 500); g.put(c1, r, '+', 1, 0, 500);
+    const m = Math.floor((c0 + c1 - t.length) / 2); g.clear(m - 1, r, t.length + 2, 1); g.text(m, r, t, 1, 0, 700); };
+  brace(xs[0], xs[3] + tw - 1, 33, 'dp = 0'); brace(xs[4], xs[7] + tw - 1, 33, 'dp = 1');
+  g.text(6, ys[0] + 6, 'pp', 1, 0, 700); g.text(6, ys[2] + 6, 'pp', 1, 0, 700);
+  g.text(6, ys[0] + 7, '=0', 1, 0, 700); g.text(6, ys[2] + 7, '=1', 1, 0, 700);
+};
+
+/* Kernel Engineering (coming soon) — a tiled GEMM, C += A·B, caught mid-run: the kernel is still computing */
+EMBLEMS['kernel-engineering'] = (g) => {
+  const bw = 6, bh = 3, M = 6, N = 8, KK = 4, cA = 21, cC = 51, rB = 31, rC = 45, I = 2, J = 5, k = 1;
+  for (let kk = 0; kk < KK; kk++) for (let j = 0; j < N; j++) { const c = cC + j * bw, r = rB + kk * bh;
+    if (j === J) tileT(g, c, r, bw, bh, kk === k ? 2 : 1, kk === k ? 'B' + kk + J : '', { inset: 1 }); else g.put(c + 2, r + 1, '·', 1); }
+  for (let i = 0; i < M; i++) for (let kk = 0; kk < KK; kk++) { const c = cA + kk * bw, r = rC + i * bh;
+    if (i === I) tileT(g, c, r, bw, bh, kk === k ? 2 : 1, kk === k ? 'A' + I + kk : '', { inset: 1 }); else g.put(c + 2, r + 1, '·', 1); }
+  for (let i = 0; i < M; i++) for (let j = 0; j < N; j++) { const c = cC + j * bw, r = rC + i * bh, idx = i * N + j, cur = I * N + J;
+    if (idx < cur) tileT(g, c, r, bw, bh, 3, '', { inset: 1 });
+    else if (idx === cur) tileT(g, c, r, bw, bh, 2, 'C' + I + J, { inset: 1 });
+    else g.put(c + 2, r + 1, '·', 1); }
+  frame(g, cA - 1, rC - 1, KK * bw + 2, M * bh + 2, 1, 500); frame(g, cC - 1, rB - 1, N * bw + 2, KK * bh + 2, 1, 500); frame(g, cC - 1, rC - 1, N * bw + 2, M * bh + 2, 1, 500);
+  g.text(cA - 4, rC + 1, 'A', 2, 0, 800); g.text(cC + N * bw + 2, rB + 1, 'B', 2, 0, 800); g.text(cC + N * bw + 2, rC + 1, 'C', 2, 0, 800);
+  g.text(cA, rB + 1, 'C += A . B', 2, 0, 700); g.text(cA, rB + 3, 'tile 128 x 128', 1, 0, 500); g.text(cA, rB + 4, 'k-step 1 of 4', 1, 0, 500);
+  const done = I * N + J, tot = M * N, bar = 30, fillN = Math.round(done / tot * bar);
+  g.text(cC - 1, rC + M * bh + 2, '[' + '#'.repeat(fillN) + '.'.repeat(bar - fillN) + '] ' + Math.round(done / tot * 100) + '%', 2, 0, 700);
+};
+
+/* ---------------------------------------------------------------- AGENTS & CONTEXT */
+
+/* AI Context Engineering — many candidate sources, a few selected into a finite window, budget metered */
+EMBLEMS['ai-context-engineering'] = (g) => {
+  const items = ['README.md', 'tool: web.search', 'chat turn 3', 'memory: user prefs', 'docs/api.md', 'ticket #1182', 'tool: sql.query', 'notes/standup.txt',
+    'chat turn 41', 'schema.sql', 'docs/auth.md', 'tool: calendar', 'slack #eng', 'chat turn 42', 'spec-v2.pdf', 'memory: project'];
+  const bands = [['system', 2, 16, null], ['tools', 1, 26, 1], ['memory', 1, 18, 3], ['retrieved', 2, 36, 4], ['retrieved', 2, 30, 10], ['history', 1, 42, 13], ['user', 2, 12, null]];
+  const wc = 60, wr = 31, ww = 53, wh = 35, ic = 7, sel = new Set(bands.map((b) => b[3]).filter((x) => x !== null));
+  bands.forEach(([t, ink, w, src], k) => { if (src === null) return; const r = 34 + k * 4 + 1;
+    const y0 = (32 + src * 2) * CH + 6, x0 = (ic + items[src].length + 1) * CW + 3;
+    line(g, x0, y0, (wc - 1) * CW, r * CH + 6, 1, { ch: '·', wt: 800 }); });
+  items.forEach((t, i) => { const r = 32 + i * 2; if (sel.has(i)) { g.text(ic - 2, r, '>', 2, 0, 800); g.text(ic, r, t, 2, 0, 700); } else g.text(ic, r, t, 3, 0, 500); });
+  g.clear(wc, wr, ww, wh); frame(g, wc, wr, ww, wh, 2, 800);
+  g.text(wc + 2, wr + 1, 'context window', 2, 0, 700);
+  bands.forEach(([t, ink, w], k) => tileT(g, wc + 2, 34 + k * 4, w, 3, ink, t, { left: true }));
+  const used = 38, cap = 47; g.text(wc + 2, wr + wh - 3, '[' + '#'.repeat(used) + '.'.repeat(cap - used) + ']', 2, 0, 700);
+  g.text(wc + 2, wr + wh - 2, Math.round(used / cap * 100) + '% of the token budget', 2, 0, 500);
+};
+
+/* Pi vs Hermes vs Codex — three transcripts, each folded into a summary when the window fills: three hourglasses */
+EMBLEMS['pi-vs-hermes-vs-codex'] = (g) => {
+  const A = [{ n: 'pi', cc: 24, pinch: 44, tw: 13 }, { n: 'hermes', cc: 60, pinch: 50, tw: 15 }, { n: 'codex', cc: 96, pinch: 56, tw: 13 }];
+  const maxW = 31, top = 35, bot = 66, rnd = rng(4);
+  const words = (w, ch) => { let s = ''; while (s.length < w) { const l = 1 + Math.floor(rnd() * 6); s += ch.repeat(l) + ' '; } return s.slice(0, w).replace(/ $/, ch); };
+  A.forEach(({ n, cc, pinch, tw }) => {
+    tileT(g, cc - Math.ceil((n.length + 4) / 2), 31, n.length + 4, 3, 1, n);
+    for (let r = top; r <= pinch - 2; r++) { const t = (r - top) / (pinch - 2 - top), w = Math.round(maxW - t * (maxW - tw + 2));
+      g.text(cc - Math.floor(w / 2), r, words(w, '-'), 1, 0, 700); }
+    tileT(g, cc - Math.floor(tw / 2), pinch - 1, tw, 3, 2, 'summary');
+    for (let r = pinch + 3; r <= bot; r++) { const t = (r - pinch - 3) / Math.max(1, bot - pinch - 3), w = Math.round(tw - 2 + t * (maxW * .8 - tw));
+      g.text(cc - Math.floor(w / 2), r, words(w, '='), 2, 0, 700); }
   });
 };
 
+/* ---------------------------------------------------------------- RL */
+
+/* Reinforcement Learning — a gridworld solved by value iteration: values, greedy policy, and the path it takes */
+EMBLEMS['reinforcement-learning'] = (g) => {
+  const GW = 8, GH = 5, cw = 12, chh = 6, c0 = 12, r0 = 33, goal = '7,0', pit = '7,1', start = [0, 4];
+  const walls = new Set(['2,1', '2,2', '2,3', '5,2', '5,3', '5,4', '4,0']);
+  const V = {}; for (let y = 0; y < GH; y++) for (let x = 0; x < GW; x++) V[x + ',' + y] = 0;
+  const mv = [[1, 0, '>'], [-1, 0, '<'], [0, -1, '^'], [0, 1, 'v']];
+  const nxt = (x, y, d) => { const nx = x + d[0], ny = y + d[1]; return (nx < 0 || ny < 0 || nx >= GW || ny >= GH || walls.has(nx + ',' + ny)) ? [x, y] : [nx, ny]; };
+  for (let it = 0; it < 60; it++) for (let y = 0; y < GH; y++) for (let x = 0; x < GW; x++) { const k = x + ',' + y;
+    if (k === goal) { V[k] = 1; continue; } if (k === pit) { V[k] = -1; continue; } if (walls.has(k)) continue;
+    V[k] = .9 * Math.max(...mv.map((d) => { const [a, b] = nxt(x, y, d); return V[a + ',' + b]; })); }
+  const pol = {}; for (const k in V) { const [x, y] = k.split(',').map(Number); let best = -9, bd = null;
+    for (const d of mv) { const [a, b] = nxt(x, y, d); const v = V[a + ',' + b]; if (v > best + 1e-9) { best = v; bd = d; } } pol[k] = bd; }
+  const path = new Set(); let [px, py] = start; for (let s = 0; s < 30; s++) { const k = px + ',' + py; path.add(k); if (k === goal) break; [px, py] = nxt(px, py, pol[k]); }
+  for (let y = 0; y <= GH; y++) for (let x = 0; x <= GW * cw; x++) g.put(c0 + x, r0 + y * chh, x % cw === 0 ? '+' : '-', 3, 0, 500);
+  for (let y = 0; y < GH * chh; y++) for (let x = 0; x <= GW; x++) if (y % chh) g.put(c0 + x * cw, r0 + y, '|', 3, 0, 500);
+  const arrow = (c, r, ch, ink) => { if (ch === '>') g.text(c + 4, r + 3, '-->', ink, 0, 800); else if (ch === '<') g.text(c + 4, r + 3, '<--', ink, 0, 800);
+    else if (ch === '^') { g.put(c + 5, r + 2, '^', ink, 0, 800); g.put(c + 5, r + 3, '|', ink, 0, 800); g.put(c + 5, r + 4, '|', ink, 0, 800); }
+    else { g.put(c + 5, r + 2, '|', ink, 0, 800); g.put(c + 5, r + 3, '|', ink, 0, 800); g.put(c + 5, r + 4, 'v', ink, 0, 800); } };
+  for (let y = 0; y < GH; y++) for (let x = 0; x < GW; x++) { const k = x + ',' + y, c = c0 + x * cw + 1, r = r0 + y * chh;
+    if (walls.has(k)) { for (let yy = 1; yy < chh; yy++) for (let xx = 0; xx < cw - 1; xx++) if ((xx + yy) % 3 === 0) g.put(c + xx, r + yy, '/', 1, 0, 500); continue; }
+    if (k === goal) { tileT(g, c, r + 1, cw - 1, chh - 1, 2, '+1', { inset: 1.5 }); continue; }
+    if (k === pit) { tileT(g, c, r + 1, cw - 1, chh - 1, 1, '-1', { inset: 1.5 }); continue; }
+    const onP = path.has(k); if (onP) g.tile(c, r + 1, cw - 1, chh - 1, 2, 1.5);
+    arrow(c, r, pol[k][2], onP ? 4 : 2);
+    g.text(c + 1, r + 1, V[k].toFixed(2).slice(1), onP ? 4 : 1, 0, 500);
+    if (x === start[0] && y === start[1]) g.text(c + 8, r + 1, 'S', 4, 0, 800); }
+  g.text(c0, r0 + GH * chh + 2, 'V(s) = \u03b3 \u00b7 max V(s\')     \u03b3 = 0.9', 2, 0, 700);
+};
+
+/* ---------------------------------------------------------------- CODE & DATA */
+
+/* SQL Masterclass — a query and its result, set as the tiles of a result grid */
+EMBLEMS['sql-masterclass'] = (g) => {
+  const kw = new Set(['SELECT', 'AS', 'FROM', 'JOIN', 'USING', 'GROUP', 'BY', 'ORDER', 'DESC', 'COUNT', 'AVG']);
+  const Q = ['SELECT name, COUNT(*) AS courses, AVG(score) AS avg', '  FROM students JOIN results USING (id)', ' GROUP BY name ORDER BY avg DESC;'];
+  g.text(6, 31, 'sql>', 1, 0, 700);
+  Q.forEach((l, i) => { let c = 11; l.split(/(\W)/).forEach((tok) => { if (!tok) return; g.text(c, 31 + i, tok, 2, 0, kw.has(tok) ? 800 : 500); c += tok.length; }); });
+  const rows = [['Ada', 6, 94.5], ['Grace', 5, 91.2], ['Edsger', 6, 89.0], ['Barbara', 4, 87.7], ['Alan', 5, 86.1], ['Katherine', 3, 84.9], ['Donald', 6, 83.3], ['Frances', 4, 80.6]];
+  const cols = [[6, 50, 'name'], [57, 26, 'courses'], [84, 30, 'avg']], r0 = 36;
+  cols.forEach(([c, w, t], k) => tileT(g, c, r0, w, 3, 2, t, k ? { right: true } : { left: 2 }));
+  rows.forEach((row, i) => { const r = r0 + 3 + i * 3, hi = i === 0;
+    cols.forEach(([c, w], k) => { const v = k === 2 ? row[2].toFixed(1) : String(row[k]);
+      tileT(g, c, r, w, 3, hi ? 1 : 3, v, k ? { right: true } : { left: 2 }); }); });
+  g.text(6, r0 + 3 + rows.length * 3 + 1, '(8 rows)', 1, 0, 700);
+};
+
+/* Git & GitHub Masterclass — git log --graph, enlarged: lanes, merges, hashes */
+EMBLEMS['git-github-masterclass'] = (g) => {
+  const L = { main: 46, dark: 38, search: 54 }, rnd = rng(21);
+  const C = { m1: ['main', 14], m2: ['main', 26], d1: ['dark', 40], d2: ['dark', 50], m3: ['main', 66], s1: ['search', 80], m4: ['main', 86], s2: ['search', 92], m5: ['main', 106] };
+  const H = {}; for (const k in C) H[k] = hex(rnd);
+  const at = (k) => ({ c: C[k][1], r: L[C[k][0]], main: C[k][0] === 'main' });
+  const hline = (c0, c1, r, ch, ink) => { for (let c = c0; c <= c1; c++) g.put(c, r, ch, ink, 0, 800); };
+  const branch = (p, b) => { const P = at(p), B = at(b), n = Math.abs(B.r - P.r) - 1, dir = B.r < P.r ? -1 : 1;
+    for (let k = 0; k < n; k++) g.put(P.c + 3 + k, P.r + dir * (1 + k), dir < 0 ? '/' : '\\', 1, 0, 800);
+    hline(P.c + 3 + n, B.c - 3, B.r, '-', 1); };
+  const merge = (b, m) => { const B = at(b), M = at(m), n = Math.abs(M.r - B.r) - 1, dir = M.r > B.r ? 1 : -1, X = M.c - 3 - n;
+    hline(B.c + 3, X - 1, B.r, '-', 1);
+    for (let k = 0; k < n; k++) g.put(X + k, B.r + dir * (1 + k), dir > 0 ? '\\' : '/', 1, 0, 800); };
+  hline(at('m1').c, at('m5').c, L.main, '=', 2);
+  branch('m2', 'd1'); hline(at('d1').c, at('d2').c, L.dark, '-', 1); merge('d2', 'm3');
+  branch('m3', 's1'); hline(at('s1').c, at('s2').c, L.search, '-', 1); merge('s2', 'm5');
+  for (const k in C) { const p = at(k); tileT(g, p.c - 2, p.r - 1, 5, 3, p.main ? 2 : 1, H[k].slice(0, 3)); }
+  g.text(6, L.main, 'main', 2, 0, 700); g.clear(10, L.main, 2, 1);
+  g.text(at('d1').c - 2, L.dark - 3, 'dark-mode', 1, 0, 700); g.text(at('s1').c - 2, L.search + 2, 'search', 1, 0, 700);
+  g.text(at('m5').c + 2 - 12, L.main - 3, 'HEAD -> main', 2, 0, 700);
+  g.text(6, 60, '$ git log --oneline -5', 1, 0, 700);
+  [['m5', "Merge branch 'search'"], ['s2', 'Add search box'], ['m4', 'Fix typo in README'], ['s1', 'Index notes by tag'], ['m3', "Merge branch 'dark-mode'"]]
+    .forEach(([k, msg], i) => { g.text(6, 61 + i, H[k], at(k).main ? 2 : 1, 0, 800); g.text(14, 61 + i, msg, 2, 0, 500); });
+};
+
+/* ---------------------------------------------------------------- THE INTELLIGENCE FACTORY (sub-series) */
+const NUMERAL = { I: ['###', '.#.', '.#.', '.#.', '.#.', '.#.', '###'], V: ['#...#', '#...#', '#...#', '.#.#.', '.#.#.', '.#.#.', '..#..'] };
+function bigNumeral(g, s, cRight, r0, px = 4, py = 2, ink = 1) {
+  const gl = [...s].map((ch) => NUMERAL[ch]), w = gl.reduce((a, q) => a + q[0].length * px, 0) + (gl.length - 1) * px;
+  let c = cRight - w + 1;
+  gl.forEach((q) => { q.forEach((row, y) => [...row].forEach((b, x) => { if (b === '#') g.tile(c + x * px, r0 + y * py, px, py, ink, 0); })); c += q[0].length * px + px; });
+}
+/* The Intelligence Factory: every room is a door (with what's inside), a painted room number, and a belt carrying what the room makes */
+function factory(g, numeral, inside, belt) {
+  const dc = 8, dr = 31, dw = 34, dh = 35, br = 61;
+  inside(g, dc + 4, dr + 7, dw - 8, dh - 8);
+  g.tile(dc, dr, dw, 2, 2, 0); g.tile(dc, dr, 3, dh, 2, 0); g.tile(dc + dw - 3, dr, 3, dh, 2, 0);
+  tileT(g, dc + 8, dr + 3, dw - 16, 1, 1, 'ROOM ' + numeral, { inset: 0 });
+  bigNumeral(g, numeral, 112, 32, 4, 2, 1);
+  for (let c = dc + dw; c <= 113; c++) g.put(c, br, '=', 2, 0, 800);
+  for (let c = dc + dw + 1; c <= 110; c += 5) g.text(c, br + 1, '(o)', 1, 0, 700);
+  for (let c = dc + dw + 9; c <= 108; c += 24) { g.put(c + 1, br + 2, '|', 1, 0, 700); g.put(c + 1, br + 3, '|', 1, 0, 700); g.text(c, br + 4, '/_\\', 1, 0, 700); }
+  belt(g, dc + dw + 3, br - 1);
+}
+
+EMBLEMS['charlie-language-room'] = (g) => factory(g, 'I',
+  (g, c, r, w, h) => { const t = 'the next token is the one most likely to follow the last '.split(' '); let k = 0;
+    for (let y = r; y < r + h; y += 2) { let x = c + (y % 4 === 0 ? 0 : 2); while (x < c + w) { const wd = t[k++ % t.length]; if (!wd) continue; if (x + wd.length > c + w) break; g.text(x, y, wd, 1, 0, 500); x += wd.length + 1; } } },
+  (g, c, r) => { ['once', 'upon', 'a', 'time', 'there', 'was'].forEach((t, i) => { const w = t.length + 2; tileT(g, c, r - 2, w, 3, i === 0 ? 2 : 1, t); c += w + 2; }); });
+
+EMBLEMS['charlie-vision-room'] = (g) => factory(g, 'II',
+  (g, c, r, w, h) => { const L = V3.norm([-.5, -.6, -.62]); for (let y = r; y < r + h; y++) for (let x = c; x < c + w; x++) {
+    const dx = (x + .5 - c - w / 2) * CW / 70, dy = (y + .5 - r - h / 2 + 1) * CH / 70, d2 = dx * dx + dy * dy;
+    if (d2 < 1) { const n = [dx, dy, -Math.sqrt(1 - d2)], v = .1 + .9 * Math.max(0, V3.dot(n, L)); g.put(x, y, dens(v, ' .:-=+*#%@'), 1, 0, 700); }
+    else if ((x - c) % 7 === 0 || (y - r) % 4 === 0) g.put(x, y, (x - c) % 7 === 0 && (y - r) % 4 === 0 ? '+' : (x - c) % 7 === 0 ? '|' : '-', 3, 0, 500); } },
+  (g, c, r) => { const pats = ['@%#', '+=-', ':. ', '#*+', '-:.']; for (let i = 0; i < 5; i++) { const x = c + i * 13, ink = i === 0 ? 2 : 1; g.tile(x, r - 4, 10, 5, ink, 1);
+    for (let yy = 0; yy < 5; yy++) for (let xx = 0; xx < 10; xx++) { const ch = pats[i][(xx + yy) % 3]; if (ch !== ' ') g.put(x + xx, r - 4 + yy, ch, onTile(g, ink), 0, 700); } } });
+
+EMBLEMS['charlie-sound-room'] = (g) => factory(g, 'III',
+  (g, c, r, w, h) => { const x0 = c * CW, yc = (r + h / 2) * CH; for (let k = 1; k <= 5; k++) { const pts = [];
+    for (let i = 0; i <= 90; i++) { const t = -Math.PI / 2.4 + (Math.PI / 1.2) * i / 90; pts.push([x0 + Math.cos(t) * k * 30, yc + Math.sin(t) * k * 30]); }
+    polyline(g, pts, 1, { wt: 700 }); } tileT(g, c, rowOf(yc) - 1, 3, 3, 1, ''); },
+  (g, c, r) => { for (let x = c; x <= 112; x++) { const t = (x - c) / 68, env = Math.sin(Math.PI * t) ** .6;
+    const a = Math.round(env * (2 + 9 * Math.abs(Math.sin(x * .9) * Math.cos(x * .23)))); for (let y = 0; y < a; y++) g.put(x, r - y, '|', y >= a - 2 ? 2 : 1, 0, 800); } });
+
+EMBLEMS['charlie-reasoning-room'] = (g) => factory(g, 'IV',
+  (g, c, r, w, h) => { for (let y = r; y < r + h; y += 3) for (let x = c + ((y - r) % 2 ? 2 : 0); x < c + w; x += 4) g.put(x, y, '?', 1, 0, 800); },
+  (g, c, r) => { [['+1', 2], ['0', 3], ['+1', 2], ['+1', 2], ['0', 3], ['+1', 2], ['0', 3]].forEach(([t, ink], i) => tileT(g, c + i * 10, r - 4, 8, 5, ink, t)); });
+
+</script>
+<script>
 /* =====================================================================
-   BOOKS
+   BOOKS — title lines are set by hand (no orphans); text after a colon
+   becomes the italic subtitle.
    ===================================================================== */
 const BOOKS = [
+  // core set
+  { slug: 'ai-context-engineering', fam: 'agents', level: 'intermediate', capsules: 43, hours: 10,
+    title: ['AI Context', 'Engineering'], fig: 'fig. sixteen candidates, six admitted, one budget' },
+  { slug: 'mathematical-foundations-for-ml', fam: 'found', level: 'beginner', capsules: 43, hours: 10,
+    title: ['Mathematical', 'Foundations for', 'Machine Learning'], fig: 'fig. gradient descent on a quadratic bowl' },
   { slug: 'neural-networks-from-scratch', fam: 'found', level: 'beginner', capsules: 33, hours: 7,
-    lines: ['Neural Networks', 'from Scratch'], fig: 'fig. a 3-5-5-2 perceptron, one forward pass lit' },
+    title: ['Neural Networks', 'from Scratch'], fig: 'fig. a 3-4-4-2 perceptron, one forward pass lit' },
   { slug: 'build-llms-from-scratch', fam: 'lang', level: 'intermediate', capsules: 20, hours: 6,
-    lines: ['Build Large', 'Language Models', '<span class="soft">(LLMs)</span> from Scratch'], fig: 'fig. causal self-attention over twelve tokens' },
+    title: ['Build Large', 'Language Models', '<span class="soft">(LLMs)</span> from Scratch'], fig: 'fig. causal self-attention over twelve tokens' },
   { slug: '5d-parallelism', fam: 'sys', level: 'advanced', capsules: 40, hours: 9,
-    lines: ['5D Parallelism', 'for Large Model', 'Training'], fig: 'fig. a 2 x 2 x 2 device mesh, exploded' },
+    title: ['5D Parallelism', 'for Large Model', 'Training'], fig: 'fig. 32 GPUs as a 2x2x2x2x2 mesh; rank 0 and its five partners' },
+  { slug: 'pi-vs-hermes-vs-codex', fam: 'agents', level: 'advanced', capsules: 9, hours: 1,
+    title: ['Pi vs Hermes', 'vs Codex'], sub: 'Context Compaction and Memory', fig: 'fig. three transcripts, each folded when the window fills' },
+  // range
+  { slug: 'sql-masterclass', fam: 'code', level: 'beginner', capsules: 36, hours: 8,
+    title: ['SQL', 'Masterclass'], fig: 'fig. one query, nine rows' },
+  { slug: 'git-github-masterclass', fam: 'code', level: 'beginner', capsules: 40, hours: 9,
+    title: ['Git &amp; GitHub', 'Masterclass'], fig: 'fig. git log --graph, two branches merged' },
+  { slug: 'decision-trees-from-scratch', fam: 'found', level: 'beginner', capsules: 23, hours: 5,
+    title: ['Build Decision', 'Trees from Scratch'], fig: 'fig. the iris tree: three splits, four leaves' },
+  { slug: 'transformers-from-scratch', fam: 'lang', level: 'intermediate', capsules: 20, hours: 5,
+    title: ['Transformers'], sub: 'Theory, Intuition, and Building from Scratch', fig: 'fig. one attention head: "it" looks back at "animal"' },
+  { slug: 'reinforcement-learning', fam: 'rl', level: 'intermediate', capsules: 38, hours: 8,
+    title: ['Reinforcement', 'Learning'], fig: 'fig. a gridworld solved by value iteration' },
+  { slug: 'cnn-fundamentals', fam: 'vision', level: 'intermediate', capsules: 34, hours: 8,
+    title: ['Convolutional', 'Neural Networks', 'Fundamentals'], fig: 'fig. a sobel kernel slides over a handwritten 7' },
+  { slug: 'deit-from-scratch', fam: 'vision', level: 'advanced', capsules: 42, hours: 10,
+    title: ['Build a Data-Efficient', 'Image Transformer', '<span class="soft">(DeiT)</span> from Scratch'], fig: 'fig. sixteen patches, a class token, a distillation token' },
+  { slug: 'kernel-engineering', fam: 'sys', level: 'advanced', soon: true,
+    title: ['Kernel', 'Engineering'], sub: 'From silicon to speculative decoding — GPU kernels for modern LLMs.', fig: 'fig. a tiled matmul, still running' },
+  // sub-series
+  { slug: 'charlie-language-room', fam: 'factory', level: 'advanced', capsules: 22, hours: 5, kicker: 'Charlie and the Intelligence Factory · I',
+    title: ['Charlie and the', 'Language Room'], sub: 'Language — Inference Engineering', fig: 'fig. room I ships tokens' },
+  { slug: 'charlie-vision-room', fam: 'factory', level: 'intermediate', capsules: 20, hours: 6, kicker: 'Charlie and the Intelligence Factory · II',
+    title: ['Charlie and the', 'Vision Room'], sub: 'Vision — Vision Transformers', fig: 'fig. room II ships patches' },
+  { slug: 'charlie-sound-room', fam: 'factory', level: 'intermediate', capsules: 20, hours: 6, kicker: 'Charlie and the Intelligence Factory · III',
+    title: ['Charlie and the', 'Sound Room'], sub: 'Audio — Voice Agents', fig: 'fig. room III ships waveforms' },
+  { slug: 'charlie-reasoning-room', fam: 'factory', level: 'advanced', capsules: 21, hours: 6, kicker: 'Charlie and the Intelligence Factory · IV',
+    title: ['Charlie and the', 'Reasoning Room'], sub: 'Reason — Reinforcement Learning, from bandits to reasoning models', fig: 'fig. room IV ships rewarded rollouts' },
 ];
 
 /* =====================================================================
    BUILD
    ===================================================================== */
 function markSVG(fg, bgc, h = 22) {
-  const w = h * .6;
-  return `<svg width="${w}" height="${h}" viewBox="0 0 12 20" aria-label="Vizuara"><rect width="12" height="20" fill="${fg}"/>` +
+  return `<svg width="${h * .6}" height="${h}" viewBox="0 0 12 20" aria-label="Vizuara"><rect width="12" height="20" fill="${fg}"/>` +
     `<path d="M2.2 4.2h2.5L6 11.2l1.3-7h2.5L7.4 15.8H4.6z" fill="${bgc}"/></svg>`;
 }
 const LEVELN = { beginner: 1, intermediate: 2, advanced: 3 };
 function buildCover(b) {
-  const K = inksFor(b.fam, b.level);
-  const g = new Grid(K.dark);
+  const K = inksFor(b.fam, b.level), g = new Grid(K.dark);
   (EMBLEMS[b.slug] || (() => {}))(g, K, b);
   const el = document.createElement('div');
   el.className = 'cover'; el.dataset.slug = b.slug;
   el.style.cssText = `--ground:${K.ground};--A:${K.A};--B:${K.B};--faint:${K.faint}`;
   const lv = LEVELN[b.level];
-  const lines = b.lines.map((l, i) => `<span class="l">${l}${i === b.lines.length - 1 ? '<span class="cur"></span>' : ''}</span>`).join('');
+  const lines = b.title.map((l, i) => `<span class="l">${l}${i === b.title.length - 1 ? '<span class="cur"></span>' : ''}</span>`).join('');
   el.innerHTML =
     `<svg class="field" viewBox="0 0 720 888" font-family="JetBrains Mono" font-size="10">${gridSVG(g, K)}</svg>` +
     `<div class="imprint"><div class="brand">${markSVG(K.B, K.ground)}<span>Vizuara Books</span></div>` +
     `<div class="lvl"><span>${b.level}</span><span class="meter">${[1, 2, 3].map((i) => `<i class="${i <= lv ? 'on' : ''}"></i>`).join('')}</span></div></div>` +
+    (b.kicker ? `<div class="kicker">${b.kicker}</div>` : '') +
     `<h1 class="title">${lines}</h1>` +
     (b.sub ? `<p class="sub">${b.sub}</p>` : '') +
-    `<div class="foot"><span class="cap">${b.fig || ''}</span><span class="meta">${b.capsules ? `${b.capsules} capsules · ${b.hours} h` : 'coming soon'}</span></div>`;
+    `<div class="foot"><span class="cap">${b.fig || ''}</span><span class="meta">${b.soon ? 'coming soon' : `${b.capsules} capsules · ${b.hours} h`}</span></div>`;
   return el;
 }
+const TITLE_BOTTOM = 352;
 function fitTitle(el, b) {
-  const h1 = el.querySelector('h1.title'); const maxW = 648, maxH = b.maxH || 270;
-  let size = b.size || 104; h1.style.setProperty('--ts', size + 'px');
+  const h1 = el.querySelector('h1.title'), sub = el.querySelector('.sub'), top = b.kicker ? 106 : 80;
+  h1.style.top = top + 'px';
+  const subH = sub ? sub.getBoundingClientRect().height + 12 : 0, maxW = 646, maxH = TITLE_BOTTOM - top - subH;
+  let size = b.size || 112; h1.style.setProperty('--ts', size + 'px');
   const widest = () => Math.max(...[...h1.querySelectorAll('span.l')].map((s) => s.getBoundingClientRect().width));
-  for (let k = 0; k < 4; k++) { const w = widest(), h = h1.getBoundingClientRect().height;
-    const f = Math.min(maxW / w, maxH / h, 1); if (f > .995) break; size = Math.floor(size * f); h1.style.setProperty('--ts', size + 'px'); }
-  const sub = el.querySelector('.sub'); if (sub) sub.style.top = (78 + h1.getBoundingClientRect().height + 14) + 'px';
+  for (let k = 0; k < 5; k++) { const f = Math.min(maxW / widest(), maxH / h1.getBoundingClientRect().height, 1); if (f > .995) break;
+    size = Math.floor(size * f); h1.style.setProperty('--ts', size + 'px'); }
+  if (sub) sub.style.top = (top + h1.getBoundingClientRect().height + 10) + 'px';
 }
 
 Promise.all([
-  document.fonts.load('640 96px Fraunces'), document.fonts.load('italic 420 96px Fraunces'),
-  document.fonts.load('700 10px "JetBrains Mono"'), document.fonts.load('500 10px "JetBrains Mono"'), document.fonts.load('400 10px "JetBrains Mono"'),
+  document.fonts.load('640 96px Fraunces'), document.fonts.load('italic 420 96px Fraunces'), document.fonts.load('italic 400 24px Fraunces'),
+  document.fonts.load('700 10px "JetBrains Mono"'), document.fonts.load('500 10px "JetBrains Mono"'), document.fonts.load('800 10px "JetBrains Mono"'),
 ]).then(() => {
   const host = document.getElementById('covers');
   for (const b of BOOKS) { const fig = document.createElement('figure'); const el = buildCover(b); fig.appendChild(el);

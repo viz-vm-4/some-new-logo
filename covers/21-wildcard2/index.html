@@ -8,15 +8,12 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=Martian+Mono:wdth,wght@75..112.5,100..800&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bench:#1B463C; --cream:#F3EEE2; --ink:#14201D;
-}
+:root{ --bench:#1B463C; --cream:#F3EEE2; --ink:#14201D; --paper:#E9E4D8; }
 *{box-sizing:border-box}
-html,body{margin:0;background:#E9E4D8;color:var(--ink);font-family:Archivo,sans-serif}
+html,body{margin:0;background:var(--paper);color:var(--ink);font-family:Archivo,sans-serif}
 .covers{display:flex;flex-wrap:wrap;gap:48px;padding:48px;justify-content:center}
 .cover{position:relative;width:720px;height:888px;overflow:hidden;flex:none;background:var(--bench)}
 .cover svg{position:absolute;left:0;top:0;display:block}
-.cover .t{position:absolute;left:48px;right:40px;color:var(--cream);font-family:Archivo;font-weight:800;font-stretch:87.5%;letter-spacing:-0.012em;line-height:.94;margin:0}
 </style>
 </head>
 <body>
@@ -24,109 +21,108 @@ html,body{margin:0;background:#E9E4D8;color:var(--ink);font-family:Archivo,sans-
 
 <script>
 /* ============================================================
-   SOME ASSEMBLY REQUIRED — cover engine
-   Every book is a model kit: the subject's real components are
-   molded onto a sprue. Frame, bench, type and imprint never change.
+   SOME ASSEMBLY REQUIRED — Vizuara Books cover engine
+   Every book builds a model, so every cover is a model kit:
+   the subject's real components molded onto a sprue.
+   Bench, frame, type and imprint never change; the parts do.
    ============================================================ */
-const W = 720, H = 888;
+const W = 720, H = 888, M = 48;
+let UID = 0; const uid = p => (p||'u') + (UID++);
 
 const MATS = {
-  bench:   {ground:'#1B463C', minor:'#23524A', major:'#2C5F55', num:'#6F9B8E', shadow:'#0F2B25', text:'#F3EEE2', dim:'#A9C3BA'},
-  factory: {ground:'#3B2319', minor:'#482C21', major:'#57372A', num:'#A08170', shadow:'#1F120C', text:'#F6E9CF', dim:'#CBB293'},
+  bench:   {ground:'#1B463C', minor:'#24544A', major:'#2D6255', num:'#79A596', shadow:'#0E2A24', text:'#F3EEE2', dim:'#A7C4BA'},
+  factory: {ground:'#3A2219', minor:'#482B20', major:'#583629', num:'#B08D74', shadow:'#1C0F0A', text:'#F7EAD0', dim:'#D6BD9C'},
 };
 const PLASTIC = {
-  bone:   {base:'#ECE4D1', hi:'#FFFDF7', lo:'#A39A83', ink:'#857C66'},
-  red:    {base:'#DE4A2E', hi:'#FF8E72', lo:'#8A2412', ink:'#7A1F10'},
-  yellow: {base:'#F1BF2C', hi:'#FFEAA3', lo:'#9C7507', ink:'#7E5E06'},
-  grey:   {base:'#B8BDC1', hi:'#F1F3F5', lo:'#6C747A', ink:'#5B6268'},
-  lilac:  {base:'#B4A3E4', hi:'#E6DDFF', lo:'#65569A', ink:'#524584'},
-  gold:   {base:'url(#gold)', hi:'#FFF1BE', lo:'#6B4B12', ink:'#5E410F'},
-  clear:  {base:'rgba(225,245,238,.13)', hi:'rgba(255,255,255,.62)', lo:'rgba(0,0,0,.30)', ink:'rgba(255,255,255,.55)'},
+  bone:   {base:'#ECE4D1', hi:'#FFFDF7', lo:'#9D947D', ink:'#6F6752'},
+  red:    {base:'#DE4A2E', hi:'#FF9277', lo:'#8A2412', ink:'#6E1A0B'},
+  yellow: {base:'#F1BF2C', hi:'#FFEBA6', lo:'#9C7507', ink:'#6B5005'},
+  grey:   {base:'#B8BDC1', hi:'#F3F5F6', lo:'#687076', ink:'#474E54'},
+  lilac:  {base:'#B6A5E6', hi:'#EAE2FF', lo:'#62539A', ink:'#43387A'},
+  gold:   {base:'#D5A84C', hi:'#FFF1C2', lo:'#6B4B12', ink:'#4E3408', sheen:'GOLD'},
+  clear:  {base:'#4A6E64', hi:'#C2D7D0', lo:'#0D2B24', ink:'#E0EEE9', clear:true},
 };
 
-/* ---------- tiny SVG helpers (part-local coordinates) ---------- */
+/* ---------- SVG helpers (part-local coordinates) ---------- */
 const n2 = v => +(+v).toFixed(2);
-const R  = (x,y,w,h,r=0) => `<rect x="${n2(x)}" y="${n2(y)}" width="${n2(w)}" height="${n2(h)}" rx="${r}"/>`;
-const C  = (cx,cy,r) => `<circle cx="${n2(cx)}" cy="${n2(cy)}" r="${r}"/>`;
+const R   = (x,y,w,h,r=0) => `<rect x="${n2(x)}" y="${n2(y)}" width="${n2(w)}" height="${n2(h)}" rx="${r}"/>`;
+const C   = (cx,cy,r) => `<circle cx="${n2(cx)}" cy="${n2(cy)}" r="${r}"/>`;
 const ROD = (d,w) => `<path d="${d}" fill="none" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`;
-const P  = (d) => `<path d="${d}" stroke-linejoin="round"/>`;
-const T  = (x,y,s,size,o={}) => `<text x="${n2(x)}" y="${n2(y)}" font-size="${size}" text-anchor="${o.a||'middle'}" font-family="${o.f||'Archivo'}" font-weight="${o.w||800}" style="font-stretch:${o.st||'100%'}" stroke="none" ${o.ls?`letter-spacing="${o.ls}"`:''}>${s}</text>`;
-const pts = (arr) => arr.map((p,i)=>(i?'L':'M')+n2(p[0])+' '+n2(p[1])).join(' ');
-const ringD = (cx,cy,r1,r2) => `M${cx-r1} ${cy}a${r1} ${r1} 0 1 0 ${2*r1} 0a${r1} ${r1} 0 1 0 ${-2*r1} 0Z M${cx-r2} ${cy}a${r2} ${r2} 0 1 1 ${2*r2} 0a${r2} ${r2} 0 1 1 ${-2*r2} 0Z`;
-const RING = (cx,cy,r1,r2) => `<path fill-rule="evenodd" stroke="none" d="${ringD(cx,cy,r1,r2)}"/>`;
-const arrowHead = (x,y,ang,s=14) => { // tip at x,y pointing along ang (deg)
-  const a = ang*Math.PI/180, b = 2.5;
-  const p1=[x - s*Math.cos(a) + s*.62*Math.sin(a), y - s*Math.sin(a) - s*.62*Math.cos(a)];
-  const p2=[x - s*Math.cos(a) - s*.62*Math.sin(a), y - s*Math.sin(a) + s*.62*Math.cos(a)];
-  return `<path d="${pts([[x,y],p1,p2])}Z" stroke-linejoin="round" stroke-width="${b}"/>`;
-};
-/* decoration: drawn after the plastic, in the plastic's own light/dark */
-const ENG = (d,w=1.6) => `<path d="${d}" fill="none" stroke="%HI%" stroke-width="${w}" stroke-linecap="round" transform="translate(.9 .9)"/><path d="${d}" fill="none" stroke="%LO%" stroke-width="${w}" stroke-linecap="round"/>`;
-const RELIEF = (el) => `<g fill="%HI%" stroke="%HI%" transform="translate(-.9 -.9)">${el}</g><g fill="%LO%" stroke="%LO%" transform="translate(1.1 1.3)">${el}</g><g fill="%BASE%" stroke="%BASE%">${el}</g>`;
+const P   = (d,eo) => `<path d="${d}" stroke-linejoin="round"${eo?' fill-rule="evenodd" stroke="none"':''}/>`;
+const pts = (a,close) => a.map((p,i)=>(i?'L':'M')+n2(p[0])+' '+n2(p[1])).join(' ')+(close?'Z':'');
+const rr  = (x,y,w,h,r) => `M${x+r} ${y}H${x+w-r}A${r} ${r} 0 0 1 ${x+w} ${y+r}V${y+h-r}A${r} ${r} 0 0 1 ${x+w-r} ${y+h}H${x+r}A${r} ${r} 0 0 1 ${x} ${y+h-r}V${y+r}A${r} ${r} 0 0 1 ${x+r} ${y}Z`;
+const circ= (cx,cy,r) => `M${n2(cx-r)} ${n2(cy)}a${r} ${r} 0 1 0 ${2*r} 0a${r} ${r} 0 1 0 ${-2*r} 0Z`;
+const RING= (cx,cy,r1,r2) => P(circ(cx,cy,r1)+circ(cx,cy,r2), true);
+const TXT = (x,y,s,size,o={}) => `<text x="${n2(x)}" y="${n2(y)}" font-size="${size}" text-anchor="${o.a||'middle'}" font-family="${o.f||'Archivo'}" font-weight="${o.w||800}" style="font-stretch:${o.st||'100%'}" stroke="none"${o.ls?` letter-spacing="${o.ls}"`:''}>${s}</text>`;
+const HEAD= (x,y,ang,s=14) => { const a=ang*Math.PI/180;
+  const p1=[x - s*Math.cos(a) + s*.6*Math.sin(a), y - s*Math.sin(a) - s*.6*Math.cos(a)];
+  const p2=[x - s*Math.cos(a) - s*.6*Math.sin(a), y - s*Math.sin(a) + s*.6*Math.cos(a)];
+  return `<path d="${pts([[x,y],p1,p2],1)}" stroke-linejoin="round" stroke-width="2.5"/>`; };
+/* decoration drawn over the plastic, in the plastic's own light/shade */
+const ENG = (d,w=1.6) => `<path d="${d}" fill="none" stroke="%HI%" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" transform="translate(.8 .8)" opacity=".9"/><path d="${d}" fill="none" stroke="%LO%" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`;
+const EDOT= (cx,cy,r) => `<circle cx="${n2(cx+.6)}" cy="${n2(cy+.6)}" r="${r}" fill="%HI%" opacity=".8"/><circle cx="${n2(cx)}" cy="${n2(cy)}" r="${r}" fill="%LO%"/>`;
+const ETX = (x,y,s,size,o={}) => `<g font-size="${size}" font-family="${o.f||'Martian Mono'}" font-weight="${o.w||700}" text-anchor="${o.a||'middle'}"${o.ls?` letter-spacing="${o.ls}"`:''}><text x="${n2(x+.7)}" y="${n2(y+.8)}" fill="%HI%" opacity=".75">${s}</text><text x="${n2(x)}" y="${n2(y)}" fill="%INK%">${s}</text></g>`;
+const RELIEF = el => `<g fill="%LO%" stroke="%LO%" transform="translate(1.1 1.3)">${el}</g><g fill="%HI%" stroke="%HI%" transform="translate(-.6 -.6)">${el}</g><g fill="%BASE%" stroke="%BASE%">${el}</g>`;
+const ELT = (x,y,s,size,o={}) => ETX(x,y,s,size,{f:'Archivo',w:800,...o});
+const RTX = (x,y,s,size,o={}) => RELIEF(TXT(x,y,s,size,o));
 
 /* ================= PARTS LIBRARY =================
-   each part: {w,h,g (plastic geometry), d (decoration), gates:[[x,y,'up'|'down']], name} */
+   part = {w,h, g: molded geometry, d: surface detail, gates:[[x,y,'up'|'down']], name} */
 const PARTS = {
-  /* ---------- neural networks ---------- */
-  network(layers=[3,4,2], opt={}) {
-    const r = opt.r||15, dx = opt.dx||102, pitch = opt.pitch||48, rodW = opt.rod||5;
-    const maxN = Math.max(...layers), h = (maxN-1)*pitch + 2*r, w = (layers.length-1)*dx + 2*r;
-    const nodes = layers.map((k,li)=>Array.from({length:k},(_,i)=>[r+li*dx, h/2 + (i-(k-1)/2)*pitch]));
-    let g = '', d = '';
-    for (let li=0; li<layers.length-1; li++) for (const a of nodes[li]) for (const b of nodes[li+1]) g += ROD(`M${a[0]} ${a[1]}L${b[0]} ${b[1]}`, rodW);
-    nodes.flat().forEach(([x,y])=>{ g += C(x,y,r); d += ENG(ringD(x,y,r*.5,r*.5).split('Z')[0]+'Z',1.4); });
+  /* ----- neural networks ----- */
+  network(layers=[3,4,2], o={}) {
+    const r=o.r||15, dx=o.dx||102, pitch=o.pitch||48, rod=o.rod||5;
+    const maxN=Math.max(...layers), h=(maxN-1)*pitch+2*r, w=(layers.length-1)*dx+2*r;
+    const nodes = layers.map((k,li)=>Array.from({length:k},(_,i)=>[r+li*dx, h/2+(i-(k-1)/2)*pitch]));
+    let g='', d='';
+    for (let li=0; li<layers.length-1; li++) for (const a of nodes[li]) for (const b of nodes[li+1]) g += ROD(`M${n2(a[0])} ${n2(a[1])}L${n2(b[0])} ${n2(b[1])}`, rod);
+    nodes.flat().forEach(([x,y])=>{ g += C(x,y,r); d += ENG(circ(x,y,r*.5),1.4); });
     const mid = nodes[Math.floor(layers.length/2)];
-    return {w,h,g,d,gates:[[mid[0][0], mid[0][1]-r,'up'],[mid[mid.length-1][0], mid[mid.length-1][1]+r,'down']], name:'Network'};
+    return {w,h,g,d,gates:[[mid[0][0],mid[0][1]-r,'up'],[mid[mid.length-1][0],mid[mid.length-1][1]+r,'down']],name:o.name||'Network'};
   },
   neuron() {
-    const cx=100, cy=48, r=34; let g='', d='';
-    [[8,10],[2,48],[8,86]].forEach(([x,y])=> g += ROD(`M${x} ${y}Q${cx-40} ${cy+(y-cy)*.35} ${cx-r+4} ${cy}`,6));
-    g += C(cx,cy,r) + ROD(`M${cx+r-2} ${cy}L${cx+r+44} ${cy}`,7) + arrowHead(cx+r+60,cy,0,18);
-    d += ENG(`M${cx+10} ${cy-13}L${cx-10} ${cy-13}L${cx+3} ${cy}L${cx-10} ${cy+13}L${cx+10} ${cy+13}`,2.2);
+    const cx=100, cy=48, r=34; let g='';
+    [[8,10],[3,48],[8,86]].forEach(([x,y])=> g += ROD(`M${x} ${y}Q${cx-40} ${n2(cy+(y-cy)*.35)} ${cx-r+4} ${cy}`,6));
+    g += C(cx,cy,r) + ROD(`M${cx+r-2} ${cy}L${cx+r+44} ${cy}`,7) + HEAD(cx+r+60,cy,0,18);
+    const d = ENG(`M${cx+10} ${cy-13}L${cx-10} ${cy-13}L${cx+3} ${cy}L${cx-10} ${cy+13}L${cx+10} ${cy+13}`,2.4);
     return {w:cx+r+62,h:96,g,d,gates:[[cx,cy-r,'up'],[cx,cy+r,'down']],name:'Neuron'};
   },
   sigmoid() {
-    const w=170,h=86, p=[]; for(let x=0;x<=w;x+=5){p.push([x, 8 + 70 - 70/(1+Math.exp(-(x-w/2)/15))]);}
-    let g = ROD(pts(p),9) + C(0,p[0][1],8) + C(w,p[p.length-1][1],8);
-    return {w,h,g,d:'',gates:[[w/2,h/2,'up'],[w/2,h/2,'down']],name:'Sigmoid'};
+    const w=170, p=[]; for (let x=0;x<=w;x+=5) p.push([x, 8+70-70/(1+Math.exp(-(x-w/2)/15))]);
+    const g = ROD(pts(p),9) + C(0,p[0][1],8) + C(w,p[p.length-1][1],8);
+    return {w,h:86,g,d:'',gates:[[w,0,'up'],[0,86,'down']],name:'Sigmoid'};
   },
   bowl() {
-    const w=150,h=86, p=[]; for(let x=0;x<=w;x+=5){p.push([x, h-4 - (h-12)*(1-((x-w/2)/(w/2))**2)]);}
-    // U-shape: ends high
-    const q = p.map(([x,y])=>[x, (h-4) - (y-4)]);
-    return {w,h,g:ROD(pts(q),9),d:'',gates:[[w/2,h-4,'down'],[0,8,'up']],name:'Loss'};
+    const w=150, p=[]; for (let x=0;x<=w;x+=5) p.push([x, 78-74*((x-w/2)/(w/2))**2]);
+    return {w,h:84,g:ROD(pts(p),9)+C(w*.28,78-74*(.44**2)-13,0),d:'',gates:[[0,0,'up'],[w/2,83,'down']],name:'Loss curve'};
   },
-  ball(r=15) {
-    return {w:2*r,h:2*r,g:C(r,r,r),d:`<circle cx="${r-r*.35}" cy="${r-r*.35}" r="${r*.28}" fill="%HI%" opacity=".8"/>`,gates:[[r,0,'up'],[r,2*r,'down']],name:'Ball'};
+  ball(r=15) { return {w:2*r,h:2*r,g:C(r,r,r),d:`<circle cx="${r*.62}" cy="${r*.62}" r="${r*.26}" fill="%HI%" opacity=".85"/>`,gates:[[r,0,'up'],[r,2*r,'down']],name:'Ball'}; },
+  tile(ch, o={}) {
+    const w=o.w||48, h=o.h||48, size=o.size||30;
+    const d = o.eng ? ELT(w/2,h/2+size*.36,ch,size) : RTX(w/2,h/2+size*.35,ch,size,{st:o.st||'100%',w:o.fw||800});
+    return {w,h,g:R(0,0,w,h,7),d,gates:[[w/2,0,'up'],[w/2,h,'down']],name:o.name||('Tile '+ch)};
   },
-  tile(ch, w=46, h=46, size=30, o={}) {
-    return {w,h,g:R(0,0,w,h,7),d:RELIEF(T(w/2,h/2+size*.36,ch,size,o)),gates:[[w/2,0,'up'],[w/2,h,'down']],name:'Tile '+ch};
-  },
-  backprop() {
-    const w=170,h=70; const g = ROD(`M${w-6} ${h-10}Q${w/2} ${-22} 22 ${h-14}`,8) + arrowHead(8,h-4,118,20);
-    return {w,h,g,d:'',gates:[[w/2,6,'up'],[w-6,h-10,'down']],name:'Backprop'};
-  },
-  /* ---------- transformers / LLMs ---------- */
+  /* ----- transformers / LLMs ----- */
   causalMask(n=6, cell=26, gap=6) {
-    const pitch = cell+gap; let g='', d='';
+    const pitch=cell+gap; let g='', d='';
     for (let i=0;i<n;i++) for (let j=0;j<=i;j++) {
       const x=j*pitch, y=i*pitch; g += R(x,y,cell,cell,3);
-      if (j<i) g += R(x+cell-1,y+cell/2-3,gap+2,6); // bridge right
-      if (i<n-1) g += R(x+cell/2-3,y+cell-1,6,gap+2); // bridge down
-      if (i===j) d += `<circle cx="${x+cell/2}" cy="${y+cell/2}" r="4.5" fill="%LO%"/>`;
+      if (j<i) g += R(x+cell-1,y+cell/2-3,gap+2,6);
+      if (i<n-1) g += R(x+cell/2-3,y+cell-1,6,gap+2);
+      if (i===j) d += EDOT(x+cell/2,y+cell/2,4.5);
     }
-    const s = n*pitch-gap;
-    return {w:s,h:s,g,d,gates:[[cell/2,0,'up'],[s/2,s,'down']],name:'Causal mask'};
+    const s=n*pitch-gap;
+    return {w:s,h:s,g,d,gates:[[cell/2,0,'up'],[s/2+cell/2,s,'down']],name:'Causal mask'};
   },
   block() {
-    const w=96,h=176; let g=R(0,0,w,h,12), d='';
-    d += ENG(`M14 22h68v46h-68zM14 104h68v46h-68z`,1.6) + ENG(`M48 76v20M40 86h16`,2);
-    d += RELIEF(T(48,50,'ATTN',13,{st:'87.5%'})) + RELIEF(T(48,132,'FFN',13,{st:'87.5%'}));
-    return {w,h,g,d,gates:[[w/2,0,'up'],[w/2,h,'down']],name:'Block'};
+    const w=96,h=176; const g=R(0,0,w,h,12);
+    const d = ENG(`M14 22h68v46h-68zM14 106h68v46h-68z`,1.6) + ENG(`M48 76v22M37 87h22`,2.4)
+            + ETX(48,50,'ATTN',12) + ETX(48,134,'FFN',12);
+    return {w,h,g,d,gates:[[w/2,0,'up'],[w/2,h,'down']],name:'Transformer block'};
   },
   tokens(words=['to','ken','s']) {
-    let x=0, g='', d=''; const h=44;
-    words.forEach((t,i)=>{ const w = 22 + t.length*15; g += R(x,0,w,h,6); d += RELIEF(T(x+w/2,h/2+8,t,22,{w:700})); if(i<words.length-1) g += R(x+w-1,h/2-3,10,6); x += w+8; });
+    let x=0, g='', d=''; const h=46;
+    words.forEach((t,i)=>{ const w=24+t.length*15; g += R(x,0,w,h,7); d += ELT(x+w/2,h/2+8,t,23,{w:700}); if (i<words.length-1) g += R(x+w-1,h/2-3,10,6); x += w+8; });
     return {w:x-8,h,g,d,gates:[[22,0,'up'],[x-30,h,'down']],name:'Tokens'};
   },
   qkv() {
@@ -134,176 +130,567 @@ const PARTS = {
     const tips=[[22,24],[66,24],[110,24]];
     tips.forEach(([x,y])=> g += ROD(`M${x} ${y}Q${x} ${y+44} ${w/2} ${h-26}`,7));
     g += ROD(`M${w/2} ${h-28}L${w/2} ${h-6}`,9);
-    tips.forEach(([x,y],i)=>{ g += C(x,y,21); d += RELIEF(T(x,y+8,'QKV'[i],22)); });
+    tips.forEach(([x,y],i)=>{ g += C(x,y,21); d += RTX(x,y+8,'QKV'[i],23); });
     return {w,h,g,d,gates:[[66,3,'up'],[w/2,h-2,'down']],name:'Q·K·V head'};
   },
-  wave(len=170, amp=20, periods=2) {
-    const p=[]; for(let x=0;x<=len;x+=3) p.push([x, amp+4 + amp*Math.sin(x/len*periods*2*Math.PI)]);
-    return {w:len,h:2*amp+8,g:ROD(pts(p),8),d:'',gates:[[len/4,4,'up'],[len*3/4,2*amp+4,'down']],name:'Position wave'};
+  wave(len=170, amp=20) {
+    const p=[]; for (let x=0;x<=len;x+=3) p.push([x, amp+4+amp*Math.sin(x/len*4*Math.PI)]);
+    return {w:len,h:2*amp+8,g:ROD(pts(p),8),d:'',gates:[[len*3/8,0,'up'],[len*5/8,2*amp+8,'down']],name:'Position wave'};
   },
-  /* ---------- systems ---------- */
+  patchGrid(n=3, cell=36, gap=6) {
+    const pitch=cell+gap, s=n*pitch-gap; let g='', clip='';
+    for (let i=0;i<n;i++) for (let j=0;j<n;j++) { const x=j*pitch,y=i*pitch; g+=R(x,y,cell,cell,4); clip+=R(x,y,cell,cell,4);
+      if (j<n-1) g+=R(x+cell-1,y+cell/2-3,gap+2,6); if (i<n-1) g+=R(x+cell/2-3,y+cell-1,6,gap+2); }
+    const id=uid('cp');
+    const pic = `M0 ${s*.86}L${s*.3} ${s*.44}L${s*.5} ${s*.68}L${s*.68} ${s*.5}L${s} ${s*.9}` ;
+    const d = `<defs><clipPath id="${id}">${clip}</clipPath></defs><g clip-path="url(#${id})">${ENG(pic,2.2)}${ENG(circ(s*.76,s*.22,s*.1),2.2)}</g>`;
+    return {w:s,h:s,g,d,gates:[[cell/2,0,'up'],[s-cell/2,s,'down']],name:'Image patches'};
+  },
+  patchSeq(labels=['CLS','1','2','3','4']) {
+    let x=0,g='',d=''; const c=38;
+    labels.forEach((t,i)=>{ const w = t.length>2?54:c; g+=R(x,0,w,c,5); d += ETX(x+w/2,c/2+4.5,t,t.length>2?12:13); if(i<labels.length-1) g+=R(x+w-1,c/2-3,10,6); x+=w+8; });
+    return {w:x-8,h:c,g,d,gates:[[27,0,'up'],[x-8-c/2,c,'down']],name:'Patch sequence'};
+  },
+  /* ----- systems ----- */
   cluster(nx=4, ny=4, chip=36, pitch=52) {
     let g='', d='';
-    for (let i=0;i<ny;i++) for (let j=0;j<nx;j++) {
-      const x=j*pitch, y=i*pitch;
-      if (j<nx-1) g += R(x+chip-1,y+chip/2-3.5,pitch-chip+2,7);
-      if (i<ny-1) g += R(x+chip/2-3.5,y+chip-1,7,pitch-chip+2);
-      g += R(x,y,chip,chip,4);
-      d += ENG(`M${x+10} ${y+10}h${chip-20}v${chip-20}h${-(chip-20)}z`,1.5);
-    }
+    for (let i=0;i<ny;i++) for (let j=0;j<nx;j++) { const x=j*pitch,y=i*pitch;
+      if (j<nx-1) g+=R(x+chip-1,y+chip/2-3.5,pitch-chip+2,7);
+      if (i<ny-1) g+=R(x+chip/2-3.5,y+chip-1,7,pitch-chip+2);
+      g+=R(x,y,chip,chip,4); d+=ENG(`M${x+10} ${y+10}h${chip-20}v${chip-20}h${-(chip-20)}z`,1.5); }
     const s=(nx-1)*pitch+chip, t=(ny-1)*pitch+chip;
     return {w:s,h:t,g,d,gates:[[chip/2+pitch,0,'up'],[chip/2+2*pitch,t,'down']],name:'GPU grid'};
   },
   dimArrow(label) {
-    const w=50,h=118; let g = R(0,h-30,w,30,6) + ROD(`M${w/2} ${h-30}L${w/2} ${22}`,8) + arrowHead(w/2,2,-90,22);
-    return {w,h,g,d:RELIEF(T(w/2,h-9,label,17,{st:'87.5%'})),gates:[[w/2,2,'up'],[w/2,h,'down']],name:label};
+    const w=52,h=120; const g=R(0,h-32,w,32,6)+ROD(`M${w/2} ${h-32}L${w/2} 22`,8)+HEAD(w/2,2,-90,22);
+    return {w,h,g,d:ETX(w/2,h-11,label,15,{w:800}),gates:[[w/2,2,'up'],[w/2,h,'down']],name:label+' axis'};
   },
   ring(k=8, r=58, nr=11) {
-    let g = RING(r+nr,r+nr,r+3.5,r-3.5), d='';
-    for (let i=0;i<k;i++){ const a=i/k*2*Math.PI - Math.PI/2; g += C(r+nr+r*Math.cos(a), r+nr+r*Math.sin(a), nr); }
-    // direction chevrons
-    for (let i=0;i<k;i++){ const a=(i+.5)/k*2*Math.PI - Math.PI/2; const x=r+nr+(r-14)*Math.cos(a), y=r+nr+(r-14)*Math.sin(a); d += `<path d="M${n2(x)} ${n2(y)}l${n2(5*Math.cos(a+2.4))} ${n2(5*Math.sin(a+2.4))}M${n2(x)} ${n2(y)}l${n2(5*Math.cos(a-2.4+Math.PI))} ${n2(5*Math.sin(a-2.4+Math.PI))}" stroke="%LO%" stroke-width="1.6" fill="none"/>`; }
+    let g=RING(r+nr,r+nr,r+3.5,r-3.5), d='';
+    for (let i=0;i<k;i++){ const a=i/k*2*Math.PI-Math.PI/2; g+=C(r+nr+r*Math.cos(a),r+nr+r*Math.sin(a),nr); }
+    for (let i=0;i<k;i++){ const a=(i+.5)/k*2*Math.PI-Math.PI/2, x=r+nr+(r-16)*Math.cos(a), y=r+nr+(r-16)*Math.sin(a), t=a+Math.PI/2;
+      d += ENG(`M${n2(x-5*Math.cos(t)+4*Math.cos(a))} ${n2(y-5*Math.sin(t)+4*Math.sin(a))}L${n2(x)} ${n2(y)}L${n2(x-5*Math.cos(t)-4*Math.cos(a))} ${n2(y-5*Math.sin(t)-4*Math.sin(a))}`,1.6); }
     const s=2*(r+nr);
     return {w:s,h:s,g,d,gates:[[s/2,0,'up'],[s/2,s,'down']],name:'All-reduce ring'};
   },
-  pipeline(k=4) {
+  pipeline(k=3) {
     let g='', x=0; const b=40;
-    for (let i=0;i<k;i++){ g += R(x,0,b,b,6); if(i<k-1){ g += ROD(`M${x+b} ${b/2}L${x+b+16} ${b/2}`,6) + arrowHead(x+b+26,b/2,0,12);} x += b+30; }
-    return {w:x-30,h:b,g,d:'',gates:[[b/2,0,'up'],[x-30-b/2,b,'down']],name:'Pipeline'};
+    for (let i=0;i<k;i++){ g+=R(x,0,b,b,6); if(i<k-1){ g+=ROD(`M${x+b} ${b/2}L${x+b+16} ${b/2}`,6)+HEAD(x+b+26,b/2,0,12);} x+=b+30; }
+    return {w:x-30,h:b,g,d:'',gates:[[b/2,0,'up'],[x-30-b/2,b,'down']],name:'Pipeline stages'};
+  },
+  gpuDie() {
+    const s=176; let g=R(0,0,s,s,10), d='';
+    for (let i=0;i<6;i++) for (let j=0;j<6;j++) { if (i===2||i===3) continue; d += ENG(`M${14+j*26} ${14+i*26+(i>3?0:0)}h18v18h-18z`,1.4); }
+    d += ENG(`M14 70H162V106H14Z`,1.6) + ETX(88,93,'L2',12);
+    return {w:s,h:s,g,d,gates:[[s/2,0,'up'],[s/2,s,'down']],name:'GPU die'};
+  },
+  warp(n=32) {
+    let g=ROD(`M2 6H${(n-1)*6+4}`,8); for (let i=0;i<n;i++) g+=ROD(`M${3+i*6} 6V${i%8===0?64:56}`,3);
+    return {w:(n-1)*6+6,h:66,g,d:'',gates:[[((n-1)*6+6)/2,2,'up'],[3,64,'down']],name:'Warp of 32 threads'};
+  },
+  memPyramid() {
+    const bars=[['REG',56],['SMEM',104],['HBM',152]]; let g='',d='',y=0;
+    g += ROD(`M76 4V${3*26-4}`,6);
+    bars.forEach(([t,w])=>{ g+=R(76-w/2,y,w,20,5); d+=ETX(76,y+14,t,10); y+=26; });
+    return {w:152,h:y-6,g,d,gates:[[76,0,'up'],[76,y-6,'down']],name:'Memory hierarchy'};
+  },
+  /* ----- context & agents ----- */
+  contextTray() {
+    const w=440,h=118,t=10, bot=36; const segs=[['SYSTEM',.16],['TOOLS',.19],['RETRIEVED',.36],['HISTORY',.29]];
+    const inner=w-2*t-3*9; let x=t, holes='', d='';
+    segs.forEach(([lab,f],i)=>{ const sw=inner*f; holes+=rr(x,t,sw,h-t-bot,5); d+=ETX(x+sw/2,h-13,lab,10,{ls:'.06em'}); x+=sw+9; });
+    return {w,h,g:P(rr(0,0,w,h,12)+holes,true),d,gates:[[w*.3,0,'up'],[w*.62,h,'down']],name:'Context window'};
+  },
+  doc() {
+    const g=P(`M6 0H44L64 20V74Q64 80 58 80H6Q0 80 0 74V6Q0 0 6 0Z`);
+    const d=ENG(`M44 2V20H62`,1.6)+ENG(`M12 34H52M12 46H52M12 58H40`,2);
+    return {w:64,h:80,g,d,gates:[[22,0,'up'],[32,80,'down']],name:'Document'};
+  },
+  bubble(w=96,h=66, o={}) {
+    const g=P(rr(0,0,w,h-14,16)+`M${w*.18} ${h-16}L${w*.16} ${h}L${w*.4} ${h-16}Z`);
+    const d = o.dots ? [0,1,2].map(i=>EDOT(w/2+(i-1)*w*.2,(h-14)/2,w*.055)).join('') : ENG(`M18 ${(h-14)*.36}H${w-18}M18 ${(h-14)*.66}H${w*.6}`,2);
+    return {w,h,g,d,gates:[[w/2,0,'up'],[w*.72,h-14,'down']],name:o.name||'Message'};
+  },
+  wrench() {
+    const cx=24, cy=26, Rr=24, s=8, yy=n2(cy-Math.sqrt(Rr*Rr-s*s));
+    const g=P(`M${cx-s} ${yy}V${cy+2}A${s} ${s} 0 0 0 ${cx+s} ${cy+2}V${yy}A${Rr} ${Rr} 0 1 1 ${cx-s} ${yy}Z`)+R(cx-8,cy+16,16,80,8);
+    return {w:48,h:122,g,d:ENG(`M${cx} 58V${cy+86}`,1.6),gates:[[cx,cy-Rr+3,'up'],[cx,122,'down']],name:'Tool'};
+  },
+  chip() {
+    let g=R(10,0,60,56,5); for(let i=0;i<4;i++){ g+=R(0,7+i*12,12,5,1.5)+R(68,7+i*12,12,5,1.5); }
+    return {w:80,h:56,g,d:ENG(`M24 14h32v28h-32z`,1.6),gates:[[40,0,'up'],[40,56,'down']],name:'Memory chip'};
+  },
+  magnifier() {
+    const g=RING(30,30,30,20)+ROD(`M52 52L84 84`,12);
+    return {w:92,h:92,g,d:'',gates:[[30,0,'up'],[86,90,'down']],name:'Retriever'};
+  },
+  transcript(n=9) {
+    let g=ROD(`M60 4V${(n-1)*15+8}`,6), d=''; const L=[44,30,50,22,46,36,52,26,40];
+    for (let i=0;i<n;i++){ const y=6+i*15, l=L[i%L.length]; g += i%2 ? R(60,y-4,l+14,9,4) : R(60-l-14,y-4,l+14,9,4); }
+    return {w:136,h:(n-1)*15+12,g,d,gates:[[60,0,'up'],[60,(n-1)*15+12,'down']],name:'Long transcript'};
+  },
+  clamp() {
+    let g=P(`M0 22Q0 0 22 0H112V20H22V140H112V160H22Q0 160 0 138Z`);
+    g += R(94,14,18,14,3)+R(94,132,18,14,3);               // jaws
+    g += ROD(`M103 -26V58`,9)+ROD(`M80 -26H126`,8)+R(84,58,38,10,3); // screw, handle, pad
+    g += R(58,70,88,62,4);                                  // compacted block
+    const d = ENG(`M64 86H140M64 101H140M64 116H140`,1.6);
+    return {w:146,h:186,g:`<g transform="translate(0 26)">${g}</g>`,d:`<g transform="translate(0 26)">${d}</g>`,gates:[[46,26,'up'],[46,186,'down']],name:'Compactor'};
+  },
+  badge(kind) {
+    const r=40, cx=r, cy=r; let el='';
+    if (kind==='pi') el = `<path d="M${cx-22} ${cy-12}Q${cx-20} ${cy-20} ${cx-10} ${cy-20}H${cx+24}V${cy-10}H${cx+10}V${cy+14}Q${cx+10} ${cy+20} ${cx+18} ${cy+20}V${cy+24}Q${cx} ${cy+26} ${cx} ${cy+12}V${cy-10}H${cx-8}V${cy+24}H${cx-18}V${cy-10}Q${cx-20} ${cy-10} ${cx-22} ${cy-6}Z"/>`;
+    if (kind==='wing') el = ROD(`M${cx-16} ${cy+14}L${cx+22} ${cy-22}`,9)+ROD(`M${cx-16} ${cy+14}L${cx+24} ${cy-6}`,9)+ROD(`M${cx-16} ${cy+14}L${cx+20} ${cy+10}`,9)+`<circle cx="${cx-14}" cy="${cy+12}" r="11"/>`;
+    if (kind==='codex') el = `<path d="M${cx-24} ${cy-18}Q${cx-12} ${cy-24} ${cx-2} ${cy-18}V${cy+22}Q${cx-12} ${cy+16} ${cx-24} ${cy+22}Z M${cx+2} ${cy-18}Q${cx+12} ${cy-24} ${cx+24} ${cy-18}V${cy+22}Q${cx+12} ${cy+16} ${cx+2} ${cy+22}Z"/>`;
+    return {w:2*r,h:2*r,g:C(cx,cy,r),d:ENG(circ(cx,cy,r-6),1.4)+RELIEF(el),gates:[[cx,0,'up'],[cx,2*r,'down']],name:{pi:'Pi',wing:'Hermes',codex:'Codex'}[kind]};
+  },
+  star() {
+    const g=R(0,0,56,56,8); const el=ROD(`M28 13V43M15 20.5L41 35.5M41 20.5L15 35.5`,6.5);
+    return {w:56,h:56,g,d:RELIEF(el),gates:[[28,0,'up'],[28,56,'down']],name:'SELECT *'};
+  },
+  vs() { return PARTS.tile('vs',{w:44,h:32,size:18,name:'vs',eng:true}); },
+  /* ----- mathematics ----- */
+  sigma() {
+    const g=P(pts([[0,0],[104,0],[104,34],[91,34],[87,19],[31,19],[70,67],[29,116],[88,116],[92,100],[106,100],[106,136],[0,136],[0,118],[43,67],[0,16]],1));
+    return {w:106,h:136,g,d:'',gates:[[52,0,'up'],[52,136,'down']],name:'Sigma'};
+  },
+  bell() {
+    const w=200, p=[]; for (let x=4;x<=w-4;x+=4) p.push([x, 92-78*Math.exp(-(((x-w/2)/30)**2))]);
+    let g=ROD(`M0 94H${w}`,7)+ROD(pts(p),8); [-60,-30,30,60].forEach(o=>g+=ROD(`M${w/2+o} 94V103`,4)); g+=ROD(`M${w/2} 94V105`,5);
+    return {w,h:106,g,d:'',gates:[[w/2,10,'up'],[18,97,'down']],name:'Gaussian'};
+  },
+  integral() {
+    const g=ROD(`M46 12C30 -2 24 14 24 44V92C24 122 16 132 4 120`,11)+C(48,13,8)+C(4,118,8);
+    return {w:56,h:128,g,d:'',gates:[[42,2,'up'],[4,126,'down']],name:'Integral'};
+  },
+  nabla() {
+    return {w:104,h:92,g:P(pts([[0,0],[104,0],[52,92]],1)+pts([[20,12],[84,12],[52,69]],1),true),d:'',gates:[[52,0,'up'],[52,92,'down']],name:'Nabla'};
+  },
+  matrix() {
+    let g=ROD(`M18 4H6V100H18`,9)+ROD(`M104 4H116V100H104`,9), d='';
+    for (let i=0;i<3;i++) for (let j=0;j<3;j++){ const x=32+j*29, y=23+i*29; g+=C(x,y,9.5); if(j<2) g+=R(x,y-2.5,29,5); if(i<2) g+=R(x-2.5,y,5,29); }
+    g+=R(6,49,26,5)+R(90,49,26,5);
+    return {w:122,h:104,g,d,gates:[[12,0,'up'],[110,104,'down']],name:'Matrix'};
+  },
+  vector() {
+    const g=ROD(`M6 82L84 18`,9)+HEAD(100,5,-39.4,24)+C(6,82,8);
+    return {w:104,h:92,g,d:'',gates:[[6,74,'up'],[6,90,'down']],name:'Vector'};
+  },
+  /* ----- trees & data ----- */
+  tree() {
+    let g='', d='';
+    const root=[132,18], kids=[[68,96],[196,96]], leaves=[[24,172],[98,172],[166,172],[240,172]];
+    kids.forEach(k=>g+=ROD(`M${root[0]} ${root[1]}L${k[0]} ${k[1]}`,7));
+    leaves.forEach((l,i)=>g+=ROD(`M${kids[i>>1][0]} ${kids[i>>1][1]}L${l[0]} ${l[1]}`,7));
+    g += R(root[0]-44,0,88,36,8); kids.forEach(k=>g+=R(k[0]-38,k[1]-16,76,32,8)); leaves.forEach(l=>g+=C(l[0],l[1],17));
+    d += ETX(root[0],23,'x ≤ 2.5',12) + ETX(kids[0][0],kids[0][1]+5,'y ≤ 1',11) + ETX(kids[1][0],kids[1][1]+5,'x ≤ 4',11);
+    leaves.forEach((l,i)=> d += i%2 ? ENG(circ(l[0],l[1],7),2.2) : EDOT(l[0],l[1],7));
+    return {w:264,h:190,g,d,gates:[[132,0,'up'],[98,189,'down']],name:'Decision tree'};
+  },
+  boundary() {
+    const s=128; const g=R(0,0,s,s,8);
+    let d=''; [[22,112],[34,100],[18,74],[40,114],[28,62],[70,112],[88,98],[64,86]].forEach(([x,y])=>d+=EDOT(x,y,4.2));
+    [[74,22],[100,30],[112,58],[66,34],[92,70],[112,90],[104,14]].forEach(([x,y])=>d+=ENG(circ(x,y,4.2),1.8));
+    d += RELIEF(ROD(`M8 92H52V44H120`,5));
+    return {w:s,h:s,g,d,gates:[[s/2,0,'up'],[s/2,s,'down']],name:'Decision boundary'};
+  },
+  hist() {
+    const g=ROD(`M4 84H116`,7)+R(12,20,26,64,3)+R(47,52,26,32,3)+R(82,36,26,48,3);
+    return {w:120,h:88,g,d:ENG(`M12 34H38M47 64H73M82 50H108`,1.4),gates:[[25,20,'up'],[95,88,'down']],name:'Class counts'};
+  },
+  leq() {
+    const g=R(0,0,56,56,8); const el=`<path d="M40 12L14 25L40 38M14 45H40" fill="none" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>`;
+    return {w:56,h:56,g,d:RELIEF(el),gates:[[28,0,'up'],[28,56,'down']],name:'Split test'};
+  },
+  table() {
+    const w=176,h=128; const g=R(0,0,w,h,6); let d=ENG(`M0 32H${w}M8 56H${w-8}M8 80H${w-8}M8 104H${w-8}M58 8V${h-8}M116 8V${h-8}`,1.5);
+    d += ETX(30,21,'id',11)+ETX(87,21,'name',11)+ETX(146,21,'city',11);
+    return {w,h,g,d,gates:[[w/2,0,'up'],[w/2,h,'down']],name:'Table'};
+  },
+  key() {
+    const g=RING(26,26,26,12)+R(48,20,98,12,4)+R(112,30,10,16,2)+R(130,30,10,22,2);
+    return {w:146,h:54,g,d:'',gates:[[26,0,'up'],[118,46,'down']],name:'Primary key'};
+  },
+  venn() {
+    const lens=`M64 13.2A36 36 0 0 1 64 66.8A36 36 0 0 1 64 13.2Z`;
+    const g=RING(40,40,40,30)+RING(88,40,40,30)+P(lens);
+    return {w:128,h:80,g,d:'',gates:[[40,0,'up'],[88,80,'down']],name:'Join'};
+  },
+  funnel() {
+    const g=P(`M0 6Q0 0 6 0H90Q96 0 96 6L58 52V84Q58 90 52 88L42 84Q38 82 38 78V52Z`);
+    return {w:96,h:90,g,d:ENG(`M8 12H88`,1.6),gates:[[48,0,'up'],[48,88,'down']],name:'Filter'};
+  },
+  /* ----- alignment ----- */
+  thumbs() {
+    const g=P(rr(0,54,20,54,4))+R(18,72,12,16)+P(rr(26,46,64,62,15))+P(rr(32,2,25,58,12.5));
+    return {w:90,h:108,g,d:ENG(`M58 64H84M58 80H86M58 96H82`,1.8),gates:[[44,2,'up'],[58,108,'down']],name:'Human feedback'};
+  },
+  prefPair() {
+    let g=R(0,0,64,78,8)+R(84,0,64,78,8)+R(63,35,22,8), d='';
+    d += ETX(32,20,'A',13,{f:'Archivo',w:800})+ETX(116,20,'B',13,{f:'Archivo',w:800});
+    d += RELIEF(ROD(`M16 50L28 61L48 38`,6.5))+RELIEF(ROD(`M104 40L128 62M128 40L104 62`,6.5));
+    return {w:148,h:78,g,d,gates:[[32,0,'up'],[116,78,'down']],name:'Preference pair'};
+  },
+  clipFn() {
+    const g=ROD(`M6 4V84H152`,5)+ROD(`M12 70H52L104 24H148`,8);
+    return {w:154,h:88,g,d:'',gates:[[6,1,'up'],[80,86,'down']],name:'Clipped objective'};
+  },
+  spring() {
+    const zz=[]; for (let i=0;i<=10;i++) zz.push([34+i*9.4, 30+(i%2?-12:12)*(i>0&&i<10?1:0)]);
+    const g=C(17,30,17)+ROD(pts(zz),5)+C(151,30,17);
+    return {w:168,h:60,g,d:ELT(17,36,'π',17)+ETX(151,34,'ref',10),gates:[[17,13,'up'],[151,47,'down']],name:'KL penalty'};
+  },
+  /* ----- software craft ----- */
+  commitGraph() {
+    let g=ROD(`M8 70H286`,7)+ROD(`M76 70C100 70 100 22 124 22H176C200 22 200 70 216 70`,7), d='';
+    [[20,70,13],[76,70,13],[216,70,16],[272,70,13],[124,22,12],[176,22,12]].forEach(([x,y,r])=>{ g+=C(x,y,r); d+=EDOT(x,y,r*.38); });
+    return {w:290,h:86,g,d,gates:[[150,22-12,'up'],[48,77,'down']],name:'Commit graph'};
+  },
+  terminal() {
+    const g=R(0,0,124,80,9);
+    const d=ENG(`M0 20H124`,1.5)+EDOT(12,10,3)+EDOT(23,10,3)+EDOT(34,10,3)+ETX(14,50,'$ git',14,{a:'start'})+ENG(`M14 62H40`,2.4);
+    return {w:124,h:80,g,d,gates:[[62,0,'up'],[62,80,'down']],name:'Terminal'};
+  },
+  diff() {
+    const g=R(0,0,72,72,9);
+    const d=RELIEF(ROD(`M14 24H34M24 14V34`,6))+RELIEF(ROD(`M38 50H58`,6))+ENG(`M12 60L60 12`,1.2);
+    return {w:72,h:72,g,d,gates:[[36,0,'up'],[36,72,'down']],name:'Diff'};
+  },
+  tag() {
+    const g=P(`M10 0H70L98 32L70 64H10Q0 64 0 54V10Q0 0 10 0Z`+circ(74,32,7),true);
+    return {w:98,h:64,g,d:ETX(34,37,'v1.0',12),gates:[[34,0,'up'],[34,64,'down']],name:'Release tag'};
+  },
+  fork() {
+    const g=ROD(`M34 90V52L12 14M34 52L56 14`,8)+C(34,92,11)+C(12,14,11)+C(56,14,11);
+    return {w:68,h:104,g,d:'',gates:[[12,3,'up'],[34,103,'down']],name:'Fork'};
+  },
+  /* ----- Charlie's rooms ----- */
+  kvCache() {
+    let g='', d=''; const c=34, pitch=40;
+    g += R(0,0,c,c,6)+R(c+8,0,c,c,6); d += RTX(c/2,c/2+8,'K',22)+RTX(c+8+c/2,c/2+8,'V',22);
+    for (let i=1;i<=4;i++){ g+=R(0,i*pitch,c,c-6,4)+R(c+8,i*pitch,c,c-6,4); d+=ENG(`M8 ${i*pitch+14}H${c-8}M${c+16} ${i*pitch+14}H${2*c}`,2); }
+    g += R(c/2-3,0,6,4*pitch+c-10)+R(c+8+c/2-3,0,6,4*pitch+c-10)+R(c-2,c/2-3,12,6);
+    return {w:2*c+8,h:4*pitch+c-6,g,d,gates:[[c/2,0,'up'],[c+8+c/2,4*pitch+c-6,'down']],name:'KV cache'};
+  },
+  stopwatch() {
+    const g=RING(40,52,38,28)+R(32,0,16,12,3)+R(37,10,6,6)+C(40,52,7)+ROD(`M40 52L40 26`,5)+ROD(`M70 18L76 12`,7);
+    let d=''; for(let i=0;i<12;i++){ const a=i/12*2*Math.PI; d+=`<circle cx="${n2(40+33*Math.cos(a))}" cy="${n2(52+33*Math.sin(a))}" r="1.5" fill="%LO%"/>`; }
+    return {w:82,h:90,g,d,gates:[[40,0,'up'],[40,90,'down']],name:'Latency'};
+  },
+  die() {
+    const g=R(0,0,62,62,11); const d=[[16,16],[46,16],[31,31],[16,46],[46,46]].map(([x,y])=>EDOT(x,y,5.5)).join('');
+    return {w:62,h:62,g,d,gates:[[31,0,'up'],[31,62,'down']],name:'Sampler'};
+  },
+  eye() {
+    const g=P(`M0 64Q110 -24 220 64Q110 152 0 64Z M26 64Q110 4 194 64Q110 124 26 64Z`,true)+RING(110,64,38,15);
+    return {w:220,h:128,g,d:`<circle cx="98" cy="52" r="6" fill="%HI%" opacity=".9"/>`,gates:[[110,20,'up'],[110,108,'down']],name:'Eye'};
+  },
+  waveform() {
+    let g=ROD(`M0 56H236`,5); for (let i=0;i<=19;i++){ const x=4+i*12, a=8+44*Math.abs(Math.sin(i*.55)*Math.sin(i*.17+.4)); g+=ROD(`M${x} ${n2(56-a)}V${n2(56+a)}`,7); }
+    return {w:236,h:112,g,d:'',gates:[[118,10,'up'],[118,102,'down']],name:'Waveform'};
+  },
+  mic() {
+    const g=R(12,0,44,70,22)+ROD(`M4 36V48Q4 86 34 86Q64 86 64 48V36`,6)+ROD(`M34 86V104`,7)+ROD(`M14 108H54`,8);
+    return {w:68,h:112,g,d:ENG(`M20 20H48M18 32H50M18 44H50M20 56H48`,1.8),gates:[[34,0,'up'],[34,112,'down']],name:'Microphone'};
+  },
+  speaker() {
+    let g=R(0,30,18,36,3)+P(`M18 30L52 8V88L18 66Z`)+ROD(`M52 48H104`,4);
+    [18,32,46].forEach(r=>g+=ROD(`M${n2(52+r*Math.cos(-.8))} ${n2(48+r*Math.sin(-.8))}A${r} ${r} 0 0 1 ${n2(52+r*Math.cos(.8))} ${n2(48+r*Math.sin(.8))}`,5));
+    return {w:104,h:96,g,d:'',gates:[[35,19,'up'],[35,78,'down']],name:'Speaker'};
+  },
+  bandit() {
+    let g=R(0,92,214,14,5), d='';
+    for (let i=0;i<3;i++){ const x=i*70; g+=R(x,20,54,76,8)+ROD(`M${x+54} 52H${x+60}V16`,5)+C(x+60,12,7); d+=ENG(rr(x+10,34,34,34,4),1.6)+ETX(x+27,58,'?',17,{f:'Archivo',w:800}); }
+    return {w:214,h:106,g,d,gates:[[27,20,'up'],[107,106,'down']],name:'Multi-armed bandit'};
+  },
+  gridworld() {
+    const s=128; let g=R(0,0,s,s,6)+ROD(`M20 108H52V76H84V44H108V22`,6)+HEAD(108,10,-90,14)+R(60,20,8,40,2)+R(20,40,36,8,2);
+    let d=ENG(`M34 6V122M66 6V122M98 6V122M6 34H122M6 66H122M6 98H122`,1.2)+EDOT(20,108,6);
+    return {w:s,h:s,g,d,gates:[[s/2,0,'up'],[s/2,s,'down']],name:'Grid world'};
+  },
+  coin() {
+    return {w:64,h:64,g:C(32,32,32),d:ENG(circ(32,32,25),1.5)+ELT(32,41,'+1',22),gates:[[32,0,'up'],[32,64,'down']],name:'Reward'};
+  },
+  chain() {
+    let g=''; [0,76,152].forEach(x=>g+=P(rr(x,0,62,36,18)+rr(x+10,10,42,16,8),true)); [52,128].forEach(x=>g+=R(x,13,34,10,5));
+    return {w:214,h:36,g,d:'',gates:[[31,0,'up'],[183,36,'down']],name:'Chain of thought'};
   },
 };
 
 /* ============== SPRUE LAYOUT ENGINE ============== */
 function sprue(fr, rows, pl, mat, opts={}) {
-  const TF = 11, TR = 9;              // frame and runner thickness
-  let geo = '', deco = '', tags = '';
-  const {x,y,w,h} = fr;
-  geo += `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="18" fill="none" stroke-width="${TF}"/>`;
-  const tw = rows.reduce((a,r)=>a+(r.h||1),0);
-  let top = y, num = 1; const runnersY=[y];
+  const TF=11, TR=9, {x,y,w,h}=fr;
+  let geo=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="18" fill="none" stroke-width="${TF}"/>`, deco='', tags='';
+  const tw=rows.reduce((a,r)=>a+(r.h||1),0);
+  const runners=[{y, t:TF, occ:[]}]; const gates=[]; const parts=[];
+  let top=y, num=1;
   rows.forEach((row,ri)=>{
-    const bh = h*(row.h||1)/tw, bot = top+bh;
-    if (ri<rows.length-1) { geo += `<path d="M${x} ${n2(bot)}H${x+w}" fill="none" stroke-width="${TR}"/>`; runnersY.push(bot); }
-    const parts = row.parts.map(p=>p.w?{p}:p);
-    const padY = 34, padX = 30;
-    const maxH = Math.max(...parts.map(q=>q.p.h*(q.s||1)));
-    let sc = Math.min(1, (bh-2*padY)/maxH);
-    const sumW = parts.reduce((a,q)=>a+q.p.w*(q.s||1),0);
-    sc = Math.min(sc, (w-2*padX-(parts.length-1)*26)/sumW);
-    const gap = (w - sumW*sc)/(parts.length+1);
-    let cx = x + gap;
-    parts.forEach(q=>{
-      const s = sc*(q.s||1), pw=q.p.w*s, ph=q.p.h*s;
-      const px = cx + (q.dx||0), py = top + (bh-ph)/2 + (q.dy||0);
-      geo += `<g transform="translate(${n2(px)} ${n2(py)}) scale(${n2(s)})">${q.p.g}</g>`;
+    const bh=h*(row.h||1)/tw, bot=top+bh;
+    if (ri<rows.length-1) geo += `<path d="M${x} ${n2(bot)}H${x+w}" fill="none" stroke-width="${TR}"/>`;
+    runners.push({y:bot, t: ri<rows.length-1?TR:TF, occ:[]});
+    const items=row.parts.map(p=>p.w?{p}:p);
+    const padY=row.padY||30, padX=26;
+    const maxH=Math.max(...items.map(q=>q.p.h*(q.s||1)));
+    const sumW=items.reduce((a,q)=>a+q.p.w*(q.s||1),0);
+    let sc=Math.min(row.max||1.3, (bh-2*padY)/maxH, (w-2*padX-(items.length-1)*24)/sumW);
+    const gap=(w-sumW*sc)/(items.length+1);
+    let cx=x+gap;
+    items.forEach(q=>{
+      const s=sc*(q.s||1), pw=q.p.w*s, ph=q.p.h*s, px=cx+(q.dx||0), py=top+(bh-ph)/2+(q.dy||0);
+      geo  += `<g transform="translate(${n2(px)} ${n2(py)}) scale(${n2(s)})">${q.p.g}</g>`;
       deco += `<g transform="translate(${n2(px)} ${n2(py)}) scale(${n2(s)})">${q.p.d}</g>`;
-      q.p.gates.forEach(([gx,gy,dir],gi)=>{
-        const X = px+gx*s, Y = py+gy*s, Yr = dir==='up'?top:bot;
-        const y0=Math.min(Y,Yr), y1=Math.max(Y,Yr);
-        geo += `<path stroke="none" d="M${n2(X-3.5)} ${n2(Yr)}L${n2(X+3.5)} ${n2(Yr)}L${n2(X+2)} ${n2(Y)}L${n2(X-2)} ${n2(Y)}Z"/>`;
-        if (gi===0) { // part number tag on the runner
-          const tx = X + 9, ty = dir==='up' ? top+TR/2-1 : bot-TR/2-12;
-          geo += R(tx,ty,17,13,2);
-          tags += `<text x="${n2(tx+8.5)}" y="${n2(ty+10)}" font-size="9.5" font-family="Martian Mono" font-weight="700" text-anchor="middle" fill="%INK%">${num}</text>`;
-        }
-      });
-      num++;
-      cx += pw + gap;
+      q.p.gates.forEach(([gx,gy,dir],gi)=>{ const ro=dir==='up'?runners[ri]:runners[ri+1];
+        gates.push({X:px+gx*s, Y:py+gy*s, ro, dir, num, first:gi===0}); ro.occ.push([px+gx*s-7, px+gx*s+7]); });
+      parts.push({num, name:q.p.name});
+      num++; cx+=pw+gap;
     });
-    top = bot;
+    top=bot;
   });
-  // ejector pin marks on runners
+  // gates (tapered) + numbered tags
+  gates.forEach(G=>{
+    const Yr=G.ro.y;
+    geo += `<path stroke="none" d="M${n2(G.X-3.6)} ${n2(Yr)}L${n2(G.X+3.6)} ${n2(Yr)}L${n2(G.X+2.1)} ${n2(G.Y)}L${n2(G.X-2.1)} ${n2(G.Y)}Z"/>`;
+  });
+  gates.filter(G=>G.first).forEach(G=>{
+    const ro=G.ro, free=(a,b)=>!ro.occ.some(([p,q])=>!(b<p||a>q)) && a>x+16 && b<x+w-16;
+    let tx=G.X+9; if (!free(tx,tx+17)) tx=G.X-26;
+    const ty = G.dir==='up' ? ro.y+ro.t/2-1 : ro.y-ro.t/2-12;
+    ro.occ.push([tx,tx+17]);
+    geo += R(tx,ty,17,13,2);
+    tags += `<text x="${n2(tx+8.5)}" y="${n2(ty+10)}" font-size="9.5" font-family="Martian Mono" font-weight="700" text-anchor="middle" fill="%INK%">${G.num}</text>`;
+  });
+  // maker's tab: scan the top frame, then the bottom frame, right to left, for a clear span
+  const first=runners[0], last=runners[runners.length-1];
+  if (opts.reserve) first.occ.push(opts.reserve);
+  const scan=(ro,tw)=>{ for (let tx=x+w-24-tw; tx>=x+24; tx-=4) if (!ro.occ.some(([p,q])=>!(tx+tw<p-5||tx>q+5))) return tx; return null; };
+  let tabW=116, tro=first, tabX=scan(first,tabW);
+  if (tabX===null){ tro=last; tabX=scan(last,tabW); }
+  if (tabX===null){ tabW=44; tro=first; tabX=scan(first,tabW); if(tabX===null){ tro=last; tabX=scan(last,tabW)??(x+w-24-tabW);} }
+  const tabY = tro===first ? y+TF/2-1 : y+h-TF/2-21;
+  tro.occ.push([tabX,tabX+tabW]);
+  geo += R(tabX,tabY,tabW,22,3);
+  tags += (tabW>60?`<text x="${tabX+10}" y="${tabY+15.5}" font-size="10" font-family="Martian Mono" font-weight="700" letter-spacing=".08em" fill="%INK%">VIZUARA</text>`:'')+`<text x="${tabX+tabW-10}" y="${tabY+16.5}" font-size="14" font-family="Archivo" font-weight="800" text-anchor="end" fill="%INK%">${opts.letter||'A'}</text>`;
+  // ejector-pin marks where the runners are clear
   let pins='';
-  runnersY.concat([y+h]).forEach(ry=>[0.25,0.75].forEach(f=>{ const px=x+w*f; pins += `<circle cx="${n2(px)}" cy="${n2(ry)}" r="4.2" fill="none" stroke="%LO%" stroke-width="1.2"/><circle cx="${n2(px+.7)}" cy="${n2(ry+.7)}" r="4.2" fill="none" stroke="%HI%" stroke-width=".8" opacity=".7"/>`; }));
-  // sprue identification tab (molded maker's name + sprue letter)
-  const tabW=112, tabX = x+w-tabW-24, tabY = y+TF/2-1;
-  geo += R(tabX, tabY, tabW, 22, 3);
-  tags += `<text x="${tabX+10}" y="${tabY+15.5}" font-size="10" font-family="Martian Mono" font-weight="700" letter-spacing=".08em" fill="%INK%">VIZUARA</text><text x="${tabX+tabW-10}" y="${tabY+16}" font-size="14" font-family="Archivo" font-weight="800" text-anchor="end" fill="%INK%">${opts.letter||'A'}</text>`;
+  runners.forEach(ro=>{ let k=0; [0.1,0.32,0.5,0.68,0.9].forEach(f=>{ const px=x+w*f; if (k<2 && !ro.occ.some(([p,q])=>px>p-9&&px<q+9)) { k++;
+    pins += `<circle cx="${n2(px+.7)}" cy="${n2(ro.y+.7)}" r="4.2" fill="none" stroke="%HI%" stroke-width="1" opacity=".8"/><circle cx="${n2(px)}" cy="${n2(ro.y)}" r="4.2" fill="none" stroke="%LO%" stroke-width="1.3"/>`; } }); });
 
-  const id = 'g'+Math.random().toString(36).slice(2,8);
-  const sub = s => s.replace(/%HI%/g,pl.hi).replace(/%LO%/g,pl.lo).replace(/%BASE%/g,pl.base).replace(/%INK%/g,pl.ink);
+  return {parts, svg: molded(geo, deco+pins+tags, pl, mat)};
+}
+
+/* the plastic: shadow on the bench, lower-right shade, upper-left light, body, (sheen) */
+function molded(geo, deco, pl, mat) {
+  const id=uid('sp');
+  const sub=s=>s.replace(/%HI%/g,pl.hi).replace(/%LO%/g,pl.lo).replace(/%BASE%/g,pl.base).replace(/%INK%/g,pl.ink);
   return `<defs><g id="${id}">${geo}</g></defs>
-    <use href="#${id}" x="7" y="9" fill="${mat.shadow}" stroke="${mat.shadow}" opacity=".55"/>
+    <use href="#${id}" x="7" y="9" fill="${mat.shadow}" stroke="${mat.shadow}" opacity="${pl.clear?.28:.55}"/>
     <use href="#${id}" x="1.5" y="2" fill="${pl.lo}" stroke="${pl.lo}"/>
     <use href="#${id}" x="-1" y="-1" fill="${pl.hi}" stroke="${pl.hi}"/>
     <use href="#${id}" fill="${pl.base}" stroke="${pl.base}"/>
-    ${sub(deco)}${sub(pins)}${sub(tags)}`;
+    ${pl.sheen?`<use href="#${id}" fill="url(#${pl.sheen})" stroke="url(#${pl.sheen})"/>`:''}
+    ${sub(deco)}`;
 }
 
-/* ============== THE BENCH (cutting mat) ============== */
-function bench(mat) {
-  let s = `<rect width="${W}" height="${H}" fill="${mat.ground}"/>`;
-  let minor='', major='';
-  for (let x=48; x<W; x+=48) (x%96? (minor += `M${x} 0V${H}`) : (major += `M${x} 0V${H}`));
-  for (let y=48; y<H; y+=48) (y%96? (minor += `M0 ${y}H${W}`) : (major += `M0 ${y}H${W}`));
+/* ============== THE BENCH (a cutting mat, ruled true to trim) ============== */
+function bench(mat, ww=W) {
+  let s=`<rect width="${ww}" height="${H}" fill="${mat.ground}"/>`, minor='', major='';
+  for (let x=48;x<ww;x+=48) (x%96?(minor+=`M${x} 0V${H}`):(major+=`M${x} 0V${H}`));
+  for (let y=48;y<H;y+=48) (y%96?(minor+=`M0 ${y}H${ww}`):(major+=`M0 ${y}H${ww}`));
   s += `<path d="${minor}" stroke="${mat.minor}" stroke-width="1"/><path d="${major}" stroke="${mat.major}" stroke-width="1.4"/>`;
-  // rulers: left edge (inches down) and bottom edge (inches across) — true to trim size
   let ticks='', nums='';
-  for (let y=0; y<=H; y+=12) { const k=(y%96===0)?14:(y%48===0)?9:5; ticks += `M0 ${y}h${k}`; }
-  for (let x=0; x<=W; x+=12) { const k=(x%96===0)?14:(x%48===0)?9:5; ticks += `M${x} ${H}v${-k}`; }
-  for (let i=1;i<=9;i++) nums += `<text x="17" y="${i*96+3.5}" font-size="9" font-family="Martian Mono" fill="${mat.num}">${i}</text>`;
-  for (let i=1;i<=7;i++) nums += `<text x="${i*96}" y="${H-18}" font-size="9" font-family="Martian Mono" text-anchor="middle" fill="${mat.num}">${i}</text>`;
-  s += `<path d="${ticks}" stroke="${mat.num}" stroke-width="1.2"/>${nums}`;
-  return s;
+  for (let y=0;y<=H;y+=12){ const k=y%96===0?14:y%48===0?9:5; ticks+=`M0 ${y}h${k}`; }
+  for (let x=0;x<=ww;x+=12){ const k=x%96===0?14:x%48===0?9:5; ticks+=`M${x} ${H}v${-k}`; }
+  for (let i=1;i<=9;i++) nums+=`<text x="17" y="${i*96+3.5}" font-size="9" font-family="Martian Mono" fill="${mat.num}">${i}</text>`;
+  for (let i=1;i*96<ww;i++) nums+=`<text x="${i*96}" y="${H-18}" font-size="9" font-family="Martian Mono" text-anchor="middle" fill="${mat.num}">${i}</text>`;
+  return s+`<path d="${ticks}" stroke="${mat.num}" stroke-width="1.2"/>${nums}`;
 }
 
-/* ============== IMPRINT MARK: a V on its own little sprue ============== */
-function mark(x,y,s,col,bg) {
+/* ============== IMPRINT: a V molded on its own little sprue ============== */
+function mark(x,y,s,col) {
   return `<g transform="translate(${x} ${y}) scale(${s})" fill="none" stroke="${col}">
     <rect x="1.5" y="1.5" width="29" height="29" rx="5" stroke-width="3"/>
-    <path d="M9 10.5L16 24L23 10.5" stroke-width="4.2" stroke-linejoin="round" stroke-linecap="round"/>
-    <path d="M9 3v6.5M23 3v6.5" stroke-width="1.6"/>
-  </g>`;
+    <path d="M9 10.5L16 24L23 10.5" stroke-width="4.4" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M9 3v6.5M23 3v6.5" stroke-width="1.8"/></g>`;
 }
 
-const LEVELS = {beginner:1, intermediate:2, advanced:3};
+const LEVELS={beginner:1,intermediate:2,advanced:3};
+const TITLE_MAX = W-2*M;
 
-function renderCover(b) {
-  const mat = MATS[b.mat||'bench'], pl = PLASTIC[b.plastic];
-  const el = document.createElement('div');
-  el.className = 'cover'; el.dataset.slug = b.slug;
-  const lh = b.size*0.94, titleTop = 96;
-  const titleBot = titleTop + b.lines.length*lh;
-  const subY = titleBot + 26;
-  const frTop = subY + 44, frBot = 792;
-  const lv = LEVELS[b.level];
-  let svg = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
-    <defs><linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F4D77E"/><stop offset=".45" stop-color="#C9983A"/><stop offset=".7" stop-color="#E8C766"/><stop offset="1" stop-color="#A67A27"/></linearGradient></defs>
-    ${bench(mat)}
-    ${mark(48,38,0.84,mat.text)}
+/* the front cover, as SVG content in a 720×888 space */
+function coverInner(b, size, o={}) {
+  const mat=MATS[b.mat||'bench'], pl=PLASTIC[b.plastic], lv=LEVELS[b.level];
+  const lh=size*0.95, capTop=100, base0=capTop+size*0.72;
+  const lastBase=base0+(b.lines.length-1)*lh;
+  const subY=lastBase+40, frTop=subY+36, frBot=790;
+  const gid=uid('gold');
+  const sp=sprue({x:M,y:frTop,w:W-2*M,h:frBot-frTop}, b.rows(PARTS), {...pl, sheen: pl.sheen && gid}, mat, {letter:b.letter, reserve: b.coming?[W-M-230,W-M]:null});
+  const right = b.coming ? 'COMING SOON' : `${b.capsules} CAPSULES · ${b.hours} H`;
+  const inner = `
+    <defs><linearGradient id="${gid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F7DE8E"/><stop offset=".38" stop-color="#C58F35"/><stop offset=".62" stop-color="#F0CF72"/><stop offset="1" stop-color="#A27425"/></linearGradient></defs>
+    ${o.noBench?'':bench(mat)}
+    ${mark(M,38,0.84,mat.text)}
     <text x="84" y="57" font-family="Archivo" font-weight="700" style="font-stretch:112.5%" font-size="13" letter-spacing=".2em" fill="${mat.text}">VIZUARA BOOKS</text>
-    <text x="${W-48}" y="57" font-family="Martian Mono" font-weight="600" font-size="12" letter-spacing=".06em" text-anchor="end" fill="${mat.dim}">KIT Nº ${String(b.kit).padStart(2,'0')}</text>
-    <text x="48" y="${subY}" font-family="Martian Mono" font-weight="500" font-size="13" letter-spacing=".02em" fill="${mat.dim}">${b.sub}</text>
-    ${sprue({x:48,y:frTop,w:624,h:frBot-frTop}, b.rows(PARTS), pl, mat)}
-    <g font-family="Martian Mono" font-size="12" font-weight="600" letter-spacing=".06em" fill="${mat.text}">
-      <text x="48" y="846">SKILL LEVEL</text>
-      ${[0,1,2].map(i=>`<rect x="${150+i*22}" y="833" width="16" height="16" rx="2" ${i<lv?`fill="${mat.text}"`:`fill="none" stroke="${mat.text}" stroke-width="1.5"`}/>`).join('')}
-      <text x="226" y="846" fill="${mat.dim}">${b.level.toUpperCase()}</text>
-      <text x="${W-48}" y="846" text-anchor="end">${b.capsules} CAPSULES · ${b.hours} H</text>
+    <text x="${W-M}" y="57" font-family="Martian Mono" font-weight="600" font-size="12" letter-spacing=".06em" text-anchor="end" fill="${mat.dim}">${b.kitLabel||('KIT Nº '+String(b.kit).padStart(2,'0'))}</text>
+    <g class="title" font-family="Archivo" font-weight="800" style="font-stretch:87.5%" font-size="${size}" letter-spacing="-0.012em" word-spacing="0.06em" fill="${mat.text}">
+      ${b.lines.map((l,i)=>`<text x="${M-3}" y="${n2(base0+i*lh)}">${l}</text>`).join('')}
     </g>
-  </svg>`;
-  el.innerHTML = svg + `<h2 class="t" style="top:${titleTop - b.size*0.2}px;font-size:${b.size}px">${b.lines.join('<br>')}</h2>`;
-  return el;
+    <text x="${M}" y="${n2(subY)}" font-family="Martian Mono" font-weight="500" font-size="13" fill="${mat.dim}">${b.sub}</text>
+    ${sp.svg}
+    ${b.coming ? stamp(W-M-118, frTop+8, mat) : ''}
+    ${levelRow(M, 828, lv, b.level, mat)}
+    <text x="${W-M}" y="843" text-anchor="end" font-family="Martian Mono" font-size="12" font-weight="600" letter-spacing=".06em" fill="${mat.text}">${right}</text>`;
+  return {inner, parts:sp.parts};
+}
+function levelRow(x,y,lv,label,mat) {
+  return `<g font-family="Martian Mono" font-size="12" font-weight="600" letter-spacing=".06em" fill="${mat.text}">
+    ${[1,2,3].map(i=>`<rect x="${x+(i-1)*27}" y="${y}" width="21" height="21" rx="3" ${i<=lv?`fill="${mat.text}"`:`fill="none" stroke="${mat.dim}" stroke-width="1.5"`}/><text x="${x+(i-1)*27+10.5}" y="${y+15}" text-anchor="middle" font-size="11" font-weight="800" letter-spacing="0" fill="${i<=lv?mat.ground:mat.dim}">${i}</text>`).join('')}
+    <text x="${x+88}" y="${y+15}">SKILL · ${label.toUpperCase()}</text></g>`;
+}
+const svgWrap = (w,h,inner) => `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">${inner}</svg>`;
+
+function stamp(x,y,mat) {
+  return `<g transform="translate(${x} ${y}) rotate(-7)" fill="none" stroke="${mat.text}" opacity=".92">
+    <rect x="-96" y="-34" width="192" height="68" rx="6" stroke-width="3"/><rect x="-89" y="-27" width="178" height="54" rx="3" stroke-width="1.2"/>
+    <text x="0" y="-2" text-anchor="middle" font-family="Archivo" font-weight="800" style="font-stretch:112.5%" font-size="22" letter-spacing=".14em" fill="${mat.text}" stroke="none">TEST SHOT</text>
+    <text x="0" y="18" text-anchor="middle" font-family="Martian Mono" font-weight="600" font-size="10.5" letter-spacing=".12em" fill="${mat.text}" stroke="none">COMING SOON</text></g>`;
+}
+
+async function renderCover(b, host) {
+  const fig=document.createElement('figure'); fig.className='kit';
+  const el=document.createElement('div'); el.className='cover'; el.dataset.slug=b.slug;
+  fig.appendChild(el); host.appendChild(fig);
+  let size=b.size, out=coverInner(b,size); el.innerHTML=svgWrap(W,H,out.inner);
+  const widest=Math.max(...[...el.querySelectorAll('g.title text')].map(t=>t.getComputedTextLength()));
+  if (widest>TITLE_MAX) { size=Math.floor(size*TITLE_MAX/widest*10)/10; out=coverInner(b,size); el.innerHTML=svgWrap(W,H,out.inner); }
+  b._size=size;
+  const cap=document.createElement('figcaption');
+  cap.innerHTML=`<b>${b.kitLabel?b.kitLabel.replace('INTELLIGENCE FACTORY','Factory'):'Nº '+String(b.kit).padStart(2,'0')}</b> · ${b.lines.join(' ')}<br><span>Parts — ${out.parts.map(p=>`${p.num} ${p.name}`).join(' · ')}</span>`;
+  fig.appendChild(cap);
+  return out.parts;
+}
+
+/* ============== FULL PRINT WRAP: back (what you'll have built) + spine + front ============== */
+function assembled(pl, mat) {
+  // the same parts, out of the sprue, placed where they go — drawn like a kit's instruction sheet
+  const at=(p,x,y,s=1)=>({g:`<g transform="translate(${x} ${y}) scale(${s})">${p.g}</g>`, d:`<g transform="translate(${x} ${y}) scale(${s})">${p.d}</g>`});
+  const parts=[ at(PARTS.tile('next',{w:92,h:46,size:22,eng:true}),314,104),
+                at(PARTS.block(),302,196,1.2),
+                at(PARTS.qkv(),96,214,.95),
+                at(PARTS.causalMask(),486,208,.6),
+                at(PARTS.wave(150,16),100,446,.95),
+                at(PARTS.tokens(),270,470) ];
+  let geo=parts.map(q=>q.g).join(''), deco=parts.map(q=>q.d).join('');
+  geo += ROD(`M360 452V420`,7)+HEAD(360,410,-90,16)+ROD(`M360 196V168`,7)+HEAD(360,156,-90,16);
+  const guide = `<g fill="none" stroke="${mat.text}" stroke-width="1.6" stroke-dasharray="7 6" opacity=".85">
+      <path d="M226 262H316"/><path d="M596 262H402"/><path d="M246 462H340"/></g>
+    <g fill="${mat.text}"><path d="M316 262l-10 -5v10z"/><path d="M402 262l10 -5v10z"/></g>
+    <g font-family="Martian Mono" font-size="12" font-weight="700" fill="${mat.text}" letter-spacing=".04em">
+      <text x="430" y="340">× N</text><text x="96" y="200">A</text><text x="486" y="200">B</text></g>`;
+  return molded(geo, deco, pl, mat) + guide;
+}
+function wrapSVG(b, size) {
+  const mat=MATS.bench, pl=PLASTIC[b.plastic], SP=72, WW=2*W+SP;
+  const front=coverInner(b,size,{noBench:true});
+  const title=b.lines.join(' ');
+  const back = `
+    ${mark(M,38,0.84,mat.text)}
+    <text x="84" y="57" font-family="Archivo" font-weight="700" style="font-stretch:112.5%" font-size="13" letter-spacing=".2em" fill="${mat.text}">WHAT YOU WILL HAVE BUILT</text>
+    <text x="${W-M}" y="57" font-family="Martian Mono" font-weight="600" font-size="12" letter-spacing=".06em" text-anchor="end" fill="${mat.dim}">KIT Nº ${String(b.kit).padStart(2,'0')}</text>
+    ${assembled(pl,mat)}
+    <path d="M${M} 566H${W-M}" stroke="${mat.dim}" stroke-width="1.2"/>
+    <text x="${M}" y="596" font-family="Martian Mono" font-size="11" font-weight="700" letter-spacing=".14em" fill="${mat.dim}">PARTS IN THIS KIT</text>
+    <g font-family="Martian Mono" font-size="13" font-weight="500" fill="${mat.text}">
+      ${front.parts.map((p,i)=>`<text x="${M+(i>2?300:0)}" y="${626+(i%3)*24}"><tspan font-weight="800">${p.num}</tspan>  ${p.name}</text>`).join('')}
+    </g>
+    <g font-family="Archivo" font-size="19" font-weight="500" fill="${mat.text}">
+      <text x="${M}" y="728">${b.blurb[0]}</text><text x="${M}" y="752">${b.blurb[1]}</text></g>
+    ${levelRow(M, 828, LEVELS[b.level], b.level, mat)}
+    <text x="${W-M-190}" y="843" text-anchor="end" font-family="Martian Mono" font-size="12" font-weight="600" letter-spacing=".06em" fill="${mat.text}">books.vizuara.ai</text>
+    <rect x="${W-M-166}" y="760" width="166" height="96" rx="3" fill="#F7F4EC"/>
+    <text x="${W-M-83}" y="813" text-anchor="middle" font-family="Martian Mono" font-size="10" font-weight="600" letter-spacing=".1em" fill="#7B7A74">ISBN / BARCODE</text>`;
+  const spine = `
+    <rect x="${W}" y="0" width="${SP}" height="118" fill="${pl.base}"/>
+    <text x="${W+SP/2}" y="46" text-anchor="middle" font-family="Martian Mono" font-size="10" font-weight="700" letter-spacing=".12em" fill="${pl.ink}">KIT</text>
+    <text x="${W+SP/2}" y="88" text-anchor="middle" font-family="Archivo" font-size="34" font-weight="800" fill="${pl.ink}">${String(b.kit).padStart(2,'0')}</text>
+    <text class="spine-title" transform="translate(${W+SP/2+10} 150) rotate(90)" font-family="Archivo" font-weight="800" style="font-stretch:87.5%" font-size="30" fill="${mat.text}">${title}</text>
+    ${mark(W+SP/2-15,806,0.94,mat.text)}`;
+  return svgWrap(WW,H, bench(mat,WW) + back + spine + `<g transform="translate(${W+SP} 0)">${front.inner}</g>`);
+}
+
+/* ============== THE PRESENTATION ============== */
+const FAMILIES = [
+  ['bone','Bone','Foundations, maths & programming'],
+  ['red','Signal red','Neural networks & vision architectures'],
+  ['yellow','Chrome yellow','Language models & how they are trained'],
+  ['grey','Aluminium','Systems, scale & serving'],
+  ['lilac','Lilac','Agents, context & memory'],
+  ['gold','Factory gold','Charlie and the Intelligence Factory'],
+  ['clear','Test shot','Coming soon: clear, unpainted plastic'],
+];
+function chip(k) {
+  const pl=PLASTIC[k], base = k==='gold' ? 'linear-gradient(135deg,#F7DE8E,#C58F35 40%,#F0CF72 62%,#A27425)' : pl.base;
+  return `<span class="chip" style="background:${base};box-shadow:inset 2px 2px 0 ${pl.hi}, inset -2px -3px 0 ${pl.lo}, 4px 5px 0 rgba(14,42,36,.35)"></span>`;
+}
+function buildIntro() {
+  const fam = FAMILIES.map(([k,n,d])=>`<li>${chip(k)}<div><b>${n}</b> <code>${k==='gold'?'#D5A84C':PLASTIC[k].base}</code><br>${d}</div></li>`).join('');
+  document.getElementById('families').innerHTML = fam;
+  const lv = ['beginner','intermediate','advanced'].map((l,i)=>`<div class="lvl">${svgWrap(250,26,levelRow(1,2,i+1,l,{...MATS.bench,text:'#14201D',dim:'#8A958F',ground:'#F3EEE2'}))}</div>`).join('');
+  document.getElementById('levels').innerHTML = lv;
+  document.getElementById('markbig').innerHTML = svgWrap(64,64,mark(4,4,1.75,'#1B463C'));
 }
 
 /* ================= THE CATALOGUE ================= */
 const BOOKS = [
+  { slug:'ai-context-engineering', kit:1, level:'intermediate', capsules:43, hours:10, plastic:'lilac',
+    lines:['AI Context','Engineering'], size:92, sub:'What goes into the window, and what stays out',
+    rows:P=>[ {h:1.05, parts:[P.contextTray()]}, {h:1, parts:[P.doc(), P.bubble(), P.wrench(), P.chip(), P.magnifier()]} ] },
+  { slug:'mathematical-foundations-for-ml', kit:2, level:'beginner', capsules:43, hours:10, plastic:'bone',
+    lines:['Mathematical','Foundations for','Machine Learning'], size:76, sub:'Linear algebra, calculus and probability',
+    rows:P=>[ {h:1.2, parts:[P.sigma(), P.bell()]}, {h:1, parts:[P.matrix(), P.nabla(), P.integral(), P.vector()]} ] },
   { slug:'neural-networks-from-scratch', kit:3, level:'beginner', capsules:33, hours:7, plastic:'red',
-    lines:['Neural Networks','from Scratch'], size:80, sub:'A neural network, one neuron at a time',
-    rows:P=>[ {h:1.25, parts:[P.network([3,4,2]), P.neuron()]},
-              {h:1, parts:[P.sigmoid(), P.bowl(), P.ball(), P.tile('w'), P.tile('b'), ]} ] },
+    lines:['Neural Networks','from Scratch'], size:84, sub:'Neurons, weights, loss and backprop, by hand',
+    rows:P=>[ {h:1.25, parts:[P.network([3,4,2]), P.neuron()]}, {h:1, parts:[P.sigmoid(), P.bowl(), P.ball(), P.tile('w'), P.tile('b')]} ] },
   { slug:'build-llms-from-scratch', kit:4, level:'intermediate', capsules:20, hours:6, plastic:'yellow',
-    lines:['Build Large Language','Models (LLMs)','from Scratch'], size:72, sub:'A GPT, from tokens to text',
-    rows:P=>[ {h:1.3, parts:[P.causalMask(), P.block(), P.qkv()]},
-              {h:.8, parts:[P.tokens(), P.wave()]} ] },
+    lines:['Build Large Language','Models (LLMs)','from Scratch'], size:72, sub:'Tokens to text: a GPT, part by part',
+    rows:P=>[ {h:1.3, parts:[P.causalMask(), P.block(), P.qkv()]}, {h:.8, parts:[P.tokens(), P.wave()]} ] },
   { slug:'5d-parallelism', kit:5, level:'advanced', capsules:40, hours:9, plastic:'grey',
-    lines:['5D Parallelism','for Large Model','Training'], size:72, sub:'Data · tensor · pipeline · context · expert',
-    rows:P=>[ {h:1.35, parts:[P.cluster(), P.ring(), ]},
-              {h:1, parts:['DP','TP','PP','CP','EP'].map(l=>P.dimArrow(l)).concat([P.pipeline(3)])} ] },
+    lines:['5D Parallelism','for Large Model','Training'], size:76, sub:'Data · tensor · pipeline · context · expert',
+    rows:P=>[ {h:1.35, parts:[P.cluster(), P.ring()]}, {h:1, parts:['DP','TP','PP','CP','EP'].map(l=>P.dimArrow(l)).concat([P.pipeline(3)])} ] },
+  { slug:'pi-vs-hermes-vs-codex', kit:6, level:'advanced', capsules:9, hours:1, plastic:'lilac',
+    lines:['Pi vs Hermes vs Codex:','Context Compaction','and Memory'], size:66, sub:'Three agents, three ways to forget on purpose',
+    rows:P=>[ {h:1.35, parts:[P.transcript(), P.clamp(), P.chip()]}, {h:.9, parts:[P.badge('pi'), P.vs(), P.badge('wing'), P.vs(), P.badge('codex')]} ] },
+  { slug:'charlie-language-room', kitLabel:'INTELLIGENCE FACTORY · I', level:'advanced', capsules:22, hours:5, plastic:'gold', mat:'factory', letter:'I',
+    lines:['Charlie and the','Language Room'], size:84, sub:'Book I · Language — Inference Engineering',
+    rows:P=>[ {h:1.2, parts:[P.bubble(200,138,{dots:true,name:'Generation'}), P.kvCache()]}, {h:.9, parts:[P.stopwatch(), P.die(), P.tokens(['next','?'])]} ] },
+  { slug:'charlie-vision-room', kitLabel:'INTELLIGENCE FACTORY · II', level:'intermediate', capsules:20, hours:6, plastic:'gold', mat:'factory', letter:'II',
+    lines:['Charlie and the','Vision Room'], size:84, sub:'Book II · Vision — Vision Transformers',
+    rows:P=>[ {h:1.1, parts:[P.eye(), P.patchGrid()]}, {h:.8, parts:[P.patchSeq(), P.wave(130,14)]} ] },
+  { slug:'charlie-sound-room', kitLabel:'INTELLIGENCE FACTORY · III', level:'intermediate', capsules:20, hours:6, plastic:'gold', mat:'factory', letter:'III',
+    lines:['Charlie and the','Sound Room'], size:84, sub:'Book III · Audio — Voice Agents',
+    rows:P=>[ {h:1.1, max:1.45, parts:[P.waveform()]}, {h:1, parts:[P.mic(), P.bubble(84,60), P.bubble(70,52), P.speaker()]} ] },
+  { slug:'charlie-reasoning-room', kitLabel:'INTELLIGENCE FACTORY · IV', level:'advanced', capsules:21, hours:6, plastic:'gold', mat:'factory', letter:'IV',
+    lines:['Charlie and the','Reasoning Room'], size:84, sub:'Book IV · Reinforcement learning, from bandits to reasoning',
+    rows:P=>[ {h:1.1, parts:[P.bandit(), P.gridworld()]}, {h:.85, parts:[P.coin(), P.chain()]} ] },
+  { slug:'decision-trees-from-scratch', kit:14, level:'beginner', capsules:23, hours:5, plastic:'bone',
+    lines:['Build Decision Trees','from Scratch'], size:76, sub:'Splits, impurity and leaves, one question at a time',
+    rows:P=>[ {h:1.25, max:1.5, parts:[P.tree()]}, {h:1, parts:[P.boundary(), P.leq(), P.hist()]} ] },
+  { slug:'deit-from-scratch', kit:37, level:'advanced', capsules:42, hours:10, plastic:'red',
+    lines:['Build a Data-Efficient','Image Transformer','(DeiT) from Scratch'], size:68, sub:'A teacher, a student and a distillation token',
+    rows:P=>[ {h:1.2, parts:[P.network([3,5,5,3],{r:13,dx:66,pitch:34,name:'Teacher'}), P.network([2,3,2],{r:12,dx:54,pitch:34,rod:4,name:'Student'})]}, {h:.9, parts:[P.patchGrid(), P.tile('CLS',{w:74,h:46,size:20,name:'Class token',eng:true}), P.tile('DIST',{w:84,h:46,size:20,name:'Distillation token',eng:true})]} ] },
+  { slug:'sql-masterclass', kit:21, level:'beginner', capsules:36, hours:8, plastic:'bone',
+    lines:['SQL','Masterclass'], size:104, sub:'Tables, keys, joins and queries',
+    rows:P=>[ {h:1.15, parts:[P.table(), P.venn()]}, {h:.85, parts:[P.key(), P.funnel(), P.star()]} ] },
+  { slug:'kernel-engineering', kit:51, level:'advanced', coming:true, plastic:'clear',
+    lines:['Kernel','Engineering'], size:104, sub:'From silicon to speculative decoding',
+    rows:P=>[ {h:1.25, parts:[P.gpuDie(), P.memPyramid()]}, {h:.8, parts:[P.warp(), P.cluster(3,3,24,34)]} ] },
 ];
 
-const host = document.getElementById('covers');
-BOOKS.forEach(b=>host.appendChild(renderCover(b)));
+(async ()=>{
+  await Promise.all(['semi-condensed 800 80px Archivo','700 13px Archivo','semi-expanded 700 13px Archivo','500 13px "Martian Mono"','700 13px "Martian Mono"','800 20px Archivo']
+    .map(f=>document.fonts.load(f).catch(()=>{})));
+  for (const b of BOOKS) await renderCover(b);
+  document.body.dataset.ready='1';
+})();
 </script>
 </body>
 </html>

@@ -12,6 +12,7 @@ const SYM = {
   C2: ['r2'],
   C4: ['r2', 'r4', 'r4b'],
   MX: ['mx'],
+  MY: ['my'],
   none: [],
 };
 
@@ -28,29 +29,31 @@ const BOOKS = {
     why: 'The classic diamond of nēr pulli, pierced by a horizontal axis of eleven dots: the number line running through the square.',
   },
   'neural-networks-from-scratch': {
-    shape: () => K.fromCols([5, 7, 9, 7, 5], 'ner', 'centre'), loops: 1, sym: 'D2', density: 0.28,
-    force: (e) => (e.dir === 'E' ? 'x' : undefined), // every link between neighbouring layers is a crossing: dense layers
+    shape: () => K.fromCols([5, 7, 9, 7, 5], 'ner', 'centre'), loops: 1, sym: 'D2', density: 0.26,
+    force: (e) => (e.dir === 'N' ? 'x' : undefined), // each layer is a braid; the line turns back between layers except where a few links carry it across
     spec: 'layers 5–7–9–7–5',
     why: 'Columns of dots are the layers of a small network (5–7–9–7–5); every step from one layer to the next is a crossing — a fully connected layer.',
   },
   'build-llms-from-scratch': {
-    shape: () => K.fromRows(Array(10).fill(2), 'ner'), loops: 1, sym: 'D2', density: 0.3,
-    spec: '2 × 10',
-    why: 'A tower two dots wide and ten high: the decoder stack, one block over the next, read by a single line.',
+    shape: () => K.fromRows([4, 4, 4, 4, 4], 'ner'), loops: 1, sym: 'D2', density: 0.38,
+    force: (e) => (e.dir === 'E' ? 'x' : undefined), // each row is a braided block; between blocks the line mostly turns back
+    spec: '4 × 5, in five blocks',
+    why: 'Five rows of four: a stack of transformer blocks, each braided on its own and joined to the next only through a few crossings, like the residual stream that runs through them all.',
   },
   'ai-context-engineering': {
     shape: () => K.fromMask([
-      'ooooooooo',
-      'o.......o',
-      'o.ooooo.o',
-      'o.ooooo.o',
-      'o.ooooo.o',
-      'o.......o',
-      'ooooooooo',
+      'rrrrrrrrr',
+      'r.......r',
+      'r.ooooo.r',
+      'r.ooooo.r',
+      'r.ooooo.r',
+      'r.......r',
+      'rrrrrrrrr',
     ].join('\n'), 'ner'),
-    loops: 2, sym: 'D2', density: 0.2,
+    loops: 3, sym: 'D2', density: 0.2,
+    force: (e, d, M) => (M.shape.cells[e.a].ch === 'r' ? 'x' : undefined),
     spec: 'frame 9 × 7 around 5 × 3',
-    why: 'An outer frame of 28 dots around an inner block of 15: the window, and what you choose to put inside it. Two lines, one held within the other.',
+    why: 'An outer frame of 28 dots around an inner block of 15: the window, and what you choose to put inside it. The frame is a plain two-strand braid; everything inside is one line.',
   },
   '5d-parallelism': {
     shape: () => K.fromMask([
@@ -64,7 +67,7 @@ const BOOKS = {
       '....oo....',
       '....oo....',
       '....oo....',
-    ].join('\n'), 'ner'), loops: 5, sym: 'D4', density: 0.22,
+    ].join('\n'), 'ner'), loops: 5, sym: 'MX', density: 0.22,
     spec: 'cross: 4 × 4 core, four 2 × 3 arms',
     why: 'A cross of forty dots — a 4 × 4 core and four arms — woven by exactly five closed lines: data, tensor, pipeline, sequence and expert parallelism.',
   },
@@ -89,9 +92,9 @@ const BOOKS = {
     why: 'A 6 × 7 grid of image patches carried by two lines, not one: the class token and the distillation token, student and teacher.',
   },
   'charlie-language-room': {
-    shape: () => K.fromRows([11, 11], 'ner'), loops: 1, sym: 'D2', density: 0.18,
-    spec: '2 × 11',
-    why: 'Eleven tokens in two rows: a sentence as a braid, generated one crossing at a time.',
+    shape: () => K.fromMask('oooooooo\noooooooo\noooooo', 'ner'), loops: 1, sym: 'none', density: 0.18,
+    spec: 'a paragraph: 8 + 8 + 6',
+    why: 'Twenty-two dots set like a paragraph of text: two full lines and a short last one. A single line reads through every token and returns to the start.',
   },
   'charlie-vision-room': {
     shape: () => K.fromRows([5, 5, 5, 5], 'ner'), loops: 1, sym: 'D2', density: 0,
@@ -99,17 +102,17 @@ const BOOKS = {
     why: 'An image cut into a 5 × 4 grid of patches. Four and five share no factor, so a single line crosses every patch without once turning inside.',
   },
   'charlie-sound-room': {
-    shape: () => K.fromCols([1, 3, 1, 5, 5, 1, 3, 1], 'ner', 'centre'), loops: 1, sym: 'D2', density: 0.2,
-    spec: 'waveform 1–3–1–5–5–1–3–1',
-    why: 'Columns of dots rise and fall about a centre line like a sampled waveform.',
+    shape: () => K.fromCols([3, 1, 5, 1, 3, 1, 5, 1], 'ner', 'centre'), loops: 1, sym: 'MY', density: 0.12,
+    spec: 'pulses 3–1–5–1–3–1–5–1',
+    why: 'Columns of dots rise and fall about a centre line like the pulses of a sampled waveform; the line runs through them without a single inner turn.',
   },
   'charlie-reasoning-room': {
-    shape: () => K.fromRows([1, 2, 3, 4, 5, 6], 'idukku'), loops: 1, sym: 'none', density: 0.22,
+    shape: () => K.fromRows([1, 2, 3, 4, 5, 6], 'idukku'), loops: 3, sym: 'MX', density: 0.2,
     spec: 'idukku pulli 1–2–3–4–5–6',
-    why: 'Interlaced dots fanning out row by row, a tree of possible moves; one line — one chain of reasoning — has to find its way through all of them.',
+    why: 'Interlaced dots fanning out row by row, a tree of possible moves. Mirror symmetry through the centre forces exactly three lines: bandits, reinforcement learning, reasoning models.',
   },
   'kernel-engineering': {
-    shape: () => K.fromRows([8, 8, 8, 8], 'ner'), loops: 1, sym: 'D2', density: 0.22, partial: 0.4,
+    shape: () => K.fromRows([8, 8, 8, 8], 'ner'), loops: 1, sym: 'MX', density: 0.22, partial: 0.27,
     spec: '8 × 4 — one warp',
     why: 'Thirty-two dots, one warp of GPU threads. The book is coming, so the dots are down and the line has only just begun.',
   },

@@ -48,11 +48,11 @@ figure.c figcaption b{font-weight:650;letter-spacing:.12em;text-transform:upperc
   box-shadow:0 2px 3px rgba(0,0,0,.18),0 18px 40px -18px rgba(0,0,0,.35)}
 .cover svg.cloth{position:absolute;left:0;top:0;display:block}
 .panel{position:absolute;left:0;top:560px;width:720px;height:328px;padding:34px 48px 0;color:var(--ink)}
-.series{font-weight:650;font-size:13px;letter-spacing:.2em;text-transform:uppercase;margin:0 0 12px;font-variation-settings:'wdth' 100}
+.series{font-weight:650;font-size:13px;letter-spacing:.2em;text-transform:uppercase;margin:0 0 10px;font-variation-settings:'wdth' 100}
 .title{font-family:'Eczar';font-weight:700;line-height:.98;letter-spacing:-.012em;margin:0;color:var(--ink);font-feature-settings:'kern' 1,'liga' 1}
 .title span{display:block;white-space:nowrap;width:max-content}
 .title .t2{font-weight:500;letter-spacing:-.005em}
-.sub{font-family:'Eczar';font-weight:500;font-size:21px;line-height:1.3;margin:14px 0 0;max-width:560px}
+.sub{font-family:'Eczar';font-weight:500;font-size:20px;line-height:1.28;margin:12px 0 0;max-width:600px}
 .foot{position:absolute;left:48px;right:48px;bottom:32px;display:flex;align-items:center;justify-content:space-between;
   font-weight:650;font-size:13px;letter-spacing:.16em;text-transform:uppercase;line-height:1}
 .imprint{display:flex;align-items:center;gap:11px}
@@ -211,20 +211,23 @@ const BLOCKS = {
     return {w:120,h:120,layers:{main,accent},order:['main','accent']};
   },
 
-  /* Pi vs Hermes vs Codex — three lanes, three agents. Token lines crowd closer
-     as the context fills, then compact into a summary band (madder); a memory
-     dot survives beside each compaction. Lanes are phase-shifted by a third. */
+  /* Pi vs Hermes vs Codex — context over time, three agents in three lanes.
+     Each column is the context at one turn: a madder summary cell (the memory that
+     survives) with the turns stacked above it. The stack grows a step per turn until
+     compaction collapses it back to the summary. A stepped sawtooth — the dant
+     border of printed cloth — and the three lanes compact at different moments. */
   compaction(){
     let main='',accent='',line='';
-    const lanes=[[5,33,0],[45,33,40],[85,33,80]];
-    const ys=[];let y=2,g=13;while(y<92){ys.push(y);y+=g;g=Math.max(4.6,g*.82);}
-    lanes.forEach(([x,w,ph])=>{
-      const put=(yy,fn)=>{const a=((yy+ph)%120);fn(a);if(a>120-16)fn(a-120);};
-      ys.forEach(yy=>put(yy,a=>main+=R(x,a,w,2.4)));
-      put(100,a=>{accent+=R(x,a,w,14); line+=R(x,a,w,14,'fill="none" stroke="currentColor" stroke-width="2"');});
-      put(107,a=>main+=C(x-4,a,2.6));
+    const cellH=4.6, gap=1.6, pitch=cellH+gap;
+    [[0,0],[40,2],[80,4]].forEach(([y0,ph])=>{
+      const base=y0+37;
+      for(let c=0;c<12;c++){
+        const n=(c+ph)%6, x=c*10+1;
+        accent+=R(x,base-cellH,8,cellH);
+        for(let k=1;k<=n;k++) main+=R(x,base-cellH-k*pitch,8,cellH);
+      }
     });
-    return {w:120,h:120,layers:{main,accent,line},order:['main','accent','line']};
+    return {w:120,h:120,scale:1.6,layers:{main,accent},order:['main','accent']};
   },
 
   /* CNN Fundamentals — the block IS the kernel: a 5x5 Laplacian-of-Gaussian
@@ -233,15 +236,15 @@ const BLOCKS = {
   log(){
     let main='',accent='',line='';
     const K=[[0,0,-1,0,0],[0,-1,-2,-1,0],[-1,-2,16,-2,-1],[0,-1,-2,-1,0],[0,0,-1,0,0]];
-    const sz=(v)=>({16:21,2:15,1:9.5})[Math.abs(v)];
+    const c=144/5, sz=(v)=>({16:26,2:19,1:12.5})[Math.abs(v)];
     K.forEach((row,i)=>row.forEach((v,j)=>{
-      const cx=j*24+12, cy=i*24+12;
-      if(v>0){ main+=R(cx-sz(v)/2,cy-sz(v)/2,sz(v),sz(v)); }
+      const cx=j*c+c/2, cy=i*c+c/2;
+      if(v>0) main+=R(cx-sz(v)/2,cy-sz(v)/2,sz(v),sz(v));
       else if(v<0) line+=R(cx-sz(v)/2,cy-sz(v)/2,sz(v),sz(v));
-      else accent+=C(cx,cy,2.6);
+      else accent+=C(cx,cy,3.4);
     }));
-    accent+=R(60-4,60-4,8,8);
-    return {w:120,h:120,layers:{line,main,accent},order:['line','main','accent']};
+    accent+=R(72-5,72-5,10,10);
+    return {w:144,h:144,layers:{line,main,accent},order:['line','main','accent']};
   },
 
   /* Decision Trees — a depth-3 binary tree: split nodes as squares, leaves as
@@ -259,8 +262,37 @@ const BLOCKS = {
     node(60,12,0);
     const cls=[0,0,1,0,1,1,0,1];
     cls.forEach((k,i)=>{const x=7.5+i*15,y=12+26*3+8; if(k) accent+=C(x,y,6); else line+=C(x,y,6);});
-    return {w:120,h:120,layers:{main,line,accent},order:['main','line','accent'],
+    return {w:120,h:120,scale:1.5,layers:{main,line,accent},order:['main','line','accent'],
       arr:(c,r)=>(r%2?'translate(0 120) scale(1 -1)':'')};
+  },
+
+  /* Transformers — attention drawn as arcs between tokens on a line. One head
+     looks ahead (white arcs above), another looks back (indigo arcs below);
+     nested arcs become the scalloped band of a border. */
+  arcs(){
+    let main='',accent='',line='';
+    const xs=[10,30,50,70,90,110];
+    const fwd=[3,1,2,3,1,2], back=[2,3,1,2,3,1];
+    xs.forEach((x,i)=>{
+      const r1=fwd[i]*20, r2=back[i]*20;
+      main+=`<path d="M${x} 60 A${r1} ${r1} 0 0 1 ${x+2*r1} 60" fill="none" stroke="currentColor" stroke-width="3.4"/>`;
+      accent+=`<path d="M${x} 60 A${r2} ${r2} 0 0 1 ${x-2*r2} 60" fill="none" stroke="currentColor" stroke-width="3.4"/>`;
+      line+=C(x,60,5.2);
+    });
+    return {w:120,h:120,layers:{accent,main,line},order:['accent','main','line']};
+  },
+
+  /* Diffusion Language Model — masked diffusion. Each row is one denoising step:
+     every token starts as a mask (dot); each step reveals one more (madder when
+     new, white once settled), in an order the model chooses. */
+  unmask(){
+    let main='',accent='',line='';
+    const rank=[5,2,7,0,4,6,1,3];
+    for(let t=0;t<8;t++)for(let j=0;j<8;j++){
+      const cx=j*15+7.5, cy=t*15+7.5;
+      if(rank[j]<t) main+=C(cx,cy,5.4); else if(rank[j]===t) accent+=C(cx,cy,5.4); else main+=C(cx,cy,1.6);
+    }
+    return {w:120,h:120,scale:1.5,layers:{main,accent},order:['main','accent']};
   },
 
   /* Kernel Engineering — tiled matrix multiply. A row panel of A and a column
@@ -282,31 +314,26 @@ const BLOCKS = {
    thread-slip of tied bundles feathers each edge.
    ===================================================================== */
 const IKAT = {
-  /* Language Room — speculative decoding. Each row is one decoding step: a draft
-     of five tokens, the accepted prefix (white), the target model's correction
-     (anar), the rejected rest (madder). The next step starts where this one ended,
-     so the rows march forward like a Patola step. */
+  /* Language Room — continuous batching, the heart of inference engineering.
+     Each row is a batch slot: a request's prefill (madder), its decoded tokens
+     (white), its end-of-sequence (anar) — and the next request slides straight in. */
   language(rand){
-    const W=60,H=40,g=[];for(let y=0;y<H;y++)g.push(new Array(W).fill(0));
-    const TW=3, PITCH=4, N=W/PITCH; let s=0;
-    for(let r=0;r<14;r++){
-      const y0=r*3; const acc=1+Math.floor(rand()*4);
-      for(let k=0;k<5;k++){
-        const v = k<acc?1 : k===acc?4 : 2;
-        const x0=((s+k)%N)*PITCH;
-        for(let dx=0;dx<TW;dx++)for(let dy=0;dy<2;dy++){const yy=y0+dy; if(yy<H) g[yy][x0+dx]=v;}
+    const W=60,H=44,g=[];for(let y=0;y<H;y++)g.push(new Array(W).fill(0));
+    for(let r=0;r<11;r++){
+      const y0=r*4; let x=-Math.floor(rand()*14);
+      const put=(x0,len,v)=>{for(let dx=0;dx<len;dx++)for(let dy=0;dy<3;dy++){const xx=x0+dx; if(xx>=0&&xx<W) g[y0+dy][xx]=v;}};
+      while(x<W){
+        const pre=2+Math.floor(rand()*3), dec=5+Math.floor(rand()*13);
+        put(x,pre,2); x+=pre; put(x,dec,1); x+=dec; put(x,1,4); x+=1; x+=1+Math.floor(rand()*2);
       }
-      // earlier context stays on the row as white tokens
-      for(let k=1;k<=5;k++){ const x0=((s-k+N*4)%N)*PITCH; if(rand()<.9) for(let dx=0;dx<TW;dx++)for(let dy=0;dy<2;dy++){const yy=y0+dy; if(yy<H&&!g[yy][x0+dx]) g[yy][x0+dx]=1;} }
-      s+=acc+1;
     }
-    return {W,H,g,feather:.5};
+    return {W,H,g,feather:.42};
   },
   /* Vision Room — a ViT's view: the image cut into patches, each patch shaded by
      how much the class token attends to it (anar > white > indigo > none). */
   vision(rand){
-    const W=60,H=40,g=[];
-    const blobs=[[27,17,9,1],[40,25,6,.8],[14,29,4,.45],[49,9,3.5,.4]];
+    const W=60,H=44,g=[];
+    const blobs=[[27,19,9,1],[40,27,6,.8],[14,32,4,.45],[49,10,3.5,.4]];
     for(let y=0;y<H;y++){g.push([]);for(let x=0;x<W;x++){
       const px=Math.floor(x/6), py=Math.floor((y+2)/6), gx=x%6, gy=(y+2)%6;
       if(gx===5||gy===5){g[y].push(0);continue;}
@@ -324,13 +351,13 @@ const IKAT = {
   /* Sound Room — two spoken phrases as a waveform: words are bursts of energy,
      silences a single thread; every other thread-column is left undyed. */
   sound(rand){
-    const W=60,H=40,g=[];for(let y=0;y<H;y++)g.push(new Array(W).fill(0));
-    [[10,.8],[29,1]].forEach(([cy,amp])=>{
+    const W=60,H=44,g=[];for(let y=0;y<H;y++)g.push(new Array(W).fill(0));
+    [[11,.95],[33,1]].forEach(([cy,amp])=>{
       const words=[];let x=1+rand()*3;while(x<W){const len=4+rand()*9;words.push([x,x+len,.55+rand()*.45]);x+=len+2+rand()*3;}
       for(let x=0;x<W;x+=2){
         let e=0;for(const [a,b,h] of words){ if(x>=a&&x<=b){ const t=(x-a)/(b-a); e=Math.max(e,h*Math.sin(Math.PI*t)**.7); } }
         e*= (0.6+0.4*Math.abs(Math.sin(x*1.3+cy)));
-        const A=Math.round(e*8.4*amp);
+        const A=Math.round(e*9.4*amp);
         if(A===0){ g[cy][x]=2; continue; }
         for(let d=-A;d<=A;d++){ const yy=cy+d; if(yy>=0&&yy<H) g[yy][x]=(Math.abs(d)>=A-1&&A>=5)?4:1; }
       }
@@ -340,8 +367,8 @@ const IKAT = {
   /* Reasoning Room — a solved gridworld: every cell a chevron along the optimal
      policy, flowing around madder walls to the anar goals. */
   reasoning(rand){
-    const W=60,H=40,g=[];for(let y=0;y<H;y++)g.push(new Array(W).fill(0));
-    const CW=10,CH=7, goals=[[7,1],[2,5]], walls=[[4,1],[4,2],[4,3],[6,4],[7,4],[8,4],[1,2]];
+    const W=60,H=44,g=[];for(let y=0;y<H;y++)g.push(new Array(W).fill(0));
+    const CW=10,CH=8, goals=[[7,1],[2,5]], walls=[[4,1],[4,2],[4,3],[6,4],[7,4],[8,4],[1,2],[5,7]];
     const key=(x,y)=>x+','+y, wall=new Set(walls.map(([x,y])=>key(x,y)));
     const dist={}; const q=[]; goals.forEach(([x,y])=>{dist[key(x,y)]=0;q.push([x,y]);});
     while(q.length){const [x,y]=q.shift();for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy,k=key(nx,ny);
@@ -352,7 +379,7 @@ const IKAT = {
         o[y]+=m[sy][sx];}} return o; };
     function set(x,y,v){ if(x>=0&&y>=0&&x<W&&y<H) g[y][x]=v; }
     for(let cy=0;cy<CH;cy++)for(let cx=0;cx<CW;cx++){
-      const ox=cx*6, oy=cy*6-1, k=key(cx,cy);
+      const ox=cx*6, oy=cy*6-2, k=key(cx,cy);
       if(wall.has(k)){ for(let y=0;y<5;y++)for(let x=0;x<5;x++)set(ox+x,oy+y,2); continue; }
       if(dist[k]===0){ for(let y=0;y<5;y++)for(let x=0;x<5;x++)set(ox+x,oy+y,(x%4===0||y%4===0)?4:(x===2&&y===2?4:0)); continue; }
       let best='r',bd=1e9;
@@ -379,20 +406,24 @@ const BOOKS = [
   {slug:'5d-parallelism', lines:['5D Parallelism','for Large Model','Training'], level:'advanced', capsules:40, hours:9, block:'pipeline',
    why:'A pipeline schedule — forward micro-batches down one diagonal, backward (madder) back up; each stage split in two for tensor parallelism; the block repeated is data parallelism.'},
   {slug:'pi-vs-hermes-vs-codex', lines:['Pi vs Hermes','vs Codex'], sub2:'Context Compaction and Memory', level:'advanced', capsules:9, hours:1, block:'compaction',
-   why:'Three lanes for three agents. Token lines crowd tighter as the window fills, then compact into a madder summary band with a memory dot beside it.'},
+   why:'Context over time, three agents in three lanes: each turn stacks a row on a madder summary cell until compaction collapses it back — a stepped sawtooth whose lanes reset at different moments.'},
   {slug:'cnn-fundamentals', lines:['Convolutional','Neural Networks','Fundamentals'], level:'intermediate', capsules:34, hours:8, block:'log',
    why:'The block is the kernel: a 5×5 Laplacian-of-Gaussian edge filter carved as a Hinton diagram — white positive centre, black negative ring, zeros as dots. Stamping a block across cloth is convolution.'},
   {slug:'decision-trees-from-scratch', lines:['Build Decision Trees','from Scratch'], level:'beginner', capsules:23, hours:5, block:'dtree',
    why:'A depth-3 binary tree: split tests as squares, leaves as class-coloured discs. Alternate rows hang inverted so leaves meet leaves.'},
+  {slug:'transformers-from-scratch', lines:['Transformers'], sub2:'Theory, Intuition, and Building<br>from Scratch', level:'intermediate', capsules:20, hours:5, block:'arcs',
+   why:'Attention as arcs between tokens on a line: one head looks ahead (white, above), another looks back (indigo, below). Nested arcs make a scalloped border.'},
+  {slug:'diffusion-lm-from-scratch', lines:['Build a Diffusion','Language Model','from Scratch'], level:'advanced', capsules:35, hours:8, block:'unmask',
+   why:'Masked diffusion: eight denoising steps top to bottom; each reveals one more token (madder when new, white once settled) until the sentence is whole.'},
   {slug:'kernel-engineering', lines:['Kernel','Engineering'], sub:'From silicon to speculative decoding — GPU kernels for modern LLMs.', level:'advanced', soon:true, block:'gemm',
    why:'Tiled matrix multiply: a row panel of A and a column panel of B stream through shared memory; where they cross, the output tile accumulates. It weaves into a check.'},
   {slug:'charlie-language-room', lines:['Charlie and the','Language Room'], series:'I', sub:'Language — Inference Engineering', level:'advanced', capsules:22, hours:5, ikat:'language',
-   why:'Speculative decoding as ikat stripes: runs of accepted draft tokens (white), the target model\'s correction (yellow), rejected drafts (madder).'},
+   why:'Continuous batching as ikat stripes: each row a batch slot — prefill (madder), decoded tokens (white), end-of-sequence (yellow) — and the next request slides straight in.'},
   {slug:'charlie-vision-room', lines:['Charlie and the','Vision Room'], series:'II', sub:'Vision — Vision Transformers', level:'intermediate', capsules:20, hours:6, ikat:'vision',
-   why:'How a ViT sees: an image of concentric rings cut into a grid of patches, woven as double ikat.'},
+   why:'How a ViT sees: the image cut into patches, each shaded by how strongly the class token attends to it — yellow, white, indigo, or a single centre thread.'},
   {slug:'charlie-sound-room', lines:['Charlie and the','Sound Room'], series:'III', sub:'Audio — Voice Agents', level:'intermediate', capsules:20, hours:6, ikat:'sound',
-   why:'Three spoken utterances as mirrored waveforms; the loudest peaks dyed yellow, silences as a single indigo thread.'},
-  {slug:'charlie-reasoning-room', lines:['Charlie and the','Reasoning Room'], series:'IV', sub:'Reason — Reinforcement Learning, from bandits to reasoning models', level:'advanced', capsules:21, hours:6, ikat:'reasoning',
+   why:'Two spoken phrases as waveforms: words are bursts of energy, the loudest peaks dyed yellow, silences a single indigo thread.'},
+  {slug:'charlie-reasoning-room', lines:['Charlie and the','Reasoning Room'], series:'IV', sub:'Reason — Reinforcement Learning,<br>from bandits to reasoning models', level:'advanced', capsules:21, hours:6, ikat:'reasoning',
    why:'A solved gridworld: each cell a chevron along the optimal policy, flowing around madder walls to the yellow goals.'},
 ];
 
@@ -428,18 +459,19 @@ function clothDefs(id,seed){
 
 /* ---------- stamping ---------- */
 function stampField(B, lv, rand, id){
-  const cols=Math.ceil(720/B.w)+1, rows=Math.ceil(FIELD_H/B.h)+1;
-  const ox=(720-Math.floor(720/B.w)*B.w)/2 - (B.ox||0), oy=B.oy||0;
+  const k=B.scale||1, BW=B.w*k, BH=B.h*k;
+  const cols=Math.ceil(720/BW)+1, rows=Math.ceil(FIELD_H/BH)+1;
+  const ox=(720-Math.floor(720/BW)*BW)/2 - (B.ox||0), oy=B.oy||0;
   let defs='', out='';
   B.order.forEach((role,li)=>{
     defs+=`<g id="${id}-${role}" fill="currentColor" stroke="currentColor" stroke-width="0">${B.layers[role]}</g>`;
     defs+=inkFilter(`${id}-ink-${role}`, (hash(id)%500)+li*31, role==='line'?2.2:2.8, role==='ground'?.78:.68);
     let g='', n=0;
     for(let r=-1;r<rows;r++)for(let c=-1;c<cols;c++){
-      const x=ox+c*B.w, y=oy+r*B.h;
+      const x=ox+c*BW, y=oy+r*BH;
       const dx=(rand()-.5)*2.2, dy=(rand()-.5)*2.2, rot=(rand()-.5)*.8;
       const op=[1,.94,.88][n++%3]-rand()*.04;
-      g+=`<use href="#${id}-${role}" transform="translate(${f(x+dx)} ${f(y+dy)}) rotate(${f(rot)} ${B.w/2} ${B.h/2}) ${B.arr?B.arr(c,r):''}" opacity="${f(op)}"/>`;
+      g+=`<use href="#${id}-${role}" transform="translate(${f(x+dx)} ${f(y+dy)}) rotate(${f(rot)} ${BW/2} ${BH/2}) scale(${k}) ${B.arr?B.arr(c,r):''}" opacity="${f(op)}"/>`;
     }
     const col = role==='ground'?lv.ground: role==='kora'?P.kora: role==='haldi'?P.haldi: lv[role];
     out+=`<g color="${col}" filter="url(#${id}-ink-${role})">${g}</g>`;
@@ -540,13 +572,16 @@ document.getElementById('shelf').innerHTML = BOOKS.map(cover).join('');
 function fit(){
   document.querySelectorAll('.cover').forEach(cv=>{
     const t=cv.querySelector('.title'), spans=[...t.querySelectorAll('span:not(.t2)')], t2=t.querySelector('.t2');
-    const hasSeries=!!cv.querySelector('.series'), hasSub=!!cv.querySelector('.sub');
-    const maxW=624, cap=spans.length>2?64:76;
+    const panel=cv.querySelector('.panel'), foot=cv.querySelector('.foot'), sub=cv.querySelector('.sub');
+    const maxW=624, cap=cv.querySelector('.series')?70:spans.length>2?64:(spans.length===1?92:76);
     t.style.fontSize='100px';
     const widest=Math.max(...spans.map(s=>s.getBoundingClientRect().width));
     let fs=Math.min(cap, 100*maxW/widest);
-    t.style.fontSize=fs.toFixed(1)+'px';
-    if(t2){ t2.style.fontSize='0.44em'; t2.style.marginTop='.3em'; }
+    const apply=()=>{ t.style.fontSize=fs.toFixed(1)+'px'; if(t2){ t2.style.fontSize=Math.max(24,Math.min(34,fs*.42)).toFixed(1)+'px'; t2.style.marginTop='.35em'; t2.style.whiteSpace='normal'; t2.style.width='auto'; t2.style.lineHeight='1.12'; } };
+    apply();
+    const bottom=()=>{ const last=sub||t; return last.getBoundingClientRect().bottom; };
+    let guard=0;
+    while(bottom() > foot.getBoundingClientRect().top-22 && guard++<40){ fs-=1.5; apply(); }
   });
 }
 document.fonts.ready.then(fit);

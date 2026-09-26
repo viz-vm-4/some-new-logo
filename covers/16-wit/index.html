@@ -18,27 +18,27 @@ html,body{margin:0;padding:0}
 body{background:var(--page);color:var(--ink);font-family:'Albert Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 
 /* ---------- the cover system ---------- */
-.cover{position:relative;width:720px;height:888px;overflow:hidden;flex:none;font-family:'Albert Sans',sans-serif;font-kerning:normal}
-.cover.beginner{background:var(--paper);color:var(--ink)}
-.cover.intermediate{background:var(--red);color:var(--ink)}
-.cover.advanced{background:var(--ink);color:var(--paper)}
-.cover .art{position:absolute;left:0;top:0;width:720px;height:888px;display:block}
-.cover .tb{position:absolute;left:48px;right:44px;top:612px}
-.cover h2{margin:0;font-weight:700;font-size:56px;line-height:1.0;letter-spacing:-0.024em;font-feature-settings:"kern","ss01"}
-.cover h2.s{font-size:50px}
-.cover .sub{margin:14px 0 0;font-weight:500;font-size:23px;line-height:1.18;letter-spacing:-0.006em;max-width:560px}
-.cover .foot{position:absolute;left:48px;right:48px;bottom:36px;display:flex;justify-content:space-between;align-items:center;font-size:15px;font-weight:600;letter-spacing:.01em;line-height:1}
-.cover .imprint{display:flex;align-items:center;gap:9px}
-.cover .imprint svg{display:block}
-.cover .imprint b{font-weight:700;letter-spacing:.005em}
-.cover .imprint span{font-weight:500}
-.cover .lvl{display:flex;align-items:center;gap:8px;font-weight:600}
-.cover .lvl i{font-style:normal;font-weight:500;opacity:1}
-.cover .lvl svg{display:block}
-.cover .soon{display:inline-block;padding:5px 9px 4px;border:2px solid currentColor;border-radius:3px;font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;margin-right:4px}
+.cv{position:relative;width:720px;height:888px;overflow:hidden;flex:none;font-family:'Albert Sans',sans-serif;font-kerning:normal}
+.cv.beginner{background:var(--paper);color:var(--ink)}
+.cv.intermediate{background:var(--red);color:var(--ink)}
+.cv.advanced{background:var(--ink);color:var(--paper)}
+.cv .art{position:absolute;left:0;top:0;width:720px;height:888px;display:block}
+.cv .tb{position:absolute;left:48px;right:44px;top:612px}
+.cv h2{margin:0;font-weight:700;font-size:56px;line-height:1.0;letter-spacing:-0.024em;font-feature-settings:"kern","ss01"}
+.cv h2.s{font-size:50px}
+.cv .sub{margin:14px 0 0;font-weight:500;font-size:23px;line-height:1.18;letter-spacing:-0.006em;max-width:560px}
+.cv .foot{position:absolute;left:48px;right:48px;bottom:36px;display:flex;justify-content:space-between;align-items:center;font-size:15px;font-weight:600;letter-spacing:.01em;line-height:1}
+.cv .imprint{display:flex;align-items:center;gap:9px}
+.cv .imprint svg{display:block}
+.cv .imprint b{font-weight:700;letter-spacing:.005em}
+.cv .imprint span{font-weight:500}
+.cv .lvl{display:flex;align-items:center;gap:8px;font-weight:600}
+.cv .lvl i{font-style:normal;font-weight:500;opacity:1}
+.cv .lvl svg{display:block}
+.cv .soon{display:inline-block;padding:5px 9px 4px;border:2px solid currentColor;border-radius:3px;font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;margin-right:4px}
 
 /* ---------- presentation page ---------- */
-.wrapall{max-width:1520px;margin:0 auto;padding:72px 40px 120px}
+.wrapall{max-width:1600px;margin:0 auto;padding:72px 40px 120px}
 header.intro{display:grid;grid-template-columns:1.1fr 1fr;gap:56px;align-items:start;margin-bottom:72px}
 .kicker{font-size:14px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin:0 0 18px}
 h1{font-size:112px;line-height:.9;letter-spacing:-.045em;margin:0 0 28px;font-weight:800}
@@ -57,6 +57,21 @@ h1{font-size:112px;line-height:.9;letter-spacing:-.045em;margin:0 0 28px;font-we
 figure.c{margin:0;width:720px}
 figure.c figcaption{margin-top:16px;font-size:16px;line-height:1.45;max-width:660px}
 figure.c figcaption b{font-weight:700}
+.wrapbox{overflow-x:auto;padding-bottom:8px}
+.wrap{position:relative;width:1484px;height:888px;display:flex;margin:0 auto;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.wrap .back{position:relative;width:720px;height:888px;background:var(--paper);color:var(--ink);font-family:'Albert Sans',sans-serif}
+.wrap .spine{position:relative;width:44px;height:888px;background:var(--paper);color:var(--ink);border-left:1px dashed rgba(26,24,23,.28);border-right:1px dashed rgba(26,24,23,.28)}
+.wrap .over{position:absolute;left:0;top:0;width:1484px;height:888px;pointer-events:none}
+.wrap .blurb{position:absolute;left:48px;top:430px;width:400px}
+.wrap .blurb h3{font-size:36px;line-height:1.02;letter-spacing:-.022em;margin:0 0 18px;font-weight:700}
+.wrap .blurb p{font-size:17px;line-height:1.45;margin:0 0 12px;font-weight:500}
+.wrap .bfoot{position:absolute;left:48px;right:48px;bottom:36px;display:flex;justify-content:space-between;align-items:flex-end;font-size:15px;font-weight:600}
+.wrap .code{width:176px;height:96px;background:#fff;display:flex;align-items:flex-end;justify-content:center;padding:8px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:#6b655c}
+.wrap .sp{position:absolute;left:50%;top:652px;transform:translate(-50%,-50%) rotate(90deg);white-space:nowrap;font-weight:700;font-size:19px;letter-spacing:-.01em}
+.wrap .sp-top{position:absolute;left:0;right:0;top:30px;display:flex;justify-content:center}
+.wrap .sp-bot{position:absolute;left:0;right:0;bottom:30px;display:flex;justify-content:center}
+.caps{font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+.sect-note{text-align:center;max-width:720px;margin:-12px auto 32px;font-size:17px;line-height:1.45}
 .sect{font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin:96px 0 28px;text-align:center}
 </style>
 </head>
@@ -105,7 +120,7 @@ const ART = {};
 
 // B or 13? The same mark means different things in different context.
 ART['ai-context-engineering'] = () => {
-  const s = 0.93, sw = 21;
+  const s = 0.84, sw = 19;
   const G = {
     A:   'M0 150 L65 0 L130 150 M25 103 H105',
     C:   'M115.5 26.8 A62 75 0 1 0 115.5 123.2',
@@ -115,13 +130,13 @@ ART['ai-context-engineering'] = () => {
     amb: 'M10 0 V150 M41 0 H70 A37.5 37.5 0 0 1 70 75 H50 M50 75 H72 A37.5 37.5 0 0 1 72 150 H41',
   };
   const g = (k,x,y,col) => `<path transform="translate(${x} ${y}) scale(${s})" d="${G[k]}" fill="none" stroke="${col}" stroke-width="${sw/s}" stroke-linecap="round" stroke-linejoin="round"/>`;
-  const cy = 236, gapV = 196;
+  const y0 = 60, gapV = 184;
   return `
-    ${g('one', 250, cy-gapV, C.ink)}${g('two', 322, cy-gapV, C.ink)}
-    ${g('A', 96, cy, C.paper)}
-    ${g('amb', 305, cy, C.yellow)}
-    ${g('C', 482, cy, C.paper)}
-    ${g('one', 244, cy+gapV, C.ink)}${g('four', 322, cy+gapV, C.ink)}
+    ${g('one', 271.6, y0, C.ink)}${g('two', 338, y0, C.ink)}
+    ${g('A', 127.4, y0+gapV, C.paper)}
+    ${g('amb', 313.8, y0+gapV, C.yellow)}
+    ${g('C', 477.4, y0+gapV, C.paper)}
+    ${g('one', 267, y0+2*gapV, C.ink)}${g('four', 338.5, y0+2*gapV, C.ink)}
   `;
 };
 
@@ -154,13 +169,13 @@ ART['mathematical-foundations-for-ml'] = () => {
 
 // A spider spinning a neural network instead of a web — every connection by hand, from scratch.
 ART['neural-networks-from-scratch'] = () => {
-  const layers = [[3,130],[4,282],[4,434],[2,586]], cy = 318, sp = 98;
+  const layers = [[3,118],[4,280],[4,442],[2,604]], cy = 300, sp = 106;
   const N = layers.map(([n,x]) => Array.from({length:n},(_,i)=>[x, cy + (i-(n-1)/2)*sp]));
   const out = [];
   // guy lines to the edges, like a real web
-  N[0].forEach(([x,y],i)=> out.push(S(`M${x} ${y} L0 ${[150,318,486][i]}`, C.ink, 2.2)));
-  N[3].forEach(([x,y],i)=> out.push(S(`M${x} ${y} L720 ${[196,440][i]}`, C.ink, 2.2)));
-  out.push(S(`M${N[1][0][0]} ${N[1][0][1]} L250 0`, C.ink, 2.2));
+  N[0].forEach(([x,y],i)=> out.push(S(`M${x} ${y} L0 ${[120,300,480][i]}`, C.ink, 2.2)));
+  N[3].forEach(([x,y],i)=> out.push(S(`M${x} ${y} L720 ${[170,420][i]}`, C.ink, 2.2)));
+  out.push(S(`M${N[1][0][0]} ${N[1][0][1]} L250 0 M${N[2][0][0]} ${N[2][0][1]} L470 0`, C.ink, 2.2));
   // the unfinished edge
   const a = N[2][3], b = N[3][1], t = 0.62;
   const sx = a[0]+(b[0]-a[0])*t, sy = a[1]+(b[1]-a[1])*t;
@@ -203,34 +218,38 @@ ART['build-llms-from-scratch'] = () => {
     }
   });
   // crane lowering the last block
-  const topY = base - widths.length*th; // 212
-  const mx = 408;
-  out.push(S(`M${mx} ${topY} V46 M${mx+14} ${topY} V46`, C.ink, 3.5));
-  let z = ''; for(let y=topY; y>50; y-=16) z += `M${mx} ${y} L${mx+14} ${y-16} `;
+  const topY = base - widths.length*th, mx = 424;
+  out.push(S(`M${mx} ${topY} V40 M${mx+14} ${topY} V40`, C.ink, 3.5));
+  let z = ''; for(let y=topY; y>44; y-=16) z += `M${mx} ${y} L${mx+14} ${y-16} `;
   out.push(S(z, C.ink, 2.4));
-  out.push(S(`M${mx-150} 60 H${mx+96} M${mx-150} 46 H${mx+96}`, C.ink, 3.5));
-  let zj=''; for(let x=mx-150; x<mx+96; x+=16) zj += `M${x} 60 L${x+16} 46 `;
+  out.push(S(`M246 54 H528 M246 40 H528`, C.ink, 3.5));
+  let zj=''; for(let x=246; x<528; x+=16) zj += `M${x} 54 L${Math.min(x+16,528)} 40 `;
   out.push(S(zj, C.ink, 2.4));
-  out.push(S(`M${mx+7} 46 L${mx+7} 20 M${mx+7} 20 L${mx-110} 46 M${mx+7} 20 L${mx+84} 46`, C.ink, 2.4));
-  out.push(rect(mx+60, 62, 34, 26, C.ink));
-  out.push(S(`M300 60 V124`, C.ink, 2.4));
-  out.push(S(`M300 124 L262 142 M300 124 L338 142`, C.ink, 2.4));
-  out.push(rect(260, 142, 80, 50, C.yellow));
-  out.push(P(`M${287} 184 V162 A13 13 0 0 1 313 162 V184 Z`, C.ink));
-  out.push(`<text x="300" y="181" text-anchor="middle" font-family="Noto Sans" font-weight="700" font-size="15" fill="${C.yellow}">?</text>`);
+  out.push(S(`M${mx+7} 40 L${mx+7} 14 L262 40 M${mx+7} 14 L514 40`, C.ink, 2.4));
+  out.push(rect(478, 56, 40, 30, C.ink));
+  out.push(rect(320, 54, 20, 10, C.ink));
+  out.push(S(`M330 64 V116 M330 116 L294 136 M330 116 L366 136`, C.ink, 2.4));
+  out.push(rect(290, 136, 80, 50, C.yellow));
+  out.push(P(`M317 178 V156 A13 13 0 0 1 343 156 V178 Z`, C.ink));
   return out.join('');
 };
 
 // A 5-dimensional cube: 2×2×2×2×2 = 32 GPUs, one axis per kind of parallelism.
 ART['5d-parallelism'] = () => {
-  const n=5, R=64, cx=360, cy=318, rot=-Math.PI/2;
+  const n=5, R=66, cx=360, cy=300, rot=-Math.PI/2;
   const dirs=[...Array(n)].map((_,k)=>{const a=rot+Math.PI*k/n;return [Math.cos(a),Math.sin(a)];});
   const V=[]; for(let i=0;i<32;i++){let x=0,y=0;for(let k=0;k<n;k++){const s=(i>>k)&1?1:-1;x+=s*dirs[k][0];y+=s*dirs[k][1];}V.push([cx+x*R,cy+y*R]);}
-  const out=[], hi = 0b00000;
+  const out=[];
+  const AX = [C.paper, C.yellow, C.red, '#8FA3DA', '#8E877B'];
   const E=[]; for(let i=0;i<32;i++)for(let k=0;k<n;k++){const j=i^(1<<k);if(j>i)E.push([i,j,k]);}
-  E.forEach(([i,j])=>{ if(i===hi||j===hi) return; out.push(S(`M${f(V[i][0])} ${f(V[i][1])} L${f(V[j][0])} ${f(V[j][1])}`, C.paper, 2)); });
-  E.forEach(([i,j])=>{ if(i!==hi&&j!==hi) return; out.push(S(`M${f(V[i][0])} ${f(V[i][1])} L${f(V[j][0])} ${f(V[j][1])}`, C.yellow, 5)); });
-  V.forEach(([x,y],i)=>{ out.push(rect(f(x-8),f(y-8),16,16, i===hi?C.yellow:C.red, `stroke="${C.ink}" stroke-width="3"`)); });
+  for(let k=0;k<n;k++) out.push(S(E.filter(e=>e[2]===k).map(([i,j])=>`M${f(V[i][0])} ${f(V[i][1])} L${f(V[j][0])} ${f(V[j][1])}`).join(' '), AX[k], 3.2));
+  V.forEach(([x,y])=>{ out.push(rect(f(x-7),f(y-7),14,14, C.ink, `stroke="${C.paper}" stroke-width="2.6"`)); });
+  // key: five axes of the device mesh
+  const names = ['data','tensor','pipeline','context','expert'];
+  const kx0 = 118, ky = 572;
+  names.forEach((nm,k)=>{ const x = kx0 + k*100;
+    out.push(S(`M${x} ${ky-4} l22 0`, AX[k], 4));
+    out.push(`<text x="${x+30}" y="${ky}" font-family="Albert Sans" font-weight="600" font-size="13" fill="${C.paper}">${nm}</text>`); });
   return out.join('');
 };
 
@@ -255,39 +274,460 @@ ART['pi-vs-hermes-vs-codex'] = () => {
     return g.join('');
   };
   out.push(`<g transform="translate(720 0) scale(-1 1)">${flower(C.tint, C.tint, C.tint, C.tint)}</g>`);
-  out.push(flower(C.ink, C.red, C.yellow, C.blue));
+  out.push(flower(C.ink, C.red, C.yellow, C.ink));
+  return out.join('');
+};
+
+
+// Computer scientists draw trees upside down: root at the top, leaves at the bottom. So here is one.
+ART['decision-trees-from-scratch'] = () => {
+  const out = [];
+  // tree spec: arrays are splits, strings are leaves (class r = red, b = blue)
+  const T = [[[ 'r', ['b','r'] ], [ ['b','b'], 'r' ]], [[ 'b', ['r', ['b','r']] ], 'b']];
+  let leafIx = 0; const leaves = [];
+  const Y = [170, 272, 360, 436, 502, 556];
+  function lay(node, depth){
+    if(typeof node === 'string'){ const n = {leaf:node, depth}; leaves.push(n); return n; }
+    const kids = node.map(k=>lay(k, depth+1));
+    return {kids, depth};
+  }
+  const root = lay(T, 0);
+  const x0 = 104, x1 = 616; leaves.forEach((l,i)=> l.x = x0 + (x1-x0)*i/(leaves.length-1));
+  function pos(n){ if(n.leaf){ n.y = Y[n.depth]; return n; } n.kids.forEach(pos); n.x = (n.kids[0].x+n.kids[1].x)/2; n.y = Y[n.depth]; return n; }
+  pos(root); root.x = 360;
+  const W = [22, 15, 10, 7, 5, 4];
+  // the ground is at the top: a band of soil with the roots drawn inside it, grass hanging down
+  out.push(rect(0, 0, 720, 96, C.ink));
+  const rt = (x0,y0,ang,len,w,d) => { if(d===0||w<1.6) return;
+    const x1 = x0 + Math.cos(ang)*len, y1 = y0 + Math.sin(ang)*len;
+    out.push(S(`M${f(x0)} ${f(y0)} Q${f((x0+x1)/2 + Math.sin(ang)*len*0.18)} ${f((y0+y1)/2)} ${f(x1)} ${f(y1)}`, C.paper, w));
+    rt(x1,y1,ang-0.42,len*0.72,w*0.62,d-1); rt(x1,y1,ang+0.38,len*0.66,w*0.6,d-1); };
+  rt(360,96,-Math.PI/2-0.72,70,9,4); rt(360,96,-Math.PI/2+0.7,72,9,4); rt(360,96,-Math.PI/2-0.05,46,8,3);
+  [[92,-1],[168,1],[560,-1],[640,1]].forEach(([x,d])=>{
+    out.push(S(`M${x} 94 l${-6*d} 20 M${x+8} 94 l${2*d} 26 M${x+16} 94 l${8*d} 18`, C.ink, 3.4));
+  });
+  out.push(S(`M360 92 L360 ${Y[0]}`, C.ink, 26, 'stroke-linecap="butt"'));
+  function draw(n){
+    if(n.leaf) return;
+    n.kids.forEach(k=>{
+      const ky = k.leaf ? k.y - 22 : k.y;
+      out.push(S(`M${f(n.x)} ${n.y} C${f(n.x)} ${f(n.y+(ky-n.y)*0.55)} ${f(k.x)} ${f(n.y+(ky-n.y)*0.35)} ${f(k.x)} ${f(ky)}`, C.ink, W[n.depth]));
+      draw(k);
+    });
+  }
+  draw(root);
+  leaves.forEach(l=>{
+    const col = l.leaf==='r' ? C.red : C.blue;
+    out.push(P(`M${f(l.x)} ${l.y-26} C${f(l.x+22)} ${l.y-8} ${f(l.x+18)} ${l.y+20} ${f(l.x)} ${l.y+34} C${f(l.x-18)} ${l.y+20} ${f(l.x-22)} ${l.y-8} ${f(l.x)} ${l.y-26} Z`, col));
+  });
+  return out.join('');
+};
+
+// A python that has swallowed a table.
+ART['python-for-data-science'] = () => {
+  const out = [], ink = C.ink;
+  // tail taper
+  out.push(P('M58 520 C84 500 118 488 150 486 L152 530 C120 530 90 530 58 520 Z', ink));
+  out.push(S('M148 508 C210 506 226 470 232 420 C238 372 252 346 296 344 L444 344 C500 344 520 392 548 424 C580 460 640 446 646 386 C650 340 626 300 604 272', ink, 44, 'stroke-linecap="butt"'));
+  // the swallowed dataframe
+  out.push(`<rect x="248" y="262" width="236" height="164" rx="44" fill="${ink}"/>`);
+  const gx = 282, gy = 292, gw = 168, gh = 104;
+  out.push(`<rect x="${gx}" y="${gy}" width="${gw}" height="${gh}" fill="none" stroke="${C.paper}" stroke-width="3.2"/>`);
+  out.push(rect(gx, gy, gw, 21, C.paper));
+  for(let c=1;c<4;c++) out.push(S(`M${gx+c*gw/4} ${gy} V${gy+gh}`, C.paper, 3.2));
+  for(let r=1;r<5;r++) out.push(S(`M${gx} ${gy+21+r*(gh-21)/5} H${gx+gw}`, C.paper, 3.2));
+  // head
+  out.push(`<g transform="translate(604 262) rotate(-58)">
+     <path d="M-30 -24 C-4 -34 40 -30 62 -12 C72 -4 72 6 62 12 C40 28 -4 32 -30 22 Z" fill="${ink}"/>
+     ${circ(22,-11,7.5,C.paper)}${circ(24,-11,3.6,ink)}
+     ${S('M68 0 L104 0 L118 -10 M104 0 L118 10', C.red, 4.5)}
+   </g>`);
+  return out.join('');
+};
+
+// The retriever fetches the document. (It is what the component is called.)
+ART['rag-in-production'] = () => {
+  const Y = C.yellow, R = C.red, K = C.ink, out = [];
+  const sep = `stroke="${R}" stroke-width="5" stroke-linejoin="round"`;
+  out.push(`<g transform="translate(88 208)">
+    <path d="M104 120 C66 110 34 86 20 48 C40 60 56 60 62 70 C72 88 94 98 118 102 Z" fill="${Y}"/>
+    <rect x="126" y="140" width="34" height="150" rx="17" fill="${Y}" transform="rotate(20 143 150)"/>
+    <rect x="316" y="140" width="34" height="150" rx="17" fill="${Y}" transform="rotate(-24 333 150)"/>
+    <rect x="118" y="140" width="36" height="156" rx="18" fill="${Y}" ${sep}/>
+    <rect x="292" y="140" width="36" height="156" rx="18" fill="${Y}" ${sep}/>
+    <rect x="96" y="92" width="244" height="100" rx="46" fill="${Y}"/>
+    <path d="M292 150 C300 104 324 62 356 36 L414 64 C400 108 382 150 356 184 Z" fill="${Y}"/>
+    <ellipse cx="384" cy="48" rx="46" ry="40" fill="${Y}"/>
+    <rect x="384" y="38" width="96" height="46" rx="22" fill="${Y}"/>
+    ${circ(476,52,10.5,K)}
+    ${circ(394,34,6.5,K)}
+    <path d="M358 18 C334 26 326 80 346 106 C370 98 380 60 376 24 Z" fill="${K}"/>
+    <g transform="translate(420 74) rotate(-6)">
+      <path d="M0 0 H104 V132 L84 152 H0 Z" fill="${C.paper}"/>
+      <path d="M104 132 L84 132 L84 152 Z" fill="${C.tint}"/>
+      ${[0,1,2,3,4,5,6].map(i=>`<rect x="14" y="${24+i*15}" width="${[62,76,70,54,76,66,40][i]}" height="5" fill="${K}"/>`).join('')}
+    </g>
+    <rect x="394" y="68" width="60" height="16" rx="8" fill="${Y}"/>
+  </g>`);
+  return out.join('');
+};
+
+// Carrot and stick: reward, and negative reward, on one pole.
+ART['reinforcement-learning'] = () => {
+  const out = [];
+  out.push(S('M-20 612 C180 470 420 250 604 118', C.ink, 15));
+  out.push(S('M604 118 L604 230', C.ink, 3.2));
+  // leaves
+  out.push(P('M604 250 C584 222 566 190 572 150 C592 180 600 214 604 250 Z', C.ink));
+  out.push(P('M604 250 C600 212 604 176 624 146 C630 186 618 222 604 250 Z', C.ink));
+  out.push(P('M604 252 C620 226 642 208 672 198 C662 228 636 246 604 252 Z', C.ink));
+  out.push(P('M604 252 C586 230 560 218 530 216 C546 244 574 254 604 252 Z', C.ink));
+  // carrot
+  out.push(P('M560 256 C574 244 634 244 648 256 C654 300 630 420 610 540 C607 552 601 552 598 540 C578 420 554 300 560 256 Z', C.yellow));
+  [[292,18],[330,-14],[368,16],[404,-12],[440,12],[478,-8]].forEach(([y,d])=>{
+    const half = 40 - (y-280)*0.13; const x = d>0 ? 604 + half - 2 : 604 - half + 2;
+    out.push(S(`M${f(x)} ${y} l${-d} 4`, C.red, 4));
+  });
+  return out.join('');
+};
+
+// Fine-tuning: a small turn of one peg on an instrument that is already built.
+ART['llm-finetuning'] = () => {
+  const K = C.ink, Pp = C.paper, out = [];
+  out.push(`<g transform="translate(300 280) rotate(-60) scale(1.28)">
+    <rect x="-22" y="120" width="44" height="560" rx="6" fill="${K}"/>
+    <path d="M-26 -60 C-30 20 -28 90 -22 128 L22 128 C30 90 32 20 28 -60 Z" fill="${K}"/>
+    <circle cx="-2" cy="-106" r="56" fill="${K}"/>
+    <path d="M-2 -106 m0 -8 a8 8 0 1 1 -8 8 a16 16 0 1 1 16 16 a26 26 0 1 1 -26 -26 a38 38 0 1 1 38 38" fill="none" stroke="${C.red}" stroke-width="6" stroke-linecap="round"/>
+    <path d="M-14 -58 V122 M-5 -58 V122 M5 -58 V122 M14 -58 V122" stroke="${Pp}" stroke-width="2.6"/>
+    ${[[-40,-24,-1],[-40,48,-1],[40,-2,1],[40,72,1]].map(([x,y,sd])=>`
+      <path d="M${sd*22} ${y-9} H${x} V${y+9} H${sd*22} Z" fill="${K}"/>
+      <ellipse cx="${x+sd*26}" cy="${y}" rx="30" ry="22" fill="${K}"/>
+      <circle cx="${x+sd*26}" cy="${y}" r="7" fill="${C.red}"/>`).join('')}
+    <path d="M81 -46.5 A46 46 0 0 1 101.2 27.6" fill="none" stroke="${Pp}" stroke-width="6.5" stroke-linecap="round"/>
+    <path d="M85 26 L101.2 27.6 L103 10" fill="none" stroke="${Pp}" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>`);
+  return out.join('');
+};
+
+// Pre-training a mini model: a model train on the training loop.
+ART['pretraining-mini-kimi-k3'] = () => {
+  const out = [], cx = 360, cy = 318;
+  const ties = [];
+  for(let k=0;k<72;k++){ const a = k/72*2*Math.PI; const c=Math.cos(a), s=Math.sin(a);
+    ties.push(`M${f(cx+c*244)} ${f(cy+s*96)} L${f(cx+c*296)} ${f(cy+s*134)}`); }
+  out.push(S(ties.join(' '), C.tint, 5, 'stroke-linecap="butt"'));
+  out.push(`<ellipse cx="${cx}" cy="${cy}" rx="252" ry="102" fill="none" stroke="${C.paper}" stroke-width="5"/>`);
+  out.push(`<ellipse cx="${cx}" cy="${cy}" rx="288" ry="128" fill="none" stroke="${C.paper}" stroke-width="5"/>`);
+  // train, side view, on the near side of the loop, heading left
+  const by = 430;
+  const wheel = (x,r=15) => circ(x, by, r, C.paper) + circ(x, by, 5, C.ink);
+  const g = [];
+  // engine
+  g.push(rect(176, by-78, 118, 58, C.red));
+  g.push(rect(262, by-126, 70, 106, C.red));
+  g.push(rect(254, by-136, 86, 14, C.paper));
+  g.push(rect(278, by-110, 36, 34, C.ink));
+  g.push(rect(196, by-122, 26, 46, C.red));
+  g.push(rect(190, by-130, 38, 12, C.paper));
+  g.push(P(`M176 ${by-30} L150 ${by+6} L176 ${by+6} Z`, C.red));
+  g.push(`<path d="M232 ${by-78} a18 18 0 0 1 36 0 z" fill="${C.yellow}"/>`);
+  g.push(rect(170, by-28, 170, 12, C.ink));
+  g.push(wheel(204)+wheel(248)+wheel(300,20));
+  // cars
+  const car = (x, w, col, top) => rect(x, by-72, w, 52, col) + (top||'') + rect(x-4, by-26, w+8, 10, C.ink) + wheel(x+22) + wheel(x+w-22);
+  g.push(car(352, 96, C.yellow, rect(352, by-84, 96, 12, C.paper)));
+  g.push(S(`M340 ${by-38} H352`, C.paper, 5));
+  g.push(car(462, 96, C.blue, [0,1,2].map(i=>rect(372+110+i*24, by-62, 16, 18, C.paper)).join('')));
+  g.push(S(`M450 ${by-38} H462`, C.paper, 5));
+  g.push(car(572, 80, C.paper, rect(572, by-84, 80, 12, C.red)));
+  g.push(S(`M560 ${by-38} H572`, C.paper, 5));
+  // smoke
+  g.push(circ(222, by-160, 16, C.paper) + circ(252, by-196, 22, C.paper) + circ(296, by-228, 28, C.paper));
+  out.push(g.join(''));
+  return out.join('');
+};
+
+// A kernel. GPU kernels run over a grid, the way kernels grow on a cob.
+ART['kernel-engineering'] = () => {
+  const out = [], cx = 360, top = 64, bot = 560;
+  // cob kernels
+  const rows = 21, rowH = (bot - top - 30)/rows;
+  let hot = null;
+  for(let j=0;j<rows;j++){
+    const y = top + 18 + j*rowH;
+    const tt = j/(rows-1);
+    const R = 92 * Math.pow(Math.sin(Math.PI*(0.12 + 0.88*tt)*0.5 + 0.2), 0.7) * (tt>0.85 ? 1 - (tt-0.85)*1.2 : 1);
+    const off = (j%2)*0.5;
+    for(let i=-4;i<=4;i++){
+      const th = (i+off)*0.36; if(Math.abs(th) > 1.45) continue;
+      const x = cx + R*Math.sin(th), w = Math.max(3, 2*R*0.18*Math.cos(th)), h = rowH-4;
+      const isHot = (j===8 && i===0);
+      out.push(`<rect x="${f(x-w/2)}" y="${f(y)}" width="${f(w)}" height="${f(h)}" rx="${f(Math.min(w,h)/2.6)}" fill="${isHot?C.red:C.yellow}"/>`);
+    }
+  }
+  // husk leaves, peeled back
+  out.push(P('M360 580 C300 560 230 520 190 420 C170 370 166 320 176 272 C214 330 262 400 330 470 C348 490 356 530 360 580 Z', C.paper));
+  out.push(P('M360 580 C420 560 492 516 530 420 C550 368 552 312 540 262 C504 324 456 396 390 470 C372 492 364 530 360 580 Z', C.paper));
+  out.push(S('M198 330 C236 410 290 470 350 540 M522 324 C486 404 432 468 370 540', C.tint, 3));
+  out.push(rect(346, 572, 28, 18, C.paper));
+  return out.join('');
+};
+
+// Serving, in batches: one trip, many plates, all different sizes.
+ART['inference-engineering'] = () => {
+  const out = [], ty = 356;
+  // the waiter's black sleeve vanishes into the black ground: only the white glove and the cuff remain
+  out.push(`<g transform="translate(372 ${ty+14})">
+    <path d="M-104 10 C-106 2 -100 -2 -90 -2 L60 -2 C84 -2 98 12 98 34 L98 176 L42 176 L42 58 C42 48 36 42 26 40 L-86 30 C-98 28 -104 20 -104 10 Z" fill="${C.paper}"/>
+    <path d="M-36 -2 C-40 -20 -30 -30 -18 -26 C-10 -22 -10 -12 -12 -2 Z" fill="${C.paper}"/>
+    <path d="M-100 14 H-66 M-98 24 H-70" stroke="${C.ink}" stroke-width="3.2" stroke-linecap="round"/>
+    <rect x="34" y="174" width="72" height="34" fill="${C.paper}"/>
+    ${circ(70,191,5.5,C.ink)}
+  </g>`);
+  // tray
+  out.push(`<rect x="96" y="${ty}" width="540" height="14" rx="7" fill="${C.yellow}"/>`);
+  // cloches: different sizes = requests of different lengths
+  const cl = [[150,46,C.paper],[248,34,C.red],[348,60,C.paper],[462,40,C.paper],[554,52,C.red]];
+  cl.forEach(([x,r,col])=>{
+    out.push(`<path d="M${x-r} ${ty} A${r} ${r*1.02} 0 0 1 ${x+r} ${ty} Z" fill="${col}"/>`);
+    out.push(rect(x-r-6, ty-6, 2*r+12, 7, col));
+    out.push(circ(x, ty - r*1.02 - 5, Math.max(6, r*0.14), col));
+  });
+  return out.join('');
+};
+
+
+/* The Intelligence Factory sub-series: every room's idea rides the same factory belt, and a
+   golden ticket carries the series number. */
+const belt = (fg, bg) => {
+  let s = `<rect x="-30" y="500" width="780" height="30" rx="15" fill="${fg}"/>`;
+  for(let x=14;x<720;x+=44) s += circ(x, 515, 7.5, bg);
+  [96, 360, 624].forEach(x=> s += rect(x-7, 530, 14, 60, fg));
+  return s;
+};
+const ticket = (n, col, txt) => `<g transform="translate(48 44)"><path d="M0 0 H256 V13 A8 8 0 0 0 256 29 V42 H0 V29 A8 8 0 0 0 0 13 Z" fill="${col}"/><text x="128" y="26" text-anchor="middle" font-family="Albert Sans" font-weight="700" font-size="11.5" letter-spacing="1.9" fill="${txt}">THE INTELLIGENCE FACTORY · ${n}</text></g>`;
+
+// I. Language: the machine makes a sentence one token at a time; the gauge is tokens per second.
+ART['charlie-language-room'] = () => {
+  const out = [belt(C.paper, C.ink), ticket('I', C.yellow, C.ink)];
+  // machine on the right, belt runs left
+  out.push(rect(452, 250, 224, 250, C.red));
+  out.push(rect(440, 236, 248, 22, C.red));
+  out.push(rect(452, 420, 34, 80, C.ink));
+  // gauge
+  out.push(circ(580, 340, 58, C.paper));
+  const tk=[]; for(let k=0;k<=10;k++){ const a = Math.PI*(0.8 + 1.4*k/10); tk.push(`M${f(580+Math.cos(a)*44)} ${f(340+Math.sin(a)*44)} L${f(580+Math.cos(a)*52)} ${f(340+Math.sin(a)*52)}`); }
+  out.push(S(tk.join(' '), C.ink, 3.4));
+  const na = Math.PI*(0.8+1.4*0.92);
+  out.push(S(`M580 340 L${f(580+Math.cos(na)*46)} ${f(340+Math.sin(na)*46)}`, C.red, 5));
+  out.push(circ(580,340,7,C.ink));
+  out.push(`<text x="580" y="378" text-anchor="middle" font-family="Albert Sans" font-weight="700" font-size="11" letter-spacing="1" fill="${C.ink}">TOK/S</text>`);
+  // chimney + puff
+  out.push(rect(622, 176, 30, 60, C.red));
+  out.push(circ(612, 150, 16, C.paper) + circ(584, 118, 22, C.paper));
+  // tokens on the belt (read left to right: the first one out has travelled furthest)
+  const toks = [['Char',96],['lie',62],['␣and',92],['␣the',92]];
+  let x = 40;
+  toks.forEach(([t,w],i)=>{
+    out.push(`<rect x="${x}" y="${500-66}" width="${w}" height="66" rx="6" fill="${C.yellow}"/>`);
+    out.push(`<text x="${x+w/2}" y="${500-24}" text-anchor="middle" font-family="Albert Sans" font-weight="700" font-size="26" letter-spacing="-0.5" fill="${C.ink}">${t}</text>`);
+    x += w + 14;
+  });
+  // next token half out of the slot
+  out.push(`<rect x="418" y="${500-66}" width="34" height="66" fill="${C.yellow}"/>`);
+  return out.join('');
+};
+
+// II. Vision: an image becomes a sequence of patches (a ViT's first move).
+ART['charlie-vision-room'] = () => {
+  const out = [belt(C.ink, C.red), ticket('II', C.yellow, C.ink)];
+  const eye = (id) => `<clipPath id="${id}"><rect x="0" y="0" width="240" height="240"/></clipPath>`;
+  const scene = `<rect width="240" height="240" fill="${C.yellow}"/>
+     <path d="M16 120 C70 40 170 40 224 120 C170 200 70 200 16 120 Z" fill="${C.paper}"/>
+     ${circ(120,120,48,C.blue)}${circ(120,120,22,C.ink)}${circ(134,104,9,C.paper)}`;
+  const T = 80, gap = 7;
+  let defs = '<defs>';
+  const tiles = [];
+  for(let r=0;r<3;r++) for(let c=0;c<3;c++){
+    const id = `vp${r}${c}`;
+    defs += `<clipPath id="${id}"><rect x="${c*T}" y="${r*T}" width="${T}" height="${T}"/></clipPath>`;
+    tiles.push({r,c,id});
+  }
+  defs += '</defs>';
+  out.push(defs);
+  // the image, as a grid of patches
+  const gx = 360 - (3*T+2*gap)/2, gy = 104;
+  tiles.forEach(({r,c,id})=>{
+    out.push(`<g transform="translate(${gx + c*(T+gap) - c*T} ${gy + r*(T+gap) - r*T})"><g clip-path="url(#${id})">${scene}</g></g>`);
+  });
+  // the same patches, in raster order, riding the belt
+  const s = 0.62, tw = T*s, bg = 9, bx = 360 - (9*tw + 8*bg)/2;
+  tiles.forEach(({r,c,id},i)=>{
+    const x = bx + i*(tw+bg), y = 500 - tw - 4;
+    out.push(`<g transform="translate(${f(x)} ${f(y)}) scale(${s}) translate(${-c*T} ${-r*T})"><g clip-path="url(#${id})">${scene}</g></g>`);
+  });
+  out.push(S(`M360 ${gy+3*T+2*gap+14} v44 M346 ${gy+3*T+2*gap+44} l14 14 l14 -14`, C.ink, 5));
+  return out.join('');
+};
+
+// III. Sound: a horn speaking a waveform onto the line.
+ART['charlie-sound-room'] = () => {
+  const out = [belt(C.ink, C.red), ticket('III', C.yellow, C.ink)];
+  // horn
+  out.push(P('M70 470 L70 430 C120 430 150 410 176 360 C204 300 236 220 280 150 C300 250 300 350 280 450 C240 420 200 430 176 450 C150 470 120 470 70 470 Z', C.yellow));
+  out.push(`<ellipse cx="282" cy="300" rx="34" ry="150" fill="${C.yellow}"/>`);
+  out.push(`<ellipse cx="288" cy="300" rx="22" ry="126" fill="${C.ink}"/>`);
+  out.push(rect(40, 440, 110, 60, C.ink));
+  // waveform bars on the belt
+  const H = [26,54,92,140,110,178,132,70,160,196,120,82,146,98,48,30,18];
+  H.forEach((h,i)=>{ out.push(`<rect x="${336 + i*22}" y="${500-h}" width="14" height="${h}" rx="3" fill="${C.paper}"/>`); });
+  return out.join('');
+};
+
+// IV. Reason: the one-armed bandit, where reinforcement learning starts — paying out in verified answers.
+ART['charlie-reasoning-room'] = () => {
+  const out = [belt(C.paper, C.ink), ticket('IV', C.yellow, C.ink)];
+  const x0 = 206, y0 = 190, w = 290, h = 310;
+  out.push(`<path d="M${x0} ${y0+40} C${x0} ${y0-20} ${x0+w} ${y0-20} ${x0+w} ${y0+40} Z" fill="${C.yellow}"/>`);
+  out.push(rect(x0, y0+34, w, h-34, C.red));
+  out.push(rect(x0+22, y0+72, w-44, 112, C.ink));
+  [0,1,2].forEach(i=>{
+    const rx = x0+34 + i*76;
+    out.push(rect(rx, y0+82, 66, 92, C.paper));
+    out.push(S(`M${rx+16} ${y0+130} l14 14 l24 -30`, C.ink, 9));
+  });
+  out.push(rect(x0+40, y0+214, w-80, 18, C.ink));
+  out.push(rect(x0+22, y0+256, w-44, 30, C.ink));
+  // the arm
+  out.push(rect(x0+w, y0+150, 26, 30, C.yellow));
+  out.push(S(`M${x0+w+26} ${y0+165} C${x0+w+60} ${y0+150} ${x0+w+62} ${y0+90} ${x0+w+56} ${y0+44}`, C.paper, 9));
+  out.push(circ(x0+w+56, y0+36, 22, C.red));
   return out.join('');
 };
 
 /* ---------- the catalogue ---------- */
 const BOOKS = [
-  {slug:'ai-context-engineering', level:'intermediate', title:'AI Context<br>Engineering', meta:'43 capsules · 10 hours',
+  {slug:'ai-context-engineering', group:'core', level:'intermediate', title:'AI Context<br>Engineering', meta:'43 capsules · 10 hours',
    cap:'<b>B or 13?</b> The same mark reads as a letter across, a number down. What a model makes of your words depends on what you put around them — which is the whole discipline.'},
-  {slug:'mathematical-foundations-for-ml', level:'beginner', title:'Mathematical<br>Foundations for<br>Machine Learning', meta:'43 capsules · 10 hours',
+  {slug:'mathematical-foundations-for-ml', group:'core', level:'beginner', title:'Mathematical<br>Foundations for<br>Machine Learning', meta:'43 capsules · 10 hours',
    cap:'<b>Foundations, literally.</b> A Greek temple built from Greek letters: a Δ pediment on four Π’s — eight columns, like the Parthenon — standing on three steps: calculus, probability, linear algebra.'},
-  {slug:'neural-networks-from-scratch', level:'beginner', title:'Neural Networks<br>from Scratch', meta:'33 capsules · 7 hours',
+  {slug:'neural-networks-from-scratch', group:'core', level:'beginner', title:'Neural Networks<br>from Scratch', meta:'33 capsules · 7 hours',
    cap:'<b>Web → net.</b> A spider spinning a fully connected network instead of a web, one thread at a time. The last connection isn’t finished yet.'},
-  {slug:'build-llms-from-scratch', level:'intermediate', title:'Build Large<br>Language Models<br>(LLMs) from Scratch', meta:'20 capsules · 6 hours',
+  {slug:'build-llms-from-scratch', group:'core', level:'intermediate', title:'Build Large<br>Language Models<br>(LLMs) from Scratch', meta:'20 capsules · 6 hours',
    cap:'<b>Babel, rebuilt.</b> Build + large + language: a tower of identical blocks — as a decoder is a stack of identical layers — with every script in its windows. The crane lowers the last block.'},
-  {slug:'5d-parallelism', level:'advanced', title:'5D Parallelism<br>for Large<br>Model Training', meta:'40 capsules · 9 hours',
-   cap:'<b>Five dimensions, literally.</b> A 5-cube is exactly a 2×2×2×2×2 device mesh: 32 GPUs, and every edge is one axis of parallelism. One GPU and its five partners are lit.'},
-  {slug:'pi-vs-hermes-vs-codex', level:'advanced', title:'Pi vs Hermes<br>vs Codex', sub:'Context Compaction and Memory', meta:'9 capsules · 1 hour',
+  {slug:'5d-parallelism', group:'core', level:'advanced', title:'5D Parallelism for<br>Large Model Training', meta:'40 capsules · 9 hours',
+   cap:'<b>Five dimensions of parallel lines.</b> A 5-cube is exactly a 2×2×2×2×2 device mesh: 32 GPUs. Drawn this way, every edge along one axis is parallel to the others — so the five kinds of parallelism are, literally, five families of parallel lines.'},
+  {slug:'pi-vs-hermes-vs-codex', group:'core', level:'advanced', title:'Pi vs Hermes<br>vs Codex', sub:'Context Compaction and Memory', meta:'9 capsules · 1 hour',
    cap:'<b>Pressed.</b> Compaction flattens a conversation so it fits in a book (a codex) — and memory is the faint imprint it leaves on the facing page.'},
+  {slug:'decision-trees-from-scratch', group:'range', level:'beginner', title:'Build Decision<br>Trees from Scratch', meta:'23 capsules · 5 hours',
+   cap:'<b>Upside down, as CS draws them.</b> Root at the top (with actual roots), binary splits all the way down, and the leaf nodes are leaves — coloured by the class they predict.'},
+  {slug:'python-for-data-science', group:'range', level:'beginner', title:'Python for<br>Data Science', meta:'38 capsules · 8 hours',
+   cap:'<b>What’s in the python?</b> A table, rows and header and all — the snake that swallowed the elephant, updated for pandas.'},
+  {slug:'rag-in-production', group:'range', level:'intermediate', title:'RAG in Production', meta:'42 capsules · 10 hours',
+   cap:'<b>Good dog.</b> The component that fetches documents in a RAG system is called the retriever. So: a retriever, bringing back a document.'},
+  {slug:'reinforcement-learning', group:'range', level:'intermediate', title:'Reinforcement<br>Learning', meta:'38 capsules · 8 hours',
+   cap:'<b>Carrot and stick.</b> Reward and penalty on one pole — the agent chases the signal it is given, not the one you meant.'},
+  {slug:'llm-finetuning', group:'range', level:'intermediate', title:'LLM Finetuning', meta:'40 capsules · 9 hours',
+   cap:'<b>Fine-tuning, literally.</b> You don’t build the violin; you take a finished instrument and give one peg a small turn.'},
+  {slug:'pretraining-mini-kimi-k3', group:'range', level:'advanced', title:'Pretraining a<br>Mini Kimi K3', meta:'30 capsules · 5 hours',
+   cap:'<b>A mini model train</b> going round and round the training loop.'},
+  {slug:'kernel-engineering', group:'soon', level:'advanced', soon:true, title:'Kernel<br>Engineering', sub:'From silicon to speculative decoding — GPU kernels for modern LLMs.',
+   cap:'<b>Kernels grow on a grid.</b> A GPU kernel is launched over a grid of blocks; a cob is a grid of kernels. One of them is the one you’re writing.'},
+  {slug:'inference-engineering', group:'soon', level:'advanced', soon:true, title:'Inference<br>Engineering', sub:'Serve LLMs fast — batching, KV-cache, paged attention, speculative decoding.',
+   cap:'<b>Serving, batched.</b> One trip to the table, many plates of different sizes — which is what continuous batching does with requests.'},
+  {slug:'charlie-language-room', group:'factory', level:'advanced', title:'Charlie and the<br>Language Room', sub:'Language — Inference Engineering', meta:'22 capsules · 5 hours',
+   cap:'<b>The Intelligence Factory, I.</b> A machine that makes sentences one token at a time — and the only dial that matters is tokens per second.'},
+  {slug:'charlie-vision-room', group:'factory', level:'intermediate', title:'Charlie and the<br>Vision Room', sub:'Vision — Vision Transformers', meta:'20 capsules · 6 hours',
+   cap:'<b>II.</b> A vision transformer’s first move: cut the picture into patches and line them up as a sequence. The eye goes in as a grid and leaves as a queue.'},
+  {slug:'charlie-sound-room', group:'factory', level:'intermediate', title:'Charlie and the<br>Sound Room', sub:'Audio — Voice Agents', meta:'20 capsules · 6 hours',
+   cap:'<b>III.</b> Sound, manufactured: a horn speaks a waveform onto the belt — voice in, voice out, which is all a voice agent does, very fast.'},
+  {slug:'charlie-reasoning-room', group:'factory', level:'advanced', title:'Charlie and the<br>Reasoning Room', sub:'Reason — Reinforcement Learning, from bandits to reasoning models', meta:'21 capsules · 6 hours',
+   cap:'<b>IV.</b> Reinforcement learning begins with the one-armed bandit. Reasoning models are trained on the same machine — it just pays out for verified answers.'},
 ];
 
-function coverHTML(b){
+function coverHTML(b, face){
   const L = LV[b.level];
   const dot = b.level==='beginner' ? C.red : (b.level==='intermediate' ? C.paper : C.yellow);
-  return `<div class="cover ${b.level}" data-slug="${b.slug}">
+  return `<div class="${face?'':'cover '}cv ${b.level}"${face?'':` data-slug="${b.slug}"`}>
     <svg class="art" viewBox="0 0 720 888" xmlns="http://www.w3.org/2000/svg">${ART[b.slug] ? ART[b.slug]() : ''}</svg>
-    <div class="tb"><h2 class="${b.small?'s':''}">${b.title}</h2>${b.sub?`<p class="sub">${b.sub}</p>`:''}</div>
+    <div class="tb"><h2>${b.title}</h2>${b.sub?`<p class="sub">${b.sub}</p>`:''}</div>
     <div class="foot">
       <div class="imprint">${mark(L.fg, dot)}<b>Vizuara</b><span>Books</span></div>
       <div class="lvl">${b.soon?'<span class="soon">Coming soon</span>':`<i>${b.meta}</i><span style="width:10px"></span>`}${L.glyph(L.fg)}<span>${L.name}</span></div>
     </div>
   </div>`;
 }
-document.getElementById('grid').innerHTML = BOOKS.map(b=>`<figure class="c">${coverHTML(b)}<figcaption>${b.cap||''}</figcaption></figure>`).join('');
+
+/* ---------- spec panel ---------- */
+const sw = (hex, name, role, dark) => `<div style="background:${hex};color:${dark?C.paper:C.ink};${hex===C.paper?'box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)':''}"><span>${name}</span><span style="font-weight:500">${hex}<br>${role}</span></div>`;
+document.getElementById('spec').innerHTML = `
+  <h3>Palette — three grounds, two accents</h3>
+  <div class="sw">
+    ${sw(C.paper,'Newsprint','beginner ground')}
+    ${sw(C.red,'Signal red','intermediate ground')}
+    ${sw(C.ink,'Lamp black','advanced ground',1)}
+    ${sw(C.blue,'Ultramarine','accent',1)}
+    ${sw(C.yellow,'Chrome yellow','accent')}
+  </div>
+  <h3>Level — the ground darkens as the slope steepens</h3>
+  <div class="lv">
+    <div style="background:${C.paper};box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)">${LV.beginner.glyph(C.ink)}Beginner<br><span style="font-weight:500">circle · newsprint</span></div>
+    <div style="background:${C.red}">${LV.intermediate.glyph(C.ink)}Intermediate<br><span style="font-weight:500">square · red</span></div>
+    <div style="background:${C.ink};color:${C.paper}">${LV.advanced.glyph(C.paper)}Advanced<br><span style="font-weight:500">diamond · black</span></div>
+  </div>
+  <p style="margin:-18px 0 30px">Borrowed from ski-run signs (green circle, blue square, black diamond): the shape survives greyscale and photocopiers, and the ground’s value carries the same message a second time.</p>
+  <h3>Type — one family, one size</h3>
+  <div class="typ"><div class="big">Albert Sans Bold 56</div></div>
+  <p style="margin:0 0 30px">Every title hangs from the same line, 612px down, at the same size — one to three lines, never a stranded word. Subtitles in Medium 23. A Scandinavian-modernist grotesk, chosen for its plainness: the picture does the talking.</p>
+  <h3>Imprint</h3>
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:8px">${mark(C.ink, C.red).replace('width="26" height="22"','width="52" height="44"')}<span style="font-size:26px;font-weight:700;letter-spacing:-.01em">Vizuara <span style="font-weight:500">Books</span></span></div>
+  <p style="margin:0">An open book seen end-on is a V. The dot it holds is the one idea. Always bottom-left, always smaller than the level line.</p>
+`;
+
+/* ---------- the shelf ---------- */
+const SECTIONS = [
+  ['core','The core set',''],
+  ['range','Range','Beginner to advanced, long titles and short.'],
+  ['factory','Sub-series · Charlie and the Intelligence Factory','Four rooms, one production line: every idea rides the same conveyor belt, and a golden ticket carries the series number.'],
+  ['soon','Coming soon','Same system; the capsule count is replaced by a stamped label.'],
+];
+const fig = b => `<figure class="c">${coverHTML(b)}<figcaption>${b.cap||''}</figcaption></figure>`;
+document.getElementById('grid').outerHTML = SECTIONS.map(([g,t,n])=>`<p class="sect">${t}</p>${n?`<p class="sect-note">${n}</p>`:''}<div class="grid">${BOOKS.filter(b=>b.group===g).map(fig).join('')}</div>`).join('') + `<p class="sect">Print wrap · back, spine, front</p><p class="sect-note">The spider’s dragline starts on the back cover and runs across the spine into the network on the front.</p><div class="wrapbox" id="wrapbox"></div>`;
+
+/* ---------- print wrap: Neural Networks from Scratch ---------- */
+(function(){
+  const b = BOOKS.find(x=>x.slug==='neural-networks-from-scratch');
+  const FX = 764; // front face starts here
+  // the dragline and the anchor threads crossing the spine
+  const knot = [560, 250];
+  const lines = [[FX,120],[FX,300],[FX,480]].map(([x,y])=>`M${knot[0]} ${knot[1]} L${x} ${y}`).join(' ');
+  const over = `<svg class="over" viewBox="0 0 1484 888">
+      ${S(`M${knot[0]} 0 L${knot[0]} ${knot[1]} ${lines}`, C.ink, 2.2)}
+      ${circ(knot[0], knot[1], 6, C.ink)}
+    </svg>`;
+  document.getElementById('wrapbox').innerHTML = `<div class="wrap">
+    <div class="back">
+      <div class="blurb">
+        <h3>It starts with<br>one thread.</h3>
+        <p>A neural network is neurons, weights and connections — nothing more mysterious than that. This book builds one from nothing, one connection at a time, until it learns.</p>
+        <p style="font-weight:600">33 capsules · about 7 hours · ● Beginner</p>
+        <p style="font-weight:500">books.vizuara.ai</p>
+      </div>
+      <div class="bfoot">
+        <div class="imprint" style="display:flex;align-items:center;gap:9px">${mark(C.ink, C.red)}<b>Vizuara</b><span style="font-weight:500">Books</span></div>
+        <div class="code">barcode</div>
+      </div>
+    </div>
+    <div class="spine">
+      <div class="sp-top">${LV.beginner.glyph(C.ink)}</div>
+      <div class="sp">Neural Networks from Scratch</div>
+      <div class="sp-bot">${mark(C.ink, C.red)}</div>
+    </div>
+    ${coverHTML(b, true)}
+    ${over}
+  </div>`;
+})();
 </script>
 </body>
 </html>

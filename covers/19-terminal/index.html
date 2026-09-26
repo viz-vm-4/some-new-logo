@@ -21,13 +21,16 @@ body{font-family:'Martian Mono',monospace;font-variation-settings:'wdth' 75}
 .field .t9,.field .s9{height:calc(var(--ch) + .7px)}
 .cap,.foot,.tl,.pr,.lab{position:absolute;white-space:pre}
 .tl{font-variation-settings:'wdth' 75,'wght' 800;color:var(--ink);word-spacing:-.28em}
+.tl.sub{font-variation-settings:'wdth' 75,'wght' 700;word-spacing:-.2em}
 .pr{font-variation-settings:'wdth' 75,'wght' 800;color:var(--sig)}
 .cur{position:absolute;background:var(--sig)}
+.cur.soon{background:transparent;border:3px solid var(--sig)}
 .cap{font-size:10px;line-height:var(--ch);font-variation-settings:'wdth' 75,'wght' 500;color:var(--ink)}
 .cap b{font-variation-settings:'wdth' 75,'wght' 800;color:var(--sig)}
 .foot{font-size:10px;line-height:var(--ch);font-variation-settings:'wdth' 100,'wght' 600;letter-spacing:.06em;color:var(--ink)}
 .foot.im{font-variation-settings:'wdth' 112.5,'wght' 800;letter-spacing:.14em}
 .foot b{color:var(--sig);font-variation-settings:'wdth' 100,'wght' 800}
+.foot.im i{display:inline-block;width:6px;height:9px;background:var(--sig);margin-left:3px;vertical-align:-1px}
 </style>
 </head><body>
 <div class="covers" id="covers"></div>
@@ -147,7 +150,7 @@ EMBLEM['neural-networks-from-scratch']=function(g){
 
 // Histogram of N(0,1) samples; every sample printed in its bin
 EMBLEM['mathematical-foundations-for-ml']=function(g){
-  const R=rng(5), n=420, xs=[];
+  const R=rng(3664), n=420, xs=[];
   for(let i=0;i<n;i++) xs.push(gauss(R));
   const B=20, lo=-2.5, bw=5/B, bins=Array.from({length:B},()=>[]);
   xs.forEach(x=>{const k=Math.floor((x-lo)/bw); if(k>=0&&k<B) bins[k].push(x);});
@@ -175,8 +178,8 @@ EMBLEM['mathematical-foundations-for-ml']=function(g){
     const h=pdf*n*bw; pts.push(base-1-h);
   }
   for(let c=0;c<COLS;c++){ const r=Math.round(pts[c])-1; if(r<0||r>=base) continue; const q=g.get(r,c);
-    if(q.t>=.86){ q.s=1; } else g.put(r,c,'*',.95,1); }
-  return {cap:['x','= np.random.randn(420); hist(x, bins=20)   * = N(0, 1)']};
+    if(q.t<.86) g.put(r,c,'*',.95,1); }
+  return {cap:['x','= np.random.default_rng(3664).standard_normal(420)   * N(0, 1)']};
 };
 
 
@@ -208,95 +211,277 @@ function drawLine(g,x0,y0,x1,y1,pat,t,s=0,skip){
 // 5D parallelism: the 2x2x2x2x2 device mesh is a 5-cube; 32 ranks, 80 links
 EMBLEM['5d-parallelism']=function(g){
   const AX=['dp','pp','tp','cp','ep'];
-  let n=0;
-  for(let r=0;r<FR;r++){ let c=(r*7)%9-9; while(c<COLS){ const k=n%32; const s=k.toString(2).padStart(5,'0')+'  '; g.text(r,c,s,.04); c+=s.length; n++; } }
-  const H=FR*CH, cx=360, cy=H/2+4;
+  for(let r=0;r<FR;r++)for(let c=0;c<COLS;c++) g.put(r,c,(r%2===0&&c%4===0)?'·':' ',.05);
+  const H=FR*CH, cx=360, cy=H/2;
   const ang=[0,1,2,3,4].map(k=>(k*36+18)*Math.PI/180);
-  const sy=ang.reduce((a,t)=>a+Math.abs(Math.sin(t)),0);
-  const sc=(H-40)/sy;
-  const E=ang.map(a=>[Math.cos(a)*sc*1.12, Math.sin(a)*sc]);
+  const sy=ang.reduce((a,t)=>a+Math.abs(Math.sin(t)),0), sx=ang.reduce((a,t)=>a+Math.abs(Math.cos(t)),0);
+  const scy=(H-34)/sy, scx=(720-70)/sx;
+  const E=ang.map(a=>[Math.cos(a)*scx, Math.sin(a)*scy]);
   const V=[]; for(let m=0;m<32;m++){ let x=0,y=0; for(let k=0;k<5;k++){ const b=(m>>k)&1; x+=(b-.5)*E[k][0]; y+=(b-.5)*E[k][1]; } V.push([cx+x,cy+y]); }
-  const node=V.map(([x,y])=>[Math.floor(y/CH), Math.round(x/CW-2.5)]);
-  const isNode=(r,c)=>node.some(([nr,nc])=>r===nr&&c>=nc-1&&c<nc+6);
+  const node=V.map(([x,y])=>[Math.floor(y/CH), Math.round(x/CW)-2]);
+  const isNode=(r,c)=>node.some(([nr,nc])=>r===nr&&c>=nc&&c<nc+4);
   const hot=0;
-  const tone=[.62,.62,.62,.62,.62];
-  for(let m=0;m<32;m++)for(let k=0;k<5;k++){ const m2=m^(1<<k); if(m2<m) continue; if(m===hot||m2===hot) continue;
-    drawLine(g,...V[m],...V[m2],AX[k],tone[k],0,isNode); }
-  for(let k=0;k<5;k++){ const m2=hot^(1<<k); drawLine(g,...V[hot],...V[m2],AX[k],.95,1,isNode); }
-  node.forEach(([r,c],m)=>{ g.text(r,c-1,' '+m.toString(2).padStart(5,'0')+' ',.95,m===hot?1:0); });
-  return {cap:['mesh','= init_device_mesh("cuda", (2,2,2,2,2), ("dp","pp","tp","cp","ep"))']};
+  for(let m=0;m<32;m++)for(let k=0;k<5;k++){ const m2=m^(1<<k); if(m2<m||m===hot||m2===hot) continue;
+    drawLine(g,...V[m],...V[m2],AX[k],.66,0,isNode); }
+  for(let k=0;k<5;k++) drawLine(g,...V[hot],...V[hot^(1<<k)],AX[k],.84,1,isNode);
+  node.forEach(([r,c],m)=>g.text(r,c,' '+String(m).padStart(2,'0')+' ',.95,m===hot?1:0));
+  return {cap:['mesh','= init_device_mesh("cuda", (2, 2, 2, 2, 2), ("dp", "pp", "tp", "cp", "ep"))']};
 };
 
 // Context engineering: packing a finite window
 EMBLEM['ai-context-engineering']=function(g){
-  const hay='[kb/0412] rate limits apply per workspace · [log] 14:02:11 cache miss ratio 0.31 · [doc] migration guide v3 → v4 · [ticket] p95 latency regression after deploy · [wiki] onboarding checklist · [slack] can someone review the cache PR? · [log] 14:02:13 upstream timeout 3000ms · [doc] retry policy: exponential backoff, max 5 · [memo] Q3 infra budget · [kb/0977] webhook signatures · [log] GET /v1/orders 200 212ms · [doc] redis eviction policies explained · ';
+  const hay='[kb/0412] rate limits apply per workspace · [log] 14:02:11 cache miss ratio 0.31 · [doc] migration guide v3 to v4 · [ticket] p95 latency regression after deploy · [wiki] onboarding checklist · [slack] can someone review the cache PR? · [log] 14:02:13 upstream timeout 3000ms · [doc] retry policy: exponential backoff, max 5 · [memo] Q3 infra budget · [kb/0977] webhook signatures · [log] GET /v1/orders 200 212ms · [doc] redis eviction policies explained · ';
   g.stream(0,0,FR,COLS,hay,.05);
-  const r0=7, r1=FR, c0=8, c1=112;
-  g.fill(r0,c0,r1,c1,' ',-1);
-  // frame
-  for(let c=c0;c<c1;c++){ g.put(r0,c,' ',.95); }
-  const head=' CONTEXT WINDOW  ·  128,000 TOKENS  ·  127,406 USED ';
-  g.text(r0,c0+2,head,.95);
-  for(let r=r0;r<r1;r++){ g.put(r,c0,' ',.95); g.put(r,c1-1,' ',.95); }
+  const r0=6, r1=FR-1, c0=6, c1=114;
+  g.fill(r0,c0,r1+1,c1,' ',-1);
+  for(let c=c0;c<c1;c++){ g.put(r0,c,' ',.95); g.put(r1,c,' ',.95); }
+  for(let r=r0;r<=r1;r++){ g.put(r,c0,' ',.95); g.put(r,c0+1,' ',.95); g.put(r,c1-1,' ',.95); g.put(r,c1-2,' ',.95); }
+  g.text(r0,c0+3,'CONTEXT WINDOW  ·  128,000 TOKENS  ·  127,406 USED',.95);
+  const L=c0+4, R=c1-4, mid=L+46;
   const B=[
-    {l:'SYSTEM',r:r0+2,c:c0+3,h:6,w:98,t:.9,x:'You are the on-call assistant for the billing platform. Answer only from the documents and tool results provided in this context. Cite every claim as [doc:n] or [tool:n]. If the context does not contain the answer, say what is missing instead of guessing. Prefer short answers; show commands in code blocks; never run a destructive command without asking.'},
-    {l:'TOOLS',r:r0+9,c:c0+3,h:15,w:45,t:.62,x:'{"name": "search_logs", "description": "Full-text search over service logs", "input_schema": {"type": "object", "properties": {"query": {"type": "string"}, "since": {"type": "string"}, "limit": {"type": "integer"}}, "required": ["query"]}} {"name": "get_metric", "description": "Fetch a time series", "input_schema": {"type": "object", "properties": {"name": {"type": "string"}, "window": {"type": "string"}}}}'},
-    {l:'DOCS',r:r0+9,c:c0+51,h:9,w:50,t:.78,x:'[doc:1] The response cache sits in front of the orders service; entries expire after 300 s. [doc:2] Cache keys include the tenant id and the request path. [doc:3] On a miss the service calls the upstream ledger, p95 180 ms.'},
-    {l:'MEMORY',r:r0+19,c:c0+51,h:5,w:50,t:.5,x:'- user is on the payments team - prefers commands over prose - last week: rolled back cache v2 after key collisions'},
-    {l:'HISTORY',r:r0+25,c:c0+3,h:10,w:98,t:.4,x:'user: latency alarms again on orders. assistant: checking the dashboards [tool:1] p95 went from 190 ms to 410 ms at 13:58, right after deploy 8812. user: that deploy only touched the cache config. assistant: then misses are the first suspect; pulling the miss ratio [tool:2] 0.31, up from 0.04. user: so the cache is barely working? assistant: it is working, but on the wrong keys.'},
-    {l:'USER',r:r0+36,c:c0+3,h:4,w:62,t:.95,s:1,x:'why did p95 double after the cache change, and what is the smallest safe fix?'},
+    {l:'SYSTEM',r:r0+2,c:L,h:6,w:R-L,t:.9,x:'You are the on-call assistant for the billing platform. Answer only from the documents and tool results provided in this context. Cite every claim as [doc:n] or [tool:n]. If the context does not contain the answer, say exactly what is missing instead of guessing. Prefer short answers; show commands in code blocks; never run a destructive command without asking first; escalate to a human when a fix touches customer money. Timezone for all logs: UTC.'},
+    {l:'TOOLS',r:r0+9,c:L,h:16,w:mid-L-2,t:.62,x:'{"name": "search_logs", "description": "Full-text search over service logs", "input_schema": {"type": "object", "properties": {"query": {"type": "string"}, "since": {"type": "string"}, "limit": {"type": "integer"}}, "required": ["query"]}} {"name": "get_metric", "description": "Fetch a time series", "input_schema": {"type": "object", "properties": {"name": {"type": "string"}, "window": {"type": "string"}}, "required": ["name"]}} {"name": "diff_deploy", "description": "Show config changes in a deploy", "input_schema": {"type": "object", "properties": {"id": {"type": "string"}}}}'},
+    {l:'DOCS',r:r0+9,c:mid,h:10,w:R-mid,t:.8,x:'[doc:1] The response cache sits in front of the orders service; entries expire after 300 s. [doc:2] Cache keys are built from the tenant id and the request path; query strings are ignored unless listed in vary_on. [doc:3] On a miss the service calls the upstream ledger, p95 180 ms, which is rate limited to 2,000 requests per second per region. [doc:5] Config changes to vary_on take effect on the next deploy.'},
+    {l:'MEMORY',r:r0+20,c:mid,h:5,w:R-mid,t:.5,x:'- user is on the payments team - prefers commands over prose - last week: rolled back cache v2 after key collisions - staging mirrors prod config'},
+    {l:'HISTORY',r:r0+26,c:L,h:11,w:R-L,t:.4,x:'user: latency alarms again on orders. assistant: checking the dashboards [tool:1] p95 went from 190 ms to 410 ms at 13:58, right after deploy 8812. user: that deploy only touched the cache config. assistant: then misses are the first suspect; pulling the miss ratio [tool:2] 0.31, up from 0.04. user: so the cache is barely working? assistant: it is working, but on the wrong keys: [tool:3] deploy 8812 added the session cookie to vary_on, so every user now gets a private copy of every response. user: which endpoints are affected? assistant: all GET routes under /v1/orders; the ledger is absorbing the misses, which is why p95 doubled rather than failing outright. user: can we just drop the cookie from vary_on? assistant: yes for anonymous routes; two authenticated routes render per-user totals and need the user id in the key instead. user: ok, what else? assistant: purge the cache after the fix so the private copies do not linger for the full 300 s.'},
   ];
   for(const b of B){
-    g.fill(b.r,b.c,b.r+b.h,b.c+b.w,' ',b.s?.95:-1,b.s||0);
-    g.text(b.r,b.c,' '+b.l+' ',.95,b.s||0);
-    g.flow(b.r,b.c+b.l.length+3,b.r+b.h,b.c+b.w,b.x,b.t,b.s||0);
+    g.text(b.r,b.c,' '+b.l+' ',.95);
+    g.flow(b.r,b.c+b.l.length+3,b.r+b.h,b.c+b.w,b.x,b.t);
   }
-  // free budget remainder
-  const fr=r0+36, fc=c0+3+64;
-  for(let r=fr;r<fr+4;r++)for(let c=fc;c<c1-3;c++) g.put(r,c,(c+r)%2?' ':'·',.3);
-  g.text(fr+1,fc+3,' 594 free ',.62);
-  // a block that did not fit, hanging over the frame
-  const ob={r:1,c:70,h:5,w:40};
+  const ur=r0+38, uw=64;
+  g.fill(ur,L,r1-1,L+uw,' ',.95,1);
+  g.text(ur,L,' USER ',.95,1);
+  g.flow(ur,L+7,r1-1,L+uw-1,'why did p95 double after the cache change, and what is the smallest safe fix?',.95,1);
+  for(let r=ur;r<r1-1;r++)for(let c=L+uw+2;c<R;c++) g.put(r,c,(c+r)%2?' ':'·',.34);
+  g.text(ur+1,L+uw+5,' 594 tokens free ',.7);
+  // a document that did not fit: dashed outline above the window
+  const ob={r:0,c:62,h:5,w:50};
   g.fill(ob.r,ob.c,ob.r+ob.h,ob.c+ob.w,' ',-1);
-  g.text(ob.r,ob.c,' DOCS[4] ',.95);
-  g.flow(ob.r,ob.c+10,ob.r+ob.h,ob.c+ob.w,'[doc:4] Full changelog for releases 8700 to 8812, 41,220 tokens. Dropped: over budget.',.35);
+  for(let c=ob.c;c<ob.c+ob.w;c++){ if(c%2===0){ g.put(ob.r+ob.h-1,c,'-',.62); g.put(ob.r,c,'-',.62);} }
+  for(let r=ob.r;r<ob.r+ob.h;r++){ g.put(r,ob.c,'¦',.62); g.put(r,ob.c+ob.w-1,'¦',.62); }
+  g.text(ob.r+1,ob.c+2,' DOCS[4] ',.95);
+  g.flow(ob.r+1,ob.c+12,ob.r+ob.h-1,ob.c+ob.w-2,'Full changelog, releases 8700 to 8812 · 41,220 tokens · not packed: over budget',.5);
   return {cap:['ctx','= pack(system, tools, docs, memory, history, user, budget=128_000)']};
 };
 
 // Context compaction: three transcripts squeezed into memory
 EMBLEM['pi-vs-hermes-vs-codex']=function(g){
-  const STOP=new Set('the a an to of that so it is and for in on with can you please we i be this was are as at by from into then now just also there be will would could should my our your'.split(' '));
+  const STOP=new Set('the a an to of that so it is and for in on with can you please we i be this was are as at by from into then now just also there will would could should my our your its which when what'.split(' '));
   const cw=(w,L)=>{ if(L>=1&&STOP.has(w.toLowerCase().replace(/[^a-z]/g,''))) return null;
     if(L>=2&&w.length>3) w=w[0]+w.slice(1).replace(/[aeiou]/gi,'');
     if(L>=3) w=w.slice(0,5); return w; };
   const T=[
-    'user: the build fails on the parser branch, can you take a look? assistant: running the tests first. tool: pytest -q: 3 failed, 41 passed. assistant: the lexer returns bytes where the parser expects str; patching lexer.py and running again. tool: 44 passed. user: great, now make it stream the file instead of loading all of it into memory. assistant: switching read() to an iterator over chunks, keeping a small carry buffer for tokens split across chunk boundaries. tool: 46 passed, peak memory 38 MB, down from 1.2 GB.',
-    'user: add retries to the payment webhook handler, it drops events when the ledger is slow. assistant: reading handler.py and the queue config. tool: grep retry: no matches. assistant: adding exponential backoff with jitter, max five attempts, and an idempotency key so a retried event is never applied twice. tool: 12 passed. user: what happens after the fifth failure? assistant: the event goes to the dead letter queue with the last error attached, and an alert fires.',
-    'user: the nightly ingest job got slow after yesterday\'s merge, can you profile it? assistant: running it with the profiler on a one percent sample. tool: 71 percent of time in normalize_rows. assistant: the merge replaced a vectorised call with a python loop over every row. restoring the vectorised path and adding a benchmark so it cannot regress silently. tool: sample run 4.1 s, was 58 s. user: ship it.',
+    'user: the build fails on the parser branch, can you take a look? assistant: running the tests first. tool: pytest -q: 3 failed, 41 passed. assistant: the lexer returns bytes where the parser expects str; patching lexer.py and running again. tool: 44 passed. user: great, now make it stream the file instead of loading all of it into memory. assistant: switching read() to an iterator over chunks, with a small carry buffer for tokens split across chunk boundaries. tool: 46 passed, peak memory 38 MB, down from 1.2 GB. user: add a test for a token split exactly at a boundary. assistant: added test_split_token with chunk sizes 1, 2 and 7. tool: 47 passed. user: commit it. assistant: committed as stream the lexer input; 3 files changed.',
+    'user: add retries to the payment webhook handler, it drops events when the ledger is slow. assistant: reading handler.py and the queue config. tool: grep retry: no matches. assistant: adding exponential backoff with jitter, at most five attempts, and an idempotency key so a retried event is never applied twice. tool: 12 passed. user: what happens after the fifth failure? assistant: the event goes to the dead letter queue with the last error attached, and an alert fires. user: and replays? assistant: a replay command reads the dead letter queue in order and reuses the same idempotency keys. tool: 15 passed. user: ship it behind a flag.',
+    'user: the nightly ingest job got slow after yesterday\'s merge, can you profile it? assistant: running it with the profiler on a one percent sample. tool: 71 percent of time in normalize_rows. assistant: the merge replaced a vectorised call with a python loop over every row. restoring the vectorised path and adding a benchmark so it cannot regress silently. tool: sample run 4.1 s, was 58 s. user: why did review miss it? assistant: the diff was large and the loop looked equivalent; the benchmark now fails the build if the sample run exceeds 8 s. user: good, ship it.',
   ];
-  const prof=[u=>1-.86*u, u=>1-.86*Math.pow(u,2.2), u=>u<.34?1:u<.68?.6:.2];
-  const centers=[20,60,100], W0=36, rows=FR-4;
+  const prof=[u=>1-.84*u, u=>1-.84*Math.pow(u,1.7), u=>1-.84*Math.pow(u,.62)];
+  const centers=[20,60,100], W0=38, rows=FR-4;
   T.forEach((txt,f)=>{
     const words=txt.split(/\s+/); let wi=0;
     for(let r=0;r<rows;r++){
-      const u=r/(rows-1), w=Math.max(4,Math.round(W0*prof[f](u)/2)*2), L=Math.min(3,Math.floor(u*4.2));
-      const t=.28+.62*u, c0=centers[f]-w/2;
+      const u=r/(rows-1), w=Math.max(6,Math.round(W0*prof[f](u)/2)*2), L=Math.min(3,Math.floor(u*4.2));
+      const t=.26+.58*u, c0=centers[f]-w/2;
       let line='', guard=0;
       while(guard++<200){
         const raw=words[wi%words.length]; const x=cw(raw,L); wi++;
         if(x===null) continue;
         const add=(line?(L>=3?'·':' '):'')+x;
-        if((line+add).length>w){ wi--; break; }
+        if((line+add).length>w){ if(!line){ line=x.slice(0,w); } else wi--; break; }
         line+=add;
       }
-      line=line.padEnd(w,' ');
-      g.text(r,c0,line,t>.86?.84:t);
+      const pad=w-line.length, lp=Math.floor(pad/2);
+      g.text(r,c0,' '.repeat(lp)+line+' '.repeat(pad-lp),t);
     }
     const mw=8, mc=centers[f]-mw/2;
-    for(let r=rows;r<FR;r++) g.fill(r,mc,r+1,mc+mw,' ',.95,1);
+    g.fill(rows,mc,FR,mc+mw,' ',.95,1);
     g.text(rows+1,mc+1,'MEMORY',.95,1);
   });
   return {cap:['ctx','= compact(history) if tokens(history) > limit else history']};
+};
+
+// Decision tree on iris: every leaf region is textured with its own rule
+EMBLEM['decision-trees-from-scratch']=function(g){
+  const col=pl=>Math.round((pl-1)/6*COLS), row=pw=>Math.round(FR-pw/2.6*FR);
+  const a=col(2.45), b=row(1.75), c=col(4.95), d=col(4.85);
+  const leaves=[
+    {r0:0,r1:FR,c0:0,c1:a,cls:'setosa',t:.26,rule:'petal_length <= 2.45 -> setosa'},
+    {r0:b+1,r1:FR,c0:a+2,c1:c,cls:'versicolor',t:.5,rule:'length > 2.45 & width <= 1.75 & length <= 4.95 -> versicolor'},
+    {r0:b+1,r1:FR,c0:c+2,c1:COLS,cls:'virginica',t:.74,rule:'length > 4.95 & width <= 1.75 -> virginica'},
+    {r0:0,r1:b,c0:a+2,c1:d,cls:'virginica',t:.74,rule:'width > 1.75 & length <= 4.85 -> virginica'},
+    {r0:0,r1:b,c0:d+2,c1:COLS,cls:'virginica',t:.74,rule:'width > 1.75 & length > 4.85 -> virginica'},
+  ];
+  for(const L of leaves) g.stream(L.r0,L.c0,L.r1,L.c1,L.rule+'  ·  ',L.t);
+  // splits
+  for(let r=0;r<FR;r++){ g.put(r,a,' ',.95,1); g.put(r,a+1,' ',.95,1); }
+  for(let c=a+2;c<COLS;c++) g.put(b,c,' ',.95);
+  for(let r=b+1;r<FR;r++){ g.put(r,c,' ',.95); g.put(r,c+1,' ',.95); }
+  for(let r=0;r<b;r++){ g.put(r,d,' ',.95); g.put(r,d+1,' ',.95); }
+  // split labels
+  g.text(3,a+3,' petal_length <= 2.45 ',.95,1);
+  g.text(b,a+4,' petal_width <= 1.75 ',.95);
+  g.text(b+3,c+3,' petal_length <= 4.95 ',.95);
+  g.text(3,d+3,' petal_length <= 4.85 ',.95);
+  return {cap:['tree','= DecisionTreeClassifier(max_depth=3).fit(iris[["petal_length", "petal_width"]], y)']};
+};
+
+// Kernel engineering: one tile of a tiled GEMM
+EMBLEM['kernel-engineering']=function(g){
+  const R=rng(9);
+  const h16=()=>{ const v=(R()*2-1)*1.5; const sgn=v<0?0x8000:0; const a=Math.abs(v)||1e-3; let e=Math.floor(Math.log2(a)); const m=Math.round((a/Math.pow(2,e)-1)*1024)&1023; return ((sgn|((e+15)<<10)|m)>>>0).toString(16).padStart(4,'0'); };
+  // tile geometry: values are 5 cols wide; a tile is 3 values x 4 rows, gutters 1 col / 1 row
+  const TW=16, TH=5; // tile pitch
+  const mat=(r0,c0,nr,nc,tone)=>{ // nr, nc in tiles
+    for(let ti=0;ti<nr;ti++)for(let tj=0;tj<nc;tj++){
+      const t=tone(ti,tj);
+      for(let rr=0;rr<TH-1;rr++)for(let v=0;v<3;v++) g.text(r0+ti*TH+rr,c0+tj*TW+v*5,h16()+' ',typeof t==='number'?t:t[0],typeof t==='number'?0:t[1]);
+    }
+  };
+  const I=2, J=3, K=0; // active output tile, current k-step
+  // B: top right, 3 tile-rows x 5 tile-cols ; A: bottom left, 6 x 2 ; C: bottom right 6 x 5
+  // wait: A is M x K, B is K x N. K tiles = 3 here.
+  const cB=40, rA=19;
+  const BLUE=[.95,1], BLK=.95;
+  mat(2,cB,3,5,(ti,tj)=> tj===J ? (ti===K?BLUE:BLK) : .3);
+  mat(rA,0,6,2,(ti,tj)=> ti===I ? (tj===K?BLUE:BLK) : .3);
+  mat(rA,cB,6,5,(ti,tj)=> ti===I&&tj===J ? BLUE : ti<I||(ti===I&&tj<J) ? .56 : .1);
+  g.text(rA-2,0,' A[M, K] ',.95); g.text(2,cB-10,' B[K, N] ',.95); g.text(rA-2,cB,' C[M, N] ',.95); g.text(rA-2,cB+10,'+= A[i, k] @ B[k, j]',.62);
+  return {cap:['acc','+= tl.dot(a_tile, b_tile)   # fp16 tiles, fp32 accumulator, one C tile per program']};
+};
+
+// ─── Charlie and the Intelligence Factory: a sub-series, one tmux window per room
+const ROOMS=['language','vision','sound','reasoning'];
+function seriesBand(g,active){
+  g.fill(0,0,4,COLS,' ',.95);
+  g.text(2,6,'CHARLIE AND THE INTELLIGENCE FACTORY',.95);
+  let c=COLS-6; const tabs=ROOMS.map((n,i)=>` ${i+1}:${n}${i===active?'*':' '}`);
+  c-=tabs.reduce((a,t)=>a+t.length,0);
+  tabs.forEach((t,i)=>{ if(i===active) g.fill(1,c,4,c+t.length,' ',.95,1); g.text(2,c,t,.95,i===active?1:0); c+=t.length; });
+}
+
+// I · Language room: the roofline. Every column prints what it can attain.
+EMBLEM['charlie-language-room']=function(g){
+  seriesBand(g,0);
+  const PEAK=989, BW=3.35, x0=4, x1=116, top=7, base=46; // log2 intensity 0..12
+  const col=I=>Math.round(x0+(Math.log2(I))/12*(x1-x0));
+  const rowOf=v=>Math.round(base-(Math.log2(v)-Math.log2(BW*.8))/(Math.log2(PEAK)-Math.log2(BW*.8))*(base-top));
+  for(let r=5;r<FR;r++)for(let c=0;c<COLS;c++) g.put(r,c,(r%2===0&&c%4===0)?'·':' ',.05);
+  let prevR=null; const roof=[];
+  for(let c=x0;c<=x1;c++){
+    const I=Math.pow(2,(c-x0)/(x1-x0)*12), v=Math.min(PEAK,BW*I), r=rowOf(v); roof.push(r);
+    const lo=prevR===null?r:Math.min(r,prevR), hi=prevR===null?r:Math.max(r,prevR);
+    for(let rr=lo;rr<=hi;rr++) g.put(rr,c,' ',.95);
+    prevR=r;
+  }
+  // under the roof: each row names the throughput it stands for
+  for(let rr=top;rr<base;rr++){
+    const v=Math.exp(Math.log(BW*.8)+(base-rr)/(base-top)*(Math.log(PEAK)-Math.log(BW*.8)));
+    const lab=(v>=100?Math.round(v):v>=10?v.toFixed(0):v.toFixed(1))+' TFLOP/s · ';
+    let k=0;
+    for(let c=x0;c<=x1;c++){ if(roof[c-x0]>=rr) continue; const q=g.get(rr,c); if(q.t>=.86) continue; g.put(rr,c,lab[k%lab.length],.5+.3*(rr-top)/(base-top)); k++; }
+  }
+  // axis
+  for(let c=x0;c<=x1;c++) g.put(base,c,(c-x0)%Math.round((x1-x0)/12)===0?'+':'-',.8);
+  [1,4,16,64,256,1024,4096].forEach(I=>{ const s=String(I); g.text(base+1,col(I)-Math.floor(s.length/2),s,.7); });
+  g.text(base+2,x1-24,'FLOP / byte  (log2)',.62);
+  g.text(8,x0,'TFLOP/s',.62);
+  // operating points
+  const pt=(I,label,s)=>{ const c=col(I), r=rowOf(Math.min(PEAK,BW*I)); g.text(r-2,Math.min(COLS-4-label.length,Math.max(4,c-Math.floor(label.length/2))),label,.95,s); g.put(r-1,c,'|',.95,s); };
+  pt(1,' decode b=1 ',0); pt(8,' b=8 ',0); pt(64,' b=64 ',0); pt(295,' ridge 295 ',1); pt(2048,' prefill 2k tok ',0);
+  return {cap:['tflops','= min(989, 3.35 * intensity)   # H100 roofline: decode is memory-bound']};
+};
+
+// II · Vision room: an eye, cut into patches
+EMBLEM['charlie-vision-room']=function(g){
+  seriesBand(g,1);
+  const cx=360, cy=5*CH+282;
+  const f=(x,y)=>{
+    const dx=(x-cx)/330, u=Math.abs(dx);
+    const up=cy-165*(1-dx*dx)*(1-.12*dx), lo=cy+118*(1-dx*dx)*(1+.05*dx);
+    const brow=cy-218+ (dx*dx)*70 - 12*dx;
+    let t=.17;
+    if(Math.abs(y-brow)<16-10*u && u<.95) t=.92;
+    if(u<1 && y>up && y<lo){
+      t=.02;
+      const d=Math.hypot(x-cx,y-(cy-10));
+      if(d<138){ const th=Math.atan2(y-cy,x-cx); t=.66+.16*Math.sin(th*19)+.16*(d/138); }
+      if(d>126&&d<138) t=.95;
+      if(d<58) t=.97;
+      if(Math.hypot(x-(cx+34),y-(cy-46))<17) t=.0;
+    }
+    if(u<1.03 && y<=up && y>up-18+8*u) t=.97;
+    if(u<1 && y>=lo && y<lo+8) t=.62;
+    return t;
+  };
+  const PW=9, PH=5, c0=2, r0=5;
+  const hot=[4,8];
+  for(let pi=0;pi<9;pi++)for(let pj=0;pj<13;pj++){
+    const isHot=pi===hot[0]&&pj===hot[1];
+    for(let rr=0;rr<4;rr++)for(let v=0;v<3;v++){
+      const r=r0+pi*PH+rr, c=c0+pj*PW+v*3;
+      const t=f((c+1)*CW,(r+.5)*CH), b=Math.round(clamp(t)*255).toString(16).padStart(2,'0');
+      const cell=(v<2?b+' ':b.slice(0,2)), tt=t>=.86?.95:t<.06?.03:.14+t*.7;
+      g.text(r,c,cell,isHot?Math.max(.45,tt):tt,isHot?1:0);
+    }
+  }
+  return {cap:['tokens','= patchify(img, 16) @ W_embed + pos   # 13 x 9 patches -> 117 tokens']};
+};
+
+// III · Sound room: a user turn and an agent turn, each column made of the letter being spoken
+EMBLEM['charlie-sound-room']=function(g){
+  seriesBand(g,2);
+  const mid=28, amp=20, R=rng(8);
+  const turn=(txt,c0,c1,s)=>{
+    const dur=[...txt].map(ch=>/[aeiou]/.test(ch)?1.6:/[a-z]/.test(ch)?1:ch===' '?.7:.5);
+    const tot=dur.reduce((a,b)=>a+b,0), sc=(c1-c0)/tot; let x=c0; const cols=[];
+    [...txt].forEach((ch,i)=>{ const w=dur[i]*sc; for(let c=Math.round(x);c<Math.round(x+w);c++) cols.push([c,ch]); x+=w; });
+    let prev=0;
+    cols.forEach(([c,ch],i)=>{
+      const base=/[aeiou]/.test(ch)?.95:/[mnlrwy]/.test(ch)?.62:/[a-z]/.test(ch)?.42:/[?.,]/.test(ch)?.05:.08;
+      const a=.55*base+.45*prev; prev=base;
+      const h=Math.max(0,Math.round(amp*a*(.8+.3*R())*Math.min(1,(i+2)/5,(cols.length-i+1)/5)));
+      for(let dr=-h;dr<=h;dr++){ const t=Math.abs(dr)<=h*.45?.95:.7-.3*Math.abs(dr)/(h+1); g.put(mid+dr,c,ch,t,s); }
+      if(h===0) g.put(mid,c,'-',.4,s);
+    });
+  };
+  for(let c=0;c<COLS;c++) g.put(mid,c,'-',.3);
+  turn('can you move my dentist appointment to friday?',2,58,0);
+  turn('sure. friday at ten is free. shall i book it?',65,118,1);
+  g.text(49,2,' USER  0.0-2.4 s ',.95); g.text(49,58,'240 ms',.7); g.text(49,65,' AGENT  2.6-4.9 s ',.95,1);
+  return {cap:['reply','= tts(llm(asr(mic)))   # user turn · 240 ms · agent turn']};
+};
+
+// IV · Reasoning room: sampled chains of thought, rewarded by the answer
+EMBLEM['charlie-reasoning-room']=function(g){
+  seriesBand(g,3);
+  for(let r=5;r<FR;r++)for(let c=0;c<COLS;c++) g.put(r,c,(r%2===0&&c%4===0)?'·':' ',.05);
+  const L1=[['17x20 + 17x4',['340 + 68','408'],['340 + 64','404']],
+            ['20x24 - 3x24',['480 - 72','408'],['480 - 62','418']],
+            ['17x25 - 17',['425 - 17','408'],['425 - 7','418']],
+            ['10x24 + 7x24',['240 + 168','408'],['240 + 148','388']]];
+  const X=[15,45,75,105], R0=7, R1=17, R2=28, R3=37, R4=43;
+  const chip=(r,x,t,tone,s)=>{ const w=t.length+2; g.text(r,x-Math.floor(w/2),' '+t+' ',tone,s); };
+  const vline=(c,r0,r1,s)=>{ for(let r=r0;r<=r1;r++) g.put(r,c,'|',s?.84:.72,s?1:0); };
+  const hline=(r,c0,c1,s)=>{ for(let c=Math.min(c0,c1);c<=Math.max(c0,c1);c++) g.put(r,c,c===c0||c===c1?'+':'-',s?.84:.72,s?1:0); };
+  const HOT=[0,0];
+  // root -> approaches
+  vline(60,R0+1,R0+4,1); hline(R0+5,X[0],X[3],0); hline(R0+5,X[0],60,1);
+  X.forEach((x,i)=>vline(x,R0+6,R1-1,i===HOT[0]));
+  L1.forEach((a,i)=>{
+    const x=X[i], hot=i===HOT[0];
+    vline(x,R1+1,R1+4,hot); hline(R1+5,x-7,x+7,0); if(hot) hline(R1+5,x-7,x,1);
+    [a[1],a[2]].forEach((ch,j)=>{
+      const cx=x+(j?7:-7), h=hot&&j===HOT[1], ok=ch[1]==='408';
+      vline(cx,R1+6,R2-1,h); chip(R2,cx,ch[0],.95,h?1:0);
+      vline(cx,R2+1,R3-1,h); chip(R3,cx,ch[1],ok?.95:.6,h?1:0);
+      vline(cx,R3+1,R4-1,h); chip(R4,cx,ok?'+1':'0',ok?.95:.6,h?1:0);
+    });
+    chip(R1,x,a[0],.95,hot?1:0);
+  });
+  chip(R0,60,'Q: 17 x 24 = ?',.95,1);
+  g.text(47,2,'reward = 1 if answer == 408 else 0   ·   advantage = reward - mean(group)',.62);
+  return {cap:['loss','= -(advantage * logprob(chain)).mean()   # sample a group, reinforce the right ones']};
 };
 
 // ─── books ───────────────────────────────────────────────────────────────
@@ -312,7 +497,19 @@ const BOOKS=[
   {slug:'ai-context-engineering', level:'intermediate', meta:'43 capsules · 10 h',
    title:[['AI Context','Engineering'],6]},
   {slug:'pi-vs-hermes-vs-codex', level:'advanced', meta:'9 capsules · 1 h',
-   title:[['Pi vs Hermes','vs Codex:','Context Compaction','and Memory'],5]},
+   title:[['Pi vs Hermes','vs Codex:'],5,['Context Compaction and Memory']]},
+  {slug:'decision-trees-from-scratch', level:'beginner', meta:'23 capsules · 5 h',
+   title:[['Build Decision','Trees from Scratch'],5]},
+  {slug:'kernel-engineering', level:'advanced', meta:'coming soon', soon:true,
+   title:[['Kernel','Engineering'],6,['From silicon to speculative decoding —','GPU kernels for modern LLMs.'],2.4]},
+  {slug:'charlie-language-room', level:'advanced', meta:'22 capsules · 5 h',
+   title:[['Charlie and the','Language Room'],5,['Inference Engineering']]},
+  {slug:'charlie-vision-room', level:'intermediate', meta:'20 capsules · 6 h',
+   title:[['Charlie and the','Vision Room'],5,['Vision Transformers']]},
+  {slug:'charlie-sound-room', level:'intermediate', meta:'20 capsules · 6 h',
+   title:[['Charlie and the','Sound Room'],5,['Voice Agents']]},
+  {slug:'charlie-reasoning-room', level:'advanced', meta:'21 capsules · 6 h',
+   title:[['Charlie and the','Reasoning Room'],5,['Reinforcement Learning,','from bandits to reasoning models']]},
 ];
 const PROMPT={beginner:'>',intermediate:'$',advanced:'#'};
 
@@ -322,16 +519,16 @@ function build(b){
   const info=EMBLEM[b.slug](g)||{};
   const parts=[];
   const M=6, T0=56;
-  const [lines,k]=b.title, TX=M+2*k;
-  lines.forEach((ln,i)=>{
-    const r=T0+i*k;
-    parts.push(`<div class="tl" style="left:${TX*CW}px;top:${(r*CH).toFixed(1)}px;font-size:${k*10}px;line-height:${(k*CH).toFixed(1)}px">${esc(ln)}</div>`);
-  });
+  const [lines,k,sub,sk=3]=b.title, TX=M+2*k;
+  let r=T0;
+  const line=(txt,kk,cls)=>{ parts.push(`<div class="tl ${cls||''}" data-k="${kk}" style="left:${TX*CW}px;top:${(r*CH).toFixed(1)}px;font-size:${kk*10}px;line-height:${(kk*CH).toFixed(1)}px">${esc(txt)}</div>`); r+=kk; };
+  lines.forEach(ln=>line(ln,k));
+  if(sub){ r+=1; sub.forEach(ln=>line(ln,sk,'sub')); }
   parts.push(`<div class="pr" style="left:${M*CW}px;top:${(T0*CH).toFixed(1)}px;font-size:${k*10}px;line-height:${(k*CH).toFixed(1)}px">${esc(PROMPT[b.level])}</div>`);
   // cursor: measured after fonts load
-  parts.push(`<div class="cur" data-k="${k}"></div>`);
+  parts.push(`<div class="cur${b.soon?' soon':''}"></div>`);
   if(info.cap) parts.push(`<div class="cap" style="left:${M*CW}px;top:${(52.5*CH).toFixed(1)}px"><b>${esc(info.cap[0])}</b> ${esc(info.cap[1])}</div>`);
-  parts.push(`<div class="foot im" style="left:${M*CW}px;top:${(76*CH).toFixed(1)}px">VIZUARA BOOKS</div>`);
+  parts.push(`<div class="foot im" style="left:${M*CW}px;top:${(76*CH).toFixed(1)}px">VIZUARA BOOKS<i></i></div>`);
   parts.push(`<div class="foot" style="right:${M*CW}px;top:${(76*CH).toFixed(1)}px"><b>${esc(PROMPT[b.level])}</b> ${b.level.toUpperCase()}  ·  ${esc(b.meta.toUpperCase())}</div>`);
   el.innerHTML=`<div class="field">${g.html()}</div>`+parts.join('');
   return el;
@@ -342,7 +539,7 @@ for(const b of BOOKS) host.appendChild(build(b));
 document.fonts.ready.then(()=>{
   document.querySelectorAll('.cover').forEach(cv=>{
     const tls=cv.querySelectorAll('.tl'), last=tls[tls.length-1], cur=cv.querySelector('.cur');
-    const k=+cur.dataset.k, fs=k*10;
+    const k=+last.dataset.k, fs=k*10;
     const x=last.offsetLeft+last.getBoundingClientRect().width;
     const lh=k*CH, top=last.offsetTop;
     cur.style.left=(x+fs*.18).toFixed(1)+'px';
