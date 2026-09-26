@@ -53,6 +53,7 @@ body{
   font-family:'Archivo';font-weight:900;font-stretch:125%;font-size:15px;letter-spacing:.16em;line-height:1.15;text-align:center;text-transform:uppercase}
 .stamp small{display:block;font-family:'IBM Plex Mono';font-weight:600;font-size:10.5px;letter-spacing:.12em}
 
+@media print{ .cover,.face,.wrap,.sheet{box-shadow:none !important} body{background:none} }
 /* ================= PAGE ================= */
 .page{max-width:1640px;margin:0 auto;padding:64px 48px 140px}
 .sheet{background:var(--sheet);color:var(--sheetink);border-radius:4px;padding:56px 64px 60px;box-shadow:0 18px 40px rgba(0,0,0,.35);position:relative}
@@ -84,6 +85,18 @@ h3.k{font-family:'IBM Plex Mono';font-weight:600;font-size:12px;letter-spacing:.
 .wrapbox{display:flex;justify-content:center;margin-top:40px;overflow-x:auto}
 .thumbs{display:flex;flex-wrap:wrap;gap:22px 18px;margin-top:34px;background:#F4F1EA;padding:28px;border-radius:4px}
 .thumbs img{width:180px;height:222px;display:block;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+
+/* ================= SHELF ================= */
+.spines{display:flex;justify-content:center;margin-top:36px;padding:0 0 14px;border-bottom:14px solid #6B5A45;box-shadow:0 22px 30px -18px rgba(0,0,0,.5)}
+.mini{position:relative;width:29px;height:440px;background:var(--card);color:var(--ink);flex:none;box-shadow:inset -1px 0 0 rgba(0,0,0,.28), inset 1px 0 0 rgba(255,255,255,.07)}
+.mini .mb{position:absolute;left:0;right:0;top:0;height:46px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:6px;font-family:'IBM Plex Mono';font-weight:600;font-size:9px;letter-spacing:.02em}
+.mini .mp{position:absolute;top:54px;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:2px}
+.mini .mp s{display:block;width:7px;height:7px;border:1.6px solid var(--ink);border-radius:1px}
+.mini .mp s.on{background:var(--ink)}
+.mini .mt{position:absolute;top:88px;bottom:40px;left:0;right:0;display:flex;justify-content:center;align-items:flex-start}
+.mini .mt span{writing-mode:vertical-rl;font-family:'Archivo';font-weight:800;font-stretch:100%;font-size:12.5px;line-height:1;white-space:nowrap;letter-spacing:-.005em}
+.mini .mm{position:absolute;bottom:12px;left:0;right:0;display:flex;justify-content:center}
+.mini .mm svg{width:17px;height:17px}
 
 /* ================= WRAP ================= */
 .wrap{position:relative;width:1512px;height:888px;display:flex;flex:none;background:var(--card);color:var(--ink);box-shadow:0 18px 40px rgba(0,0,0,.35)}
@@ -151,7 +164,7 @@ h3.k{font-family:'IBM Plex Mono';font-weight:600;font-size:12px;letter-spacing:.
 
   <section class="section">
     <h2>Range</h2>
-    <p>A beginner book, the shortest title, the longest title, and a coming-soon test shot.</p>
+    <p>A beginner book, the shortest title, the longest title, the remaining plastics (Viridian on Grey Primer, Violet on Carbon), and a coming-soon test shot.</p>
     <div class="shelf" id="range"></div>
   </section>
 
@@ -165,6 +178,12 @@ h3.k{font-family:'IBM Plex Mono';font-weight:600;font-size:12px;letter-spacing:.
     <h2>Full wrap · VZ-004</h2>
     <p>The back cover carries the assembly instructions, with each step built from the same parts as the front. On the spine, the kit number and level pips sit where they can be read on a shelf.</p>
     <div class="wrapbox" id="wrapbox"></div>
+  </section>
+
+  <section class="section">
+    <h2>The whole library · 52 kits on one shelf</h2>
+    <p>Every book in the catalogue has a kit number, a series plastic (the band at the top of the spine) and a level card. The three coming-soon titles are clear test shots, and the Charlie books sit together on cocoa. Shelved by series and then by level, the library sorts itself into bands of colour and still reads as one family.</p>
+    <div class="spines" id="spines"></div>
   </section>
 
   <section class="section">
@@ -352,10 +371,11 @@ EMBLEMS['mathematical-foundations-for-ml'] = (S,b) => {
     mu:    ()=>[['s','M-20 -28L-20 42M-20 6C-20 30 18 30 18 6M18 -28L18 22C18 30 24 33 30 29']],
   };
   const order=['sum','int','del','nabla','pi','lambda','theta','sqrt','mat','e','inf','mu'];
+  const reach={sum:2,int:-2,del:-24,nabla:-16,pi:-14,lambda:-4,theta:-24,sqrt:-24,mat:-36,e:-24,inf:-38,mu:-18};
   order.forEach((k,i)=>{
     const c=i%4, r=Math.floor(i/4), cx=6+cw*c+cw/2, cy=6+ch*r+ch/2+2;
     const gsx = c===0 ? 6 : 6+cw*c;
-    S.gate(gsx,cy,cx-22,cy,3.6);
+    S.gate(gsx,cy,cx+reach[k],cy,3.6);
     for(const it of sym[k]()){
       if(it[0]==='s') S.rod(it[1].replace(/(-?\d+\.?\d*) (-?\d+\.?\d*)/g,(m,a,bb)=>`${f(+a+cx)} ${f(+bb+cy)}`),12);
       else S.disc(cx+it[1],cy+it[2],it[3]);
@@ -651,6 +671,62 @@ EMBLEMS['charlie-reasoning-room'] = (S,b) => {
   q.forEach((v,i)=>{ const x=lx+10+i*38, hh=v*330; S.gate(x+6,base,x+6,base+14,3.6); S.part(lolly(x+6,base-hh-8,16,6,base)); S.text(x+6,base-hh-3,String(i+1),{size:12,wt:800}); });
 };
 
+
+/* Modern Robot Learning — a robot-arm kit: base, two links, servo horns,
+   gripper jaws with their gear, and a demonstrated trajectory to learn from. */
+EMBLEMS['modern-robot-learning'] = (S,b) => {
+  baseFrame(S,b);
+  S.runner([[6,112],[W-6,112]],7); S.runner([[6,236],[W-6,236]],7); S.runner([[392,6],[392,FB]],7);
+  const link=(x,y,w,h,label)=>{ const r=h/2; let d=rr(x,y,w,h,r)+circ(x+r,y+r,r*.42)+circ(x+w-r,y+r,r*.42); for(let i=1;i<=3;i++) d+=circ(x+r+i*(w-2*r)/4,y+r,r*.2); S.part(d,'evenodd'); S.text(x+w/2,y+r+4,label,{size:10,wt:900,wd:125,ls:.14}); };
+  S.gate(80,56,80,112,3.6); S.gate(300,56,300,112,3.6); link(34,34,330,50,'');
+  S.gate(80,140,80,112,3.6); S.gate(250,140,250,112,3.6); link(34,142,264,44,'');
+  // base plate with bolt holes
+  const bx=128, by=336, br=78; let bd=circ(bx,by,br)+circ(bx,by,24); for(let k=0;k<6;k++){ const a=k*Math.PI/3; bd+=circ(bx+54*Math.cos(a),by+54*Math.sin(a),7); }
+  S.gate(bx,236,bx,by-br,4); S.gate(bx-br,by,6,by,4); S.part(bd,'evenodd');
+  // servo horns
+  [[268,300],[268,392],[340,346]].forEach(([x,y],i)=>{ S.gate(392,y,x+26,y,3.4); let d=circ(x,y,27)+circ(x,y,8); for(let k=0;k<4;k++){ const a=k*Math.PI/2+Math.PI/4; d+=circ(x+17*Math.cos(a),y+17*Math.sin(a),3.2); } S.part(d,'evenodd'); });
+  // gripper jaws (mirrored) + their drive gear
+  const jaw=[[0,0],[118,0],[150,14],[166,44],[150,48],[132,24],[112,20],[0,20]];
+  S.gate(452,112,452,40,3.4); S.part(poly(tr(jaw,410,26,0,.85)));
+  S.gate(452,112,452,186,3.4); S.part(poly(tr(jaw.map(([x,y])=>[x,-y]),410,202,0,.85)));
+  const gx=598, gy=166; let gd=''; const teeth=12; for(let k=0;k<teeth*2;k++){ const a=k*Math.PI/teeth, r=k%2?23:31; gd+=(k?'L':'M')+f(gx+r*Math.cos(a))+' '+f(gy+r*Math.sin(a)); } S.gate(gx,112,gx,gy-24,3.4); S.part(gd+'Z'+circ(gx,gy,7),'evenodd');
+  // demonstrated trajectory: a curved rod with waypoints
+  const P0=[430,410], P1=[470,260], P2=[610,300];
+  const q=t=>[(1-t)**2*P0[0]+2*(1-t)*t*P1[0]+t*t*P2[0],(1-t)**2*P0[1]+2*(1-t)*t*P1[1]+t*t*P2[1]];
+  let tp=''; for(let i=0;i<=24;i++){ const [x,y]=q(i/24); tp+=(i?'L':'M')+f(x)+' '+f(y); }
+  S.gate(392,400,P0[0],P0[1],3.4); S.rod(tp,6);
+  [0,.2,.4,.6,.8,1].forEach(t=>{ const [x,y]=q(t); S.disc(x,y,9); });
+  S.text(540,418,'DEMO',{size:10,wt:900,wd:125,ls:.18});
+};
+
+/* Convolutional Neural Networks Fundamentals — the input map, the 3×3
+   kernel with its weights, the output map with the cell it just filled,
+   and the shrinking feature-map pyramid. */
+EMBLEMS['cnn-fundamentals'] = (S,b) => {
+  baseFrame(S,b);
+  const c=30;
+  // input 7x7 with the kernel footprint marked
+  const ix=34, iy=30, n=7; S.part(rr(ix,iy,n*c,n*c,4));
+  let g=''; for(let i=1;i<n;i++){ g+=`M${ix+i*c} ${iy+4}V${iy+n*c-4}M${ix+4} ${iy+i*c}H${ix+n*c-4}`; } S.groove(g,1.2);
+  S.groove(rr(ix+2*c+3,iy+1*c+3,3*c-6,3*c-6,3),2.6);
+  S.gate(6,iy+n*c/2,ix,iy+n*c/2,4.5); S.gate(ix+n*c/2,iy+n*c,ix+n*c/2,262,4.5);
+  S.runner([[6,262],[W-6,262]],7); S.runner([[270,6],[270,262]],7);
+  // kernel 3x3 with weights
+  const kx=292, ky=62, W3=[['1','0','−1'],['2','0','−2'],['1','0','−1']];
+  S.gate(270,ky+45,kx,ky+45,3.6);
+  W3.forEach((rw,r)=>rw.forEach((v,cc)=>{ S.rect(kx+cc*(c+4),ky+r*(c+4),c,c,3); S.text(kx+cc*(c+4)+c/2,ky+r*(c+4)+c/2+5,v,{size:13,wt:800}); }));
+  let kg=''; W3.forEach((_,r)=>{ kg+=''; }); for(let r=0;r<3;r++){ S.gate(kx+c,ky+r*(c+4)+c/2,kx+c+4,ky+r*(c+4)+c/2,2.4); S.gate(kx+2*c+4,ky+r*(c+4)+c/2,kx+2*c+8,ky+r*(c+4)+c/2,2.4); }
+  S.text(kx+51,ky+124,'KERNEL',{size:10,wt:900,wd:125,ls:.16});
+  // output 5x5 with a hole where the new value goes, and the value itself
+  const ox=440, oy=30, m=5; let od=rr(ox,oy,m*c,m*c,4)+rr(ox+2*c+3,oy+1*c+3,c-6,c-6,2);
+  S.gate(270,oy+m*c/2,ox,oy+m*c/2,4); S.part(od,'evenodd');
+  let og=''; for(let i=1;i<m;i++){ og+=`M${ox+i*c} ${oy+4}V${oy+m*c-4}M${ox+4} ${oy+i*c}H${ox+m*c-4}`; } S.groove(og,1.2);
+  S.gate(ox+m*c/2,oy+m*c,ox+m*c/2,262,3.6); S.rect(ox+2*c+6,oy+m*c+28,c-12,c-12,2); S.gate(ox+2*c+c/2,oy+m*c+28+c-12,ox+2*c+c/2,262,2.6);
+  // feature-map pyramid
+  const sizes=[132,104,80,60,44,32]; let x=34;
+  sizes.forEach((s,i)=>{ const y=424-s-8; S.gate(x+s/2,262,x+s/2,y,3.6); for(let k=2;k>=0;k--) S.rect(x+k*6,y-k*6,s,s,4); x+=s+30; });
+};
+
 /* ================================================================
    Catalogue (kit numbers follow the library's order)
 ================================================================ */
@@ -677,6 +753,10 @@ const BOOKS = [
    note:'Least squares, moulded. The fitted line is the runner, and each observation hangs off it by a gate as long as its residual. lm(y ~ x) is moulded on the axis.'},
   {slug:'deit-from-scratch', lines:['Build a Data-Efficient','Image Transformer','(DeiT) from Scratch'], level:'advanced', fam:'vision', capsules:42, hours:10, set:'range',
    note:'A picture cut into 3×3 patches, the token row with its extra DIST token, and the CNN teacher whose runner feeds that token.'},
+  {slug:'cnn-fundamentals', lines:['Convolutional Neural','Networks Fundamentals'], level:'intermediate', fam:'vision', capsules:34, hours:8, set:'range',
+   note:'The input map with the kernel footprint marked on it, the 3×3 kernel with its Sobel weights, the output map with the cell it has just filled, and the shrinking feature-map pyramid.'},
+  {slug:'modern-robot-learning', lines:['Modern Robot','Learning'], level:'advanced', fam:'learning', capsules:42, hours:9, set:'range',
+   note:'A robot-arm kit: the base plate, two links, three servo horns, the gripper jaws and their gear, and a demonstrated trajectory with waypoints to learn from.'},
   {slug:'kernel-engineering', lines:['Kernel','Engineering'], sub:'From silicon to speculative decoding —<br>GPU kernels for modern LLMs.', level:'advanced', fam:'systems', soon:true, set:'range',
    note:'Tiled GEMM: A-tiles and B-tiles meet in one C tile, with the HBM, SMEM and register hierarchy beside it. Shown as a clear test shot because the book is coming soon.'},
 
@@ -761,6 +841,70 @@ function wrapHTML(b){
 }
 document.getElementById('wrapbox').innerHTML = wrapHTML(BOOKS.find(b=>b.slug==='build-llms-from-scratch'));
 
+const CATALOG = [{"s":"ai-context-engineering","t":"AI Context Engineering","l":"intermediate","f":"agents"},
+  {"s":"mathematical-foundations-for-ml","t":"Mathematical Foundations for Machine Learning","l":"beginner","f":"foundations"},
+  {"s":"neural-networks-from-scratch","t":"Neural Networks from Scratch","l":"beginner","f":"foundations"},
+  {"s":"build-llms-from-scratch","t":"Build Large Language Models (LLMs) from Scratch","l":"intermediate","f":"language"},
+  {"s":"5d-parallelism","t":"5D Parallelism for Large Model Training","l":"advanced","f":"systems"},
+  {"s":"pi-vs-hermes-vs-codex","t":"Pi vs Hermes vs Codex: Context Compaction and Memory","l":"advanced","f":"agents"},
+  {"s":"deepseek-harness","t":"DeepSeek Harness","l":"advanced","f":"agents"},
+  {"s":"how-to-host-kimi-k3","t":"How to Host Kimi K3","l":"advanced","f":"systems"},
+  {"s":"machine-learning-fundamentals","t":"Machine Learning Fundamentals","l":"beginner","f":"foundations"},
+  {"s":"pretraining-mini-kimi-k3","t":"Pretraining a Mini Kimi K3","l":"advanced","f":"systems"},
+  {"s":"prompt-engineering","t":"Prompt Engineering","l":"beginner","f":"language"},
+  {"s":"python-for-data-science","t":"Python for Data Science","l":"beginner","f":"foundations"},
+  {"s":"rag-in-production","t":"RAG in Production","l":"intermediate","f":"agents"},
+  {"s":"decision-trees-from-scratch","t":"Build Decision Trees from Scratch","l":"beginner","f":"foundations"},
+  {"s":"deep-learning-fundamentals","t":"Deep Learning Fundamentals","l":"beginner","f":"foundations"},
+  {"s":"foundations-for-ai-ml","t":"Foundations for AI & ML","l":"beginner","f":"foundations"},
+  {"s":"generative-ai-fundamentals","t":"Generative AI Fundamentals","l":"beginner","f":"language"},
+  {"s":"git-github-masterclass","t":"Git & GitHub Masterclass","l":"beginner","f":"foundations"},
+  {"s":"modern-software-developer","t":"The Modern Software Developer","l":"beginner","f":"foundations"},
+  {"s":"r-masterclass","t":"R Masterclass","l":"beginner","f":"foundations"},
+  {"s":"sql-masterclass","t":"SQL Masterclass","l":"beginner","f":"foundations"},
+  {"s":"ai-agents-bootcamp","t":"AI Agents Bootcamp","l":"intermediate","f":"agents"},
+  {"s":"claude-certified-architect","t":"Claude Certified Architect (CCAF)","l":"intermediate","f":"agents"},
+  {"s":"cnn-fundamentals","t":"Convolutional Neural Networks Fundamentals","l":"intermediate","f":"vision"},
+  {"s":"computer-vision-bootcamp","t":"Computer Vision Bootcamp","l":"intermediate","f":"vision"},
+  {"s":"dsa-in-python","t":"Data Structures & Algorithms in Python","l":"intermediate","f":"foundations"},
+  {"s":"llm-finetuning","t":"LLM Finetuning","l":"intermediate","f":"language"},
+  {"s":"llm-production-deployment","t":"LLM Production & Deployment","l":"intermediate","f":"systems"},
+  {"s":"memory-in-ai-systems","t":"Memory in AI Systems","l":"intermediate","f":"agents"},
+  {"s":"mini-clawdbot","t":"Build a Mini ClawdBot from Scratch","l":"intermediate","f":"agents"},
+  {"s":"ml-dl-mastery","t":"Machine Learning & Deep Learning Mastery","l":"intermediate","f":"foundations"},
+  {"s":"nlp-cv-mastery","t":"NLP & Computer Vision Mastery","l":"intermediate","f":"language"},
+  {"s":"reinforcement-learning","t":"Reinforcement Learning","l":"intermediate","f":"learning"},
+  {"s":"transformers-from-scratch","t":"Transformers: Theory, Intuition, and Building from Scratch","l":"intermediate","f":"language"},
+  {"s":"vit-from-scratch","t":"Build a Vision Transformer (ViT) from Scratch","l":"intermediate","f":"vision"},
+  {"s":"writing-papers","t":"Writing Journal & Conference Papers","l":"intermediate","f":"foundations"},
+  {"s":"deit-from-scratch","t":"Build a Data-Efficient Image Transformer (DeiT) from Scratch","l":"advanced","f":"vision"},
+  {"s":"diffusion-lm-from-scratch","t":"Build a Diffusion Language Model from Scratch","l":"advanced","f":"language"},
+  {"s":"kimi-k3-from-scratch","t":"Build Kimi K3 from Scratch","l":"advanced","f":"language"},
+  {"s":"modern-robot-learning","t":"Modern Robot Learning","l":"advanced","f":"learning"},
+  {"s":"nanovlm-from-scratch","t":"Build a NanoVLM from Scratch","l":"advanced","f":"vision"},
+  {"s":"rlhf-from-scratch","t":"RLHF from Scratch","l":"advanced","f":"learning"},
+  {"s":"sciml","t":"Scientific Machine Learning (SciML)","l":"advanced","f":"learning"},
+  {"s":"transformers-vision-multimodal","t":"Transformers for Vision & Multimodal LLMs","l":"advanced","f":"vision"},
+  {"s":"vla-world-models","t":"Vision-Language-Action & World Models for Robotics","l":"advanced","f":"learning"},
+  {"s":"charlie-language-room","t":"Charlie and the Language Room","l":"advanced","f":"strawberry","ser":"I"},
+  {"s":"charlie-vision-room","t":"Charlie and the Vision Room","l":"intermediate","f":"mint","ser":"II"},
+  {"s":"charlie-sound-room","t":"Charlie and the Sound Room","l":"intermediate","f":"lemon","ser":"III"},
+  {"s":"charlie-reasoning-room","t":"Charlie and the Reasoning Room","l":"advanced","f":"grape","ser":"IV"},
+  {"s":"harness-engineering","t":"Harness Engineering","l":"advanced","f":"agents","soon":1},
+  {"s":"kernel-engineering","t":"Kernel Engineering","l":"advanced","f":"systems","soon":1},
+  {"s":"inference-engineering","t":"Inference Engineering","l":"advanced","f":"systems","soon":1}];
+
+/* the whole library as a shelf of spines */
+function spineMini(c){
+  const card = c.ser ? CARD.factory : CARD[c.l], P=PLASTIC[c.f], lv=LV[c.l];
+  const light = hx(P.base).reduce((a,v)=>a+v,0)/3>170;
+  const band = c.soon ? `background:transparent;box-shadow:inset 0 0 0 2px ${mix(card.bg,'#ffffff',.6)};color:${card.ink}` : `background:${P.base};color:${light?'#151515':'#fff'}`;
+  const pips=[1,2,3].map(i=>`<s class="${i<=lv?'on':''}"></s>`).join('');
+  return `<div class="mini" style="--card:${card.bg};--ink:${card.ink}" title="VZ-${kitNo(c.s)} · ${c.t}"><div class="mb" style="${band}">${kitNo(c.s)}</div><div class="mp">${pips}</div><div class="mt"><span>${c.t}</span></div><div class="mm">${markSVG(card.ink,card.bg)}</div></div>`;
+}
+const FAMORDER=['foundations','language','vision','agents','systems','learning','strawberry','mint','lemon','grape'];
+document.getElementById('spines').innerHTML = CATALOG.slice().sort((a,b)=>FAMORDER.indexOf(a.f)-FAMORDER.indexOf(b.f) || LV[a.l]-LV[b.l] || (a.soon?1:0)-(b.soon?1:0) || kitNo(a.s).localeCompare(kitNo(b.s))).map(spineMini).join('');
+
 /* swatches */
 document.getElementById('sw-card').innerHTML = ['beginner','intermediate','advanced','factory'].map(k=>`<div><i style="background:${CARD[k].bg}"></i><b>${CARD[k].name}</b><br>${CARD[k].bg} · ${k==='factory'?'Charlie':k}</div>`).join('');
 document.getElementById('sw-plastic').innerHTML = ['foundations','language','vision','agents','systems','learning'].map(k=>`<div><i style="background:${PLASTIC[k].base}"></i><b>${PLASTIC[k].name}</b><br>${PLASTIC[k].base}<br>${PLASTIC[k].series}</div>`).join('');
@@ -778,7 +922,8 @@ function fitTitles(){
   });
 }
 function fitSpine(){ document.querySelectorAll('.spine .st').forEach(st=>{ const sp=st.querySelector('span'); let fs=25; sp.style.fontSize=fs+'px'; while(fs>14 && sp.getBoundingClientRect().height>st.clientHeight){ fs-=.5; sp.style.fontSize=fs+'px'; } }); }
-function fitAll(){ fitTitles(); fitSpine(); }
+function fitMini(){ document.querySelectorAll('.mini .mt').forEach(st=>{ const sp=st.querySelector('span'); let fs=12.5; sp.style.fontSize=fs+'px'; while(fs>7 && sp.getBoundingClientRect().height>st.clientHeight){ fs-=.25; sp.style.fontSize=fs+'px'; } }); }
+function fitAll(){ fitTitles(); fitSpine(); fitMini(); }
 fitAll();
 document.fonts.ready.then(fitAll);
 </script>

@@ -768,7 +768,7 @@ FIG['build-llms-from-scratch'] = (P) => {
   // labels
   const tk = pr(-104 + 9, 109, 36); label(P, tk[0] - 4, tk[1] + 2, 84, 742, 'a');
   const pl = pr(-112, 40, 13); label(P, pl[0] + 2, pl[1], 84, 680, 'b');
-  const d2 = pr(0, 0, 112 + H / 2); label(P, d2[0] + 76, d2[1] + 8, 560, d2[1] + 8, 'c');
+  const d2 = pr(0, 0, 194 + H / 2); label(P, d2[0] + 76, d2[1] + 8, 560, d2[1] + 8, 'c');
   const dw = pr(0, 0, 90); label(P, dw[0] + 8, dw[1] - 6, 560, dw[1] - 22, 'd');
   const ec = pr(0, 0, zE + 10); label(P, ec[0] + 84, ec[1] + 10, 560, ec[1] + 4, 'e');
   const tb = pr(-86 + 4 * 22 + 13, 7, zE + 36 + 60); label(P, tb[0] + 2, tb[1], 560, tb[1] - 50, 'f');
@@ -780,7 +780,7 @@ FIG['build-llms-from-scratch'] = (P) => {
 
 /* Transformers — one attention head over a sentence of tokens, drawn as arches; Fig. 2, the same weights as a matrix */
 FIG['transformers-from-scratch'] = (P) => {
-  const n = 9, x0 = 118, dx = 60, base = 536;
+  const n = 9, x0 = 104, dx = 64, base = 568;
   const X = (i) => x0 + i * dx;
   const R = rng(21);
   const W = [];
@@ -795,7 +795,7 @@ FIG['transformers-from-scratch'] = (P) => {
   arcs.sort((a, b) => (b[0] - b[1]) - (a[0] - a[1]) || a[0] - b[0]);
   for (const [i, j] of arcs) {
     const w = W[i][j], last = i === n - 1;
-    const a = X(j), b = X(i), h = (b - a) / 2 * 0.9;
+    const a = X(j), b = X(i), h = (b - a) / 2 * 0.98;
     const pts = sample((t) => [lerp(a, b, t), base - 14 - Math.sin(t * Math.PI) * h], 90);
     const ws = pts.map((_, q) => 0.7 + 6.5 * w * Math.pow(Math.sin(q / 90 * Math.PI), 0.6));
     P.fill('g', ribbon(pts, ws.map((v) => v + 4)));
@@ -807,23 +807,28 @@ FIG['transformers-from-scratch'] = (P) => {
   for (let i = 0; i < n; i++) {
     sphere(P, X(i), base, 14, { spacing: 2.4 });
   }
-  // Fig. 2 — the same weights as a lower-triangular matrix, keys aligned with the tokens above
-  const my = 582, ch = 20, cw = 20;
+  // Fig. 2 — the same weights as a matrix, set beneath like a keystone
+  const cs = 15, X0 = 360 - n * cs / 2, Y0 = 612;
   const wmax = Math.max(...W.flat());
-  for (let i = 0; i < n; i++) for (let j = 0; j <= i; j++) {
-    const w = W[i][j] / wmax, last = i === n - 1;
-    const Q = [[X(j) - cw / 2, my + i * ch], [X(j) + cw / 2, my + i * ch], [X(j) + cw / 2, my + i * ch + cw - 2], [X(j) - cw / 2, my + i * ch + cw - 2]];
-    P.fill('g', poly(Q));
-    if (last) P.fill('h', poly(Q.map(([x, y]) => [x + (x < X(j) ? 2.5 : -2.5) * (1 - w), y + (y < my + i * ch + 5 ? 2.5 : -2.5) * (1 - w)])));
-    else quad(P, Q, { sp: lerp(5, 1.9, Math.sqrt(w)), w: lerp(0.7, 1.4, w), fill: false, outline: false });
-    P.line('si', 1, poly(Q));
+  P.fill('g', poly([[X0 - 3, Y0 - 3], [X0 + n * cs + 3, Y0 - 3], [X0 + n * cs + 3, Y0 + n * cs + 3], [X0 - 3, Y0 + n * cs + 3]]));
+  // a Hinton diagram: each weight a square sized to its magnitude; the masked future left as points
+  for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+    const mx = X0 + (j + 0.5) * cs, my = Y0 + (i + 0.5) * cs;
+    if (j > i) { P.fill('i', circ(mx, my, 0.9)); continue; }
+    const h = (1.6 + (cs - 4) * Math.sqrt(W[i][j] / wmax)) / 2;
+    const sq = [[mx - h, my - h], [mx + h, my - h], [mx + h, my + h], [mx - h, my + h]];
+    if (i === n - 1) { P.fill('i', poly(sq.map(([x, y]) => [x + (x < mx ? -1 : 1), y + (y < my ? -1 : 1)]))); P.fill('h', poly(sq)); }
+    else P.fill('i', poly(sq));
   }
-  P.text(X(n - 1) + 22, my + 14, 'Fig. 2', 'fig', 'start');
-  const peak = [(X(0) + X(n - 1)) / 2, base - 14 - (X(n - 1) - X(0)) / 2 * 0.9];
-  label(P, X(0) - 10, base + 8, 64, 606, 'a', { gap: 10 });
+  P.line('si', 1.5, poly([[X0, Y0], [X0 + n * cs, Y0], [X0 + n * cs, Y0 + n * cs], [X0, Y0 + n * cs]]));
+  P.text(X0 - 14, Y0 + 10, 'Fig. 2', 'fig', 'end');
+  P.text(X0 + n * cs / 2, Y0 + n * cs + 20, 'keys', 'fig', 'middle');
+  P.raw(`<text class="fig" transform="translate(${X0 + n * cs + 16} ${Y0 + n * cs / 2}) rotate(90)" text-anchor="middle">queries</text>`);
+  const peak = [(X(0) + X(n - 1)) / 2, base - 14 - (X(n - 1) - X(0)) / 2 * 0.98];
+  label(P, X(0) - 10, base + 8, 64, 628, 'a', { gap: 10 });
   label(P, peak[0] + 60, peak[1] + 8, 620, 300, 'b');
-  label(P, X(0) + 10, base - 30, 70, 420, 'c');
-  label(P, X(6), my + 6 * ch + 9, 470, my + 6 * ch + 9 - 70, 'd', { dot: true });
+  label(P, X(0) + 10, base - 30, 70, 440, 'c');
+  label(P, X0 + 4.5 * cs + 5, Y0 + 4.5 * cs + 5, X0 + n * cs + 70, Y0 + 116, 'd');
 };
 
 /* Pi vs Hermes vs Codex — one triple spiral: three agents' histories wound together, each older turn sealed into a smaller chamber */
@@ -989,7 +994,7 @@ const BOOKS = [
   { slug: 'neural-networks-from-scratch', level: 'beginner', lines: ['Neural Networks', 'from Scratch'], meta: '33 capsules · 7 hours',
     cap: '<b>Fig. 1.</b> A single unit, dissected. <b>a</b> inputs; <b>b</b> weights, each bead sized to its magnitude; <b>c</b> bias; <b>d</b> the core, where the weighted sum is formed; <b>e</b> the shell of activation; <b>f</b> output.' },
   { slug: 'build-llms-from-scratch', level: 'intermediate', lines: ['Build Large Language', 'Models (LLMs)', 'from Scratch'], size: 58, meta: '20 capsules · 6 hours',
-    cap: '<b>Fig. 1.</b> A decoder-only language model, raised as a column. <b>a</b> tokens; <b>b</b> the embedding; <b>c</b> a transformer block, one of N; <b>d</b> the residual stream on which they are threaded; <b>e</b> the output head; <b>f</b> the next-token distribution.' },
+    cap: '<b>Fig. 1.</b> A decoder-only model, raised as a column. <b>a</b> tokens; <b>b</b> embedding; <b>c</b> a transformer block, one of N; <b>d</b> the residual stream they are threaded on; <b>e</b> output head; <b>f</b> next-token distribution.' },
   { slug: '5d-parallelism', level: 'advanced', lines: ['5D Parallelism for', 'Large Model Training'], size: 58, meta: '40 capsules · 9 hours',
     cap: '<b>Fig. 1.</b> A device mesh of 2 × 2 × 2 × 2 × 2, projected out of five dimensions. From the nearest device, one rod along each axis: <b>a</b> data; <b>b</b> tensor; <b>c</b> pipeline; <b>d</b> sequence; <b>e</b> expert.' },
   { slug: 'pi-vs-hermes-vs-codex', level: 'advanced', lines: ['Pi vs Hermes vs Codex'], size: 56, sub: 'Context Compaction and Memory', meta: '9 capsules · 1 hour',

@@ -20,11 +20,11 @@
     const w = 1488, h = 380;
     const K = INK.federal.hex, FX = [INK.fpink.hex];
     const st = { font: 'display', weight: 800, opsz: 96, wdth: 88, ls: -0.03 };
-    const size = Math.floor(100 * 1060 / measure('Overprint', { ...st, size: 100 }));
+    const size = Math.floor(100 * 980 / measure('Overprint', { ...st, size: 100 }));
     let fl = '', key = '';
     fl += p(halftone({ box: [860, 0, w, h], cell: 9, angle: 15, tone: (x, y) => { const d = Math.hypot(x - 1270, y - 196) / 250; return d < 1 ? 0.95 * (1 - d * d) : 0; } }));
-    fl += T(36, 298, 'Overprint', { ...st, size });
-    key += T(46, 306, 'Overprint', { ...st, size });
+    fl += T(34, 270, 'Overprint', { ...st, size });
+    key += T(41, 275, 'Overprint', { ...st, size });
     key += T(40, 52, 'Vizuara Books · cover system · direction 07', mono(13, 500, 0.14));
     key += T(w - 40, 52, 'Proposal · September 2026', { ...mono(13, 500, 0.14), anchor: 'end' });
     key += T(40, h - 28, 'Two or three spot inks · procedural halftones · controlled misregistration · every emblem is the book’s own mechanism', mono(12.5, 400, 0.08));
@@ -36,15 +36,15 @@
 
   // ---------------------------------------------------------------- ink chart
   {
-    const w = 1488, h = 440;
-    const flashes = ['sunflower', 'yellow', 'fpink', 'orange', 'forange', 'aqua', 'green'];
+    const w = 1488, h = 460;
+    const flashes = ['sunflower', 'yellow', 'fpink', 'orange', 'forange', 'bubblegum', 'aqua', 'cornflower', 'green'];
     const keys = ['hunter', 'federal'];
     const FX = [...flashes, ...keys].map((k) => INK[k].hex);
     const drums = FX.map(() => '');
     let key = '';
     key += T(40, 50, 'Ink library — real risograph inks, printed in multiply', mono(13, 500, 0.14));
     key += T(w - 40, 50, 'Paper · natural uncoated · #F4F0E6', { ...mono(13, 500, 0.14), anchor: 'end' });
-    const mx0 = 520, colW = 120, gap = 13, top = 88, bot = 350;
+    const mx0 = 520, colW = 94, gap = 11, top = 100, bot = 356;
     const bands = [['hunter', 'beginner', 'circle'], ['federal', 'intermediate', 'square'], ['black', 'advanced', 'diamond']];
     const by = (i) => top + 34 + i * 76;
     // key legend on the left, aligned with the bands
@@ -59,14 +59,14 @@
     flashes.forEach((k, j) => {
       const x = mx0 + j * (colW + gap);
       drums[j] += p(rectD(x, top, colW, bot - top));
-      key += T(x, bot + 28, INK[k].name, mono(11, 500, 0.06));
-      key += T(x, bot + 46, INK[k].hex, mono(11, 400, 0.06));
+      INK[k].name.split(' ').forEach((wd, q, arr) => { key += T(x, bot + 26 + q * 16, wd, mono(11, 500, 0.06)); });
+      key += T(x, bot + 26 + INK[k].name.split(' ').length * 16, INK[k].hex, mono(11, 400, 0.06));
     });
     bands.forEach(([k], i) => {
       const d = rectD(mx0 - 16, by(i), w - 40 - (mx0 - 16), 40);
       if (k === 'black') key += p(d); else drums[flashes.length + keys.indexOf(k)] += p(d);
     });
-    key += T(mx0 - 16, top - 12, 'Flash inks carry the subject; key inks cross them. Each crossing is a colour you get for free.', { font: 'serif', italic: true, size: 20, ls: 0 });
+    key += T(mx0 - 16, top - 22, 'Flash inks carry the subject; key inks cross them. Each crossing is a colour you get for free.', { font: 'serif', italic: true, size: 20, ls: 0 });
     document.getElementById('inks').innerHTML = sheet({ w, h, id: 'inks', FX, K: INK.black.hex, flash: drums, key, label: 'Ink library' });
   }
 
@@ -74,7 +74,7 @@
   const groups = {
     core: ['ai-context-engineering', 'mathematical-foundations-for-ml', 'neural-networks-from-scratch', 'build-llms-from-scratch', '5d-parallelism', 'pi-vs-hermes-vs-codex'],
     series: ['charlie-language-room', 'charlie-vision-room', 'charlie-sound-room', 'charlie-reasoning-room'],
-    range: ['kernel-engineering', 'deit-from-scratch', 'sql-masterclass'],
+    range: ['kernel-engineering', 'deit-from-scratch', 'sql-masterclass', 'machine-learning-fundamentals', 'reinforcement-learning'],
   };
   const shelf = document.getElementById('shelf');
   const built = {};

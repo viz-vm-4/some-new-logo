@@ -79,8 +79,8 @@ section > h2 span{font-weight:400}
 .gridnotes dt i{display:inline-block;width:12px;height:12px;margin-right:8px;vertical-align:0}
 .shelf2{display:grid;grid-template-columns:720px 720px;gap:72px 80px}
 figure{margin:0}
-figcaption{margin-top:14px;font-size:15px;line-height:21px;display:grid;grid-template-columns:90px 1fr;column-gap:20px;max-width:720px}
-figcaption b{font-weight:700}
+figcaption{margin-top:14px;font-size:15px;line-height:21px;max-width:640px}
+figcaption b{font-weight:700;display:block}
 figcaption code{font-family:inherit;font-weight:400;opacity:1}
 .corridor{display:flex;gap:0;margin-top:56px}
 .mini{position:relative;overflow:hidden;flex:none}
@@ -104,11 +104,17 @@ figcaption code{font-family:inherit;font-weight:400;opacity:1}
 .back .about{position:absolute;left:30px;top:646px;width:436px;font-size:13.5px;line-height:18px}
 .back .about b{display:block}
 .back .code{position:absolute;left:534px;top:646px;width:156px;height:156px;background:var(--paper);display:flex;align-items:flex-end;padding:8px;font-size:11px;line-height:13px;color:var(--ink)}
-.spine .sp-title{position:absolute;left:50%;top:170px;transform:translateX(-50%) rotate(90deg);transform-origin:0 0;white-space:nowrap;font-size:21px;font-weight:700;letter-spacing:-.01em;margin-left:10px}
-.spine .sp-imp{position:absolute;left:50%;bottom:30px;transform:translateX(-50%) rotate(90deg) translateX(-100%);transform-origin:0 0;white-space:nowrap;font-size:13.5px;font-weight:700;margin-left:9px}
+.spine .sp-title{position:absolute;top:172px;left:0;right:0;margin:0 auto;width:max-content;writing-mode:vertical-rl;white-space:nowrap;font-size:21px;line-height:26px;font-weight:700;letter-spacing:-.01em}
+.spine .sp-imp{position:absolute;bottom:30px;left:0;right:0;margin:0 auto;width:max-content;writing-mode:vertical-rl;white-space:nowrap;font-size:13.5px;line-height:17px;font-weight:700}
 .spine .ribbon{position:absolute;left:6px;top:0;width:44px}
 .foot{margin-top:112px;font-size:14px;line-height:20px;display:grid;grid-template-columns:repeat(4,1fr);gap:40px;border-top:4px solid var(--ink);padding-top:14px}
 .foot b{display:block}
+@media print{
+  .page{width:720px;padding:0}
+  .mast,.bar,section>h2,section>.note,.rules,.inks,.levels,.type,.twocol,.row,.corridor,.library,.wrapbox,.foot,figcaption{display:none !important}
+  .shelf2{display:block}
+  section{margin:0}
+}
 </style>
 </head>
 <body>
@@ -292,7 +298,7 @@ FIG.mesh = () => {
 FIG.eigen = () => {
   const cx=X(7)+6, cy=CY(9), u=P*2.1, th=-30, l1=1.95, l2=0.52;
   const dx=Math.cos(th*RAD), dy=Math.sin(th*RAD);
-  let s=`<g clip-path="url(#clipFig)">`;
+  let s=`<g clip-path="url(#${CLIP})">`;
   s+=`<ellipse cx="${cx}" cy="${cy}" rx="${f2(u*l1)}" ry="${f2(u*l2)}" transform="rotate(${th} ${cx} ${cy})" class="fk"/>`;
   s+=C(cx,cy,u,'sk','stroke-width="7"');
   s+=L(cx-dx*900,cy-dy*900,cx+dx*900,cy+dy*900,9,'ss');
@@ -305,7 +311,7 @@ FIG.eigen = () => {
 FIG.window = () => {
   let s=''; const h=P/2;
   const c0=4, r0=6, n=6, wx0=X(c0)-G, wy0=Y(r0)-G, ws=n*P+G;
-  for(let yy=Y(5)+h/2; yy<Y(14)-G; yy+=h) for(let xx=h/2+2; xx<720; xx+=h){
+  for(let yy=Y(5)+h/2; yy<Y(14)-G-10; yy+=h) for(let xx=h/2+2; xx<720; xx+=h){
     if(xx>wx0-24 && xx<wx0+ws+24 && yy>wy0-24 && yy<wy0+ws+24) continue;
     s+=C(xx,yy,3.5,'fk');
   }
@@ -362,7 +368,7 @@ FIG.boundary = () => {
     let up=side(CX(c),CY(r)); if(flip.has(c+','+r)) up=!up;
     s+= up ? C(CX(c),CY(r),13,'fk') : C(CX(c),CY(r),11,'sk','stroke-width="5"');
   }
-  s+=`<g clip-path="url(#clipFig)">`+L(0,a*(0-xm)+b,720,a*(720-xm)+b,12,'ss')+`</g>`;
+  s+=`<g clip-path="url(#${CLIP})">`+L(0,a*(0-xm)+b,720,a*(720-xm)+b,12,'ss')+`</g>`;
   return s;
 };
 
@@ -450,7 +456,7 @@ FIG.odefield = () => {
   let x=1.62,y=0.0, pts=[]; const h=0.01;
   for(let i=0;i<2200;i++){ const k1=f(x,y), k2=f(x+h/2*k1[0],y+h/2*k1[1]), k3=f(x+h/2*k2[0],y+h/2*k2[1]), k4=f(x+h*k3[0],y+h*k3[1]);
     x+=h/6*(k1[0]+2*k2[0]+2*k3[0]+k4[0]); y+=h/6*(k1[1]+2*k2[1]+2*k3[1]+k4[1]); if(i%4===0) pts.push([ox+x*u, oy-y*u]); }
-  s+=`<g clip-path="url(#clipFig)">`+PL(pts,11,'ss','stroke-linecap="round" stroke-linejoin="round"')+`</g>`;
+  s+=`<g clip-path="url(#${CLIP})">`+PL(pts,11,'ss','stroke-linecap="round" stroke-linejoin="round"')+`</g>`;
   s+=C(ox+1.62*u,oy,12,'fs');
   return s;
 };
@@ -559,13 +565,14 @@ book({g:'series', slug:'charlie-reasoning-room', level:'advanced', capsules:21, 
 const LV={beginner:1,intermediate:2,advanced:3};
 const esc=t=>t.replace(/&/g,'&amp;');
 function ribbon(lv,cls='fs'){ const h=Y(lv-1)+F, n=F/2; return `<div class="ribbon"><svg width="44" height="${h}" viewBox="0 0 44 ${h}">${PG([[0,0],[44,0],[44,h],[22,h-n],[0,h]],cls)}</svg></div>`; }
+let CLIP='clip';
 function coverInner(b){
-  const lv=LV[b.level];
+  const lv=LV[b.level]; CLIP='clip-'+b.slug;
   const svg=`<svg class="fig" viewBox="0 0 720 888" xmlns="http://www.w3.org/2000/svg">
-    <defs><clipPath id="clipFig"><rect x="0" y="${Y(4)}" width="720" height="${Y(14)-G-Y(4)}"/></clipPath></defs>
+    <defs><clipPath id="${CLIP}"><rect x="0" y="${Y(4)}" width="720" height="${Y(14)-G-Y(4)}"/></clipPath></defs>
     ${FIG[b.fig]()}</svg>`;
   const lvName=b.level[0].toUpperCase()+b.level.slice(1);
-  const third = b.soon ? `<b>Forthcoming</b>In preparation` : `<b>${b.capsules} capsules</b>${b.hours} hours`;
+  const third = b.soon ? `<b>Forthcoming</b>In preparation` : `<b>${b.capsules} capsules</b>${b.hours} hour${b.hours===1?'':'s'}`;
   const fourth = b.series ? `<b>Intelligence Factory</b>Charlie, Book ${b.series}` : '';
   const colo=`<div class="colo">${b.series?'':'<div class="rule"></div>'}
     <div class="cell" style="left:${X(0)}px"><b>Vizuara</b>Books</div>

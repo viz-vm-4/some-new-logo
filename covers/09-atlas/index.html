@@ -205,7 +205,7 @@ function makeMap(svg, book, slug){
         const tip = book.caps ? `${String(num).padStart(2,'0')} · ${book.caps[num-1]||''}` : '';
         let e;
         if(isRing) e=M.ring(p[0],p[1],o.ringR);
-        else if(o.hollow){ e=el('circle',{cx:f(p[0]),cy:f(p[1]),r:5.2,fill:'var(--paper)',stroke:color,'stroke-width':2.6},L.rings); }
+        else if(o.hollow){ e=el('circle',{cx:f(p[0]),cy:f(p[1]),r:w/2+2.5,fill:'var(--paper)',stroke:color,'stroke-width':2.8},L.rings); }
         else { const b=add(p,mul(nrm,w/2+TICK)); e=el('line',{x1:f(p[0]),y1:f(p[1]),x2:f(b[0]),y2:f(b[1]),stroke:color,'stroke-width':3.6},L.ticks); }
         if(tip){ const t=el('title',{},e); t.textContent=tip; }
         stations.push({part,num,p});
@@ -254,7 +254,7 @@ function makeMap(svg, book, slug){
       t.textContent=txt; if(o.size) t.style.fontSize=o.size+'px'; if(o.ls!=null) t.style.letterSpacing=o.ls; if(o.fill) t.style.fill=o.fill; return t;
     },
     label(txt,x,y,o={}){ const t=el('text',{x,y,'text-anchor':o.anchor||'start',class:o.cls||'lb',transform:o.rot?`rotate(${o.rot} ${x} ${y})`:''},L.labels); t.textContent=txt; if(o.fill) t.style.fill=o.fill; return t; },
-    math(txt,x,y,o={}){ const t=el('text',{x,y,'text-anchor':o.anchor||'middle',class:'mt'},L.labels); t.textContent=txt; if(o.fill) t.style.fill=o.fill; return t; },
+    math(txt,x,y,o={}){ const t=el('text',{x:f(x),y:f(y),'text-anchor':o.anchor||'middle',class:'mt'},L.labels); t.textContent=txt; if(o.fill) t.style.fill=o.fill; if(o.size) t.style.fontSize=o.size+'px'; return t; },
     claim(part,n,kind){ for(let i=0;i<n;i++) stations.push({part,num:first[part]+used[part]+i,kind}); used[part]+=n; },
     parts(){ return parts; },
     audit(){ return parts.map((p,i)=>[p[2],used[i]]); }
@@ -332,25 +332,26 @@ MAPS['5d-parallelism'] = { h:362, draw(M){
 
 /* ---------- Pi vs Hermes vs Codex ----------
    Three harness tracks funnel into one (compaction); one traced session; three memories. */
-MAPS['pi-vs-hermes-vs-codex'] = { h:284, draw(M){
-  const T=[22,142,262], J1=[300,142], J2=[392,142], J3=[626,142];
-  M.zone(`M-60,-8 H176 L310,126 V158 L176,292 H-60Z`);
-  M.zone(`M392,142 L500,34 H518 L626,142 L518,250 H500Z`);
-  M.tlabel('context window',100,90); M.tlabel('memory',509,196);
+MAPS['pi-vs-hermes-vs-codex'] = { h:300, draw(M){
+  const T=[16,150,284], J1=[300,150], J2=[386,150], J3=[630,150], lt=[76,224];
+  M.zone(`M-60,-14 H152 L310,134 V166 L152,314 H-60Z`);
+  M.zone(`M386,150 L472,52 H544 L630,150 L544,248 H472Z`);
+  M.tlabel('context window',96,90); M.tlabel('memory',508,206);
   const names=['PI','HERMES','CODEX'];
   T.forEach((ty,i)=>{
-    const pts = i===1 ? [[-60,ty],J1] : [[-60,ty],[180,ty],J1];
-    M.line(0,pts,{n:1,where:'h',avoid:[OUT,[180,-1e4,1e4,1e4]],side:i===2?-1:1,bullet:66,r:24});
+    const pts = i===1 ? [[-60,ty],J1] : [[-60,ty],[166,ty],J1];
+    M.line(0,pts,{n:1,where:'h',avoid:[OUT,[166,-1e4,1e4,1e4]],side:i===2?-1:1,bullet:66,r:28});
     M.label(names[i],44,ty+(i===2?26:-14),{cls:'trk'});
   });
   M.line(0,[J1,J1],{n:1,ring:'all'});
   M.line(1,[J1,J2],{n:1,side:1});
   T.forEach((ty,i)=>{
-    const pts = i===1 ? [J2,J3] : [J2,[500,ty+(i===0?12:-12)],[518,ty+(i===0?12:-12)],J3];
-    M.line(2,pts,{n:1,avoid:[[0,-1e4,488,1e4],[530,-1e4,1e4,1e4]],side:i===2?-1:1,r:18});
+    const yy = i===1 ? 150 : lt[i===0?0:1];
+    const pts = i===1 ? [J2,J3] : [J2,[J2[0]+Math.abs(yy-150),yy],[J3[0]-Math.abs(yy-150),yy],J3];
+    M.line(2,pts,{n:1,avoid:[[0,-1e4,480,1e4],[536,-1e4,1e4,1e4]],side:i===2?-1:1,r:24});
   });
   M.line(2,[J3,J3],{n:1,ring:'all'});
-  M.bullet(1,346,112);
+  M.bullet(1,343,120);
 }};
 
 /* ---------- AI Context Engineering ----------
@@ -375,15 +376,15 @@ MAPS['ai-context-engineering'] = { h:336, draw(M){
    Coordinate axes: linear algebra runs along x, probability up y, calculus down z;
    Python is the unit circle round the origin; Putting It Together is the resultant vector. */
 MAPS['mathematical-foundations-for-ml'] = { h:392, draw(M){
-  const O=[246,246], rc=70, zL=138, vL=138;
+  const O=[246,236], rc=62, zL=150, vL=140;
   M.zone(`M${O[0]},${O[1]} H606 L${606-zL},${O[1]+zL} H${O[0]-zL}Z`);
-  M.tlabel('the ground floor',470,O[1]+zL-18,{anchor:'middle'});
+  M.tlabel('the ground floor',478,O[1]+zL-20,{anchor:'middle'});
   const q=rc*Math.SQRT1_2;
   M.line(0,[[-60,O[1]],O],{avoid:[OUT,[O[0]-rc-14,0,O[0]-rc+14,1e3]],ends:'end',ring:'end',side:1,bullet:66});
   M.line(1,[O,[440,O[1]]],{avoid:[[0,0,O[0]+18,1e3],[O[0]+rc-14,0,O[0]+rc+14,1e3]],ends:'end',ring:'end',side:1});
   M.line(2,[[440,O[1]],[600,O[1]]],{avoid:[[0,0,454,1e3],[586,0,1e3,1e3]],side:1,arrow:'end'});
-  M.line(3,[O,[O[0],120]],{avoid:[[0,O[1]-18,1e3,1e3],[0,O[1]-rc-14,1e3,O[1]-rc+14]],ends:'end',ring:'end',side:-1});
-  M.line(4,[[O[0],120],[O[0],8]],{avoid:[[0,106,1e3,1e3],[0,-100,1e3,20]],side:-1,arrow:'end'});
+  M.line(3,[O,[O[0],112]],{avoid:[[0,O[1]-18,1e3,1e3],[0,O[1]-rc-14,1e3,O[1]-rc+14]],ends:'end',ring:'end',side:-1});
+  M.line(4,[[O[0],112],[O[0],4]],{avoid:[[0,98,1e3,1e3],[0,-100,1e3,16]],side:-1,arrow:'end'});
   M.line(6,[O,[O[0]-zL,O[1]+zL]],{avoid:[[O[0]-20,0,1e3,1e3],[O[0]-q-14,O[1]+q-14,O[0]-q+14,O[1]+q+14],[-100,O[1]+zL-16,1e3,1e3]],side:-1,arrow:'end'});
   M.line(7,[O,[O[0]+vL,O[1]-vL]],{avoid:[[0,O[1]-20,O[0]+20,1e3],[O[0]+q-14,O[1]-q-14,O[0]+q+14,O[1]-q+14],[O[0]+vL-16,-100,1e3,1e3]],side:1,arrow:'end'});
   const Rc=rc/Math.cos(Math.PI/8), oc=[];
@@ -391,30 +392,38 @@ MAPS['mathematical-foundations-for-ml'] = { h:392, draw(M){
   const start=[O[0],O[1]-rc], circ=[start,...oc.slice(0,8),start];
   const cross=[[O[0]+rc,O[1]],[O[0],O[1]-rc],[O[0]-rc,O[1]],[O[0]-q,O[1]+q],[O[0]+q,O[1]-q]];
   M.line(5,circ,{r:34,side:1,avoid:cross.map(p=>[p[0]-15,p[1]-15,p[0]+15,p[1]+15])});
-  M.math('x',622,O[1]+7,{anchor:'start'}); M.math('y',O[0]+18,12,{anchor:'start'}); M.math('z',O[0]-zL-16,O[1]+zL+6,{anchor:'end'});
-  M.bullet(1,O[0]+rc+46,O[1]+22); M.bullet(2,470,O[1]+22); M.bullet(3,O[0]+22,O[1]-rc-30); M.bullet(4,O[0]+22,70);
-  M.bullet(5,O[0]-rc-22,O[1]-rc+4); M.bullet(6,O[0]-106,O[1]+76); M.bullet(7,O[0]+vL+8,O[1]-vL+30);
+  M.math('x',622,O[1]+7,{anchor:'start'}); M.math('y',O[0]+18,10,{anchor:'start'}); M.math('z',O[0]-zL-16,O[1]+zL+6,{anchor:'end'});
+  M.bullet(1,O[0]+rc+44,O[1]+22); M.bullet(2,470,O[1]+22); M.bullet(3,O[0]+22,O[1]-rc-24); M.bullet(4,O[0]+22,62);
+  M.bullet(5,O[0]-rc-20,O[1]-rc+2); M.bullet(6,O[0]-112,O[1]+78); M.bullet(7,O[0]+vL+8,O[1]-vL+30);
 }};
 
 /* ---------- Build LLMs from Scratch ----------
-   The GPT diagram as a network: tokens enter bottom-left, climb the residual stream,
-   loop out through attention inside the repeated block (×12), and leave at the top. */
-MAPS['build-llms-from-scratch'] = { h:356, draw(M){
-  const X=300, top=34, base=318, b0=82, b1=262;
-  M.rect(X-86,b0,236,b1-b0,20);
-  M.tlabel('transformer block',X-72,b0+22,{anchor:'start'});
-  M.tlabel('residual stream',X-18,b1-16,{anchor:'end',rot:0});
-  // ×12 bracket
-  const bx=X+168; M.zone(`M${bx},${b0} h8 v${b1-b0} h-8`,{fill:'none',stroke:'var(--ink)',sw:2});
-  M.math('× 12',bx+18,(b0+b1)/2+8,{anchor:'start'});
-  M.line(0,[[-60,base],[150,base]],{avoid:[OUT],ends:'end',ring:'end',side:1,bullet:66});
-  M.line(2,[[150,base],[X,base]],{avoid:[[0,0,166,1e3]],ends:'end',ring:'end',side:1});
-  M.line(1,[[X,b1-4],[X,b1-14],[X+66,b1-80],[X+66,b0+80],[X,b0+14],[X,b0+4]],{side:-1,span:[26,26],r:20});
-  M.line(3,[[X,base],[X,top]],{avoid:[[0,base-16,1e3,1e3],[0,b1-22,1e3,b1+8],[0,b0-8,1e3,b0+22]],side:1,ends:'end',ring:'end',at:[0.14,0.5,1]});
-  M.line(4,[[X,top],[560,top]],{avoid:[[0,0,X+20,1e3]],side:1,term:'end'});
-  M.line(5,[[X,top],[150,top]],{avoid:[[X-20,0,1e3,1e3]],side:1,term:'end',at:[0.6]});
-  M.bullet(1,X+96,b0+90); M.bullet(2,226,base+24); M.bullet(3,X-24,base-40); M.bullet(4,584,top); M.bullet(5,126,top);
-  M.label('TOKENS IN',24,base-16,{cls:'dest'}); M.label('NEXT TOKEN',560,top-16,{cls:'dest',anchor:'end'});
+   The GPT diagram as a network: tokens enter bottom-left and climb the residual stream;
+   attention loops out of it and splits into query, key and value tracks inside the
+   repeated block (×12); the top of the stack forks into pretraining and finetuning. */
+MAPS['build-llms-from-scratch'] = { h:376, draw(M){
+  const X=292, top=26, base=350, b0=56, b1=308, lx=X+44;
+  M.rect(X-122,b0,272,b1-b0,22);
+  M.tlabel('transformer block',X+136,b1-16,{anchor:'end'});
+  M.tlabel('residual',X-18,b0+116,{anchor:'end'}); M.tlabel('stream',X-18,b0+134,{anchor:'end'});
+  const bx=X+170; M.zone(`M${bx},${b0} h9 v${b1-b0} h-9`,{fill:'none',stroke:'var(--ink)',sw:2.2});
+  M.math('× 12',bx+22,(b0+b1)/2+8,{anchor:'start'});
+  M.line(0,[[-60,base],[172,base]],{avoid:[OUT],ends:'end',ring:'end',side:1,bullet:66});
+  M.line(2,[[172,base],[X,base]],{avoid:[[0,0,188,1e3]],ends:'end',ring:'end',side:1});
+  // attention loop: leaves the stream, splits into query / key / value tracks, rejoins
+  const y0=b1-10, y1=y0-10, y2=y1-44, y3=y2-12, y4=b0+10+10+44+12, y5=y4-12, y6=y5-44, y7=y6-10;
+  M.line(1,[[X,y0],[X,y1],[lx,y2],[lx,y3]],{n:3,side:-1,span:[18,0],r:18});
+  M.line(1,[[lx,y4],[lx,y5],[X,y6],[X,y7]],{n:3,side:-1,span:[0,18],r:18});
+  [-14,0,14].forEach(dx=>{
+    const p = dx===0 ? [[lx,y3],[lx,y4]] : [[lx,y3],[lx+dx,y3-Math.abs(dx)],[lx+dx,y4+Math.abs(dx)],[lx,y4]];
+    M.line(1,p,{ctx:true,r:9});
+  });
+  M.math('q, k, v',lx+34,(y3+y4)/2+6,{anchor:'start',size:17});
+  M.line(3,[[X,base],[X,top]],{avoid:[[0,base-16,1e3,1e3],[0,y1-8,1e3,y0+24],[0,y7-24,1e3,y6+8]],side:1,ends:'end',ring:'end',at:[0.07,0.5,1]});
+  M.line(4,[[X,top],[590,top]],{avoid:[[0,0,X+22,1e3]],side:1,term:'end'});
+  M.line(5,[[X,top],[150,top]],{avoid:[[X-22,0,1e3,1e3]],side:1,term:'end',at:[0.55]});
+  M.bullet(1,lx+22,y2+34); M.bullet(2,230,base+24); M.bullet(3,X-24,base-46); M.bullet(4,614,top); M.bullet(5,126,top);
+  M.label('TOKENS IN',24,base-17,{cls:'dest'}); M.label('NEXT TOKEN',590,top-17,{cls:'dest',anchor:'end'});
 }};
 
 /* ---------- Data Structures & Algorithms in Python ----------
@@ -422,13 +431,15 @@ MAPS['build-llms-from-scratch'] = { h:356, draw(M){
 MAPS['dsa-in-python'] = { h:372, draw(M){
   const g=48, x0=14, x1=14+12*g, y0=10, y1=10+7*g;
   for(let i=0;i<=12;i++) for(let j=0;j<=7;j++) M.rect(x0+i*g-18,y0+j*g-18,36,36,3,{cls:'cell'});
-  const pts=[[-60,y0],[x1,y0]]; let L=x0, T=y0, Rr=x1, B=y1, k=0;
-  while(true){
-    if(k%4===0){ pts.push([Rr,B]); T+=g; }
-    else if(k%4===1){ pts.push([L,B]); Rr-=g; }
-    else if(k%4===2){ pts.push([L,T]); B-=g; }
-    else { pts.push([Rr,T]); L+=g; }
-    k++; if(Rr-L<=g*2 && B-T<=g) break; if(k>20) break;
+  const pts=[[-60,y0],[x1,y0]]; let L=x0, T=y0+g, Rr=x1, B=y1, k=0;
+  const maxSides=10;
+  while(k<maxSides){
+    const s=k%4;
+    if(s===0){ if(T>B) break; pts.push([Rr,B]); Rr-=g; }
+    else if(s===1){ if(L>Rr) break; pts.push([L,B]); B-=g; }
+    else if(s===2){ if(T>B) break; pts.push([L,T]); L+=g; }
+    else { if(L>Rr) break; pts.push([Rr,T]); T+=g; }
+    k++;
   }
   const counts=M.parts().map(p=>p[2]), tot=counts.reduce((a,b)=>a+b,0);
   const cum=polyCum(pts), s0=84, S=cum[cum.length-1]-s0;
@@ -437,7 +448,7 @@ MAPS['dsa-in-python'] = { h:372, draw(M){
   pieces.forEach((pc,i)=>{
     M.line(i,pc,{ends:'end',ring:'end',avoid:i===0?[[-100,-1e4,s0-60,1e4]]:[],side:-1,r:20,bullet:i===0?66:undefined});
   });
-  M.tlabel('spiral traversal of a matrix',x1+18,y1+44,{anchor:'end'});
+  M.tlabel('spiral traversal',(x0+x1)/2,y0+3.5*g-4,{anchor:'middle'}); M.tlabel('of a matrix',(x0+x1)/2,y0+3.5*g+16,{anchor:'middle'});
 }};
 
 /* ---------- Build Decision Trees from Scratch ----------
@@ -492,7 +503,7 @@ function drawCharlie(M,idx){
   let acc=0; const cuts=counts.slice(0,-1).map(c=>{ acc+=c; return s0+S*acc/tot; });
   const route=[...pts]; const pieces=cutPoly(route,[s0,...cuts],22).slice(1);
   // rooms: alternate tints behind the line
-  pieces.forEach((pc,i)=>M.band(pc,34,{color:i%2?'var(--tint2)':'var(--tint)',r:22}));
+  pieces.forEach((pc,i)=>{ const L=polyCum(pc).slice(-1)[0]; const tp=cutPoly(pc,[2,L-2],0)[1]; M.band(tp,36,{color:i%2?'var(--tint2)':'var(--tint)',r:22}); });
   M.line(0,[pts[0],cutPoly(route,[s0],10)[0].slice(-1)[0]],{ctx:true,r:22});
   M.claim(0,1);
   pieces.forEach((pc,i)=>M.line(i,pc,{n:counts[i],side:(idx===1||idx===3)?-1:1,span:[6,6],r:22}));
@@ -505,16 +516,16 @@ function drawCharlie(M,idx){
 CHARLIE.forEach((c,i)=>{ MAPS[c.slug]={h:372,draw(M){drawCharlie(M,i);}}; });
 
 /* ---------- Inference Engineering (coming soon) ----------
-   A line under construction: hollow, with its announced stops. */
-MAPS['inference-engineering'] = { h:250, draw(M){
-  const pts=[[-60,190],[150,190],[270,70],[560,70]];
-  M.zone(`M150,${-10} H640 V250 H150Z`,{fill:M.hatch});
-  M.line(0,pts,{hollow:true,at:[0.18,0.52,0.72,0.93],avoid:[OUT],r:26});
-  M.line(0,[[560,70],[700,70]],{ctx:true,dash:'10 7',w:4,color:M.col(0)});
+   A line under construction: hollow, inside a hatched works corridor, with its announced stops. */
+MAPS['inference-engineering'] = { h:260, draw(M){
+  const pts=[[-60,228],[96,228],[196,128],[396,128],[496,28],[580,28]];
+  M.band([[-60,228],[96,228],[196,128],[396,128],[496,28],[700,28]],48,{color:M.hatch,r:26});
+  M.line(0,pts,{hollow:true,at:[0.12,0.47,0.62,0.93],avoid:[OUT],r:26,w:11});
+  M.line(0,[[580,28],[700,28]],{ctx:true,dash:'10 8',w:4,color:M.col(0)});
   const names=['BATCHING','KV-CACHE','PAGED ATTENTION','SPECULATIVE DECODING'];
-  M.stations.forEach((s,i)=>{ const [x,y]=s.p; const below = i===0;
-    M.label(names[i], x+(i===0?0:0), below? y+30 : y-18, {cls:'stn',anchor: i===0?'middle':'middle'}); });
-  M.tlabel('line under construction',400,152,{anchor:'middle'});
+  const off=[[0,40],[0,-30],[0,40],[-8,40]], anc=['middle','middle','middle','middle'];
+  M.stations.forEach((st,i)=>{ const [x,y]=st.p; M.label(names[i],x+off[i][0],y+off[i][1],{cls:'stn',anchor:anc[i]}); });
+  M.tlabel('line under construction',452,206,{anchor:'middle'});
 }};
 
 /* ============================================================
@@ -533,7 +544,7 @@ const META = {
  'charlie-vision-room':    {title:'Charlie and the<br>Vision Room', ts:64, series:1, hdr:'Charlie and the Intelligence Factory&ensp;·&ensp;Book II'},
  'charlie-sound-room':     {title:'Charlie and the<br>Sound Room', ts:64, series:2, hdr:'Charlie and the Intelligence Factory&ensp;·&ensp;Book III'},
  'charlie-reasoning-room': {title:'Charlie and the<br>Reasoning Room', ts:64, series:3, hdr:'Charlie and the Intelligence Factory&ensp;·&ensp;Book IV'},
- 'inference-engineering':  {title:'Inference<br>Engineering', ts:76, hdr:'Opening soon'},
+ 'inference-engineering':  {title:'Inference<br>Engineering', ts:76, hdr:'Opening soon', tag:'Serve LLMs fast — batching, KV-cache, paged attention,<br>speculative decoding.'},
 };
 const ORDER = Object.keys(META);
 
@@ -567,12 +578,13 @@ function buildCover(slug, host){
   const parts=d.parts||[]; let acc=1;
   let keyHTML;
   if(d.coming_soon){
-    keyHTML = d.stops.map((s,i)=>`<div class="k"><b class="hollow" style="--kc:${colors[0]}"></b><span>${s}</span><i>planned</i></div>`).join('');
+    keyHTML = d.stops.map((s,i)=>`<div class="k"><b class="hollow" style="--kc:${colors[0]}"></b><span>${s}</span><i>stop ${i+1}</i></div>`).join('');
   } else keyHTML = parts.map((p,i)=>{ const r=`${pad(acc)}${p[2]>1?'–'+pad(acc+p[2]-1):''}`; acc+=p[2];
      return `<div class="k"><b style="background:${colors[i%colors.length]}">${p[0]}</b><span>${p[1]}</span><i>${r}</i></div>`; }).join('');
   const stats = d.coming_soon ? `Line under construction&ensp;·&ensp;opening soon`
      : `${d.capsules} stations&ensp;·&ensp;${parts.length} ${m.series!=null?'rooms':'lines'}&ensp;·&ensp;${d.hours} ${d.hours===1?'hour':'hours'}`;
-  const hdr = m.hdr || (d.stage||'').replace(' · ','&ensp;·&ensp;');
+  let stage=d.stage||''; if(stage && !/^Stage/.test(stage)) stage='Stage 6 · '+stage;
+  const hdr = m.hdr || stage.replace(' · ','&ensp;·&ensp;');
   c.innerHTML = `
     <svg class="map" viewBox="0 0 720 888" xmlns="http://www.w3.org/2000/svg"></svg>
     <div class="hdr"><span>${hdr}</span><span class="lvl">${levelMark(d.level)}${LEVELS[d.level]}</span></div>

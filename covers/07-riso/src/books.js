@@ -17,7 +17,7 @@
   const BOOKS = [
     { slug: 'ai-context-engineering', fullTitle: 'AI Context Engineering', title: ['AI Context', 'Engineering'],
       level: 'intermediate', capsules: 43, hours: 10, flash: ['sunflower'], wdth: 90, titleMax: 112,
-      note: 'The context window as a fixed frame. Every source — system prompt, tools, memory, retrieved docs, history, query — is a strip of tokens; only what the frame admits prints solid, the rest stays a 30% screen.' },
+      note: 'The context window as a solid block of ink. Every source — system prompt, tools, memory, retrieved docs, history, query — is a strip of tokens; inside the window they overprint solid, outside they survive only as a 30% screen. A token-budget ruler runs down the edge.' },
     { slug: 'mathematical-foundations-for-ml', fullTitle: 'Mathematical Foundations for Machine Learning',
       title: ['Mathematical', 'Foundations for', 'Machine Learning'], level: 'beginner', capsules: 43, hours: 10,
       flash: ['yellow'], wdth: 84, titleMax: 96,
@@ -62,6 +62,12 @@
       title: ['Build a Data-Efficient', 'Image Transformer', '(DeiT) from Scratch'], level: 'advanced', capsules: 42, hours: 10,
       flash: ['aqua', 'forange'], wdth: 82, titleMax: 84,
       note: 'DeiT’s one new idea: a distillation token. An image split into patches, a class token, and a distillation token wired to a convolutional teacher.' },
+    { slug: 'machine-learning-fundamentals', fullTitle: 'Machine Learning Fundamentals', title: ['Machine Learning', 'Fundamentals'],
+      level: 'beginner', capsules: 37, hours: 9, flash: ['bubblegum', 'cornflower'], wdth: 86, titleMax: 104,
+      note: 'A linear classifier. Its confidence for each class is a halftone screen in that class’s ink, set at opposing angles; the decision boundary is where the two screens cross at 50% and the inks mix.' },
+    { slug: 'reinforcement-learning', fullTitle: 'Reinforcement Learning', title: ['Reinforcement', 'Learning'],
+      level: 'intermediate', capsules: 38, hours: 8, flash: ['yellow'], wdth: 88, titleMax: 112,
+      note: 'A gridworld after value iteration. Each cell’s value V(s) is its dot size, arrows show the greedy policy, and the agent’s path runs from start to the goal.' },
     { slug: 'sql-masterclass', fullTitle: 'SQL Masterclass', title: ['SQL', 'Masterclass'], level: 'beginner', capsules: 36, hours: 8,
       flash: ['aqua', 'yellow'], wdth: 92, titleMax: 124,
       note: 'Two tables as two stacks of rows. Printed in two inks, their overlap is literally the INNER JOIN — the medium does the query.' },
@@ -86,7 +92,6 @@
       const a = Math.max(s.x0, win.x0 + lab), b = Math.min(s.x1, win.x1 - 16);
       if (b > a + 6) inside.push({ ...s, x0: a, x1: b });
       if (s.x0 < win.x0 - 14) outside.push({ ...s, x1: Math.min(s.x1, win.x0 - 14) });
-      if (s.x1 > win.x1 + 74) outside.push({ ...s, x0: Math.max(s.x0, win.x1 + 74) });
     }
     let strips = '';
     for (const s of inside) strips += rectD(s.x0, s.y, s.x1 - s.x0, bh);
@@ -503,6 +508,98 @@
     key += T(bx, by + 214, 'CNN teacher', mono(13, 500, 0.08));
     key += T(gx, gy + n * s + 22, '8 × 8 patches', mono(13, 500, 0.08));
     return { flash: [p(aq), p(or)], key };
+  };
+
+
+  // ================================================================ Machine Learning Fundamentals
+  EMBLEMS['machine-learning-fundamentals'] = ({ R, K, title }) => {
+    const y0 = title.bottom + 10, y1 = 804, cx = 372, cy = (y0 + y1) / 2 + 10;
+    const th = -32 * Math.PI / 180, nx = -Math.sin(th), ny = Math.cos(th); // unit normal of the boundary
+    const sd = (x, y) => (x - cx) * nx + (y - cy) * ny;                    // signed distance
+    const pA = (x, y) => 1 / (1 + Math.exp(sd(x, y) / 52));
+    const fade = (y) => Math.max(0, Math.min(1, (y - y0) / 70)) * Math.max(0, Math.min(1, (y1 - y) / 30));
+    let a = p(halftone({ box: [0, y0, W, y1], cell: 9, angle: 15, tone: (x, y) => 0.62 * pA(x, y) * fade(y) }));
+    let b = p(halftone({ box: [0, y0, W, y1], cell: 9, angle: 75, tone: (x, y) => 0.62 * (1 - pA(x, y)) * fade(y) }));
+    // samples of each class
+    const gauss = () => { let u = 0; for (let i = 0; i < 6; i++) u += R(); return u - 3; };
+    let key = '';
+    const pts = (mx, my, n, which) => {
+      for (let i = 0; i < n; i++) {
+        const x = mx + gauss() * 78, y = my + gauss() * 62;
+        if (y < y0 + 40 || y > y1 - 24 || x < 40 || x > W - 40) continue;
+        const d = circ(x, y, 8.5);
+        if (which === 'a') a += p(d); else b += p(d);
+        key += `<path d="${circ(x, y, 8.5)}${circ(x, y, 5.6)}" fill-rule="evenodd"/>`;
+      }
+    };
+    pts(cx - 150 * nx - 20, cy - 150 * ny, 26, 'a');
+    pts(cx + 150 * nx + 20, cy + 150 * ny, 26, 'b');
+    // boundary w·x + b = 0 and its margins
+    const tx = Math.cos(th), ty = Math.sin(th), L = 520;
+    const seg = (off, w, dash) => {
+      const ox = cx + nx * off, oy = cy + ny * off;
+      if (!dash) return p(bar([ox - tx * L, oy - ty * L], [ox + tx * L, oy + ty * L], w));
+      let d = ''; for (let t = -L; t < L; t += 22) d += bar([ox + tx * t, oy + ty * t], [ox + tx * (t + 11), oy + ty * (t + 11)], w);
+      return p(d);
+    };
+    const clipId = 'mlf-clip';
+    key += `<g clip-path="url(#${clipId})">${seg(0, 5.5)}${seg(-52, 3, true)}${seg(52, 3, true)}</g>`;
+    const lx = cx + tx * 150 - nx * 14, ly = cy + ty * 150 - ny * 14;
+    key += `<text transform="rotate(${-32} ${f(lx)} ${f(ly)})" x="${f(lx)}" y="${f(ly - 10)}" style="${textStyle({ font: 'mono', size: 13, weight: 500, ls: 0.06 })}">p = 0.5</text>`;
+    const defs = `<clipPath id="${clipId}"><rect x="0" y="${f(y0 + 30)}" width="${W}" height="${f(y1 - y0 - 30)}"/></clipPath>`;
+    return { flash: [a, b], key, defs };
+  };
+
+  // ================================================================ Reinforcement Learning
+  EMBLEMS['reinforcement-learning'] = ({ R, K, title }) => {
+    const cols = 8, rows = 6, cs = 76, gx = (W - cols * cs) / 2, gy = Math.max(title.bottom + 44, 800 - rows * cs);
+    const walls = new Set(['2,1', '2,2', '2,3', '5,2', '5,3', '5,4', '5,5', '3,5', '6,0']);
+    const goal = [7, 1], start = [0, 5];
+    // BFS distance to goal -> V(s) = gamma^d
+    const dist = {}; const q = [goal]; dist[goal.join(',')] = 0;
+    while (q.length) {
+      const [i, j] = q.shift();
+      for (const [di, dj] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const ni = i + di, nj = j + dj, k = ni + ',' + nj;
+        if (ni < 0 || nj < 0 || ni >= cols || nj >= rows || walls.has(k) || k in dist) continue;
+        dist[k] = dist[i + ',' + j] + 1; q.push([ni, nj]);
+      }
+    }
+    let fl = '', key = '';
+    const cx = (i) => gx + i * cs + cs / 2, cy = (j) => gy + j * cs + cs / 2;
+    for (let i = 0; i < cols; i++) for (let j = 0; j < rows; j++) {
+      const k = i + ',' + j, x = gx + i * cs, y = gy + j * cs;
+      if (walls.has(k)) { key += p(rectD(x + 3, y + 3, cs - 6, cs - 6)); continue; }
+      if (i === goal[0] && j === goal[1]) { fl += p(rectD(x + 3, y + 3, cs - 6, cs - 6)); continue; }
+      const v = Math.pow(0.84, dist[k]);
+      fl += p(halftone({ box: [x + 5, y + 5, x + cs - 5, y + cs - 5], cell: 8, angle: 45, tone: () => v * 0.95 }));
+      // greedy policy arrow: toward the neighbour with the smallest distance
+      let best = null;
+      for (const [di, dj] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const nk = (i + di) + ',' + (j + dj); if (nk in dist && (best === null || dist[nk] < best[2])) best = [di, dj, dist[nk]]; }
+      if (best && !(i === start[0] && j === start[1])) {
+        const ax = cx(i), ay = cy(j), s = 9;
+        const [di, dj] = best;
+        key += p(polyD([[ax + di * s * 1.3, ay + dj * s * 1.3], [ax - di * s * 0.7 - dj * s, ay - dj * s * 0.7 + di * s], [ax - di * s * 0.7 + dj * s, ay - dj * s * 0.7 - di * s]]));
+      }
+    }
+    // grid ticks
+    for (let i = 0; i <= cols; i++) for (let j = 0; j <= rows; j++) key += p(rectD(gx + i * cs - 1, gy + j * cs - 5, 2, 10) + rectD(gx + i * cs - 5, gy + j * cs - 1, 10, 2));
+    // the agent's path, start -> goal
+    let cur = start.slice(); const path = [cur.slice()];
+    while (dist[cur.join(',')] > 0) {
+      let nxt = null;
+      for (const [di, dj] of [[0, -1], [1, 0], [-1, 0], [0, 1]]) { const nk = (cur[0] + di) + ',' + (cur[1] + dj); if (nk in dist && dist[nk] === dist[cur.join(',')] - 1) { nxt = [cur[0] + di, cur[1] + dj]; break; } }
+      cur = nxt; path.push(cur.slice());
+    }
+    for (let k = 0; k < path.length - 1; k++) {
+      const a = [cx(path[k][0]), cy(path[k][1])], b = [cx(path[k + 1][0]), cy(path[k + 1][1])];
+      const last = k === path.length - 2;
+      const e = last ? [a[0] + (b[0] - a[0]) * 0.42, a[1] + (b[1] - a[1]) * 0.42] : b;
+      key += p(bar(a, e, 6)) + p(circ(a[0], a[1], 3));
+    }
+    key += `<path d="${circ(cx(start[0]), cy(start[1]), 16)}${circ(cx(start[0]), cy(start[1]), 11)}" fill-rule="evenodd"/>`;
+    key += T(cx(goal[0]), cy(goal[1]) + 12, '+1', { font: 'serif', italic: true, size: 36, anchor: 'middle' });
+    return { flash: [fl], key };
   };
 
   // ================================================================ SQL Masterclass

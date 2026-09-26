@@ -18,7 +18,7 @@ body{font-family:var(--serif)}
 .wall{display:flex;flex-wrap:wrap;gap:48px;padding:0 64px}
 
 /* ---------- the cover system ---------- */
-.cover,.front{position:relative;width:720px;height:888px;overflow:hidden;background:var(--ground);color:var(--ink);flex:none}
+.cover,.front{position:relative;width:720px;height:888px;overflow:hidden;background:var(--ground);color:var(--ink);flex:none;box-shadow:0 0 0 2px var(--ground)}
 .beginner{--ground:var(--paper);--ink:var(--carbon);--ink2:#96968F;--sig:var(--signal)}
 .intermediate{--ground:var(--signal);--ink:var(--carbon);--ink2:#9C2A21;--sig:#F4F2EB}
 .advanced{--ground:var(--carbon);--ink:#ECEAE3;--ink2:#5E5F63;--sig:#EF4031}
@@ -271,7 +271,7 @@ GEN['neural-networks-from-scratch'] = (r, b, acc) => {
 
 /* ---- AI Context Engineering: retrieve, select by MMR, and lay out an 8k window ---- */
 GEN['ai-context-engineering'] = (r, b, acc) => {
-  const g = Gauss(r), dim = 48, K = 9, N = 1100, budget = 8192, lam = 0.7;
+  const g = Gauss(r), dim = 48, K = 12, N = 2400, budget = 8192, lam = 0.55;
   const cents = Array.from({ length: K }, () => unit(Array.from({ length: dim }, g))), wts = cents.map(() => 0.3 + r()), wsum = wts.reduce((a, c) => a + c, 0);
   const E = [], L = [];
   for (let n = 0; n < N; n++) {
@@ -302,11 +302,11 @@ GEN['ai-context-engineering'] = (r, b, acc) => {
   const ord = front.concat(back.reverse()), bx0 = 36, bw = 648, byy = P.y + P.h - 30, bh = 16; let a0 = 0; const slot = new Map();
   for (const c of ord) { slot.set(c, [bx0 + bw * a0 / budget, bw * L[c] / budget]); a0 += L[c]; }
   let dots = '', threads = '', chosen = '', segs = '';
-  for (let c = 0; c < N; c++) { if (inS[c]) continue; const [x, y] = M2(pr[c]), rr = 0.8 + 2.1 * clamp(rel[c], 0, 1) ** 3; dots += `M${f1(x - rr)} ${f1(y)}a${f1(rr)} ${f1(rr)} 0 1 0 ${f1(2 * rr)} 0a${f1(rr)} ${f1(rr)} 0 1 0 ${f1(-2 * rr)} 0`; }
-  for (const c of S) { const [x, y] = M2(pr[c]), [sa, sw] = slot.get(c), tx = sa + sw / 2, h = byy - y; threads += `M${f1(x)} ${f1(y)}C${f1(x)} ${f1(y + h * 0.55)} ${f1(tx)} ${f1(byy - h * 0.4)} ${f1(tx)} ${f1(byy)}`; chosen += `<circle class="fr" cx="${f1(x)}" cy="${f1(y)}" r="3.4"/>`; segs += box(sa + 1, byy, sw - 2, bh); }
+  for (let c = 0; c < N; c++) { if (inS[c]) continue; const [x, y] = M2(pr[c]), rr = 0.7 + 2.4 * clamp(rel[c], 0, 1) ** 3; dots += `M${f1(x - rr)} ${f1(y)}a${f1(rr)} ${f1(rr)} 0 1 0 ${f1(2 * rr)} 0a${f1(rr)} ${f1(rr)} 0 1 0 ${f1(-2 * rr)} 0`; }
+  for (const c of S) { const [x, y] = M2(pr[c]), [sa, sw] = slot.get(c), tx = sa + sw / 2, h = byy - y; threads += `M${f1(x)} ${f1(y)}C${f1(x)} ${f1(y + h * 0.55)} ${f1(tx)} ${f1(byy - h * 0.4)} ${f1(tx)} ${f1(byy)}`; chosen += `<circle class="fr" cx="${f1(x)}" cy="${f1(y)}" r="3.8" stroke="var(--ink)" stroke-width="1.2" style="stroke:var(--ink)"/>`; segs += box(sa + 1, byy, sw - 2, bh); }
   const [qx, qy] = M2(qp);
   return {
-    svg: `<path class="fk" d="${dots}"/>` + path(threads, 'k', 0.9) + `<path class="fr" d="${segs}"/>` + path(box(bx0, byy, bw, bh), 'k', 1) + chosen +
+    svg: `<path class="fk" d="${dots}"/>` + path(threads, 'k', 1.05) + `<path class="fr" d="${segs}"/>` + path(box(bx0, byy, bw, bh), 'k', 1) + chosen +
       `<circle class="ring" cx="${f1(qx)}" cy="${f1(qy)}" r="7" stroke-width="1.8"/><circle class="fk" cx="${f1(qx)}" cy="${f1(qy)}" r="2"/>`,
     caption: `${fmt(N)} document chunks in a ${dim}-dimensional embedding space, flattened here by PCA; ◎ is the query. Maximal marginal relevance (λ = ${lam}) picks the ${S.length} that fill an ${fmt(budget)}-token window (${fmt(used)} used), laid out most-relevant-at-the-ends. The chosen are in ${acc}.`
   };
@@ -423,7 +423,7 @@ GEN['pi-vs-hermes-vs-codex'] = (r, b, acc) => {
     labels += `<text x="${f1(cx0)}" y="${f1(P.y + 12)}" font-size="9.5" letter-spacing=".06em">${['I', 'II', 'III'][pi]} · ${name.toUpperCase()}</text>`;
   });
   return {
-    svg: path(sys, 'k2', 1.4, 'stroke-linecap="butt"') + path(raw, 'k', 0.55, 'opacity=".85"') + path(sums, 'r', 1.5) + labels,
+    svg: path(sys, 'k2', 1.4, 'stroke-linecap="butt"') + path(raw, 'k', 0.5, 'opacity=".78"') + path(sums, 'r', 1.5) + labels,
     caption: `One simulated ${T}-turn agent session (${fmt(msgs.length)} messages) replayed under three compaction policies. Each line is one message’s place in the context window, time running down; where lines converge, the window was compacted (${counts[0]}, ${counts[1]} and ${counts[2]} times). Summaries in ${acc}.`
   };
 };
@@ -499,7 +499,7 @@ GEN['kernel-engineering'] = (r, b, acc) => {
   for (let k = 0; k < ST; k++) {
     const d = 1 << k, nv = vals.slice();
     for (let i = 0; i < LN; i++) {
-      const v = seg(X(i), Y(k), X(i), Y(k + 1)); if (cone[k + 1].has(i)) red += v; else lanes += v;
+      const v = seg(X(i), Y(k), X(i), Y(k + 1)); if (i === target) red += v; else lanes += v;
       if (i >= d) { nv[i] = vals[i] + vals[i - d]; nOps++; const e = seg(X(i - d), Y(k), X(i), Y(k + 1)); if (cone[k + 1].has(i)) red += e; else diag += e; adds += `M${f1(X(i) - 1.6)} ${f1(Y(k + 1))}a1.6 1.6 0 1 0 3.2 0a1.6 1.6 0 1 0 -3.2 0`; }
     }
     vals = nv;
@@ -508,8 +508,8 @@ GEN['kernel-engineering'] = (r, b, acc) => {
   let digits = ''; vals0.forEach((v, i) => { digits += `<text x="${f1(X(i))}" y="${f1(P.y + 12)}" font-size="8" text-anchor="middle"${cone[0].has(i) ? ' class="acc"' : ''}>${v}</text>`; });
   digits += `<text x="${f1(X(target))}" y="${f1(Y(ST) + 16)}" font-size="9" text-anchor="middle" class="acc">${vals[target]}</text>`;
   return {
-    svg: path(lanes, 'k2', 0.8) + path(diag, 'k', 0.7, 'opacity=".9"') + `<path class="fk" d="${adds}"/>` + path(red, 'r', 1.7) + digits,
-    caption: `A Kogge–Stone prefix sum, the pattern inside warp-level scans: ${LN} GPU lanes, ${ST} steps, ${nOps} additions. At step k each lane adds the partial sum 2ᵏ lanes to its left. In ${acc}: everything lane ${target} depends on — ${cone[0].size} of the digits above, which it sums to ${vals[target]}${ok ? '' : ' (check failed)'}.`
+    svg: path(lanes, 'k2', 0.8) + path(diag, 'k', 0.7, 'opacity=".9"') + `<path class="fk" d="${adds}"/>` + path(red, 'r', 1.5) + digits,
+    caption: `A Kogge–Stone prefix sum, the pattern inside warp-level scans: ${LN} GPU lanes, ${ST} steps, ${nOps} additions. At step k each lane adds the partial sum 2ᵏ lanes to its left. In ${acc}: the additions lane ${target} depends on, gathering ${cone[0].size} of the digits above into ${vals[target]}${ok ? '' : ' (check failed)'}.`
   };
 };
 
@@ -524,7 +524,7 @@ GEN['charlie-language-room'] = (r, b, acc) => {
   const prob = (ctx) => { const p = new Map(Vs.map((c) => [c, 0])); let wsum = 0;
     for (let o = 0; o <= 4; o++) { const m = cnt[o].get(ctx.slice(ctx.length - o)); if (!m) continue; let tot = 0; for (const v of m.values()) tot += v; for (const [c, v] of m) p.set(c, p.get(c) + lam[o] * v / tot); wsum += lam[o]; }
     for (const c of Vs) p.set(c, (p.get(c) + 1e-4) / (wsum + 1e-4 * Vs.length)); return p; };
-  const prompt = 'Charlie and the ', goal = 'Language Room', B = 20, depth = 16;
+  const prompt = 'Charlie and the ', goal = 'Language Room', B = 28, depth = 16;
   let beams = [{ s: '^^^^' + prompt, lp: 0, id: 0, done: false }], nid = 1; const all = new Map([[0, { id: 0, parent: -1, s: prompt, kids: [] }]]);
   for (let d = 1; d <= depth; d++) {
     const cand = [];
@@ -535,7 +535,7 @@ GEN['charlie-language-room'] = (r, b, acc) => {
   // tidy layout: leaves in alphabetical order, parents centred on their children, x = letters generated
   let leafN = 0; const lay = (nd, d) => { nd.d = d; if (!nd.kids.length) { nd.y = leafN++; return; } nd.kids.sort((a, c) => (a.s < c.s ? -1 : 1)); nd.kids.forEach((k) => lay(k, d + 1)); nd.y = (nd.kids[0].y + nd.kids[nd.kids.length - 1].y) / 2; };
   const root = all.get(0); lay(root, 0);
-  const dx = 16.5, X = (nd) => Q.x + 4 + nd.d * dx, Y = (nd) => Q.y + 6 + (Q.h - 12) * nd.y / (leafN - 1);
+  const dx = 20.5, X = (nd) => Q.x + 4 + nd.d * dx, Y = (nd) => Q.y + 6 + (Q.h - 12) * nd.y / (leafN - 1);
   const ranked = beams.filter((bm) => bm.done).map((bm) => bm.s.slice(4)), goalRank = ranked.indexOf(prompt + goal + '\n') + 1;
   let lines = '', red = '', labels = '';
   for (const nd of all.values()) { if (nd.parent < 0) continue; const p = all.get(nd.parent), x0 = X(p), y0 = Y(p), x1 = X(nd), y1 = Y(nd), mx = (x0 + x1) / 2, d = `M${f1(x0)} ${f1(y0)}C${f1(mx)} ${f1(y0)} ${f1(mx)} ${f1(y1)} ${f1(x1)} ${f1(y1)}`;
@@ -553,7 +553,7 @@ GEN['charlie-vision-room'] = (r, b, acc) => {
   const half = (p) => { const v = []; for (const w of om) v.push(Math.sin(p * w), Math.cos(p * w)); return v; };   // one axis of the embedding
   const S = 3, NS = (G - 1) * S + 1, sp = Array.from({ length: NS }, (_, i) => i / S), hs = sp.map(half), ha = Array.from({ length: G }, (_, i) => half(i));
   const dd = ha.map((a) => hs.map((h) => dot(a, h)));                 // exact: cos-sim = (row part + column part) / 2q
-  const map = Q.w / G, pad = 4, cell = (map - 2 * pad) / (NS - 1), levels = [0.975, 0.945, 0.91, 0.875, 0.84];
+  const map = Q.w / G, pad = 4, cell = (map - 2 * pad) / (NS - 1), levels = [0.985, 0.962, 0.935, 0.905, 0.875, 0.845];
   let lines = '', self = '';
   for (let ai = 0; ai < G; ai++) for (let aj = 0; aj < G; aj++) {
     const F = new Float64Array(NS * NS); for (let j = 0; j < NS; j++) for (let i = 0; i < NS; i++) F[j * NS + i] = (dd[ai][j] + dd[aj][i]) / (2 * q);
@@ -562,8 +562,8 @@ GEN['charlie-vision-room'] = (r, b, acc) => {
     self += `<circle class="fr" cx="${f1(ox + aj * S * cell)}" cy="${f1(oy + ai * S * cell)}" r="1.9"/>`;
   }
   return {
-    svg: path(lines, 'k', 0.7) + self,
-    caption: `A Vision Transformer sees a picture as a ${G} × ${G} grid of patches and tells them apart by position embeddings. These are its fixed 2-D sine–cosine embeddings (d = ${d}): each small field is one patch’s cosine similarity to every position, contoured at ${levels.join(', ')}; ${acc} marks the patch itself.`
+    svg: path(lines, 'k', 0.8) + self,
+    caption: `A Vision Transformer reads a picture as a ${G} × ${G} grid of patches and tells them apart by position embeddings. These are its fixed 2-D sine–cosine ones (d = ${d}): each small field contours one patch’s cosine similarity to every other position; ${acc} marks the patch itself.`
   };
 };
 
@@ -594,10 +594,10 @@ GEN['charlie-sound-room'] = (r, b, acc) => {
   const floor = gmax - 62, X = (f) => Q.x + Q.w * f / (frames - 1), Y = (hz) => Q.y + Q.h - Q.h * hz / 4000;
   let ribbons = '', fund = '', nh = 0;
   for (let h = 1; h < 40; h++) {
-    const top = [], bot = [];
-    for (let f = 0; f < frames; f++) { const hz = h * pitch[f]; if (hz > 3950) continue; const kb = hz * Nf / fs, k0 = Math.floor(kb), db = Math.max(spec[f][k0], spec[f][k0 + 1]); const w = clamp((db - floor) / 62, 0, 1) ** 1.8 * 9 + 0.45; top.push([X(f), Y(hz) - w / 2]); bot.push([X(f), Y(hz) + w / 2]); }
-    if (top.length < 2) continue; nh++;
-    const dd = D(top.concat(bot.reverse())) + 'Z'; if (h === 1) fund += dd; else ribbons += dd;
+    let top = [], bot = [], any = false;
+    const flush = () => { if (top.length > 1) { any = true; const dd = D(top.concat(bot.reverse())) + 'Z'; if (h === 1) fund += dd; else ribbons += dd; } top = []; bot = []; };
+    for (let f = 0; f < frames; f++) { const hz = h * pitch[f]; if (hz > 3950) { flush(); continue; } const kb = hz * Nf / fs, k0 = Math.floor(kb), db = Math.max(spec[f][k0], spec[f][k0 + 1]); const w = clamp((db - floor) / 62, 0, 1) ** 1.8 * 9 + 0.45; top.push([X(f), Y(hz) - w / 2]); bot.push([X(f), Y(hz) + w / 2]); }
+    flush(); if (any) nh++;
   }
   return {
     svg: `<path class="fk" d="${ribbons}"/><path class="fr" d="${fund}"/>`,
@@ -610,20 +610,20 @@ GEN['charlie-reasoning-room'] = (r, b, acc) => {
   const g = Gauss(r), K = 12, T = 1600;
   const gamma = (a) => { const d = a - 1 / 3, c = 1 / Math.sqrt(9 * d); for (;;) { let x, v; do { x = g(); v = 1 + c * x; } while (v <= 0); v = v * v * v; const u = r(); if (u < 1 - 0.0331 * x ** 4 || Math.log(u) < 0.5 * x * x + d * (1 - v + Math.log(v))) return d * v; } };
   const beta = (a, c) => { const x = gamma(a); return x / (x + gamma(c)); };
-  const p = Array.from({ length: K }, (_, k) => k === K - 1 ? 0.78 : 0.12 + 0.5 * k / (K - 2)); for (let i = K - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [p[i], p[j]] = [p[j], p[i]]; }
+  const p = Array.from({ length: K }, (_, k) => k === K - 1 ? 0.72 : 0.12 + 0.52 * k / (K - 2)); for (let i = K - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [p[i], p[j]] = [p[j], p[i]]; }
   const bestArm = p.indexOf(Math.max(...p)), A = new Array(K).fill(1), Bb = new Array(K).fill(1), pulls = [], means = Array.from({ length: K }, () => []);
   for (let t = 0; t < T; t++) { let arm = 0, bv = -1; for (let k = 0; k < K; k++) { const s = beta(A[k], Bb[k]); if (s > bv) { bv = s; arm = k; } } const rew = r() < p[arm] ? 1 : 0; A[arm] += rew; Bb[arm] += 1 - rew; pulls.push(arm);
     if (t % 6 === 0 || t === T - 1) for (let k = 0; k < K; k++) means[k].push([t, A[k] / (A[k] + Bb[k])]); }
   // settled: from here on, every window of 100 pulls is at least 90% the best arm
   const W = 100, pre = [0]; pulls.forEach((a) => pre.push(pre[pre.length - 1] + (a === bestArm)));
   let settled = -1, ok = true; for (let t = T - W; t >= 0; t--) { if ((pre[t + W] - pre[t]) / W < 0.9) { ok = false; } if (ok) settled = t; }
-  const cw = Q.w / K, Y = (t) => Q.y + Q.h * t / (T - 1);
+  const cw = Q.w / K, Y = (t) => Q.y + Q.h * Math.sqrt(t / (T - 1));
   let dash = '', red = '', mean = '';
-  pulls.forEach((a, t) => { const x = Q.x + a * cw, d = seg(x + 3, Y(t), x + cw - 3, Y(t)); if (a === bestArm) red += d; else dash += d; });
+  pulls.forEach((a, t) => { const x = Q.x + a * cw, d = seg(x + 2, Y(t), x + cw - 2, Y(t)); if (a === bestArm) red += d; else dash += d; });
   for (let k = 0; k < K; k++) mean += D(means[k].map(([t, m]) => [Q.x + k * cw + 3 + (cw - 6) * m, Y(t)]));
   return {
     svg: path(dash, 'k', 0.8, 'stroke-linecap="butt"') + path(red, 'r', 0.8, 'stroke-linecap="butt"') + path(mean, 'k2', 1),
-    caption: `Thompson sampling on a ${K}-armed bandit, ${fmt(T)} pulls computed in this page, time running down. Each dash is one pull; the thin line in each column is the agent’s belief about that arm. The best arm (p = ${p[bestArm].toFixed(2)}) is ${acc}${settled >= 0 ? `; from pull ${fmt(settled + 1)} on, it takes 9 pulls in 10` : ''}.`
+    caption: `Thompson sampling on a ${K}-armed bandit, ${fmt(T)} pulls computed in this page, time running down (on a square-root scale). Each dash is one pull; the thin line in each column is the agent’s belief about that arm. The best arm (p = ${p[bestArm].toFixed(2)}) is ${acc}: it won ${fmt(pre[T])} of the ${fmt(T)} pulls${settled >= 0 ? `, and 9 in 10 from pull ${fmt(settled + 1)} on` : ''}.`
   };
 };
 
@@ -639,7 +639,7 @@ const BOOKS = [
   { set: 'core', slug: 'pi-vs-hermes-vs-codex', title: 'Pi vs Hermes vs Codex:<br>Context Compaction<br>and Memory', level: 'advanced', capsules: 9, hours: 1, size: 60 },
   { set: 'range', slug: 'decision-trees-from-scratch', title: 'Build Decision Trees<br>from Scratch', level: 'beginner', capsules: 23, hours: 5, size: 68 },
   { set: 'range', slug: 'sciml', title: 'Scientific Machine<br>Learning (SciML)', level: 'advanced', capsules: 39, hours: 9, size: 70 },
-  { set: 'range', slug: 'kernel-engineering', title: 'Kernel<br>Engineering', level: 'advanced', soon: true, size: 84, sub: 'From silicon to speculative decoding —<br>GPU kernels for modern LLMs.' },
+  { set: 'range', slug: 'kernel-engineering', title: 'Kernel<br>Engineering', level: 'advanced', soon: true, size: 84, sub: 'From silicon to speculative decoding — GPU kernels for modern LLMs.', subSize: 20 },
   { set: 'series', slug: 'charlie-language-room', pre: 'Charlie and the', title: 'Language Room', level: 'advanced', capsules: 22, hours: 5, size: 70, series: 'I', sub: 'Language — Inference Engineering' },
   { set: 'series', slug: 'charlie-vision-room', pre: 'Charlie and the', title: 'Vision Room', level: 'intermediate', capsules: 20, hours: 6, size: 70, series: 'II', sub: 'Vision — Vision Transformers' },
   { set: 'series', slug: 'charlie-sound-room', pre: 'Charlie and the', title: 'Sound Room', level: 'intermediate', capsules: 20, hours: 6, size: 70, series: 'III', sub: 'Audio — Voice Agents' },

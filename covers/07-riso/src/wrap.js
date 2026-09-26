@@ -32,7 +32,7 @@
     key += p(rectD(M - 3, y0 - 10, W - 2 * M + 6 - 6 + 3, 4));
     key += T(M, y0 - 24, 'ATTENTION FROM THE LAST TOKEN', mono(11.5, 500, 0.16));
     // stats
-    const facts = [['CAPSULES', String(book.capsules)], ['HOURS', `~${book.hours}`], ['LEVEL', lv.label]];
+    const facts = [['CAPSULES', String(book.capsules)], ['HOURS OF READING', `~${book.hours}`], ['TO READ ONLINE', 'Free']];
     facts.forEach(([k, v], i) => {
       const x = M + i * 200;
       key += T(x, 610, v, { font: 'display', weight: 800, size: 54, wdth: 88, opsz: 72, ls: -0.01 });

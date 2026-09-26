@@ -1,0 +1,37 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0}.cover{width:720px;height:888px;position:relative}canvas{width:720px;height:888px;display:block}#log{position:absolute;top:10px;left:10px;font:20px monospace;color:red}</style></head><body>
+<div class="cover" data-slug="test"><canvas id="c" width="2250" height="2775"></canvas><div id="log"></div></div>
+<script>
+const t0=performance.now();
+const c=document.getElementById('c');
+const gl=c.getContext('webgl2',{preserveDrawingBuffer:true,antialias:false});
+const log=document.getElementById('log');
+if(!gl){log.textContent='NO WEBGL2';}
+else{
+const dbg=gl.getExtension('WEBGL_debug_renderer_info');
+const rend=dbg?gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL):gl.getParameter(gl.RENDERER);
+const vs=`#version 300 es
+in vec2 p;void main(){gl_Position=vec4(p,0,1);}`;
+const fs=`#version 300 es
+precision highp float;out vec4 o;uniform vec2 R;
+float sd(vec3 p){float s=length(p-vec3(0,1,0))-1.;float f=p.y;return min(s,f);}
+vec3 nrm(vec3 p){vec2 e=vec2(1e-3,0);return normalize(vec3(sd(p+e.xyy)-sd(p-e.xyy),sd(p+e.yxy)-sd(p-e.yxy),sd(p+e.yyx)-sd(p-e.yyx)));}
+float sh(vec3 ro,vec3 rd){float r=1.,t=.02;for(int i=0;i<64;i++){float h=sd(ro+rd*t);r=min(r,8.*h/t);t+=clamp(h,.02,.3);if(h<1e-4||t>10.)break;}return clamp(r,0.,1.);}
+float ao(vec3 p,vec3 n){float o=0.,s=1.;for(int i=0;i<5;i++){float h=.02+.12*float(i);o+=(h-sd(p+n*h))*s;s*=.8;}return clamp(1.-2.*o,0.,1.);}
+void main(){vec2 uv=(gl_FragCoord.xy-.5*R)/R.y;vec3 ro=vec3(0,1.5,-5),rd=normalize(vec3(uv,1.6));
+float t=0.;for(int i=0;i<128;i++){float h=sd(ro+rd*t);if(h<1e-4||t>30.)break;t+=h;}
+vec3 col=vec3(.9);if(t<30.){vec3 p=ro+rd*t,n=nrm(p);vec3 l=normalize(vec3(-1,2,-1));col=vec3(.8)*(max(dot(n,l),0.)*sh(p+n*1e-3,l)+.3*ao(p,n));}
+o=vec4(pow(col,vec3(.4545)),1);}`;
+function sh(t,s){const x=gl.createShader(t);gl.shaderSource(x,s);gl.compileShader(x);if(!gl.getShaderParameter(x,gl.COMPILE_STATUS))throw gl.getShaderInfoLog(x);return x;}
+const pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,vs));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,fs));gl.linkProgram(pr);gl.useProgram(pr);
+const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+const loc=gl.getAttribLocation(pr,'p');gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
+gl.uniform2f(gl.getUniformLocation(pr,'R'),c.width,c.height);
+gl.viewport(0,0,c.width,c.height);
+gl.enable(gl.SCISSOR_TEST);
+const TS=512;
+for(let y=0;y<c.height;y+=TS)for(let x=0;x<c.width;x+=TS){gl.scissor(x,y,TS,TS);gl.drawArrays(gl.TRIANGLES,0,3);gl.finish();}
+const px=new Uint8Array(4);gl.readPixels(0,0,1,1,gl.RGBA,gl.UNSIGNED_BYTE,px);
+log.textContent=rend+' | '+(performance.now()-t0).toFixed(0)+'ms';
+console.error('RESULT '+log.textContent);
+}
+</script></body></html>
