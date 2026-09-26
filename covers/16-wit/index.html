@@ -129,7 +129,7 @@ ART['ai-context-engineering'] = () => {
 ART['mathematical-foundations-for-ml'] = () => {
   const out = [];
   const tri = [[88,292],[360,150],[632,292]];
-  const inn = insetTri(tri,[10,28,17]);
+  const inn = insetTri(tri,[7,36,20]);
   out.push(`<path d="${poly(tri)} ${poly(inn)}" fill="${C.red}" fill-rule="evenodd"/>`);
   const W=120, gap=12, x0 = 360 - (4*W+3*gap)/2, y0 = 304, H = 216;
   for(let i=0;i<4;i++){
@@ -139,7 +139,8 @@ ART['mathematical-foundations-for-ml'] = () => {
     out.push(rect(x+W-44, y0+15, 27, H-23, C.ink));            // right stem
     out.push(rect(x+6, y0+H-8, 49, 8, C.ink));                 // foot serifs = column bases
     out.push(rect(x+W-55, y0+H-8, 49, 8, C.ink));
-    out.push(P(`M${x+17} ${y0+H-8} q0 -10 -6 -10 v10 z M${x+44} ${y0+H-8} q0 -10 6 -10 v10 z M${x+W-44} ${y0+H-8} q0 -10 -6 -10 v10 z M${x+W-17} ${y0+H-8} q0 -10 6 -10 v10 z`, C.ink));
+    const yb = y0+H-8, br = (sx,dir) => `M${sx} ${yb-12} Q${sx} ${yb} ${sx+dir*12} ${yb} H${sx} Z `;
+    out.push(P(br(x+17,-1)+br(x+44,1)+br(x+W-44,-1)+br(x+W-17,1), C.ink));
     out.push(rect(x, y0+15, 5, 14, C.ink)); out.push(rect(x+W-5, y0+15, 5, 14, C.ink));
   }
   const steps = [['CALCULUS',548],['PROBABILITY & STATISTICS',602],['LINEAR ALGEBRA',656]];
@@ -161,43 +162,44 @@ ART['neural-networks-from-scratch'] = () => {
   N[3].forEach(([x,y],i)=> out.push(S(`M${x} ${y} L720 ${[196,440][i]}`, C.ink, 2.2)));
   out.push(S(`M${N[1][0][0]} ${N[1][0][1]} L250 0`, C.ink, 2.2));
   // the unfinished edge
-  const a = N[2][3], b = N[3][1], t = 0.56;
+  const a = N[2][3], b = N[3][1], t = 0.62;
   const sx = a[0]+(b[0]-a[0])*t, sy = a[1]+(b[1]-a[1])*t;
   for(let l=0;l<3;l++) N[l].forEach(p=>N[l+1].forEach(q=>{
     if(p===a && q===b) return;
     out.push(S(`M${p[0]} ${p[1]} L${q[0]} ${q[1]}`, C.ink, 2.2));
   }));
-  out.push(S(`M${a[0]} ${a[1]} L${f(sx)} ${f(sy)}`, C.ink, 2.2));
   N.flat().forEach(([x,y])=> out.push(circ(x,y,10,C.ink)));
-  // spider (drawn facing +x, then rotated along the edge)
+  // spider, top-down, facing +x, then rotated along the unfinished edge
   const ang = Math.atan2(b[1]-a[1], b[0]-a[0])*180/Math.PI;
   const legs = [];
-  [[-1],[1]].forEach(([sg])=>{
-    [[6,28,-8,52,-30],[2,34,4,58,-6],[-4,32,18,52,22],[-9,26,26,40,44]].forEach(([bx,kx,ky,fx,fy])=>{
-      legs.push(S(`M${bx} 0 L${bx+ky*0.5} ${sg*kx} L${fx*0.2+bx+ky} ${sg*fx}`, C.ink, 3.6));
+  [1,-1].forEach(sg=>{
+    [[12,7, 30,30, 62,40],[7,10, 16,40, 34,70],[1,10, -10,40, -30,68],[-5,8, -28,32, -60,48]].forEach(([ax,ay,kx,ky,fx,fy])=>{
+      legs.push(S(`M${ax} ${sg*ay} L${kx} ${sg*ky} L${fx} ${sg*fy}`, C.ink, 5.2));
     });
   });
-  out.push(`<g transform="translate(${f(sx)} ${f(sy)}) rotate(${f(ang)})">
+  out.push(S(`M${a[0]} ${a[1]} L${f(sx)} ${f(sy)}`, C.red, 3.4));
+  out.push(`<g transform="translate(${f(sx)} ${f(sy)}) rotate(${f(ang)}) scale(1.08)">
      ${legs.join('')}
-     <ellipse cx="-22" cy="0" rx="21" ry="16" fill="${C.red}"/>
-     ${circ(4,0,10,C.ink)}
+     <ellipse cx="-30" cy="0" rx="27" ry="21" fill="${C.ink}"/>
+     <ellipse cx="4" cy="0" rx="15" ry="13" fill="${C.ink}"/>
+     ${circ(20,0,7,C.ink)}
    </g>`);
   return out.join('');
 };
 
 // The Tower of Babel, rebuilt: a stack of identical blocks that learns every language.
 ART['build-llms-from-scratch'] = () => {
-  const out = [], base = 584, th = 62, glyphs = ['A','अ','λ','ع','言','Я','あ','Ω','क','ж','語','ب','e','ह','β','и'];
+  const out = [], base = 584, th = 54, glyphs = ['A','अ','λ','ع','言','Я','あ','Ω','क','ж','語','ب','e','ह','β','и'];
   let gi = 0;
-  const widths = [600, 512, 424, 336, 248, 160];
+  const widths = [520, 460, 400, 340, 280, 220, 160];
   widths.forEach((w,i)=>{
     const y = base - (i+1)*th, x = 360 - w/2;
     out.push(rect(x, y, w, th, C.paper));
-    const n = Math.floor((w-24)/46), span = n*46, x1 = 360 - span/2 + 10;
+    const n = Math.floor((w-20)/40), span = n*40, x1 = 360 - span/2 + 7;
     for(let k=0;k<n;k++){
-      const ax = x1 + k*46, ay = y+14, aw = 26, ah = 40;
+      const ax = x1 + k*40, ay = y+12, aw = 26, ah = 36;
       out.push(P(`M${ax} ${ay+ah} V${ay+13} A13 13 0 0 1 ${ax+aw} ${ay+13} V${ay+ah} Z`, C.ink));
-      out.push(`<text x="${ax+13}" y="${ay+32}" text-anchor="middle" font-family="Noto Sans, Noto Sans Devanagari, Noto Sans Arabic, Noto Sans JP" font-weight="700" font-size="15" fill="${C.paper}">${glyphs[gi++ % glyphs.length]}</text>`);
+      out.push(`<text x="${ax+13}" y="${ay+32}" text-anchor="middle" font-family="Noto Sans, Noto Sans Devanagari, Noto Sans Arabic, Noto Sans JP" font-weight="700" font-size="14" fill="${C.paper}" dy="-2">${glyphs[gi++ % glyphs.length]}</text>`);
     }
   });
   // crane lowering the last block

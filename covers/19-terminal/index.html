@@ -179,6 +179,126 @@ EMBLEM['mathematical-foundations-for-ml']=function(g){
   return {cap:['x','= np.random.randn(420); hist(x, bins=20)   * = N(0, 1)']};
 };
 
+
+// helpers for text blocks
+Grid.prototype.flow=function(r0,c0,r1,c1,text,t,s=0,sep=' '){ // word-wrapped text in a box; returns rows used
+  const words=text.split(/\s+/).filter(Boolean); let r=r0,c=c0;
+  for(const w of words){
+    if(c>c0 && c+w.length>c1){ r++; c=c0; }
+    if(r>=r1) return r-r0;
+    this.text(r,c,w.slice(0,c1-c0),t,s); c+=w.length;
+    if(c<c1){ this.put(r,c,sep,t,s); c++; }
+  }
+  return r-r0+1;
+};
+Grid.prototype.stream=function(r0,c0,r1,c1,text,t,s=0){ // continuous character stream, no wrapping logic
+  let i=0; const T=text.replace(/\s+/g,' ');
+  for(let r=r0;r<r1;r++)for(let c=c0;c<c1;c++){ this.put(r,c,T[i%T.length],t,s); i++; }
+};
+function drawLine(g,x0,y0,x1,y1,pat,t,s=0,skip){
+  const L=Math.hypot(x1-x0,y1-y0), n=Math.ceil(L/1.5); let last='', i=0;
+  for(let k=0;k<=n;k++){
+    const x=x0+(x1-x0)*k/n, y=y0+(y1-y0)*k/n, r=Math.floor(y/CH), c=Math.floor(x/CW), key=r+','+c;
+    if(key===last) continue; last=key;
+    if(skip&&skip(r,c)) continue;
+    g.put(r,c,pat[i%pat.length],t,s); i++;
+  }
+}
+
+// 5D parallelism: the 2x2x2x2x2 device mesh is a 5-cube; 32 ranks, 80 links
+EMBLEM['5d-parallelism']=function(g){
+  const AX=['dp','pp','tp','cp','ep'];
+  let n=0;
+  for(let r=0;r<FR;r++){ let c=(r*7)%9-9; while(c<COLS){ const k=n%32; const s=k.toString(2).padStart(5,'0')+'  '; g.text(r,c,s,.04); c+=s.length; n++; } }
+  const H=FR*CH, cx=360, cy=H/2+4;
+  const ang=[0,1,2,3,4].map(k=>(k*36+18)*Math.PI/180);
+  const sy=ang.reduce((a,t)=>a+Math.abs(Math.sin(t)),0);
+  const sc=(H-40)/sy;
+  const E=ang.map(a=>[Math.cos(a)*sc*1.12, Math.sin(a)*sc]);
+  const V=[]; for(let m=0;m<32;m++){ let x=0,y=0; for(let k=0;k<5;k++){ const b=(m>>k)&1; x+=(b-.5)*E[k][0]; y+=(b-.5)*E[k][1]; } V.push([cx+x,cy+y]); }
+  const node=V.map(([x,y])=>[Math.floor(y/CH), Math.round(x/CW-2.5)]);
+  const isNode=(r,c)=>node.some(([nr,nc])=>r===nr&&c>=nc-1&&c<nc+6);
+  const hot=0;
+  const tone=[.62,.62,.62,.62,.62];
+  for(let m=0;m<32;m++)for(let k=0;k<5;k++){ const m2=m^(1<<k); if(m2<m) continue; if(m===hot||m2===hot) continue;
+    drawLine(g,...V[m],...V[m2],AX[k],tone[k],0,isNode); }
+  for(let k=0;k<5;k++){ const m2=hot^(1<<k); drawLine(g,...V[hot],...V[m2],AX[k],.95,1,isNode); }
+  node.forEach(([r,c],m)=>{ g.text(r,c-1,' '+m.toString(2).padStart(5,'0')+' ',.95,m===hot?1:0); });
+  return {cap:['mesh','= init_device_mesh("cuda", (2,2,2,2,2), ("dp","pp","tp","cp","ep"))']};
+};
+
+// Context engineering: packing a finite window
+EMBLEM['ai-context-engineering']=function(g){
+  const hay='[kb/0412] rate limits apply per workspace · [log] 14:02:11 cache miss ratio 0.31 · [doc] migration guide v3 → v4 · [ticket] p95 latency regression after deploy · [wiki] onboarding checklist · [slack] can someone review the cache PR? · [log] 14:02:13 upstream timeout 3000ms · [doc] retry policy: exponential backoff, max 5 · [memo] Q3 infra budget · [kb/0977] webhook signatures · [log] GET /v1/orders 200 212ms · [doc] redis eviction policies explained · ';
+  g.stream(0,0,FR,COLS,hay,.05);
+  const r0=7, r1=FR, c0=8, c1=112;
+  g.fill(r0,c0,r1,c1,' ',-1);
+  // frame
+  for(let c=c0;c<c1;c++){ g.put(r0,c,' ',.95); }
+  const head=' CONTEXT WINDOW  ·  128,000 TOKENS  ·  127,406 USED ';
+  g.text(r0,c0+2,head,.95);
+  for(let r=r0;r<r1;r++){ g.put(r,c0,' ',.95); g.put(r,c1-1,' ',.95); }
+  const B=[
+    {l:'SYSTEM',r:r0+2,c:c0+3,h:6,w:98,t:.9,x:'You are the on-call assistant for the billing platform. Answer only from the documents and tool results provided in this context. Cite every claim as [doc:n] or [tool:n]. If the context does not contain the answer, say what is missing instead of guessing. Prefer short answers; show commands in code blocks; never run a destructive command without asking.'},
+    {l:'TOOLS',r:r0+9,c:c0+3,h:15,w:45,t:.62,x:'{"name": "search_logs", "description": "Full-text search over service logs", "input_schema": {"type": "object", "properties": {"query": {"type": "string"}, "since": {"type": "string"}, "limit": {"type": "integer"}}, "required": ["query"]}} {"name": "get_metric", "description": "Fetch a time series", "input_schema": {"type": "object", "properties": {"name": {"type": "string"}, "window": {"type": "string"}}}}'},
+    {l:'DOCS',r:r0+9,c:c0+51,h:9,w:50,t:.78,x:'[doc:1] The response cache sits in front of the orders service; entries expire after 300 s. [doc:2] Cache keys include the tenant id and the request path. [doc:3] On a miss the service calls the upstream ledger, p95 180 ms.'},
+    {l:'MEMORY',r:r0+19,c:c0+51,h:5,w:50,t:.5,x:'- user is on the payments team - prefers commands over prose - last week: rolled back cache v2 after key collisions'},
+    {l:'HISTORY',r:r0+25,c:c0+3,h:10,w:98,t:.4,x:'user: latency alarms again on orders. assistant: checking the dashboards [tool:1] p95 went from 190 ms to 410 ms at 13:58, right after deploy 8812. user: that deploy only touched the cache config. assistant: then misses are the first suspect; pulling the miss ratio [tool:2] 0.31, up from 0.04. user: so the cache is barely working? assistant: it is working, but on the wrong keys.'},
+    {l:'USER',r:r0+36,c:c0+3,h:4,w:62,t:.95,s:1,x:'why did p95 double after the cache change, and what is the smallest safe fix?'},
+  ];
+  for(const b of B){
+    g.fill(b.r,b.c,b.r+b.h,b.c+b.w,' ',b.s?.95:-1,b.s||0);
+    g.text(b.r,b.c,' '+b.l+' ',.95,b.s||0);
+    g.flow(b.r,b.c+b.l.length+3,b.r+b.h,b.c+b.w,b.x,b.t,b.s||0);
+  }
+  // free budget remainder
+  const fr=r0+36, fc=c0+3+64;
+  for(let r=fr;r<fr+4;r++)for(let c=fc;c<c1-3;c++) g.put(r,c,(c+r)%2?' ':'·',.3);
+  g.text(fr+1,fc+3,' 594 free ',.62);
+  // a block that did not fit, hanging over the frame
+  const ob={r:1,c:70,h:5,w:40};
+  g.fill(ob.r,ob.c,ob.r+ob.h,ob.c+ob.w,' ',-1);
+  g.text(ob.r,ob.c,' DOCS[4] ',.95);
+  g.flow(ob.r,ob.c+10,ob.r+ob.h,ob.c+ob.w,'[doc:4] Full changelog for releases 8700 to 8812, 41,220 tokens. Dropped: over budget.',.35);
+  return {cap:['ctx','= pack(system, tools, docs, memory, history, user, budget=128_000)']};
+};
+
+// Context compaction: three transcripts squeezed into memory
+EMBLEM['pi-vs-hermes-vs-codex']=function(g){
+  const STOP=new Set('the a an to of that so it is and for in on with can you please we i be this was are as at by from into then now just also there be will would could should my our your'.split(' '));
+  const cw=(w,L)=>{ if(L>=1&&STOP.has(w.toLowerCase().replace(/[^a-z]/g,''))) return null;
+    if(L>=2&&w.length>3) w=w[0]+w.slice(1).replace(/[aeiou]/gi,'');
+    if(L>=3) w=w.slice(0,5); return w; };
+  const T=[
+    'user: the build fails on the parser branch, can you take a look? assistant: running the tests first. tool: pytest -q: 3 failed, 41 passed. assistant: the lexer returns bytes where the parser expects str; patching lexer.py and running again. tool: 44 passed. user: great, now make it stream the file instead of loading all of it into memory. assistant: switching read() to an iterator over chunks, keeping a small carry buffer for tokens split across chunk boundaries. tool: 46 passed, peak memory 38 MB, down from 1.2 GB.',
+    'user: add retries to the payment webhook handler, it drops events when the ledger is slow. assistant: reading handler.py and the queue config. tool: grep retry: no matches. assistant: adding exponential backoff with jitter, max five attempts, and an idempotency key so a retried event is never applied twice. tool: 12 passed. user: what happens after the fifth failure? assistant: the event goes to the dead letter queue with the last error attached, and an alert fires.',
+    'user: the nightly ingest job got slow after yesterday\'s merge, can you profile it? assistant: running it with the profiler on a one percent sample. tool: 71 percent of time in normalize_rows. assistant: the merge replaced a vectorised call with a python loop over every row. restoring the vectorised path and adding a benchmark so it cannot regress silently. tool: sample run 4.1 s, was 58 s. user: ship it.',
+  ];
+  const prof=[u=>1-.86*u, u=>1-.86*Math.pow(u,2.2), u=>u<.34?1:u<.68?.6:.2];
+  const centers=[20,60,100], W0=36, rows=FR-4;
+  T.forEach((txt,f)=>{
+    const words=txt.split(/\s+/); let wi=0;
+    for(let r=0;r<rows;r++){
+      const u=r/(rows-1), w=Math.max(4,Math.round(W0*prof[f](u)/2)*2), L=Math.min(3,Math.floor(u*4.2));
+      const t=.28+.62*u, c0=centers[f]-w/2;
+      let line='', guard=0;
+      while(guard++<200){
+        const raw=words[wi%words.length]; const x=cw(raw,L); wi++;
+        if(x===null) continue;
+        const add=(line?(L>=3?'·':' '):'')+x;
+        if((line+add).length>w){ wi--; break; }
+        line+=add;
+      }
+      line=line.padEnd(w,' ');
+      g.text(r,c0,line,t>.86?.84:t);
+    }
+    const mw=8, mc=centers[f]-mw/2;
+    for(let r=rows;r<FR;r++) g.fill(r,mc,r+1,mc+mw,' ',.95,1);
+    g.text(rows+1,mc+1,'MEMORY',.95,1);
+  });
+  return {cap:['ctx','= compact(history) if tokens(history) > limit else history']};
+};
+
 // ─── books ───────────────────────────────────────────────────────────────
 const BOOKS=[
   {slug:'build-llms-from-scratch', level:'intermediate', meta:'20 capsules · 6 h',
@@ -187,6 +307,12 @@ const BOOKS=[
    title:[['Neural Networks','from Scratch'],6]},
   {slug:'mathematical-foundations-for-ml', level:'beginner', meta:'43 capsules · 10 h',
    title:[['Mathematical','Foundations for','Machine Learning'],5]},
+  {slug:'5d-parallelism', level:'advanced', meta:'40 capsules · 9 h',
+   title:[['5D Parallelism','for Large Model','Training'],5]},
+  {slug:'ai-context-engineering', level:'intermediate', meta:'43 capsules · 10 h',
+   title:[['AI Context','Engineering'],6]},
+  {slug:'pi-vs-hermes-vs-codex', level:'advanced', meta:'9 capsules · 1 h',
+   title:[['Pi vs Hermes','vs Codex:','Context Compaction','and Memory'],5]},
 ];
 const PROMPT={beginner:'>',intermediate:'$',advanced:'#'};
 

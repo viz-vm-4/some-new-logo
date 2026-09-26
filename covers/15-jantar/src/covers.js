@@ -1,6 +1,6 @@
 /* Jantar covers: palettes, scenes, assembly */
 (function () {
-  const { Scene, oblique, render, nrm, mix, D } = J;
+  const { Scene, oblique, camera, render, nrm, mix, add, mul, D } = J;
   const W = 720, H = 888, PL = 748; // plinth (section) line
 
   // ---------- the three hours ----------
@@ -36,49 +36,65 @@
   };
 
   // ---------- helpers ----------
-  const CAM = (s = 1, ox = 360, mirror = false) => oblique(0.5, mirror ? 140 : 40, s, ox, PL);
-  function ground(S, hr, yB = 3000) {
-    S.box(-4000, 0, -1200, 4000, yB, 0, { mat: (n) => (n[1] < -0.5 ? hr.cut : n[2] > 0.5 ? hr.ground : null), cast: false, noTrim: true });
+  // axonometric camera; the ground is cut by a vertical section plane facing the camera, whose
+  // top edge always lands on the plinth line PL. Sun is given relative to the camera.
+  function CAM(o) {
+    const c = camera(o.az, o.el == null ? 24 : o.el, o.s || 1, o.ox == null ? 360 : o.ox, PL);
+    c.f = [-Math.sin(o.az * D), Math.cos(o.az * D), 0]; c.rh = [Math.cos(o.az * D), Math.sin(o.az * D), 0];
+    return c;
+  }
+  function sunRel(cam, theta, alt) { // theta: 0 = from the right, +90 = from the viewer, -90 = from behind
+    const t = theta * D, a = alt * D;
+    return nrm(add(add(mul(cam.rh, Math.cos(a) * Math.cos(t)), mul(cam.f, -Math.cos(a) * Math.sin(t))), [0, 0, Math.sin(a)]));
+  }
+  function ground(S, hr, cam, o = {}) {
+    const P = (a, b, z) => add(add(mul(cam.rh, a), mul(cam.f, b)), [0, 0, z]);
+    const A0 = -5000, A1 = 5000, B0 = o.b0 || 0, B1 = 6000, Z0 = -1500;
+    const c = [P(A0, B0, Z0), P(A1, B0, Z0), P(A1, B1, Z0), P(A0, B1, Z0), P(A0, B0, 0), P(A1, B0, 0), P(A1, B1, 0), P(A0, B1, 0)];
+    S.solid([[c[4], c[5], c[6], c[7]], [c[0], c[1], c[5], c[4]]], { mat: (n) => (n[2] > 0.5 ? hr.ground : hr.cut), cast: false, noTrim: true, center: P(0, 3000, -750) });
   }
   const tanD = (a) => Math.tan(a * D);
+  const LIGHT = { beginner: [35, 60], intermediate: [22, 38], advanced: [-38, 15] };
 
   // ---------- scenes ----------
   const SCENES = {};
 
-  // Samrat Yantra — the right triangle as instrument. Triangle faces the viewer; quadrant in front.
+  // Samrat Yantra — the right triangle as instrument. Gnomon points north (away), quadrants as wings.
   SCENES.samrat = (hr) => {
-    const S = new Scene(); ground(S, hr);
+    const cam = CAM({ az: 14, s: 0.86, ox: 372 });
+    const S = new Scene(); ground(S, hr, cam);
     const phi = 27, tp = tanD(phi), cp = Math.cos(phi * D), sp = Math.sin(phi * D);
-    const x0 = -560, x1 = 330, Hg = (x1 - x0) * tp, yg0 = 250, w = 60, par = 10;
-    const tri = (y) => [[x0, y, 0], [x1, y, 0], [x1, y, Hg]];
-    S.extrude(tri(yg0), [0, par, 0], { mat: hr.stone });
-    S.extrude(tri(yg0 + w - par), [0, par, 0], { mat: hr.stone });
-    const run = 15;
-    for (let x = x0; x < x1 - 0.1; x += run) {
-      const xe = Math.min(x1, x + run); const z = Math.max(3, (xe - x0) * tp - 8);
-      S.box(x, yg0 + par, 0, xe, yg0 + w - par, z, { mat: hr.stone });
+    const y0 = 60, Lg = 820, Hg = Lg * tp, w = 64, par = 11;
+    const tri = (x) => [[x, y0, 0], [x, y0 + Lg, 0], [x, y0 + Lg, Hg]];
+    S.extrude(tri(-w / 2), [par, 0, 0], { mat: hr.stone });
+    S.extrude(tri(w / 2 - par), [par, 0, 0], { mat: hr.stone });
+    // marble coping on parapets
+    for (const x of [-w / 2, w / 2 - par]) S.extrude([[x, y0, 0.01], [x, y0 + Lg, Hg + 0.01], [x, y0 + Lg - 4, Hg + 0.01 + 4 * 0], [x, y0 - 2, 0.01]].slice(0, 2).concat([[x, y0 + Lg, Hg + 5], [x, y0, 5]]), [par, 0, 0], { mat: hr.marble });
+    const run = 17;
+    for (let y = y0; y < y0 + Lg - 0.1; y += run) {
+      const ye = Math.min(y0 + Lg, y + run); const z = Math.max(3, (ye - y0) * tp - 9);
+      S.box(-w / 2 + par, y, 0, w / 2 - par, ye, z, { mat: hr.stone });
     }
-    // north end: a plain block under the top
-    // quadrants about the gnomon edge; axis a along the hypotenuse, arcs sweep toward/away from viewer
-    const R = 220, a = [cp, 0, sp], d = [sp, 0, -cp];
-    const zc = R * cp + 16, xc = x0 + zc / tp, bw = 96, N = 40;
+    // quadrants: quarter-cylinders about the gnomon edge
+    const R = 250, a = [0, cp, sp], d = [0, sp, -cp];
+    const zc = R * cp + 18, yc = y0 + zc / tp, bw = 104, N = 44;
     for (const sg of [-1, 1]) {
-      const yf = sg < 0 ? yg0 : yg0 + w;
-      const P = (t, s) => [xc + R * Math.sin(t) * d[0] + s * a[0], yf + sg * R * Math.cos(t), zc + R * Math.sin(t) * d[2] + s * a[2]];
-      const Nn = (t) => nrm([-Math.sin(t) * d[0], -sg * Math.cos(t), -Math.sin(t) * d[2]]);
+      const xf = sg * w / 2;
+      const P = (t, s) => [xf + sg * R * Math.cos(t), yc + R * Math.sin(t) * d[1] + s * a[1], zc + R * Math.sin(t) * d[2] + s * a[2]];
+      const Nn = (t) => nrm([-sg * Math.cos(t), -Math.sin(t) * d[1], -Math.sin(t) * d[2]]);
       for (let i = 0; i < N; i++) {
         const t0 = (i / N) * Math.PI / 2, t1 = ((i + 1) / N) * Math.PI / 2;
         S.slab([P(t0, -bw / 2), P(t1, -bw / 2), P(t1, bw / 2), P(t0, bw / 2)], 0, { mat: hr.stone });
         const nn = Nn((t0 + t1) / 2);
-        S.decal([P(t0, bw / 2 - 15), P(t1, bw / 2 - 15), P(t1, bw / 2 - 4), P(t0, bw / 2 - 4)], nn, hr.marble);
-        S.decal([P(t0, -bw / 2 + 4), P(t1, -bw / 2 + 4), P(t1, -bw / 2 + 15), P(t0, -bw / 2 + 15)], nn, hr.marble);
+        S.decal([P(t0, bw / 2 - 16), P(t1, bw / 2 - 16), P(t1, bw / 2 - 4), P(t0, bw / 2 - 4)], nn, hr.marble);
+        S.decal([P(t0, -bw / 2 + 4), P(t1, -bw / 2 + 4), P(t1, -bw / 2 + 16), P(t0, -bw / 2 + 16)], nn, hr.marble);
       }
       for (let h = 1; h < 24; h++) {
-        const t = (h / 24) * Math.PI / 2, ww = h % 4 === 0 ? 0.007 : 0.0035, ln = h % 4 === 0 ? 15 : 32;
+        const t = (h / 24) * Math.PI / 2, ww = h % 4 === 0 ? 0.0075 : 0.0038, ln = h % 4 === 0 ? 16 : 36;
         S.decal([P(t - ww, -bw / 2 + ln), P(t + ww, -bw / 2 + ln), P(t + ww, bw / 2 - ln), P(t - ww, bw / 2 - ln)], Nn(t), hr.marble, 0.5);
       }
     }
-    return { S, cam: CAM(0.78, 470) };
+    return { S, cam, L: sunRel(cam, 30, 52) };
   };
 
   // A wall with one window — the context window
@@ -114,9 +130,9 @@
   // ---------- books ----------
   const BOOKS = [
     { slug: 'mathematical-foundations-for-ml', title: ['Mathematical', 'Foundations for', 'Machine Learning'], level: 'beginner', capsules: 43, hours: 10, scene: 'samrat', fig: 'After the Samrat Yantra, Jaipur, 1734' },
-    { slug: 'ai-context-engineering', title: ['AI Context', 'Engineering'], level: 'intermediate', capsules: 43, hours: 10, scene: 'aperture', fig: 'A roof with one opening' },
-    { slug: 'build-llms-from-scratch', title: ['Build Large Language', 'Models (LLMs)', 'from Scratch'], level: 'intermediate', capsules: 20, hours: 6, scene: 'stair', fig: 'A stair built one step at a time' },
-    { slug: '5d-parallelism', title: ['5D Parallelism', 'for Large Model', 'Training'], level: 'advanced', capsules: 40, hours: 9, scene: 'field', fig: 'A field of identical gnomons' },
+    // { slug: 'ai-context-engineering', title: ['AI Context', 'Engineering'], level: 'intermediate', capsules: 43, hours: 10, scene: 'aperture', fig: 'A roof with one opening' },
+    // { slug: 'build-llms-from-scratch', title: ['Build Large Language', 'Models (LLMs)', 'from Scratch'], level: 'intermediate', capsules: 20, hours: 6, scene: 'stair', fig: 'A stair built one step at a time' },
+    // { slug: '5d-parallelism', title: ['5D Parallelism', 'for Large Model', 'Training'], level: 'advanced', capsules: 40, hours: 9, scene: 'field', fig: 'A field of identical gnomons' },
   ];
 
   // ---------- marks ----------

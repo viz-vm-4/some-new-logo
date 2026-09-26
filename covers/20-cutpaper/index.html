@@ -170,14 +170,23 @@ function defs(){
   let s = '<defs>';
   for (let z=1; z<=12; z++){
     const h = z*2.1;
+    // 1. scissors: a slow wobble on every cut edge   2. two shadows (contact + ambient)
+    // 3. a hairline of light catching the top-left cut edge
     s += `<filter id="${PFX}-z${z}" filterUnits="userSpaceOnUse" x="-120" y="-120" width="960" height="1130" color-interpolation-filters="sRGB">
-      <feGaussianBlur in="SourceAlpha" stdDeviation="${f(.45+.2*h)}"/>
+      <feTurbulence type="fractalNoise" baseFrequency=".028" numOctaves="2" seed="${z*5+3}" result="wob"/>
+      <feDisplacementMap in="SourceGraphic" in2="wob" scale="2.6" xChannelSelector="R" yChannelSelector="G" result="cut"/>
+      <feColorMatrix in="cut" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="ca"/>
+      <feGaussianBlur in="ca" stdDeviation="${f(.45+.2*h)}"/>
       <feOffset dx="${f(.22*h)}" dy="${f(.48*h)}" result="o1"/>
       <feColorMatrix in="o1" type="matrix" values="0 0 0 0 .09  0 0 0 0 .05  0 0 0 0 .02  0 0 0 .42 0" result="s1"/>
-      <feGaussianBlur in="SourceAlpha" stdDeviation="${f(1.2+.85*h)}"/>
+      <feGaussianBlur in="ca" stdDeviation="${f(1.2+.85*h)}"/>
       <feOffset dx="${f(.4*h)}" dy="${f(1.05*h)}" result="o2"/>
       <feColorMatrix in="o2" type="matrix" values="0 0 0 0 .09  0 0 0 0 .05  0 0 0 0 .02  0 0 0 .30 0" result="s2"/>
-      <feMerge><feMergeNode in="s2"/><feMergeNode in="s1"/><feMergeNode in="SourceGraphic"/></feMerge>
+      <feOffset in="ca" dx="1.1" dy="1.1" result="cas"/>
+      <feComposite in="ca" in2="cas" operator="out" result="rimA"/>
+      <feFlood flood-color="#ffffff" flood-opacity=".38"/>
+      <feComposite in2="rimA" operator="in" result="rim"/>
+      <feMerge><feMergeNode in="s2"/><feMergeNode in="s1"/><feMergeNode in="cut"/><feMergeNode in="rim"/></feMerge>
     </filter>`;
   }
   s += `<radialGradient id="${PFX}-brass" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#F3D98A"/><stop offset=".55" stop-color="#C89B3C"/><stop offset="1" stop-color="#7A5A1E"/></radialGradient>`;
@@ -218,37 +227,37 @@ function slipAndPly(book){
    ===================================================================== */
 const ART = {};
 
-/* AI Context Engineering: a die-cut window over a long run of tokens.
-   Only what fits in the window is context; new pieces are being placed in. */
+/* AI Context Engineering: a long scroll of context runs behind a die-cut window.
+   Two relevant pieces have been cut out of the old context and pasted into the window. */
 ART['ai-context-engineering'] = () => {
   let s = '';
-  const W = {x:150, y:166, w:420, h:236};
-  s += R(112, 128, 496, 316, C.night, 1);
-  // lines of tokens, ragged like prose, running on under the frame
-  const cols = [C.ivory,C.ivory,C.ivory,C.ivory,C.blush,C.ivory,C.lemon,C.ivory,C.verm,C.ivory,C.cobalt];
-  let y = 128, line = 0;
-  const ends = [520, 600, 470, 640, 560, 610, 500];
-  while (y < 440){
-    let x = W.x + 18 + (line===2||line===5 ? 30 : 0);
-    const end = ends[line % ends.length];
-    let row = '';
-    while (x < end){
-      const w = [34,48,62,76,40,92,54][Math.floor(rnd()*7)];
-      row += rect(x, y, Math.min(w, end + 60 - x), 30, jit(cols[Math.floor(rnd()*cols.length)]), {rx:1});
-      x += w + 8;
+  const F = {x:88, y:150, w:544, h:322}, W = {x:146, y:208, w:428, h:206};
+  const S = {x:118, w:484};
+  const pitch = 34, th = 20;
+  let text = '', holes = '';
+  const cut = [];
+  const plan = {1:2, 3:1};              // row -> which token gets cut out (both rows sit above the frame)
+  let row = 0;
+  for (let y = 10; y < 600; y += pitch, row++){
+    let x = S.x + 24 + (row%5===3 ? 34 : 0);
+    const end = S.x + S.w - 24 - (row%4===1 ? 110 : row%3===2 ? 50 : 0);
+    let t = 0;
+    while (x < end - 24){
+      const w = Math.min([28,40,52,66,84,100,46,58][Math.floor(rnd()*8)], end - x);
+      const a = rnd();
+      const col = a < .07 ? C.verm : a < .12 ? C.lemon : a < .17 ? C.blush : C.ivory;
+      if (plan[row] === t){ holes += rectD(x-4, y-4, w+8, th+8); cut.push({x, y, w}); }
+      else text += `<rect x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${th}" rx="1.5" fill="${col}"/>`;
+      x += w + 9; t++;
     }
-    s += lift(1, row);
-    y += 44; line++;
   }
-  // the frame: a sheet with the window cut out
-  s += lift(4, path(rectD(84,94,552,380)+rectD(W.x,W.y,W.w,W.h), jit(C.ultra), 'fill-rule="evenodd"'));
-  // pieces arriving from outside
-  s += R(236, 138, 84, 30, C.blush, 6, {r:-4, rx:1});
-  s += R(318, 40, 118, 30, C.verm, 10, {r:-9, rx:1});
-  s += R(478, 78, 62, 30, C.ivory, 8, {r:7, rx:1});
-  s += R(566, 30, 44, 30, C.lemon, 11, {r:-15, rx:1});
-  // and one that did not make the cut
-  s += R(28, 476, 70, 30, C.ivory, 3, {r:22, rx:1});
+  s += lift(2, path(rectD(S.x, -30, S.w, 640) + holes, jit(C.night), 'fill-rule="evenodd"') + text);
+  // the frame: a sheet with the window cut out of it
+  s += lift(5, path(rectD(F.x,F.y,F.w,F.h) + rectD(W.x,W.y,W.w,W.h), jit(C.ultra), 'fill-rule="evenodd"'));
+  // one piece already pasted into the window, one on its way
+  const [a, b] = cut;
+  s += R(W.x + 150, W.y + 92, b.w + 8, th + 8, C.lemon, 3, {r:-4, rx:2});
+  s += R(W.x + 250, W.y - 26, a.w + 8, th + 8, C.verm, 10, {r:9, rx:2});
   return s;
 };
 
@@ -262,14 +271,14 @@ ART['mathematical-foundations-for-ml'] = () => {
   for (let y=58+20; y<528; y+=20) gp += `<rect x="70" y="${y}" width="580" height="1" fill="#9DB0D8"/>`;
   s += lift(2, `<g transform="rotate(-2.2 360 293)">${gp}</g>`);
   const base = 468;
-  const gauss = (mu,sig,A,x0,x1) => { let d=`M${x0} ${base+40}L${x0} ${base}`; for(let x=x0;x<=x1;x+=3) d+=`L${f(x)} ${f(base - A*Math.exp(-((x-mu)**2)/(2*sig*sig)))}`; return d+`L${x1} ${base}L${x1} ${base+40}Z`; };
-  s += lift(3, path(gauss(250,92,240,96,560), jit(C.lemon)));
-  s += lift(4, path(gauss(470,64,190,300,640), jit(C.leaf)));
-  s += lift(5, path(gauss(340,44,318,190,500), jit(C.verm)));
+  const gauss = (mu,sig,A) => { const x0 = mu-3.4*sig, x1 = mu+3.4*sig; let d=`M${f(x0)} ${base+3}`; for(let x=x0;x<=x1;x+=3) d+=`L${f(x)} ${f(base - A*Math.exp(-((x-mu)**2)/(2*sig*sig)))}`; return d+`L${f(x1)} ${base+3}Z`; };
+  s += lift(3, path(gauss(252,72,232), jit(C.lemon)));
+  s += lift(4, path(gauss(488,58,184), jit(C.leaf)));
+  s += lift(5, path(gauss(352,42,318), jit(C.verm)));
   // baseline strip
-  s += R(84, base-2, 552, 9, C.ink, 6);
+  s += R(52, base-2, 616, 9, C.ink, 6);
   // tangent at the inflection point of the red curve
-  const mu=340, sg=44, A=318, px=mu+sg, py=base - A*Math.exp(-.5), m = A*Math.exp(-.5)/sg;
+  const mu=352, sg=42, A=318, px=mu+sg, py=base - A*Math.exp(-.5), m = A*Math.exp(-.5)/sg;
   const L = 170, dx = L/Math.hypot(1,m);
   s += lift(8, strip(px-dx, py-m*dx, px+dx, py+m*dx, 7, jit(C.ink)));
   s += lift(9, circ(px,py,11,jit(C.ivory)) + brad(px,py,5));
@@ -302,7 +311,7 @@ ART['neural-networks-from-scratch'] = () => {
    (width = weight) all land on the next token, which is being lifted into place. */
 ART['build-llms-from-scratch'] = () => {
   let s = '';
-  const base = 470, th = 64;
+  const base = 446, th = 60;
   const ws = [70, 96, 58, 88, 76, 64];
   let x = 44; const tiles = [];
   ws.forEach(w => { tiles.push({x, w}); x += w + 14; });
@@ -314,13 +323,13 @@ ART['build-llms-from-scratch'] = () => {
   const lc = [C.ivory, C.lemon, C.blush, C.ink, C.ivory, C.cobalt];
   tiles.forEach((t,i) => {
     const x1 = t.x + t.w/2, x2 = slot.x + 14 + i*(slot.w-28)/5;
-    const H = 70 + (x2-x1)*.78;
+    const H = 52 + (x2-x1)*.62;
     const w = 8 + 20*att[i];
     s += lift(3 + (i%3), `<path d="M${f(x1)} ${base} C${f(x1)} ${f(base-H*1.33)} ${f(x2)} ${f(base-H*1.33)} ${f(x2)} ${base}" fill="none" stroke="${jit(lc[i])}" stroke-width="${f(w)}"/>`);
   });
   tiles.forEach(t => { s += R(t.x, base, t.w, th, C.ivory, 2, {rx:2}); });
   // the new token, rising
-  s += R(slot.x+10, 72, slot.w, th, C.lemon, 12, {r:-7, rx:2});
+  s += R(slot.x-6, 60, slot.w, th, C.lemon, 12, {r:-8, rx:2});
   return s;
 };
 
@@ -328,14 +337,14 @@ ART['build-llms-from-scratch'] = () => {
    tensor (columns), pipeline (bands), data (replica blocks), sequence (chunks), experts (sparse tiles). */
 ART['5d-parallelism'] = () => {
   let s = '';
-  const W=236, H=276, gap=10;
+  const W=212, H=248, gap=10;
   const planes = [
     {c:C.cobalt, cut:'experts'}, {c:C.mint, cut:'sequence'}, {c:C.rose, cut:'data'},
     {c:C.verm, cut:'pipeline'}, {c:C.lemon, cut:'tensor'}
   ];
   planes.forEach((p,i) => {
     // i = 0 is the back plane (top right), i = 4 the front plane (bottom left)
-    const L = 68 + (4-i)*66, T = 250 - (4-i)*50;
+    const L = 64 + (4-i)*84, T = 36 + i*62;
     let g = '';
     const c = p.c;
     if (p.cut==='tensor'){ const w=(W-3*gap)/4; for(let j=0;j<4;j++) g += rect(L+j*(w+gap), T, w, H, jit(c)); }
@@ -349,26 +358,31 @@ ART['5d-parallelism'] = () => {
 };
 
 /* Pi vs Hermes vs Codex: the same long context, compacted three ways.
-   Recent turns stay flat; older history is pleated into a concertina. */
+   Recent turns stay flat and legible; older history is pleated into a concertina. */
 ART['pi-vs-hermes-vs-codex'] = () => {
   let s = '';
-  const floor = 520;
+  const floor = 494;
   const strips = [
-    {x:84,  c:C.ultra, top:70,  pleats:7,  p:26},
-    {x:290, c:C.verm,  top:170, pleats:11, p:15},
-    {x:496, c:C.night, top:262, pleats:18, p:8}
+    {x:84,  c:C.ultra, top:56,  pleats:7,  p:26},
+    {x:290, c:C.verm,  top:150, pleats:11, p:16},
+    {x:496, c:C.night, top:244, pleats:17, p:9}
   ];
   strips.forEach((st,i) => {
     const w = 140;
     const pl = st.pleats*st.p;
     const flatEnd = floor - pl;
-    let g = rect(st.x, st.top, w, flatEnd - st.top, jit(st.c));
+    let g = rect(st.x, st.top, w, flatEnd - st.top + 1, jit(st.c));
+    // lines of the conversation printed on the flat part
+    for (let y = st.top + 18; y < flatEnd - 14; y += 17){
+      let x = st.x + 16; const end = st.x + w - 16 - (rnd() < .35 ? rr(20,60) : 0);
+      while (x < end - 10){ const ww = Math.min(rr(10,38), end - x); g += rect(x, y, ww, 6, tint(st.c, st.c===C.night ? .3 : .38), {rx:1}); x += ww + 5; }
+    }
     for (let j=0;j<st.pleats;j++){
       const y0 = flatEnd + j*st.p, y1 = y0 + st.p;
-      const up = j%2===0;                 // faces alternately toward and away from the light
-      const e = 6;
+      const up = j%2===0;
+      const e = 8;
       const pts = up ? [[st.x,y0],[st.x+w,y0],[st.x+w+e,y1],[st.x-e,y1]] : [[st.x-e,y0],[st.x+w+e,y0],[st.x+w,y1],[st.x,y1]];
-      g += poly(pts, up ? tint(st.c,.14) : shade(st.c,.3));
+      g += poly(pts, up ? tint(st.c,.16) : shade(st.c,.32));
     }
     s += lift(3, g);
   });
@@ -397,29 +411,40 @@ function room(back, inner){
 }
 ART['charlie-language-room'] = () => room(C.verm, (B,O) => {
   let s = '';
-  // speech bubble on the back wall
-  s += lift(2, path(`M${B.l+40} ${B.t+26}h150a14 14 0 0 1 14 14v58a14 14 0 0 1-14 14h-96l-26 24 4-24h-32a14 14 0 0 1-14-14v-58a14 14 0 0 1 14-14z`, jit(C.ivory)));
-  // conveyor belt with tokens
-  const y = 440;
-  s += lift(3, rect(92, y, 536, 26, jit(C.ink), {rx:13}) + [0,1,2,3,4,5,6,7,8].map(i=>circ(110+i*62, y+13, 7, shade(C.kraft,.1))).join(''));
-  let x = 104; const ws=[54,80,46,70,62,90,52];
-  ws.forEach((w,i) => { s += R(x, y-44, w, 40, [C.ivory,C.lemon,C.ivory,C.blush,C.ivory,C.ivory,C.lemon][i], 4, {rx:2}); x += w+10; });
+  const y = 446;
+  // conveyor
+  s += lift(3, rect(84, y, 552, 26, jit(C.ink), {rx:13}) + [...Array(9)].map((_,i)=>circ(102+i*64, y+13, 7, shade(C.kraft,.05))).join(''));
+  // raw tokens go in on the left...
+  let x = 96;
+  [48,70,40,58].forEach(w => { s += R(x, y-40, w, 36, C.ivory, 4, {rx:2}); x += w + 9; });
+  // ...and come out of the machine on the right
+  x = 440;
+  [[52,C.lemon],[38,C.blush],[66,C.lemon],[30,C.ivory]].forEach(([w,c]) => { s += R(x, y-40, w, 36, c, 4, {rx:2}); x += w + 9; });
+  // the inference machine
+  const mx = 316, mw = 112, my = 262;
+  s += lift(6,
+    poly([[mx-22,my-34],[mx+mw+22,my-34],[mx+mw-10,my],[mx+10,my]], jit(C.ivory)) +
+    rect(mx, my, mw, y + 8 - my, jit(C.ink), {rx:3}) +
+    circ(mx+30, my+42, 17, jit(C.lemon)) + circ(mx+mw-30, my+42, 17, jit(C.lemon)) +
+    strip(mx+30, my+42, mx+38, my+30, 3.2, C.ink) + strip(mx+mw-30, my+42, mx+mw-40, my+34, 3.2, C.ink) +
+    rect(mx+18, my+84, mw-36, 10, jit(C.verm), {rx:2}) + rect(mx+18, my+104, mw-36, 10, jit(C.verm), {rx:2}) +
+    rect(mx-6, y-46, 12, 48, jit(shade(C.ink,.3))) + rect(mx+mw-6, y-46, 12, 48, jit(shade(C.ink,.3))));
   return s;
 });
 ART['charlie-vision-room'] = () => room(C.leaf, (B,O) => {
   let s = '';
-  // a picture cut into 3x3 patches; one patch travels forward
-  const S = 3, P = 58, g = 8, X = 360 - (S*P+(S-1)*g)/2, Y = B.t + 22;
+  // a picture cut into 3x3 patches; the top row has already left, in raster order, as a sequence
+  const S = 3, P = 60, g = 8, X = 360 - (S*P+(S-1)*g)/2, Y = B.t + 26;
   let pic = '';
-  for (let a=0;a<S;a++) for (let b=0;b<S;b++){
-    if (a===2 && b===0) continue;
-    const x = X + a*(P+g), y = Y + b*(P+g);
-    pic += patchScene(x,y,a,b,P,g,X,Y);
-  }
+  for (let a=0;a<S;a++) for (let b=1;b<S;b++) pic += patchScene(X + a*(P+g), Y + b*(P+g), a, b, P, g, X, Y);
+  // ghost of where the top row was: the wall shows through
   s += lift(2, pic);
-  // the travelling patch
-  const tx = 470, ty = 300;
-  s += lift(9, `<g transform="rotate(8 ${tx+46} ${ty+46})"><g transform="translate(${tx} ${ty}) scale(1.6) translate(${-(X+2*(P+g))} ${-Y})">${patchScene(X+2*(P+g),Y,2,0,P,g,X,Y)}</g></g>`);
+  const flight = [ {a:2, x:440, y:216, k:1.2, r:6, z:6}, {a:1, x:506, y:298, k:1.45, r:-5, z:8}, {a:0, x:540, y:394, k:1.7, r:7, z:10} ];
+  flight.forEach(p => {
+    const sx = X + p.a*(P+g), sy = Y;
+    const cx = p.x + P*p.k/2, cy = p.y + P*p.k/2;
+    s += lift(p.z, `<g transform="rotate(${p.r} ${cx} ${cy})"><g transform="translate(${p.x} ${p.y}) scale(${p.k}) translate(${-sx} ${-sy})">${patchScene(sx, sy, p.a, 0, P, g, X, Y)}</g></g>`);
+  });
   return s;
 });
 function patchScene(x,y,a,b,P,g,X,Y){
@@ -463,50 +488,65 @@ ART['charlie-reasoning-room'] = () => room(C.rose, (B,O) => {
 });
 
 /* Inference Engineering (coming soon): the kit is still flat.
-   A punch-out sheet of KV-cache pages; a few are already pressed out. */
+   A punch-out sheet of numbered KV-cache pages; a few are already pressed out. */
 ART['inference-engineering'] = () => {
   let s = '';
-  const X=96, Y=72, W=528, H=440;
-  const cols=4, rows=4, pw=100, ph=76, gx=(W-cols*pw)/(cols+1), gy=(H-rows*ph)/(rows+1);
-  const out = new Set(['1,1','3,0','2,3','0,2']);
+  const X=92, Y=62, W=536, H=454;
+  const cols=4, rows=4, pw=104, ph=78, gx=(W-cols*pw)/(cols+1), gy=(H-rows*ph)/(rows+1);
+  const out = {'1,1':C.lemon, '3,0':C.verm, '2,3':C.cobalt, '0,2':C.mint};
   let holes = '', dies = '';
-  const pal = [C.lemon, C.cobalt, C.verm, C.mint];
-  for (let a=0;a<cols;a++) for (let b=0;b<rows;b++){
-    const x = X+gx+a*(pw+gx), y = Y+gy+b*(ph+gy);
-    if (out.has(a+','+b)) holes += rectD(x,y,pw,ph);
-    else dies += `<rect x="${x}" y="${y}" width="${pw}" height="${ph}" fill="${tint(pal[(a+b)%4],.35)}" stroke="${C.ink}" stroke-width="1.4" stroke-dasharray="7 4"/>`
-      + `<rect x="${x+10}" y="${y+10}" width="${pw-20}" height="${ph-20}" fill="none" stroke="${shade(pal[(a+b)%4],.1)}" stroke-width="1" stroke-dasharray="3 3"/>`;
+  const popped = [];
+  const lbl = (x,y,n,col) => `<text x="${f(x)}" y="${f(y)}" font-family="Bricolage Grotesque" font-weight="700" font-size="13" letter-spacing=".06em" fill="${col}">${String(n).padStart(2,'0')}</text>`;
+  for (let b=0;b<rows;b++) for (let a=0;a<cols;a++){
+    const x = X+gx+a*(pw+gx), y = Y+gy+b*(ph+gy), n = b*cols+a+1;
+    if (out[a+','+b]) { holes += rectD(x,y,pw,ph); popped.push({n, c:out[a+','+b]}); continue; }
+    dies += `<rect x="${f(x)}" y="${f(y)}" width="${pw}" height="${ph}" rx="3" fill="none" stroke="${C.ink}" stroke-width="1.6" stroke-dasharray="8 4"/>`
+      + `<path d="M${f(x)} ${f(y+ph*.3)}h${pw}" stroke="${C.ink}" stroke-width="1" stroke-dasharray="10 3 2 3" opacity=".7"/>`
+      + lbl(x+10, y+ph-12, n, C.ink);
   }
-  s += lift(2, `<g transform="rotate(-2 360 292)">${path(rectD(X,Y,W,H)+holes, jit(C.ivory), 'fill-rule="evenodd"')}${dies}</g>`);
-  // pressed-out pages
-  s += R(470, 470, 100, 76, C.lemon, 7, {r:14});
-  s += R(560, 350, 100, 76, C.verm, 9, {r:-10});
-  s += R(40, 420, 100, 76, C.cobalt, 6, {r:-18});
+  // registration marks
+  const reg = (x,y) => `<circle cx="${x}" cy="${y}" r="7" fill="none" stroke="${C.ink}" stroke-width="1.3"/><path d="M${x-12} ${y}h24M${x} ${y-12}v24" stroke="${C.ink}" stroke-width="1.3"/>`;
+  dies += reg(X+16,Y+16) + reg(X+W-16,Y+16) + reg(X+16,Y+H-16) + reg(X+W-16,Y+H-16);
+  s += lift(2, `<g transform="rotate(-2 360 289)">${path(rectD(X,Y,W,H)+holes, jit(C.ivory), 'fill-rule="evenodd"')}${dies}</g>`);
+  // pressed-out pages, lying loose
+  const spots = [[468,462,14,7],[566,330,-11,9],[34,420,-17,6],[250,-8,6,5]];
+  popped.forEach((p,i) => {
+    const [x,y,r,z] = spots[i];
+    s += lift(z, `<g transform="rotate(${r} ${x+pw/2} ${y+ph/2})">${rect(x,y,pw,ph,jit(p.c),{rx:3})}${lbl(x+10,y+ph-12,p.n, p.c===C.cobalt?C.ivory:C.ink)}</g>`);
+  });
   return s;
 };
 
-/* Reinforcement Learning: a grid world where each tile is lifted by its value.
-   The closer to the goal, the higher the card stands. */
+/* Reinforcement Learning: a grid world where every tile is lifted by its value.
+   The nearer the goal, the higher the card stands; ink arrows are the greedy policy. */
 ART['reinforcement-learning'] = () => {
   let s = '';
-  const cols=5, rows=4, T=88, g=14, X=(720-(cols*T+(cols-1)*g))/2, Y=78;
-  const goal=[4,0], walls = new Set(['1,1','2,1','3,3']);
-  const cells = [];
-  for (let b=0;b<rows;b++) for (let a=0;a<cols;a++){
-    if (walls.has(a+','+b)) continue;
-    const d = Math.abs(a-goal[0]) + Math.abs(b-goal[1]);
-    cells.push({a,b,d});
-  }
-  cells.sort((p,q)=>q.d-p.d);
+  const cols=5, rows=4, T=90, g=12, X=(720-(cols*T+(cols-1)*g))/2, Y=66;
+  const goal=[4,0], walls = new Set(['1,1','2,1','3,2']);
+  // distances by breadth-first search from the goal
+  const dist = {}; const q = [goal]; dist[goal.join(',')] = 0;
+  while (q.length){ const [a,b] = q.shift(); for (const [da,db] of [[1,0],[-1,0],[0,1],[0,-1]]){ const na=a+da, nb=b+db, k=na+','+nb;
+    if (na<0||nb<0||na>=cols||nb>=rows||walls.has(k)||k in dist) continue; dist[k]=dist[a+','+b]+1; q.push([na,nb]); } }
+  const maxD = Math.max(...Object.values(dist));
+  const cells = Object.entries(dist).map(([k,d]) => { const [a,b] = k.split(',').map(Number); return {a,b,d}; }).sort((p,q)=>q.d-p.d);
+  // walls: heavy ink blocks, flat on the board
+  walls.forEach(k => { const [a,b] = k.split(',').map(Number); s += R(X+a*(T+g), Y+b*(T+g), T, T, C.plum, 1); });
+  const ramp = t => t < .5 ? mix(C.blush, C.ivory, t*2) : mix(C.ivory, C.lemon, (t-.5)*2);
   cells.forEach(c => {
     const x = X + c.a*(T+g), y = Y + c.b*(T+g);
-    const z = Math.max(1, 9 - c.d);
-    const isGoal = c.d===0;
-    s += R(x, y, T, T, isGoal ? C.verm : mix(C.blush, C.ivory, Math.min(1,(7-c.d)/6)), z);
-    if (isGoal) s += lift(10, circ(x+T/2, y+T/2, 18, jit(C.ivory)));
+    const v = 1 - c.d/maxD;
+    const z = 1 + Math.round(v*10);
+    if (c.d === 0){ s += lift(z, rect(x,y,T,T,jit(C.verm)) + circ(x+T/2,y+T/2,20,jit(C.ivory)) + circ(x+T/2,y+T/2,9,jit(C.verm))); return; }
+    // greedy step toward the goal
+    let best = null;
+    for (const [da,db] of [[1,0],[0,-1],[-1,0],[0,1]]){ const k=(c.a+da)+','+(c.b+db); if (k in dist && dist[k] < c.d){ best=[da,db]; break; } }
+    const ang = Math.atan2(best[1], best[0])*180/Math.PI;
+    const cx = x+T/2, cy = y+T/2;
+    const arrow = `<polygon points="${cx-14},${cy-15} ${cx+16},${cy} ${cx-14},${cy+15} ${cx-6},${cy}" fill="${C.ink}" transform="rotate(${ang} ${cx} ${cy})"/>`;
+    s += lift(z, rect(x,y,T,T,jit(ramp(v))) + (c.a===0 && c.b===rows-1 ? '' : arrow));
   });
-  // the agent
-  s += lift(4, circ(X + T/2, Y + 3*(T+g) + T/2, 26, jit(C.ink)));
+  // the agent, at the start
+  s += lift(3, circ(X + T/2, Y + (rows-1)*(T+g) + T/2, 24, jit(C.ink)) + circ(X + T/2 - 7, Y + (rows-1)*(T+g) + T/2 - 8, 6, C.ivory));
   return s;
 };
 
@@ -544,9 +584,9 @@ const BOOKS = [
 /* =====================================================================
    ASSEMBLY
    ===================================================================== */
-const plyIcon = n => `<svg viewBox="0 0 22 18" aria-hidden="true">${[0,1,2].map(i=>{
-  const on = i < n; const y = 12 - i*5, x = i*2;
-  return `<rect x="${x+.75}" y="${y+.75}" width="16.5" height="4.5" fill="${on?C.ink:'none'}" stroke="${C.ink}" stroke-width="1.5"/>`; }).join('')}</svg>`;
+const plyIcon = n => `<svg viewBox="0 0 22 18" aria-hidden="true">${[0,1,2].map(i => {
+  const y = 12.5 - i*5.5, on = i < n;
+  return `<rect x="1.2" y="${y+.6}" width="19.6" height="3.8" fill="${on?C.ink:'none'}" stroke="${C.ink}" stroke-width="1.2"/>`; }).join('')}</svg>`;
 const MARK = `<svg viewBox="0 0 40 40" aria-hidden="true"><polygon points="2,4 12,4 25,37 15,37" fill="${C.ink}"/><polygon points="28,4 38,4 25,37 15,37" fill="${C.verm}" style="filter:drop-shadow(1px 1.5px 0.6px rgba(0,0,0,.35))"/></svg>`;
 
 function coverHTML(b, i){

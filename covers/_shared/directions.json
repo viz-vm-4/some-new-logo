@@ -30,5 +30,9 @@
   "09-atlas": {
     "name": "Interchange",
     "pitch": "Each book is a Beck/Vignelli transit map of its own subject. Its parts are the lines and each capsule is one tick, checked against the real capsule counts, so the 69-capsule DSA book coils into a long spiral while the 9-capsule book is tiny. The key at the foot doubles as a table of contents. Beginner and intermediate books are pale day maps, advanced books are dark night maps."
+  },
+  "02-plates": {
+    "name": "Specimen Plates",
+    "pitch": "Every book is a numbered plate in one atlas of machine learning: a single engraved specimen of its actual mechanism, lettered a, b, c with an italic legend, the way Gray or Haeckel documented theirs. The drawings are computed, not decorated (descent paths integrated on the real surface, the real 2⁵ device mesh). Paper tone gives level: sage, Ingres blue, sanguine. Everything prints as one spot tint plus black."
   }
 }
