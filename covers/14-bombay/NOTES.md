@@ -49,7 +49,7 @@ The retired orange/sky-blue/magenta pinwheel is not used anywhere.
 ## Type
 
 - **Board Block** is custom. It's a skeleton (centre-line) display alphabet, A–Z, 0–9 and a few marks, written in
-  JS/SVG (`board.js` logic inlined in `index.html`). Weight, keyline, inline and block shadow are
+  JS/SVG and inlined in `index.html`. Weight, keyline, inline and block shadow are
   all strokes of the same skeleton, so the layered treatment is exact vector. Width is a
   parameter, so lines can be fitted to the board. Stroke weight thins as letters condense so the
   counters stay open. Spacing uses a three-band (top/middle/bottom) optical kerning model.

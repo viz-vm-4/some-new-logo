@@ -62,5 +62,9 @@
   "19-terminal": {
     "name": "stdout",
     "pitch": "Every cover is what the book's own code prints. The top two-thirds is a full-bleed field of machine output on a 120 × 80 character grid (an attention matrix, a hex dump, a device mesh, a packed context window) that forms the emblem at arm's length and is real numbers up close. Tone comes from glyph weight, like a line printer. The title is typed at a prompt: > for beginner, $ for intermediate, # (root) for advanced."
+  },
+  "14-bombay": {
+    "name": "Signboard",
+    "pitch": "Every book is lettered like a Bombay shop board and labelled like a Sivakasi matchbox. The title is set in Board Block, a display alphabet built in SVG for this system (coal keyline, split cream-over-chrome fill, red inline, block shadow), widened or narrowed to fill the board as sign-painters do. A matchbox label carries one object from the book's mechanism. Board colour marks the shelf, a perforated stamp marks level, and the imprint runs in Latin and Devanagari at equal size, as Maharashtra's shop-sign rule requires."
   }
 }

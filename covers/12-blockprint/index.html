@@ -128,14 +128,14 @@ figure.c figcaption b{font-weight:650;letter-spacing:.14em;text-transform:upperc
 
 <section class="anatomy">
   <svg width="300" height="370" viewBox="0 0 300 370" aria-label="Cover anatomy">
-    <defs><pattern id="an-p" width="30" height="30" patternUnits="userSpaceOnUse"><rect width="30" height="30" fill="#9B2F25"/><rect x="9" y="9" width="12" height="12" fill="#EAE1CC"/><circle cx="0" cy="0" r="3" fill="#201B19"/></pattern></defs>
+    <defs><pattern id="an-p" width="60" height="60" patternUnits="userSpaceOnUse"><rect width="60" height="60" fill="#1C2A4A"/><g id="an-blk" transform="scale(.5)"></g></pattern></defs>
     <rect width="300" height="220" fill="url(#an-p)"/>
     <rect y="220" width="300" height="14" fill="#201B19"/>
     <pattern id="an-k" width="10" height="14" patternUnits="userSpaceOnUse"><polygon points="1.5,7 5,3.5 8.5,7 5,10.5" fill="#EAE1CC"/></pattern><rect y="220" width="300" height="14" fill="url(#an-k)"/>
     <rect y="234" width="300" height="136" fill="#EAE1CC"/>
     <rect x="20" y="252" width="190" height="22" fill="#201B19"/><rect x="20" y="280" width="140" height="22" fill="#201B19"/>
     <rect x="20" y="345" width="10" height="10" fill="#201B19"/><rect x="36" y="348" width="56" height="4" fill="#201B19"/>
-    <rect x="236" y="348" width="44" height="4" fill="#201B19"/><rect x="224" y="345" width="8" height="10" fill="#9B2F25" stroke="#201B19" stroke-width="1.2"/>
+    <rect x="236" y="348" width="44" height="4" fill="#201B19"/><rect x="224" y="345" width="8" height="10" fill="#1C2A4A" stroke="#201B19" stroke-width="1.2"/>
     <g font-family="Anek Latin" font-weight="700" font-size="15" fill="#171412">
       <circle cx="272" cy="28" r="12" fill="#E6DDC8"/><text x="272" y="33" text-anchor="middle">1</text>
       <circle cx="272" cy="227" r="12" fill="#E6DDC8"/><text x="272" y="232" text-anchor="middle">2</text>
@@ -674,6 +674,8 @@ function wrap(b, back){
   <div class="wrapnote"><i style="left:0"></i><span style="left:0">Back cover · 7.5 × 9.25 in</span><i style="left:720px"></i><span style="left:750px;transform:translateX(-50%);top:16px">Spine · 0.625 in</span><i style="left:780px"></i><span style="left:780px">Front cover · 7.5 × 9.25 in</span><i style="left:1499px"></i></div>`;
 }
 
+{ const B=BLOCKS.pipeline(), lv=LV.advanced;
+  document.getElementById('an-blk').innerHTML = B.order.map(r=>`<g fill="${lv[r]}">${B.layers[r]}</g>`).join(''); }
 const GROUPS={core:BOOKS.slice(0,6).map(b=>b.slug), charlie:BOOKS.filter(b=>b.series).map(b=>b.slug)};
 document.getElementById('shelf-core').innerHTML = BOOKS.filter(b=>GROUPS.core.includes(b.slug)).map(cover).join('');
 document.getElementById('shelf-range').innerHTML = BOOKS.filter(b=>!GROUPS.core.includes(b.slug)&&!b.series).map(cover).join('');

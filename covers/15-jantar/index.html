@@ -472,9 +472,9 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:'Anek Latin',
   // Stepwell in section (after Chand Baori, Abhaneri): the section plane cuts the pit open;
   // terraces (layers) step down, every one joined to the next by pairs of flights (connections).
   SCENES.baori = (hr) => {
-    const cam = CAM({ az: 0, s: 1, ox: 360, el: 34 });
+    const cam = CAM({ az: 0, s: 1, ox: 360, el: 38 });
     const S = new Scene(); S.E = frame(cam, 0);
-    const n = 9, h = 30, g = 27, X = 335, Y = 640, Zb = -1500;
+    const n = 8, h = 42, g = 34, X = 340, Y = 800, Zb = -1500;
     pitGround(S, hr, [{ x0: -X, x1: X, y1: Y, cols: [] }]);
     const sm = cutOr(S, hr, hr.stone), wm = cutOr(S, hr, hr.water);
     for (let i = 0; i < n; i++) {
@@ -487,7 +487,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:'Anek Latin',
     S.box(a0, 0, Zb, a1, b1, -n * h - 12, { mat: sm });
     S.box(a0, 0, -n * h - 12, a1, b1, -n * h + 6, { mat: wm, cast: false });
     // flights on each back riser: pairs of stairs meeting at a landing, offset level to level
-    const m = 5, rs = h / m, run = 6, pd = 15, span = 2 * m * run + 10;
+    const m = 6, rs = h / m, run = 8, pd = 20, span = 2 * m * run + 10;
     for (let i = 1; i < n; i++) {
       const zt = -i * h, ry = Y - i * g, xa = -X + i * g + 6, xb = X - i * g - 6, off = (i % 2) * span / 2;
       for (let x = xa + off; x + 2 * m * run + 10 <= xb; x += span) {
@@ -498,7 +498,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:'Anek Latin',
         S.box(x + m * run, ry - pd, zt, x + m * run + 10, ry, zt + h, { mat: hr.stone });
       }
     }
-    return { S, cam, L: sunRel(cam, -64, 42) };
+    return { S, cam, L: sunRel(cam, -72, 56) };
   };
 
   // A wall with one window — the context window. Sun behind the wall; light falls through onto a row of tokens.
@@ -643,28 +643,28 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:'Anek Latin',
 
   // Partition walls — a decision tree as a courtyard split by ever-lower walls (root split tallest)
   SCENES.partition = (hr) => {
-    const cam = CAM({ az: 0, s: 0.74, ox: 330 });
-    const S = new Scene(); ground(S, hr, cam); S.E = frame(cam, -32);
+    const cam = CAM({ az: 0, s: 0.86, ox: 372, el: 36 });
+    const S = new Scene(); ground(S, hr, cam); S.E = frame(cam, -24);
     const t = 14, cap = 5;
     const wallY = (x, y0, y1, h) => { S.box(x - t / 2, y0, 0, x + t / 2, y1, h, { mat: hr.stone }); S.box(x - t / 2 - 1.5, y0, h, x + t / 2 + 1.5, y1, h + cap, { mat: hr.marble }); };
     const wallX = (y, x0, x1, h) => { S.box(x0, y - t / 2, 0, x1, y + t / 2, h, { mat: hr.stone }); S.box(x0, y - t / 2 - 1.5, h, x1, y + t / 2 + 1.5, h + cap, { mat: hr.marble }); };
-    const X0 = -330, X1 = 330, Y0 = 250, Y1 = 810, H = [300, 190, 100];
+    const X0 = -300, X1 = 300, Y0 = 200, Y1 = 700, H = [290, 170, 80];
     // low curb around the feature space
     const c = 22;
     S.box(X0 - t, Y0 - t, 0, X1 + t, Y0, c, { mat: hr.stone }); S.box(X0 - t, Y1, 0, X1 + t, Y1 + t, c, { mat: hr.stone });
     S.box(X0 - t, Y0, 0, X0, Y1, c, { mat: hr.stone }); S.box(X1, Y0, 0, X1 + t, Y1, c, { mat: hr.stone });
-    const xr = -40; wallY(xr, Y0, Y1, H[0]);
-    const yl = 550, yr = 460; wallX(yl, X0, xr - t / 2, H[1]); wallX(yr, xr + t / 2, X1, H[1]);
-    wallY(-200, Y0, yl - t / 2, H[2]); wallY(-150, yl + t / 2, Y1, H[2]); wallY(150, Y0, yr - t / 2, H[2]); wallY(110, yr + t / 2, Y1, H[2]);
+    const xr = -30; wallY(xr, Y0, Y1, H[0]);
+    const yl = 480, yr = 390; wallX(yl, X0, xr - t / 2, H[1]); wallX(yr, xr + t / 2, X1, H[1]);
+    wallY(-180, Y0, yl - t / 2, H[2]); wallY(-130, yl + t / 2, Y1, H[2]); wallY(150, Y0, yr - t / 2, H[2]); wallY(100, yr + t / 2, Y1, H[2]);
     // leaves: one block per cell, two classes
-    const cells = [[X0, -200, Y0, yl, 1], [-200, xr, Y0, yl, 0], [X0, -150, yl, Y1, 0], [-150, xr, yl, Y1, 1], [xr, 150, Y0, yr, 0], [150, X1, Y0, yr, 1], [xr, 110, yr, Y1, 1], [110, X1, yr, Y1, 0]];
-    for (const [a, b, cc, d, k] of cells) { const x = (a + b) / 2, y = (cc + d) / 2, r = 16; S.box(x - r, y - r, 0, x + r, y + r, 2 * r, { mat: k ? hr.marble : hr.stone }); }
+    const cells = [[X0, -180, Y0, yl, 1], [-180, xr, Y0, yl, 0], [X0, -130, yl, Y1, 0], [-130, xr, yl, Y1, 1], [xr, 150, Y0, yr, 0], [150, X1, Y0, yr, 1], [xr, 100, yr, Y1, 1], [100, X1, yr, Y1, 0]];
+    for (const [a, b, cc, d, k] of cells) { const x = (a + b) / 2, y = (cc + d) / 2, r = 20; S.box(x - r, y - r, 0, x + r, y + r, 2 * r, { mat: k ? hr.marble : hr.stone }); }
     return { S, cam, L: sunRel(cam, 22, 44) };
   };
 
   // Three ways to fold the same climb — a straight flight, a switchback, a spiral
   SCENES.folds = (hr) => {
-    const cam = CAM({ az: 0, s: 1, ox: 360 });
+    const cam = CAM({ az: 0, s: 1.22, ox: 372 });
     const S = new Scene(); ground(S, hr, cam); S.E = frame(cam, -16);
     const H = 270, n = 18, rs = H / n, th = 12;
     // straight flight

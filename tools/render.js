@@ -104,6 +104,17 @@ async function snapped(el, shoot) {
     await el.scrollIntoViewIfNeeded();
     await snapped(el, () => el.screenshot({ path: path.join(outDir, `${slug}.jpg`), type: 'jpeg', quality: 90 }));
   }
+  if (!only && !pdfOnly) {
+    // Print wraps (back + spine + front), if the page has any: renders/_wrap.jpg, _wrap-2.jpg, ...
+    for (const f of fs.readdirSync(outDir)) if (/^_wrap(-\d+)?\.jpg$/.test(f)) fs.unlinkSync(path.join(outDir, f));
+    const wraps = await p1.$$('.wrap');
+    for (let i = 0; i < wraps.length; i++) {
+      await wraps[i].scrollIntoViewIfNeeded();
+      const name = i ? `_wrap-${i + 1}.jpg` : '_wrap.jpg';
+      await snapped(wraps[i], () => wraps[i].screenshot({ path: path.join(outDir, name), type: 'jpeg', quality: 88 }));
+    }
+    if (wraps.length) console.log(`Rendered ${wraps.length} print wrap(s)`);
+  }
   if (wantSheet) await page.screenshot({ path: path.join(outDir, `_sheet.png`), fullPage: true });
   if (wantPdf) {
     fs.mkdirSync(path.join(outDir, 'pdf'), { recursive: true });
