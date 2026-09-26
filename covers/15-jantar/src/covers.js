@@ -354,10 +354,10 @@
   // Charlie and the Intelligence Factory — each room of the factory, cut open by the section plane.
   // A shared frame (same room, same cut) with one light-instrument inside per room.
   function roomScene(hr, o) {
-    const cam = CAM({ az: 0, s: o.s || 1, ox: 360, el: o.el || 26 });
+    const cam = CAM({ az: 0, s: o.s || 0.94, ox: 360, el: o.el || 24 });
     const S = new Scene(); S.E = frame(cam, 0); ground(S, hr, cam);
     const cm = cutOr(S, hr, hr.stone);
-    const X = 262, T = 28, Y1 = 470, Hr = 300, R = Hr + T;
+    const X = 262, T = 28, Y1 = 390, Hr = 290, R = Hr + T;
     S.box(-X - T, 0, 0, -X, Y1 + T, R, { mat: cm });
     S.box(X, 0, 0, X + T, Y1 + T, R, { mat: cm });
     S.box(-X, Y1, 0, X, Y1 + T, Hr, { mat: cm });
@@ -371,28 +371,31 @@
       if (holes.some(([a, b, c, d]) => cx > a && cx < b && cy > c && cy < d)) continue;
       S.box(ux[i], uy[j], Hr, ux[i + 1], uy[j + 1], R, { mat: cm });
     }
-    S.box(-X - T - 3, 0, R, X + T + 3, Y1 + T + 3, R + 6, { mat: (n, pts) => (dot(n, S.E[1]) < -0.99 && pts.every(p => Math.abs(dot(p, S.E[1])) < 1e-6)) ? hr.cut : hr.marble });
+    const cap = (n, pts) => (dot(n, S.E[1]) < -0.99 && pts.every(p => Math.abs(dot(p, S.E[1])) < 1e-6)) ? hr.cut : hr.marble;
+    S.box(-X - T - 3, 0, R, -X - T + 12, Y1 + T + 3, R + 6, { mat: cap });
+    S.box(X + T - 12, 0, R, X + T + 3, Y1 + T + 3, R + 6, { mat: cap });
+    S.box(-X - T + 12, Y1 + T - 12, R, X + T - 12, Y1 + T + 3, R + 6, { mat: cap });
     if (o.inside) o.inside(S, { X, Y1, Hr });
     return { S, cam, L: sunRel(cam, o.theta == null ? 40 : o.theta, o.alt || 62) };
   }
   SCENES.roomLanguage = (hr) => roomScene(hr, {
-    holes: Array.from({ length: 9 }, (_, i) => [-230 + i * 54, -230 + i * 54 + 16, 150, 330]),
-    inside: (S, r) => { for (let i = 0; i < 13; i++) { const x = -234 + i * 37; S.box(x, 250, 0, x + 24, 274, 24, { mat: hr.marble }); } },
+    holes: Array.from({ length: 9 }, (_, i) => [-222 + i * 54, -222 + i * 54 + 16, 110, 300]),
+    inside: (S, r) => { for (let i = 0; i < 13; i++) { const x = -234 + i * 37; S.box(x, 230, 0, x + 24, 254, 24, { mat: hr.marble }); } },
     theta: 70, alt: 64,
   });
   SCENES.roomVision = (hr) => roomScene(hr, {
-    holes: (() => { const h = []; for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) h.push([-150 + i * 76, -150 + i * 76 + 50, 110 + j * 64, 110 + j * 64 + 40]); return h; })(),
+    holes: (() => { const h = []; for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) h.push([-150 + i * 76, -150 + i * 76 + 50, 70 + j * 62, 70 + j * 62 + 42]); return h; })(),
     theta: 60, alt: 66,
   });
   SCENES.roomSound = (hr) => roomScene(hr, {
-    holes: (() => { const amp = [30, 70, 120, 90, 150, 60, 110, 170, 80, 40, 100, 55]; return amp.map((a, i) => [-228 + i * 38, -228 + i * 38 + 14, 250 - a / 2, 250 + a / 2]); })(),
+    holes: (() => { const amp = [30, 70, 120, 90, 150, 60, 110, 170, 80, 40, 100, 55]; return amp.map((a, i) => [-228 + i * 38, -228 + i * 38 + 14, 195 - a / 2, 195 + a / 2]); })(),
     theta: 70, alt: 64,
   });
   SCENES.roomReason = (hr) => roomScene(hr, {
-    holes: [[118, 214, 180, 290]],
+    holes: [[110, 200, 150, 250]],
     inside: (S, r) => {
       const n = 9, run = 34, rise = 28;
-      for (let i = 0; i < n; i++) S.box(-230 + i * run, 200, 0, -230 + (i + 1) * run, 330, (i + 1) * rise, { mat: hr.stone });
+      for (let i = 0; i < n; i++) S.box(-230 + i * run, 180, 0, -230 + (i + 1) * run, 300, (i + 1) * rise, { mat: hr.stone });
     },
     theta: 55, alt: 58,
   });

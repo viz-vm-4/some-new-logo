@@ -289,12 +289,35 @@ class Sprue{
       }
       else if(d.k==='t'){
         const st=`font-family:${d.mono?"'IBM Plex Mono',monospace":"Archivo,sans-serif"};font-weight:${d.wt||800};font-stretch:${d.wd||100}%;font-size:${d.size||12}px;letter-spacing:${d.ls||0}em;font-style:${d.it?'italic':'normal'}`;
-        const anc=d.anchor||'middle', t=String(d.s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+        const anc=d.anchor||'middle', t=rich(String(d.s));
         out.push(`<text x="${f(d.x+.8)}" y="${f(d.y+.8)}" text-anchor="${anc}" style="${st}" fill="${T.hi}">${t}</text><text x="${f(d.x)}" y="${f(d.y)}" text-anchor="${anc}" style="${st}" fill="${T.txt}">${t}</text>`);
       }
     });
     return `<defs>${defs.join('')}</defs>`+out.join('');
   }
+}
+
+/* Rich moulded text: x_1 → subscript, h^1_2 → stacked super/subscript, and
+   '≤' borrowed from IBM Plex Mono — every glyph comes from a loaded Google
+   font, so nothing falls back to a system face. Offsets are in main-size ems. */
+function rich(str){
+  const esc=t=>t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/≤/g,`<tspan style="font-family:'IBM Plex Mono',monospace;font-weight:600;font-style:normal">≤</tspan>`);
+  const K=.62; let out='', i=0, shift=0, lastSup=0;
+  while(i<str.length){
+    const c=str[i];
+    if((c==='_'||c==='^') && i+1<str.length){
+      let body; if(str[i+1]==='{'){ const j=str.indexOf('}',i); body=str.slice(i+2,j); i=j+1; } else { body=str[i+1]; i+=2; }
+      const target = c==='_' ? .26 : -.40;
+      const dx = (c==='_' && lastSup) ? ` dx="${f(-.58*lastSup)}em"` : '';
+      out+=`<tspan font-size="${K*100}%" dy="${f((target-shift)/K)}em"${dx}>${esc(body)}</tspan>`;
+      shift=target; lastSup = c==='^' ? body.length : 0;
+    } else {
+      let j=i; while(j<str.length && str[j]!=='_' && str[j]!=='^') j++;
+      const txt=str.slice(i,j); out += shift ? `<tspan dy="${f(-shift)}em">${esc(txt)}</tspan>` : esc(txt);
+      shift=0; lastSup=0; i=j;
+    }
+  }
+  return out;
 }
 
 /* The Vizuara mark: a V moulded as a tiny sprue — two parts gated into
@@ -395,7 +418,7 @@ EMBLEMS['neural-networks-from-scratch'] = (S,b) => {
   nodes[0].forEach(p=>S.gate(6,p[1],p[0],p[1],5));
   nodes[3].forEach(p=>S.gate(p[0],p[1],W-6,p[1],5));
   [1,2].forEach(k=>{const t=nodes[k][0],u=nodes[k][nodes[k].length-1]; S.gate(t[0],6,t[0],t[1],5); S.gate(u[0],u[1],u[0],FB,5);});
-  const lab=[['x₁','x₂','x₃'],['h₁','h₂','h₃','h₄'],['h₁','h₂','h₃','h₄'],['ŷ₁','ŷ₂']];
+  const lab=[['x_1','x_2','x_3'],['h^1_1','h^1_2','h^1_3','h^1_4'],['h^2_1','h^2_2','h^2_3','h^2_4'],['ŷ_1','ŷ_2']];
   nodes.forEach((ly,k)=>ly.forEach((p,i)=>{ S.disc(p[0],p[1],31); S.text(p[0]-1,p[1]+8,lab[k][i],{size:22,wt:700,it:true}); }));
 };
 
