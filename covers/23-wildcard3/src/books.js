@@ -4,8 +4,8 @@ const ROLL = [
   {
     slug: 'ai-context-engineering', no: 1, level: 'intermediate', capsules: 43, hours: 10, field: 'purpure',
     title: 'AI Context|Engineering',
-    blazon: 'Purpure, semé of plates, a pile Or charged in pale with a billet Sable, a billet Azure and a mullet Gules.',
-    symbolism: 'The field is strewn with everything the model could be shown. The pile is the context window: only what is set on it reaches the model, in order — instructions, retrieved documents, the question.',
+    blazon: 'Purpure, semé of plates, a pile Or charged in pale with four roundels diminishing: a pellet, a torteau, a hurt and a plate.',
+    symbolism: 'Everything a model could be shown is strewn across the field. The pile is the context window, and only what is set on it reaches the model: instructions, tools, retrieved knowledge and memory, selected, ordered and compressed to fit.',
   },
   {
     slug: 'mathematical-foundations-for-ml', no: 2, level: 'beginner', capsules: 43, hours: 10, field: 'azure',
@@ -34,8 +34,8 @@ const ROLL = [
   {
     slug: 'pi-vs-hermes-vs-codex', no: 6, level: 'advanced', capsules: 9, hours: 1, field: 'purpure',
     title: 'Pi vs Hermes|vs Codex', subtitle: 'Context Compaction and Memory',
-    blazon: 'Purpure, three escutcheons Or, each charged with a pile of the field.',
-    symbolism: 'Three harnesses, three shields, one charge. Each bears the pile of the context window: a long conversation narrowed to what survives compaction. How each one narrows it is the book.',
+    blazon: 'Purpure, three escutcheons: the first barry Or and Purpure, a chief per pale Argent; the second barry, a fess Argent; the third Argent, a base barry.',
+    symbolism: 'Three harnesses, three ways to compact a conversation. Its turns are bars; a summary is plain silver. Pi cuts once and writes two summaries above the cut; Hermes keeps the head and tail and compresses the middle; Codex hands on a single summary.',
   },
   {
     slug: 'decision-trees-from-scratch', no: 14, level: 'beginner', capsules: 23, hours: 5, field: 'azure',

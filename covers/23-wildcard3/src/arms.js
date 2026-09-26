@@ -203,23 +203,26 @@ ARMS['build-llms-from-scratch'] = () => {
 // AI Context Engineering — the pile is the context window
 ARMS['ai-context-engineering'] = () => {
   let out = `<rect width="400" height="480" fill="${T.purpure}"/>`;
-  const pile = [[62, -10], [338, -10], [200, 436]];
-  // semé of plates on the field, left out where the pile lies
-  const inPile = (x, y) => { const t = (y + 10) / 446; const hw = 138 * (1 - t); return Math.abs(x - 200) < hw + 20; };
-  for (let r = 0; r < 12; r++) for (let c = 0; c < 9; c++) {
-    const x = 18 + c * 46 + (r % 2 ? 23 : 0), y = 20 + r * 40;
-    if (!inPile(x, y)) out += roundel(x, y, 8.5, T.argent);
+  const top = 56, bot = 344, apex = 440; // pile from the chief (x 56..344) to a point
+  const inPile = (x, y) => { const t = (y + 10) / (apex + 10); const hw = 144 * (1 - t); return Math.abs(x - 200) < hw + 22; };
+  for (let r = 0; r < 12; r++) for (let c = 0; c < 10; c++) {
+    const x = 14 + c * 44 + (r % 2 ? 22 : 0), y = 20 + r * 40;
+    if (!inPile(x, y)) out += roundel(x, y, 8, T.argent);
   }
-  out += poly(pile, T.or);
-  out += billet(200, 74, 92, 56, T.sable) + billet(200, 160, 66, 48, T.azure) + mullet(200, 250, 38, T.gules);
+  out += poly([[top, -10], [bot, -10], [200, apex]], T.or);
+  [[62, 40, T.sable], [150, 33, T.gules], [228, 27, T.azure], [296, 21, T.argent]].forEach(([y, r, f]) => { out += roundel(200, y, r, f); });
   return out;
 };
 
-// Pi vs Hermes vs Codex — three harnesses, each bearing the pile
+// Pi vs Hermes vs Codex — three harnesses, three shapes of compaction (turns are bars, a summary is plain)
 ARMS['pi-vs-hermes-vs-codex'] = (slug) => {
-  const inner = `<rect width="400" height="480" fill="${T.or}"/>` + poly([[40, -10], [360, -10], [200, 420]], T.purpure, 10);
+  const barry = (y0, y1, k) => { let o = ''; const h = (y1 - y0) / k; for (let i = 0; i < k; i++) o += poly([[-10, y0 + i * h], [410, y0 + i * h], [410, y0 + (i + 1) * h], [-10, y0 + (i + 1) * h]], i % 2 ? T.purpure : T.or, 7); return o; };
+  const plain = (y0, y1) => poly([[-10, y0], [410, y0], [410, y1], [-10, y1]], T.argent, 7);
+  const pi = barry(150, 500, 6) + plain(-10, 150) + `<path d="M200 -10V150" stroke="${S}" stroke-width="7"/>`;
+  const hermes = barry(-10, 150, 3) + plain(150, 300) + barry(300, 500, 4);
+  const codex = plain(-10, 318) + barry(318, 500, 3);
   return `<rect width="400" height="480" fill="${T.purpure}"/>` +
-    escutcheon(104, 128, 148, inner, slug + '-e1') + escutcheon(296, 128, 148, inner, slug + '-e2') + escutcheon(200, 318, 148, inner, slug + '-e3');
+    escutcheon(106, 132, 156, pi, slug + '-e1') + escutcheon(294, 132, 156, hermes, slug + '-e2') + escutcheon(200, 328, 156, codex, slug + '-e3');
 };
 
 // 5D Parallelism — chequy of 32; each axis of the mesh is its own line of partition
