@@ -843,7 +843,9 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
         b += Tx(cx, Y.ffn + 25, 'FFN · GELU', { a: 'middle', s: 9.5, wt: 700 });
         b += Tx(cx, Y.mha + 17, 'MASKED MHA', { a: 'middle', s: 9.5, wt: 700 });
         // residual 1: block input → around LN₁ + MHA → ⊕₁ ; residual 2: ⊕₁ → around LN₂ + FFN → ⊕₂
-        b += PL([[x0, Y.inp], [x0 - 16, Y.inp], [x0 - 16, Y.add1], [x0 - 8.5, Y.add1]], { w: 1.3 });
+        // residual 1 carries the block input x into the bottom of ⊕₁; residual 2 leaves ⊕₁'s output h
+        // from its left side, so ⊕₂ = h + FFN(LN₂(h)). The two wires never share a segment.
+        b += PL([[x0, Y.inp], [x0 - 16, Y.inp], [x0 - 16, Y.add1 + 12], [x0 - 4, Y.add1 + 12], [x0 - 4, Y.add1 + 4.5]], { w: 1.3 });
         b += PL([[x0 - 8.5, Y.add1], [x0 - 28, Y.add1], [x0 - 28, Y.add2], [x0 - 8.5, Y.add2]], { w: 1.3 });
         b += Ci(x0 - 16, Y.inp, 1.9, { fill: C.g, c: 'none' });
         b += oplus(x0 - 4, Y.add1) + oplus(x0 - 4, Y.add2);
@@ -1174,7 +1176,7 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
       t += L(343, 272, 343, 206, { w: T, d: 'hidden' }) + L(343, 346, 343, 414, { w: T, d: 'hidden' });
       // output tokens
       for (let i = 0; i < 4; i++) t += R(392 + i * 24, cy - 6, 12, 12, { fill: C.g, c: 'none' });
-      t += bal(135, 226, 1, 135, 250) + bal(211, 232, 2, 211, 262) + bal(420, 262, 3, 368, 300) + bal(484, 206, 4, 486, 192, true);
+      t += bal(135, 226, 1, 135, 250) + bal(211, 232, 2, 211, 262) + bal(420, 262, 3, 368, 300) + bal(474, 223, 4, 474, 204, true);
       let s = room(0, id, doors, t, '');
       s += schedule([{ a: 'SCHEDULER', b: 'continuous batching' }, { a: 'PREFILL', b: 'whole prompt at once' },
         { a: 'DECODE', b: 'one token per step' }, { a: 'KV CACHE', b: 'paged blocks', red: true }]);
@@ -1216,7 +1218,7 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
       t += R(418, 206, 64, 200, { w: K, fill: C.paper });
       for (let i = 1; i < 6; i++) t += L(418, 206 + i * 33.3, 482, 206 + i * 33.3, { w: T });
       t += Tx(450, 198, '× L', { a: 'middle', s: 10, wt: 700 });
-      t += bal(116, 166, 1, ix + 3, iy + 3) + bal(362, 180, 2, px + cs + 1, py + 12, true) + bal(116, 340, 3, 133, cvy - 9) + bal(450, 436, 4, 450, 406);
+      t += bal(122, 166, 1, ix + 3, iy + 3) + bal(362, 180, 2, px + cs + 1, py + 12, true) + bal(122, 340, 3, 133, cvy - 9) + bal(450, 436, 4, 450, 406);
       let s = room(1, id, [{ side: 'B', a: 170, b: 220, door: 1 }, { side: 'R', a: 284, b: 334 }, ...wins], t, '');
       s += schedule([{ a: 'IMAGE', b: 'split into patches' }, { a: 'PATCH → TOKEN', b: 'linear projection', red: true },
         { a: '[CLS] TOKEN', b: 'prepended' }, { a: 'ENCODER', b: 'L attention blocks' }]);
@@ -1325,9 +1327,9 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
       t += PL([...pts.slice(0, -1), [end[0] - Math.cos(ang) * 9, end[1] - Math.sin(ang) * 9]], { w: 2.4, join: 'round' }) + AH(...end, ang, { l: 12, h: 4 });
       t += Ci(...pts[0], 5, { fill: C.g, c: 'none' }) + Tx(pts[0][0] - 12, pts[0][1] + 4, 'S', { a: 'end', s: 11, wt: 700 });
       // tags
-      t += bal(410, 180, 1, 392, 176) + bal(gx - 24 + 0, gy + 3 * ts + ts - 8, 2, gx + 14, gy + 3 * ts + ts - 12);
-      t += bal(gx + 4 * ts + 22, gy - 20, 3, gx + 4 * ts + 22, gy + ts / 2 - 4);
-      t += bal(gx + 6 * ts + 22, gy - 20, 4, gx + 6 * ts + 22, gy, true);
+      t += bal(410, 174, 1, 386, 174) + bal(gx - 24 + 0, gy + 3 * ts + ts - 8, 2, gx + 14, gy + 3 * ts + ts - 12);
+      t += bal(gx + 4 * ts + 22, gy - 12, 3, gx + 4 * ts + 22, gy + ts / 2 - 4);
+      t += bal(gx + 6 * ts + 22, gy - 12, 4, gx + 6 * ts + 22, gy, true);
       let s = room(3, id, [{ side: 'L', a: 408, b: 452, door: 1 }, ...wins], t, '');
       s += schedule([{ a: 'BANDITS', b: 'where it starts' }, { a: 'VALUE V(s)', b: 'γ = 0.9, iterated' },
         { a: 'POLICY π', b: 'greedy on V' }, { a: 'REWARD', b: '+1 at the goal', red: true }]);
@@ -1458,7 +1460,7 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
     },
     extra(id) {
       // PRELIMINARY stamp
-      const x = 580, y = 474;
+      const x = 586, y = 474;
       return `<g transform="rotate(-8 ${x} ${y})">` +
         R(x - 76, y - 36, 152, 72, { c: C.ink, w: 3, fill: C.paper }) + R(x - 70, y - 30, 140, 60, { c: C.ink, w: 1.1 }) +
         Tx(x, y - 6, 'PRELIMINARY', { a: 'middle', s: 16.5, wt: 700, c: C.ink, ls: '0.1em' }) +

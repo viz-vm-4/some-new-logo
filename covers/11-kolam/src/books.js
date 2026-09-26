@@ -29,10 +29,10 @@ const BOOKS = {
     why: 'The classic diamond of nēr pulli, pierced by a horizontal axis of eleven dots — a number line through the figure — and drawn as a single closed line.',
   },
   'neural-networks-from-scratch': {
-    shape: () => K.fromCols([5, 7, 9, 7, 5], 'ner', 'centre'), loops: 1, sym: 'D2', density: 0.26,
-    force: (e) => (e.dir === 'N' ? 'x' : undefined), // each layer is a braid; the line turns back between layers except where a few links carry it across
+    shape: () => K.fromCols([5, 7, 9, 7, 5], 'ner', 'centre'), loops: 1, sym: 'D2', density: 0.4,
+    force: (e) => (e.dir === 'N' ? 'x' : undefined), // each layer is a braid; between layers the line turns back except at a single link
     spec: 'layers 5–7–9–7–5',
-    why: 'Columns of dots are the layers of a small network, 5–7–9–7–5. Inside a layer the line only crosses, so each column reads as its own braid; between layers it mostly turns back, and a few crossings, the weights, carry it across until the whole network is one line.',
+    why: 'Columns of dots are the layers of a small network, 5–7–9–7–5. Inside a layer the line only crosses, so each column reads as its own braid; between layers it turns back everywhere except at one crossing on the centre line, the signal passing forward, so the five layers close into one line.',
   },
   'build-llms-from-scratch': {
     shape: () => K.fromRows(Array(10).fill(2), 'ner'), loops: 1, sym: 'none', density: 0.25,

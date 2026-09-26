@@ -192,7 +192,7 @@
   };
 
   // ================================================================ Build LLMs from Scratch
-  EMBLEMS['build-llms-from-scratch'] = ({ R, K, title }) => {
+  EMBLEMS['build-llms-from-scratch'] = ({ R, K, title, book }) => {
     const words = ['Every', 'token', 'attends', 'to', 'itself', 'and', 'those', 'before', 'it'];
     const N = words.length, y1 = 800, pch = Math.min(56, Math.floor((y1 - title.bottom - 26) / N)), gap = 6, x0 = M, y0 = y1 - N * pch;
     let fl = '', key = '';
@@ -201,6 +201,7 @@
       for (let j = 0; j <= i; j++) sc.push(-0.55 * (i - j) + (j === 0 ? 1.1 : 0) + (j === i ? 0.6 : 0) + (R() - 0.5) * 1.6);
       const mx = Math.max(...sc);
       const w = sc.map((s) => Math.exp(s - mx));
+      if (i === N - 1) book.lastRow = w.map((v) => Math.min(1, 0.07 + v * 0.93));   // the wrap's back cover reprints this row
       for (let j = 0; j <= i; j++) {
         const t = Math.min(1, 0.07 + w[j] * 0.93);
         const cx = x0 + j * pch, cy = y0 + i * pch;
@@ -346,44 +347,58 @@
   // ink) and adds its own token (solid key ink). The last run is still unverified: dashed outlines + cursor.
   EMBLEMS['charlie-language-room'] = (ctx) => factory(ctx, ({ R, K, FX, door, r, ground }) => {
     let f1 = '', key = '';
-    const x0 = door.cx - r + 24, x1 = door.cx + r - 22, th = 20, lh = 34;
+    const x0 = door.cx - r + 24, x1 = door.cx + r - 22, th = 20, lh = 34, k = 4, gap = 7;
     const pink = FX[1];
-    // token stream: steps of k = 4 drafts
-    const toks = [];
-    for (let st = 0; st < 12; st++) {
-      const acc = [4, 2, 3, 1, 4, 2, 0, 3, 4, 1, 2, 3][st];
-      for (let q = 0; q < acc; q++) toks.push('acc');
-      if (acc < 4) toks.push('rej');
-      toks.push('tgt');
+    // token stream, grouped into verification steps of k = 4 drafts; every step ends with the target's token
+    const steps = [];
+    for (const acc of [4, 2, 3, 1, 4, 2, 0, 3, 4, 1, 2, 3]) {
+      const st = [];
+      for (let q = 0; q < acc; q++) st.push('acc');
+      if (acc < k) st.push('rej');
+      st.push('tgt');
+      steps.push(st.map((kind) => ({ kind, w: 22 + Math.pow(R(), 1.6) * 52 })));
     }
-    let y = door.top + 64, ti = 0, last = null;
+    const pill = (x, y, w, kind) => {
+      if (kind === 'acc') f1 += `<rect x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${th}" rx="${th / 2}"/>`;
+      else if (kind === 'rej') {
+        f1 += `<rect x="${f(x + 1.5)}" y="${f(y + 1.5)}" width="${f(w - 3)}" height="${th - 3}" rx="${(th - 3) / 2}" fill="none" stroke="${pink}" stroke-width="3"/>`;
+        key += p(bar([x - 4, y + th / 2 + 1], [x + w + 4, y + th / 2 - 1], 3.5));
+      } else if (kind === 'tgt') key += `<rect x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${th}" rx="${th / 2}"/>`;
+      else f1 += `<rect x="${f(x + 1.5)}" y="${f(y + 1.5)}" width="${f(w - 3)}" height="${th - 3}" rx="${(th - 3) / 2}" fill="none" stroke="${pink}" stroke-width="3" stroke-dasharray="6 4"/>`;
+    };
+    const draftW = [26, 30, 24, 28];                      // the next k = 4 drafts, not yet verified
+    const tailW = draftW.reduce((a, w) => a + w + gap, 0) + 14;
+    let y = door.top + 64;
     const lines = Math.floor((ground - 44 - y) / lh) + 1;
+    let si = 0, ti = 0;
     for (let line = 0; line < lines; line++, y += lh) {
       const inset = Math.max(0, r - Math.sqrt(Math.max(0, r * r - Math.max(0, door.top + r - y) ** 2)));
       let x = x0 + inset;
-      const final = line === lines - 1;
-      const limit = final ? x0 + 118 : x1 - inset;
-      while (x < limit && ti < toks.length) {
-        const w = 22 + Math.pow(R(), 1.6) * 52;
-        if (x + w > limit) break;
-        const kind = toks[ti++];
-        if (kind === 'acc') f1 += `<rect x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${th}" rx="${th / 2}"/>`;
-        else if (kind === 'rej') {
-          f1 += `<rect x="${f(x + 1.5)}" y="${f(y + 1.5)}" width="${f(w - 3)}" height="${th - 3}" rx="${(th - 3) / 2}" fill="none" stroke="${pink}" stroke-width="3"/>`;
-          key += p(bar([x - 4, y + th / 2 + 1], [x + w + 4, y + th / 2 - 1], 3.5));
-        } else key += `<rect x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${th}" rx="${th / 2}"/>`;
-        last = [x + w, y];
-        x += w + 7;
-      }
-      if (final) {
-        // the next draft run, not yet verified
-        let nx = last[0] + 7;
-        for (let q = 0; q < 3; q++) { const w = 30 + q * 6; f1 += `<rect x="${f(nx + 1.5)}" y="${f(y + 1.5)}" width="${f(w - 3)}" height="${th - 3}" rx="${(th - 3) / 2}" fill="none" stroke="${pink}" stroke-width="3" stroke-dasharray="6 4"/>`; nx += w + 7; }
-        key += p(rectD(nx + 2, y - 5, 5, th + 10));
+      const lim = x1 - inset;
+      if (line < lines - 1) {
+        // running text: tokens wrap freely across lines
+        while (si < steps.length) {
+          const tk = steps[si][ti];
+          if (x + tk.w > lim) break;
+          pill(x, y, tk.w, tk.kind); x += tk.w + gap;
+          if (++ti === steps[si].length) { si++; ti = 0; }
+        }
+      } else {
+        // last line: finish the current step, then whole steps only, leaving room for the unverified run
+        const place = (tk) => { pill(x, y, tk.w, tk.kind); x += tk.w + gap; };
+        while (si < steps.length && ti > 0) { place(steps[si][ti]); if (++ti === steps[si].length) { si++; ti = 0; } }
+        while (si < steps.length) {
+          const sw = steps[si].reduce((a, tk) => a + tk.w + gap, 0);
+          if (x + sw + tailW > lim) break;
+          steps[si].forEach(place); si++;
+        }
+        draftW.forEach((w) => place({ w, kind: 'draft' }));
+        key += p(rectD(x + 2, y - 5, 5, th + 10));
       }
     }
     return { f1, key };
   });
+
 
 
   // What a ViT does: the image (a crescent — C for Charlie) is cut into a 4×4 grid of patches inside the room,
@@ -436,7 +451,7 @@
   EMBLEMS['charlie-reasoning-room'] = (ctx) => factory(ctx, ({ R, K, door, r, ground }) => {
     let f1 = '', key = '';
     const root = [door.cx, ground - 40];
-    const spec = [[[-88, 0, 88], 96], [[-30, 0, 30], 92]]; // child offsets, rise: 3 bandit arms, 3 children each
+    const spec = [[[-80, 0, 80], 90], [[-27, 0, 27], 84]]; // child offsets, rise: 3 bandit arms, 3 children each (leaves clear the arch by ≥ 8px)
     let frontier = [{ x: root[0], y: root[1], best: true }];
     let thin = '', halo = '';
     spec.forEach(([offs, rise], L) => {

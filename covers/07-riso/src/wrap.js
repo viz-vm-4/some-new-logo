@@ -9,7 +9,6 @@
     const lv = LEVELS[book.level];
     const K = INK[lv.ink].hex;
     const FX = book.flash.map((k) => INK[k].hex);
-    const R = rng(book.slug + ':back');
 
     // ---------------- back cover
     let fl = '', key = '';
@@ -20,10 +19,10 @@
     // the last row of the front cover's mask, read across: “it” attends to every token before it
     const words = ['Every', 'token', 'attends', 'to', 'itself', 'and', 'those', 'before', 'it'];
     const cw = (W - 2 * M) / words.length, y0 = 430, ch = cw - 6;
-    const sc = words.map((_, j) => -0.55 * (8 - j) + (j === 0 ? 1.1 : 0) + (j === 8 ? 0.6 : 0) + (R() - 0.5) * 1.4);
-    const mx = Math.max(...sc);
+    // the exact tones of the front cover's last row (set by the build-llms emblem)
+    if (!book.lastRow) coverSVG(book);
     words.forEach((wd, j) => {
-      const t = Math.min(1, 0.07 + Math.exp(sc[j] - mx) * 0.93);
+      const t = book.lastRow[j];
       const x = M + j * cw;
       if (t > 0.9) fl += p(rectD(x, y0, ch, ch));
       else fl += p(halftone({ box: [x + 2, y0 + 2, x + ch - 2, y0 + ch - 2], cell: 7.5, angle: 45, tone: () => t }));

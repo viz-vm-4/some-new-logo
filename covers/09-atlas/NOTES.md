@@ -75,7 +75,7 @@ Data comes from books.vizuara.ai (scraped 2026-09-26): part names, capsule count
 - **Charlie and the Intelligence Factory, I–IV** (sub-series). The shared factory plan is a small "you are here" locator inset with the volume's line lit. A large route bullet by the title carries the numeral. Each volume's own line enters through a gate pill (capsule 01), and its parts are rooms, each with a bullet at its door. Each room is drawn from its subject:
   - **I, Language (inference)**: prefill is one long straight run. Decode climbs a step per token, and the KV cache underneath grows a page per step.
   - **II, Vision**: the image is cut into a 4×4 grid of patches, and the line reads them row by row. It then runs underneath as the flattened token sequence ("patches are tokens").
-  - **III, Sound**: listening and speaking are waveforms. The brain is the flat run of text between them, and the wire streams in small chunks.
+  - **III, Sound**: listening and speaking are drawn as waveforms, then the brain runs on as a flat line of text, and the wire streams in small chunks.
   - **IV, Reasoning**: the agent–environment loop as a circle line, with the agent above, the environment below, action down one side and reward up the other. The book enters, laps once, and leaves for production.
 - **Inference Engineering** (coming soon): a hollow line inside a hatched works corridor, stopping at the four stops the announcement names (batching, KV-cache, paged attention, speculative decoding). The dashed track is the unbuilt extension.
 

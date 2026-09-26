@@ -530,7 +530,7 @@ MAPS['mathematical-foundations-for-ml'] = { h:392, draw(M){
   const A=236, Bv=150, Cz=100, k=Math.SQRT1_2;
   const tip=[O[0]+A-Cz*k, O[1]-Bv+Cz*k], gnd=[O[0]+A-Cz*k, O[1]+Cz*k];
   const dash={fill:'none',stroke:'var(--ink2)',sw:1.8,dash:'5 4'};
-  M.zone(`M${f(tip[0])},${f(tip[1]+16)} V${f(gnd[1])} M${f(O[0]-Cz*k)},${f(gnd[1])} H${f(gnd[0])} L${f(O[0]+A)},${O[1]}`,dash);
+  M.zone(`M${f(tip[0])},${f(tip[1])} V${f(gnd[1])} M${f(O[0]-Cz*k)},${f(gnd[1])} H${f(gnd[0])} L${f(O[0]+A)},${O[1]}`,dash);
   const dv=norm(sub(tip,O)), cxp=add(O,mul(dv,rc));
   M.line(7,[O,tip],{avoid:[[0,O[1]-24,O[0]+24,1e3],[cxp[0]-15,cxp[1]-15,cxp[0]+15,cxp[1]+15],[tip[0]-22,-1e3,1e3,1e3]],side:1,arrow:'end'});
   const Rc=rc/Math.cos(Math.PI/8), oc=[];
@@ -540,7 +540,7 @@ MAPS['mathematical-foundations-for-ml'] = { h:392, draw(M){
   M.line(5,circ,{r:34,side:1,avoid:cross.map(p=>[p[0]-15,p[1]-15,p[0]+15,p[1]+15])});
   M.math('x',622,O[1]+7,{anchor:'start'}); M.math('y',O[0]+18,10,{anchor:'start'}); M.math('z',O[0]-zL-16,O[1]+zL+6,{anchor:'end'});
   M.bullet(1,O[0]+rc+44,O[1]+22); M.bullet(2,548,O[1]+22); M.bullet(3,O[0]+22,O[1]-rc-24); M.bullet(4,O[0]+22,98);
-  M.bullet(5,O[0]-rc-20,O[1]-rc+2); M.bullet(6,O[0]-112,O[1]+78); M.bullet(7,tip[0]+12,tip[1]+26);
+  M.bullet(5,O[0]-rc-20,O[1]-rc+2); M.bullet(6,O[0]-112,O[1]+78); M.bullet(7,tip[0]+26,tip[1]+26);
 }};
 
 /* ---------- Build LLMs from Scratch ----------
@@ -878,7 +878,7 @@ const CAPS = {
  'git-github-masterclass':"A commit graph is already a transit map, and time runs left to right. The first four parts run down main; GitHub (up in the github.com band) and GitHub Desktop branch off together and merge forward — the ring is the pull request; CI/CD and the open-source fork leave the sheet to the right.",
  'charlie-language-room':"Sub-series: each volume keeps the factory plan as a small ‘you are here’ inset and gets its own room. Book I is inference: prefill is one long straight run, decode climbs a step per token, and the KV cache underneath grows a page per step.",
  'charlie-vision-room':"Book II: the image is cut into a 4×4 grid of patches; the line reads them row by row and then runs underneath as the flattened sequence of tokens — ‘patches are tokens’.",
- 'charlie-sound-room':"Book III, voice agents: listening and speaking are drawn as waveforms, the brain is the flat run of text between them, and the wire streams in small chunks.",
+ 'charlie-sound-room':"Book III, voice agents: listening and speaking are drawn as waveforms, then the brain runs on as a flat line of text, and the wire streams in small chunks.",
  'charlie-reasoning-room':"Book IV: the agent–environment loop as a circle line — agent above, environment below, action down one side and reward up the other. The book enters it, laps once, and leaves for production. Advanced, so a night map.",
  'inference-engineering':"Coming soon: a line under construction — hollow, inside a hatched works corridor, stopping at the four stops the announcement names. The dashed track is the extension not yet built.",
 };
@@ -919,7 +919,7 @@ function buildWrap(slug){
     M.label(NET[k][1].toUpperCase(),x2+16,lanes[i]+3.6,{cls:'dest'}); });
   M.pill(P[0],lanes[0],P[0],lanes[3],9);
   const stageLbl=(n,t,x,y,anchor)=>{ M.bulletText(String(n),x,y,'var(--ink)','var(--paper)',9); M.label(t.toUpperCase(),x+15,y+3.4,{cls:'dest'}); };
-  stageLbl(1,'The ground floor',12,yA-26); stageLbl(2,'Learning from data',282,yA-26); stageLbl(3,'Neural networks',424,yA-26);
+  stageLbl(1,'The ground floor',12,yA-26); stageLbl(2,'Learning from data',282,yA-26); stageLbl(3,'Neural networks',446,yA-26);
   stageLbl(4,'Attention, and your own LLM',318,yB+30); stageLbl(5,'Ship something',64,yB+30);
   stageLbl(6,'Pick a frontier',64,P[1]-30);
   // you are here

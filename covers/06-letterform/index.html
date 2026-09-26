@@ -328,6 +328,10 @@ function place(g){
   const ix = g.ix ?? 360, ax = g.ax ?? .5, iy = g.iy ?? B, ay = g.ay ?? 1;
   return {x: ix - (i.l + ax*(i.r-i.l)), y: iy - (i.t + ay*(i.b-i.t)), s};
 }
+/* maths symbols in running text go to Libertinus Math — the serif's served subsets don't carry them */
+const mathSpans = h => h.replace(/([\u2100-\u2BFF]|[\u{1D400}-\u{1D7FF}])/gu, '<span class="f-math">$1</span>');
+/* Google's Libertinus Math has U+21C4 and U+21C6 outlines swapped, so ⇄ is drawn as a path */
+const ARROWS_RL = '<svg width="34" height="26" viewBox="0 0 34 26" aria-label="⇄" style="display:block"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8H30M24 3l6 5-6 5"/><path d="M31 18H4M10 13l-6 5 6 5"/></g></svg>';
 function coverHTML(b, idp){
   const id = (idp||'c') + '-' + b.slug;
   const runs = b.runs.map(g=>{ const p = place(g);
@@ -364,7 +368,7 @@ async function build(){
     const glyph = b.slug==='5d-parallelism' ? '<span style="font:italic 400 24px/1.8 Libertinus Serif">data…expert</span>'
       : b.slug==='transformers-from-scratch' ? '<span class="f-math">𝑄𝐾</span><span class="f-serif" style="font-size:.5em;vertical-align:.9em">T</span>'
       : esc(b.runs.map(r=>r.t).join(''));
-    fig.insertAdjacentHTML('beforeend', `<figcaption><div class="gl${mono?' m':''}${b.runs[0].f==='it'?' f-it':''}">${glyph}</div><p><span class="mono">${b.slug} · ${b.level}${b.soon?' · forthcoming':''}</span>${esc(b.why)}</p></figcaption>`);
+    fig.insertAdjacentHTML('beforeend', `<figcaption><div class="gl${mono?' m':''}${b.runs[0].f==='it'?' f-it':''}">${glyph}</div><p><span class="mono">${b.slug} · ${b.level}${b.soon?' · forthcoming':''}</span>${mathSpans(esc(b.why))}</p></figcaption>`);
     wall.appendChild(fig);
     fitTitle(el.querySelector('h1'), 648);
   }
@@ -395,7 +399,8 @@ async function build(){
   document.getElementById('csn').textContent = `${all.length} books · ordered by codepoint`;
   for (const a of all){
     const lab = 'U+'+a.cp.toString(16).toUpperCase().padStart(4,'0');
-    cs.insertAdjacentHTML('beforeend', `<div class="cell lv-${a.level}${a.slug===mf.slug?' me':''}" title="${a.slug}"><span class="${a.cls}">${a.g}</span><small>${lab}</small></div>`);
+    const g = a.first==='⇄' ? ARROWS_RL : a.g;
+    cs.insertAdjacentHTML('beforeend', `<div class="cell lv-${a.level}${a.slug===mf.slug?' me':''}" title="${a.slug}"><span class="${a.cls}">${g}</span><small>${lab}</small></div>`);
   }
 }
 /* keep every cover on whole pixels so renders carry no hairline of page colour */

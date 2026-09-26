@@ -26,7 +26,9 @@ in capsules, and the bill breaks out through the capsule's edge.
 
 Each cover uses paper, ink and red, plus its level colour and that colour's shade. No orange,
 sky-blue or magenta. Red sits at least 19 L\* from every field, so the accent survives greyscale.
-Red never touches a shade colour. I checked this on a greyscale 180 px contact sheet.
+On jade covers, where red and the shade are only 12 L\* apart, red never touches the shade. On
+ultramarine the 5-cube's red edges do cross the shade hull, but those are 26 L\* apart. I checked
+this on a greyscale 180 px contact sheet.
 
 ## Type
 **Schibsted Grotesk** (Google Fonts), and nothing else.
@@ -86,7 +88,7 @@ all three.
   - II Vision / Vision Transformers: an image cut into patches that leave the grid in reading order.
     One patch is in the air. Four sit on the belt, each carrying its own piece of the picture,
     behind a red class token.
-  - III Sound / Voice Agents: turn-taking on two lanes. You speak (paper), then comes a bracketed
+  - III Sound / Voice Agents: turn-taking on two ink lanes. You speak (paper), then comes a bracketed
     pause (end-of-turn detection and latency). The agent answers in red until you barge in, and it
     stops.
   - IV Reasoning / RL, bandits to reasoning models: a search tree of reasoning paths. Leaf size is
@@ -97,7 +99,7 @@ all three.
   three red passages.
 - **No. 34 Transformers: Theory, Intuition, and Building from Scratch**: an arc diagram of
   multi-head attention over tokens set into the floor. One head links each token to the previous
-  one, one reaches back to the start, and one (red) links matching words.
+  one, one (ink) links later tokens back to the first, and one (red) links matching words.
 - **No. 37 Build a DeiT from Scratch**: distillation. The teacher convnet is drawn as its pyramid of
   shrinking feature maps. Its output drops straight into the red distillation token, which comes
   last in the student's sequence after the class token (ink) and the patches.
@@ -105,7 +107,7 @@ all three.
   other key to key. Rows with matching red keys come together below as one wider table, joined on a
   red key seam. Unmatched rows stay behind.
 - **No. 51 Kernel Engineering** (forthcoming): work tiled from grid to block to warp. Forthcoming
-  books are printed as a centred proof, with keylines only and one inked tile.
+  books are printed as a centred proof, with keylines only (no fills) and one inked tile.
 
 ## Emblem registry (all 52, provisional)
 Each diagram type is used at most three times. The drawn covers are in bold.

@@ -155,7 +155,7 @@ h2.sec em{font-style:normal;font-weight:400;letter-spacing:.02em;text-transform:
       <div class="lv"><span class="pill"><i class="on"></i><i></i><i></i></span><i class="chip" style="background:#EEC232"></i><span class="nm">Beginner<small>Chrome #EEC232</small></span></div>
       <div class="lv"><span class="pill"><i class="on"></i><i class="on"></i><i></i></span><i class="chip" style="background:#63B384"></i><span class="nm">Intermediate<small>Jade #63B384</small></span></div>
       <div class="lv"><span class="pill"><i class="on"></i><i class="on"></i><i class="on"></i></span><i class="chip" style="background:#28398A"></i><span class="nm">Advanced<small>Ultramarine #28398A</small></span></div>
-      <p>Coded three ways: field colour, filled capsules, the word. The fields step light → mid → dark (L* 80 / 67 / 27) and red (L* 46) sits apart from all three, so both level and accent survive greyscale. Each field has one deeper shade for tone-on-tone; red never touches it.</p>
+      <p>Coded three ways: field colour, filled capsules, the word. The fields step light → mid → dark (L* 80 / 67 / 27) and red (L* 46) sits apart from all three, so both level and accent survive greyscale. Each field has one deeper shade for tone-on-tone; on jade, where they are close in value, red never touches it.</p>
     </div>
     <div>
       <h3>Type</h3>
@@ -284,10 +284,10 @@ ART['ai-context-engineering'] = (c) => {
    optimisation — the one red mark), and the histogram of a normal curve
    (probability). */
 ART['mathematical-foundations-for-ml'] = (c) => {
-  let s=floor(c);
+  let s='';
   // 1 · identity matrix
   const mx=48, ms=184, my=F-ms;
-  s+=R(mx,my,ms,ms,c.ink);
+  s+=R(mx,my,ms,ms+2,c.ink);
   const n=4, cell=ms/n;
   for(let i=0;i<n;i++) for(let j=0;j<n;j++){
     const cx=mx+cell*(j+.5), cy=my+cell*(i+.5);
@@ -295,11 +295,12 @@ ART['mathematical-foundations-for-ml'] = (c) => {
   }
   // 2 · the bowl
   const bx=250, bw=180, top=F-296, depth=176;
-  s+=P(`M${bx} ${top} Q ${bx+bw/2} ${top+2*depth} ${bx+bw} ${top} L ${bx+bw} ${F} L ${bx} ${F} Z`, c.paper);
+  s+=P(`M${bx} ${top} Q ${bx+bw/2} ${top+2*depth} ${bx+bw} ${top} L ${bx+bw} ${F+2} L ${bx} ${F+2} Z`, c.paper);
   s+=C(bx+bw/2, top+depth-20, 20, c.red);
   // 3 · the normal curve, as the histogram that approximates it
   const nx=448, nb=9, bw2=22, bg=3, nh=290;
-  for(let i=0;i<nb;i++){ const z=(i-(nb-1)/2)*.62; const h=nh*Math.exp(-z*z/2); s+=R(nx+i*(bw2+bg),F-h,bw2,h,c.ink); }
+  for(let i=0;i<nb;i++){ const z=(i-(nb-1)/2)*.62; const h=nh*Math.exp(-z*z/2); s+=R(nx+i*(bw2+bg),F-h,bw2,h+2,c.ink); }
+  s+=floor(c);
   return s;
 };
 
@@ -355,7 +356,7 @@ ART['5d-parallelism'] = (c) => {
   const pts=[];
   for(let m=0;m<32;m++){ let x=cx,y=cy; for(let k=0;k<5;k++){ const e=(m>>k&1)?1:-1; x+=e*v[k][0]; y+=e*v[k][1]; } pts.push([x,y]); }
   // outer decagon (the zonotope) as a mass
-  const hull=[]; for(let k=0;k<10;k++){ let x=cx,y=cy; const a=k*Math.PI/5; for(let j=0;j<5;j++){ const dot=v[j][0]*Math.cos(a)+v[j][1]*Math.sin(a); const e=dot>=0?1:-1; x+=e*v[j][0]; y+=e*v[j][1]; } hull.push([x,y]); }
+  const hull=[]; for(let k=0;k<10;k++){ let x=cx,y=cy; const a=k*Math.PI/5+Math.PI/10; for(let j=0;j<5;j++){ const dot=v[j][0]*Math.cos(a)+v[j][1]*Math.sin(a); const e=dot>=0?1:-1; x+=e*v[j][0]; y+=e*v[j][1]; } hull.push([x,y]); }
   s+=poly(hull,c.g2);
   const cols=[c.paper,c.paper,c.paper,c.paper,c.red];
   for(let k=0;k<5;k++) for(let m=0;m<32;m++) if(!(m>>k&1)){ const a=pts[m], b=pts[m|1<<k]; s+=Ln(a[0],a[1],b[0],b[1], cols[k], k===4?5:3, 'stroke-linecap="round"'); }
@@ -375,11 +376,11 @@ ART['pi-vs-hermes-vs-codex'] = (c) => {
     (y)=>{ const t=y/stop; return t<.4?[5,10]:(t<.7?[16,8]:[28,8]); },
   ];
   cols.forEach((x,i)=>{ let y=-2; while(y<stop){ const [h,g]=rhythms[i](y); const hh=Math.min(h,stop-y); s+=R(x-cw/2,y,cw,hh,c.a); y+=hh+g; if(g===0) break; } });
-  s+=floor(c);
   const gy=F-gs;
   s+=C(cols[0],gy+gs/2,gs/2,c.red);
-  s+=poly([[cols[1],gy],[cols[1]+gs*.6,F],[cols[1]-gs*.6,F]],c.red);
-  s+=R(cols[2]-gs/2,gy,gs,gs,c.red);
+  s+=poly([[cols[1],gy],[cols[1]+gs*.6+1,F+2],[cols[1]-gs*.6-1,F+2]],c.red);
+  s+=R(cols[2]-gs/2,gy,gs,gs+2,c.red);
+  s+=floor(c);
   return s;
 };
 
@@ -392,8 +393,8 @@ function factory(c, no, inner){
   let s='';
   const tw=180, x0=-60, base=90, top=26, glass=22;
   for(let i=0;i<5;i++){ const x=x0+i*tw;
-    s+=poly([[x,base],[x+tw-glass,top],[x+tw-glass,base]],c.ink);
-    s+=R(x+tw-glass,top,glass,base-top, i===no-1?c.red:c.paper);
+    s+=poly([[x,base+2],[x+tw-glass,top],[x+tw-glass,base+2]],c.ink);
+    s+=R(x+tw-glass,top,glass,base-top+2, i===no-1?c.red:c.paper);
   }
   s+=R(-12,base,W+24,ROOF_BEAM-base,c.ink);
   s+=inner;
@@ -409,11 +410,11 @@ ART['charlie-language-room'] = (c) => {        // the model: prompt in at the to
   [[172,142,46,-12],[230,150,30,8],[282,138,40,16]].forEach(([x,y,w,a])=>{ s+=R(x-w/2,y-13,w,26,c.paper,`transform="rotate(${a} ${x} ${y})"`); });
   s+=poly([[mx-30,172],[mx+mw+30,172],[mx+mw-20,my],[mx+20,my]],c.ink);
   // the machine: a stack of identical layers
-  s+=R(mx,my,mw,F-my,c.ink);
+  s+=R(mx,my,mw,F-my+2,c.ink);
   for(let k=0;k<6;k++) s+=R(mx+22,my+28+k*34,mw-44,10,c.paper);
   // output tokens on the belt, newest (red) nearest the machine; the run bleeds off the right
   let x=mx+mw+14; const ws=[44,70,36,58,84,40,66,52];
-  for(let k=0;x<W;k++){ let w=ws[k%ws.length]; if(x+w>660) w=W+14-x; s+=R(x,F-38,w,38,k===0?c.red:c.paper); x+=w+10; }
+  for(let k=0;x<W;k++){ let w=ws[k%ws.length]; if(x+w>660) w=W+14-x; s+=R(x,F-38,w,40,k===0?c.red:c.paper); x+=w+10; }
   return factory(c,1,s);
 };
 ART['charlie-vision-room'] = (c) => {          // an image cut into patches; patches leave in reading order for the belt
@@ -429,8 +430,8 @@ ART['charlie-vision-room'] = (c) => {          // an image cut into patches; pat
   s+=crop(1,0,392,300,56);
   // on the belt, in reading order behind the class token (red): CLS · p0 · p1 · p2 · p3
   const ts=52, tg=8; let x=672-ts;
-  s+=R(x,F-ts,ts,ts,c.red);
-  for(let k=0;k<gone;k++){ x-=ts+tg; s+=crop(Math.floor(k/n),k%n,x,F-ts,ts); }
+  s+=R(x,F-ts+2,ts,ts,c.red);
+  for(let k=0;k<gone;k++){ x-=ts+tg; s+=crop(Math.floor(k/n),k%n,x,F-ts+2,ts); }
   return factory(c,2,s);
 };
 ART['charlie-sound-room'] = (c) => {           // turn-taking: you (paper, upper lane), the agent (red, lower lane)
@@ -442,7 +443,7 @@ ART['charlie-sound-room'] = (c) => {           // turn-taking: you (paper, upper
       if(cut && u>.74) e=Math.max(e,.55);
       const h=Math.max(10,e*104*(.65+.35*r())); t+=R(xa+k*pitch,y-h/2,bw,h,col,`rx="${bw/2}"`); } return t; };
   // lane rules
-  s+=R(x0,L1-2,W-2*x0,4,c.g2)+R(x0,L2-2,W-2*x0,4,c.g2);
+  s+=R(x0,L1-2,W-2*x0,4,c.ink)+R(x0,L2-2,W-2*x0,4,c.ink);
   // you speak
   s+=lane(L1,48,286,c.paper,'you');
   // the pause: end-of-turn detection and response latency, bracketed
@@ -502,7 +503,7 @@ ART['rag-in-production'] = (c) => {
     if(col===c.g2 && (lift.includes(k-1)||lift.includes(k+1))) col=c.ink;   // red never touches the shade
     const lab = col===c.paper?c.ink:c.paper;
     const by = lifted? F-h-150 : F-h, bc = lifted? c.red : col, lc = lifted? c.paper : lab;
-    s+=R(x,by,w,h,bc);
+    s+=R(x,by,w,h+(lifted?0:2),bc);
     s+=R(x,by+h*.16,w,10,lc); s+=R(x,by+h*.16+16,w,4,lc);
     s+=R(x,by+h-22,w,4,lc);
     x+=w+4; k++; }
@@ -515,11 +516,11 @@ ART['rag-in-production'] = (c) => {
 ART['transformers-from-scratch'] = (c) => {
   let s='';
   const n=12, x0=64, x1=656, y=F, dx=(x1-x0)/(n-1), X=i=>x0+i*dx;
-  const arc=(i,j,col,w)=>{ const a=X(i), b=X(j); return `<path d="M${f1(a)} ${y} A ${f1((b-a)/2)} ${f1((b-a)/2)} 0 0 1 ${f1(b)} ${y}" fill="none" stroke="${col}" stroke-width="${w}"/>`; };
+  const arc=(i,j,col,w)=>{ const a=X(i), b=X(j); return `<path d="M${f1(a)} ${y+3} L${f1(a)} ${y} A ${f1((b-a)/2)} ${f1((b-a)/2)} 0 0 1 ${f1(b)} ${y} L${f1(b)} ${y+3}" fill="none" stroke="${col}" stroke-width="${w}"/>`; };
   // head 1 — previous token
   for(let i=0;i<n-1;i++) s+=arc(i,i+1,c.paper,7);
   // head 2 — back to the first token (the sink) and long range
-  [[0,11],[0,8],[0,5],[2,9]].forEach(([i,j])=>s+=arc(i,j,c.ink,7));
+  [[0,11],[0,8],[0,5],[0,3]].forEach(([i,j])=>s+=arc(i,j,c.ink,7));
   // head 3 — the one that finds the matching earlier word
   [[3,10],[1,6],[4,7]].forEach(([i,j])=>s+=arc(i,j,c.red,10));
   s+=floor(c);
@@ -535,7 +536,7 @@ ART['kernel-engineering'] = (c) => {
   const grid=(x,y,size,n,w)=>{ let g=`<rect x="${x}" y="${y}" width="${size}" height="${size}" ${st} stroke-width="${w}"/>`; for(let k=1;k<n;k++){ g+=Ln(x+k*size/n,y,x+k*size/n,y+size,c.paper,w)+Ln(x,y+k*size/n,x+size,y+k*size/n,c.paper,w);} return g; };
   const S=436, X=(W-S)/2, Y=28;
   s+=grid(X,Y,S,4,5);
-  const t=S/4, x2=X+2*t, y2=Y+1*t; s+=R(x2,y2,t,t,c.g2); s+=grid(x2,y2,t,4,3);
+  const t=S/4, x2=X+2*t, y2=Y+1*t; s+=grid(x2,y2,t,4,3);
   const t2=t/4, x3=x2+1*t2, y3=y2+2*t2; s+=R(x3,y3,t2,t2,c.red);
   return s;
 };
