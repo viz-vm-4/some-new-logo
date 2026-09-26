@@ -384,7 +384,7 @@ const EMBLEM = {
   /* Mathematical Foundations — gradient descent: a ball on a curve, its tangent,
      and the shrinking steps down to the minimum. */
   gradient(pw, ph){
-    const cx = pw/2 + 56, bottom = ph - 36, a = 0.0046;
+    const cx = pw/2 + 44, bottom = ph - 40, a = 0.0027;
     const f = (x) => bottom - a*(x - cx)*(x - cx);
     const fp = (x) => -2*a*(x - cx);
     let d = '';
@@ -395,7 +395,7 @@ const EMBLEM = {
       for (let x = -20; x <= pw+20; x += 4) dd += (dd?'L':'M') + `${F(x)} ${F(f(x) + k*13)}`;
       s += `<path d="${dd}" fill="none" stroke="${P.coal}" stroke-width="2" stroke-dasharray="2 7" stroke-linecap="round"/>`;
     }
-    const xs = [cx-150, cx-94, cx-56, cx-30, cx-14, cx-5];
+    const xs = [cx-176, cx-112, cx-66, cx-36, cx-16, cx-5];
     const lift = (x, r) => { const sl = fp(x), n = Math.hypot(sl, 1); return [x + sl/n*r, f(x) - 1/n*r]; };
     for (let i = 0; i < xs.length-1; i++) {
       const [x1,y1] = lift(xs[i], i ? 8 : 20), [x2,y2] = lift(xs[i+1], 8);
@@ -409,8 +409,6 @@ const EMBLEM = {
     const x0 = xs[0], sl = fp(x0), n = Math.hypot(1, sl), tx = 1/n, ty = sl/n, L = 118;
     s += Ln(x0 - tx*L, f(x0) - ty*L, x0 + tx*L, f(x0) + ty*L, 5, P.red, 'stroke-linecap="round"');
     // rise over run
-    const px = x0 + tx*52, py = f(x0) + ty*52;
-    s += `<path d="M${F(px)} ${F(py)}H${F(px + 40)}V${F(py + sl*40)}" fill="none" stroke="${P.coal}" stroke-width="3"/>`;
     const [bx, by] = lift(x0, 20);
     s += C_(bx, by, 20, P.red) + `<circle cx="${F(bx-7)}" cy="${F(by-7)}" r="5" fill="${P.paper}"/>`;
     return {svg:s, center:[cx, f(cx) - 20], rays:44};
@@ -462,7 +460,7 @@ const EMBLEM = {
   /* 5D Parallelism — the device mesh: two pipeline stages, each split four ways
      by data and tensor; two further splits (expert, context) run off the drawing. */
   mesh5d(pw, ph){
-    const O = [pw/2, ph/2 + 26];
+    const O = [pw/2 + 6, ph/2 + 4];
     const c30 = Math.cos(Math.PI/6);
     const iso = (x,y,z) => [O[0] + (x - y)*c30, O[1] + (x + y)*0.5 - z];
     const pt = (a) => `${F(a[0])} ${F(a[1])}`;
@@ -479,16 +477,16 @@ const EMBLEM = {
     };
     const zb = -(2*hz + gz)/2;
     let ax = '';
-    const px = iso(118,0,zb+hz*0.5), py = iso(0,118,zb+hz*0.5), pz = iso(0,0,zb + 2*hz + gz + 44);
+    const px = iso(100,0,zb+hz*0.5), py = iso(0,100,zb+hz*0.5), pz = iso(0,0,zb + 2*hz + gz + 40);
     const o1 = iso(0,0,zb+hz*0.5);
     ax += arrow(o1[0], o1[1], px[0], px[1], 4.5) + arrow(o1[0], o1[1], py[0], py[1], 4.5);
     const top = iso(0,0,zb+2*hz+gz);
     const body = slab(zb) + slab(zb + hz + gz);
     const zAx = arrow(top[0], top[1] - 6, pz[0], pz[1], 4.5);
-    const ey = O[1] - 58;
+    const ey = O[1] - 40;
     ax += arrow(O[0] - 92, ey, O[0] - 200, ey, 4.5, P.coal, '9 6') + arrow(O[0] + 92, ey, O[0] + 200, ey, 4.5, P.coal, '9 6');
-    const lab = tagT(px[0] - 4, px[1] + 22, 'DATA', 'start') + tagT(py[0] + 4, py[1] + 22, 'TENSOR', 'end') +
-      tagT(pz[0] + 12, pz[1] + 12, 'PIPELINE', 'start') + tagT(O[0] - 200, ey - 24, 'EXPERT', 'start') + tagT(O[0] + 200, ey - 24, 'CONTEXT', 'end');
+    const lab = tagT(px[0] + 12, px[1] - 4, 'DATA', 'start') + tagT(py[0] - 12, py[1] - 4, 'TENSOR', 'end') +
+      tagT(pz[0] + 18, pz[1] + 14, 'PIPELINE', 'start') + tagT(O[0] - 200, ey - 24, 'EXPERT', 'start') + tagT(O[0] + 200, ey - 24, 'CONTEXT', 'end');
     return {svg: ax + body + zAx + lab, center:[O[0], O[1] - 10], rays:40};
   },
 
@@ -503,14 +501,14 @@ const EMBLEM = {
     s += arrow(88, 124, 116, 124, 4.5);
     // the press
     const cx = 214;
-    s += R_(cx-100, 40, 14, base-40, P.coal, 0) + R_(cx+86, 40, 14, base-40, P.coal, 0);
-    s += R_(cx-112, 30, 224, 22, P.red);
-    s += R_(cx-8, 2, 16, 108, P.paper, 2.6);
-    for (let k=0;k<7;k++) s += Ln(cx-8, 60+k*7, cx+8, 64+k*7, 2.2);
-    s += R_(cx-62, 0, 124, 9, P.coal, 0) + C_(cx-66, 4.5, 9, P.yellow, 2.6) + C_(cx+66, 4.5, 9, P.yellow, 2.6);
-    s += R_(cx-80, 108, 160, 16, P.yellow);
-    s += R_(cx-70, 128, 140, base-128-10, P.paper);
-    for (let y = 133; y < base-12; y += 4.6) s += Ln(cx-70, y, cx+70, y, 1.6);
+    s += R_(cx-100, 50, 14, base-50, P.coal, 0) + R_(cx+86, 50, 14, base-50, P.coal, 0);
+    s += R_(cx-112, 40, 224, 22, P.red);
+    s += R_(cx-8, 14, 16, 104, P.paper, 2.6);
+    for (let k=0;k<6;k++) s += Ln(cx-8, 70+k*7, cx+8, 74+k*7, 2.2);
+    s += R_(cx-62, 12, 124, 9, P.coal, 0) + C_(cx-66, 16.5, 9, P.yellow, 2.6) + C_(cx+66, 16.5, 9, P.yellow, 2.6);
+    s += R_(cx-80, 116, 160, 16, P.yellow);
+    s += R_(cx-70, 136, 140, base-136-10, P.paper);
+    for (let y = 141; y < base-12; y += 4.6) s += Ln(cx-70, y, cx+70, y, 1.6);
     s += R_(cx-110, base-10, 220, 10, P.coal, 0);
     // the drawer
     const dx = 372, dy = 44, dw = 112, dh = base - dy;
@@ -738,12 +736,13 @@ const EMBLEM = {
     }
     s += tagT(tx0 + tc/2, rowY + tc + 20, 'CLS', 'middle', 12) + tagT(tx0 + st + tc/2 + 18, rowY + tc + 20, 'DIST', 'start', 12);
     // outputs of the two special tokens
-    const oy = 18;
+    const oy = 24;
     s += Ln(tx0 + tc/2, 62, tx0 + tc/2, oy + tc, 2.6) + Ln(tx0 + st + tc/2, 62, tx0 + st + tc/2, oy + tc, 2.6);
     s += R_(tx0, oy, tc, tc, P.yellow, 2.6) + R_(tx0 + st, oy, tc, tc, P.red, 2.6);
-    s += tagT(tx0 + 2*st + 6, oy + tc/2, 'STUDENT', 'start', 12);
+    s += tagT(sx + sw - 6, 62 + 28 + 11, 'STUDENT', 'end', 12);
     // the match: teacher's prediction <-> distillation output
-    s += `<path d="M150 ${my}C 190 ${my}, 180 ${oy + tc/2}, ${tx0 + st - 14} ${oy + tc/2}" fill="none" stroke="${P.red}" stroke-width="5" stroke-dasharray="10 6"/>` + arrowHead(tx0 + st - 3, oy + tc/2, 0, 16, P.red);
+    const dx = tx0 + st + tc/2;
+    s += `<path d="M150 ${my}C 176 ${my}, 168 2, ${dx - 30} 2 S ${dx} 2, ${dx} ${oy - 12}" fill="none" stroke="${P.red}" stroke-width="5" stroke-dasharray="10 6"/>` + arrowHead(dx, oy - 1, Math.PI/2, 15, P.red);
     return {svg:s, center:[tx0 + st, oy + 10], rays:44};
   },
 };

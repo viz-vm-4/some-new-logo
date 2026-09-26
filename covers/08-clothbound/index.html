@@ -715,43 +715,7 @@ function clothDefs(P, cloth, foil, seed, ww = W){
     <path d="M0 .5H4M0 2.5H4" stroke="#000" stroke-opacity=".05" stroke-width=".6"/>
   </pattern>
   <pattern id="${P}speck" width="120" height="120" patternUnits="userSpaceOnUse"><image href="${TEX.speck}" width="120" height="120" preserveAspectRatio="none"/></pattern>
-  <filter id="${P}leather" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB">
-    <feTurbulence type="fractalNoise" baseFrequency=".16" numOctaves="3" seed="${seed+11}" result="t"/>
-    <feDiffuseLighting in="t" surfaceScale="2.6" diffuseConstant="1" lighting-color="#fff" result="d"><feDistantLight azimuth="225" elevation="48"/></feDiffuseLighting>
-    <feColorMatrix in="d" type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 .5 0 0 0 -.33" result="hl"/>
-    <feComposite in="hl" in2="SourceAlpha" operator="in" result="hli"/>
-    <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="hli"/></feMerge>
-  </filter>
-  <filter id="${P}blind" x="-2%" y="-2%" width="104%" height="104%" color-interpolation-filters="sRGB">
-    <feOffset in="SourceAlpha" dx="1.3" dy="1.3" result="o1"/><feGaussianBlur in="o1" stdDeviation=".6" result="o1b"/>
-    <feComposite in="SourceAlpha" in2="o1b" operator="out" result="e1"/>
-    <feFlood flood-color="#000" flood-opacity=".6"/><feComposite in2="e1" operator="in" result="sh"/>
-    <feOffset in="SourceAlpha" dx="-1" dy="-1" result="o2"/><feGaussianBlur in="o2" stdDeviation=".5" result="o2b"/>
-    <feComposite in="SourceAlpha" in2="o2b" operator="out" result="e2"/>
-    <feFlood flood-color="#fff" flood-opacity=".2"/><feComposite in2="e2" operator="in" result="hl"/>
-    <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="sh"/><feMergeNode in="hl"/></feMerge>
-  </filter>
-  <filter id="${P}sunk" x="-4%" y="-4%" width="108%" height="108%" color-interpolation-filters="sRGB">
-    <feOffset in="SourceAlpha" dx="3" dy="3" result="o1"/><feGaussianBlur in="o1" stdDeviation="2.2" result="o1b"/>
-    <feComposite in="SourceAlpha" in2="o1b" operator="out" result="e1"/>
-    <feFlood flood-color="#000" flood-opacity=".7"/><feComposite in2="e1" operator="in" result="sh"/>
-    <feOffset in="SourceAlpha" dx="-2" dy="-2" result="o2"/><feGaussianBlur in="o2" stdDeviation="1.4" result="o2b"/>
-    <feComposite in="SourceAlpha" in2="o2b" operator="out" result="e2"/>
-    <feFlood flood-color="#fff" flood-opacity=".16"/><feComposite in2="e2" operator="in" result="hl"/>
-    <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="sh"/><feMergeNode in="hl"/></feMerge>
-  </filter>
-  <filter id="${P}foilfx" x="-3%" y="-3%" width="106%" height="106%" color-interpolation-filters="sRGB">
-    <feOffset in="SourceAlpha" dx=".9" dy=".9" result="o1"/>
-    <feComposite in="SourceAlpha" in2="o1" operator="out" result="e1"/>
-    <feFlood flood-color="${foil.edge}" flood-opacity="${foil.pigment ? .25 : .7}"/><feComposite in2="e1" operator="in" result="sh"/>
-    <feOffset in="SourceAlpha" dx="-.8" dy="-.8" result="o2"/>
-    <feComposite in="SourceAlpha" in2="o2" operator="out" result="e2"/>
-    <feFlood flood-color="#fff" flood-opacity="${foil.pigment ? .05 : .5}"/><feComposite in2="e2" operator="in" result="hl"/>
-    <feOffset in="SourceAlpha" dx="1.2" dy="1.6" result="dro"/><feGaussianBlur in="dro" stdDeviation="1" result="drob"/>
-    <feComposite in="drob" in2="SourceAlpha" operator="out" result="dr"/>
-    <feFlood flood-color="#000" flood-opacity="${foil.pigment ? .1 : .35}"/><feComposite in2="dr" operator="in" result="drop"/>
-    <feMerge><feMergeNode in="drop"/><feMergeNode in="SourceGraphic"/><feMergeNode in="sh"/><feMergeNode in="hl"/></feMerge>
-  </filter>`;
+  <linearGradient id="${P}rim" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#000" stop-opacity=".75"/><stop offset=".42" stop-color="#000" stop-opacity=".12"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff" stop-opacity=".22"/></linearGradient>`;
 }
 
 function clothLayer(hex, seed, w = W, x = 0){
@@ -763,6 +727,20 @@ function clothLayer(hex, seed, w = W, x = 0){
 function leather(clipD, x0, P, id){
   return `<clipPath id="${P}${id}"><path d="${clipD}"/></clipPath><g clip-path="url(#${P}${id})"><path d="${clipD}" fill="${HOUSE.hex}"/><image href="${TEX.leather}" x="${x0}" width="180" height="${H}" preserveAspectRatio="none"/></g>`;
 }
+/* Material effects, all as vector copies so they cost almost nothing to render and survive into the PDF.
+   blind: a light lip peeking out along the lower-right edge (the classic inset/letterpress read)
+   foil:  a soft dark drop along the lower-right, the foil itself, then the cloth grain it picks up */
+function blindArt(art, tone, lip, K){
+  return `<g class="so" transform="translate(.9 1.1)" opacity=".55">${tok(art, lip, 'none')}</g>${tok(art, tone, K)}`;
+}
+function foilArt(art, P, K, grad, speckOp){
+  return `<g class="so" transform="translate(1.1 1.5)" opacity=".42">${tok(art, '#000', 'none')}</g>${tok(art, `url(#${P}${grad})`, K)}<g class="so" opacity="${speckOp}">${tok(art, `url(#${P}speck)`, K === 'none' ? 'none' : K)}</g>`;
+}
+function sunkRim(d, P, id){
+  return `<clipPath id="${P}${id}"><path d="${d}"/></clipPath><g clip-path="url(#${P}${id})" fill="none" stroke="url(#${P}rim)">
+    <path d="${d}" stroke-width="3" opacity=".9"/><path d="${d}" stroke-width="7" opacity=".45"/><path d="${d}" stroke-width="13" opacity=".2"/></g>`;
+}
+
 function buildCover(b, P, opts = {}){
   const cloth = CLOTH[b.cloth].hex, foil = FOILS[b.foil], R = rng(hash(b.slug));
   const lvl = b.level;
@@ -824,29 +802,26 @@ function buildCover(b, P, opts = {}){
   const svgOpen = opts.x !== undefined
     ? `<svg x="${opts.x}" y="0" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`
     : `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">`;
-  const dm = { x: cx - 150, y: devY - 200, w: 300, h: 390 };
-  const speckOp = foil.pigment ? .35 : .8;
+  const speckOp = foil.pigment ? .35 : .8, lip = shade(cloth, .22);
   return `${svgOpen}
   <defs>${clothDefs(P, cloth, foil, seed)}
     <linearGradient id="${P}fgd" href="#${P}fg" gradientTransform="translate(${-cx} ${-devY})"/>
     ${bandClip}
-    <mask id="${P}dm" maskUnits="userSpaceOnUse" x="${dm.x}" y="${dm.y}" width="${dm.w}" height="${dm.h}"><rect x="${dm.x}" y="${dm.y}" width="${dm.w}" height="${dm.h}" fill="#000"/>${tok(devG(devInner), '#fff', '#000')}</mask>
   </defs>
   ${clothLayer(cloth, seed)}
 
   <!-- blind die: the band, the sunk roundel (and, while forthcoming, the device) -->
-  <g class="fx" filter="url(#${P}blind)"><g clip-path="url(#${P}cc)"><g clip-path="url(#${P}bc)">${tok(pattern, dark, dark)}</g>${tok(bandLines, dark, dark)}</g></g>
-  <g class="fx" filter="url(#${P}sunk)"><path d="${sunkD}" fill="${sunk}"/></g>
-  ${foilDev ? '' : `<g class="so fx" filter="url(#${P}blind)"><rect x="${dm.x}" y="${dm.y}" width="${dm.w}" height="${dm.h}" fill="${blindDev}" mask="url(#${P}dm)"/></g><g class="po">${devG(tok(devInner, blindDev, sunk))}</g>`}
+  <g clip-path="url(#${P}cc)"><g clip-path="url(#${P}bc)">${blindArt(pattern, dark, lip, dark)}</g>${blindArt(bandLines, dark, lip, dark)}</g>
+  <path d="${sunkD}" fill="${sunk}"/>${sunkRim(sunkD, P, 'sr')}
+  ${foilDev ? '' : devG(blindArt(devInner, blindDev, shade(cloth, .12), sunk))}
 
   ${house}
   <rect x="${HINGE-9}" width="18" height="${H}" fill="url(#${P}hinge)"/>
 
   <!-- foil die -->
   ${tok(fillets, `url(#${P}fg)`, sunk)}
-  <g class="fx" filter="url(#${P}foilfx)">${tok(foilAbs, `url(#${P}fg)`, 'none')}<g class="so" opacity="${speckOp}">${tok(foilAbs, `url(#${P}speck)`, 'none')}</g></g>
-  ${foilDev ? `<g class="so fx" filter="url(#${P}foilfx)"><rect x="${dm.x}" y="${dm.y}" width="${dm.w}" height="${dm.h}" fill="url(#${P}fg)" mask="url(#${P}dm)"/><rect x="${dm.x}" y="${dm.y}" width="${dm.w}" height="${dm.h}" fill="url(#${P}speck)" mask="url(#${P}dm)" opacity="${speckOp}"/></g>
-  <g class="po">${devG(tok(devInner, `url(#${P}fgd)`, sunk))}</g>` : ''}
+  ${foilArt(foilAbs, P, 'none', 'fg', speckOp)}
+  ${foilDev ? devG(foilArt(devInner, P, sunk, 'fgd', speckOp)) : ''}
 
   <rect class="so" width="${W}" height="${H}" fill="url(#${P}weave)"/>
   <rect width="${W}" height="${H}" fill="url(#${P}light)"/>
@@ -887,14 +862,14 @@ function buildWrap(){
       <clipPath id="${P}cc"><path clip-rule="evenodd" d="M0 0H${W}V${H}H0Z ${clearD}"/></clipPath>
     </defs>
     ${clothLayer(cloth, seed + 1)}
-    <g class="fx" filter="url(#${P}blind)"><g clip-path="url(#${P}cc)"><g clip-path="url(#${P}bc)">${tok(pattern, dark, dark)}</g>${tok(bandLines, dark, dark)}</g>${tok(blindBack, dark, cloth)}</g>
+    <g clip-path="url(#${P}cc)"><g clip-path="url(#${P}bc)">${blindArt(pattern, dark, shade(cloth, .22), dark)}</g>${blindArt(bandLines, dark, shade(cloth, .22), dark)}</g>${blindArt(blindBack, dark, shade(cloth, .22), cloth)}
     ${leather(`M${W-S} 0H${W+SP}V${H}H${W-S}Z`, W-S, P, 'sp')}
     <rect x="${W-S}" width="7" height="${H}" fill="url(#${P}lapR)"/><path d="M${W-S-.6} 0V${H}" stroke="#fff" stroke-opacity=".14" stroke-width="1.2"/>
     <rect x="${W-HINGE-9}" width="18" height="${H}" fill="url(#${P}hinge)" transform="rotate(180 ${W-HINGE} ${H/2})"/>
     <rect x="${W}" width="${SP}" height="${H}" fill="url(#${P}light)" opacity=".6"/>
     <path d="M${W+.5} 0V${H}M${W+SP-.5} 0V${H}" stroke="#000" stroke-opacity=".35" stroke-width="1"/>
     ${tok(fillet, `url(#${P}fg)`, 'none')}
-    <g class="fx" filter="url(#${P}foilfx)">${tok(backFoot + spineArt, `url(#${P}fg)`, 'none')}<g class="so" opacity=".8">${tok(backFoot + spineArt, `url(#${P}speck)`, 'none')}</g></g>
+    ${foilArt(backFoot + spineArt, P, 'none', 'fg', .8)}
     <rect class="so" width="${W+SP}" height="${H}" fill="url(#${P}weave)"/>
     <rect width="${W}" height="${H}" fill="url(#${P}vig)"/>
     ${front}

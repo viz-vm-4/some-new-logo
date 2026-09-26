@@ -38,5 +38,9 @@
   "13-miniature": {
     "name": "Muraqqa",
     "pitch": "Every cover is a folio from one Mughal album (a muraqqa) with its page architecture held fixed. The coloured margin (hashiya) and the number of gold, vermilion and black rules (jadval) give the level, and a lobed cartouche carries the title. The central miniature is a flat, jewel-toned diagram of the book's real mechanism, such as the causal mask, the 5D device mesh or the paged KV cache, painted in the Basohli manner. A shamsa rosette is the imprint."
+  },
+  "17-optical": {
+    "name": "Interference",
+    "pitch": "Every book is one field of black lines plus one spot colour, and the book's own idea is the force that bends them: a Gaussian swells them, a causal mask turns them, compaction squeezes them, attention makes two ring systems interfere. At 180px each field averages into one bold emblem; in the hand it shimmers. Line pitch gives level: coarse for beginner, fine for advanced."
   }
 }

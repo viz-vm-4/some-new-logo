@@ -218,6 +218,31 @@
     return { S, cam, L: sunRel(cam, -58, 22), extra };
   };
 
+  // Three wells in section — three ways of keeping water (memory) through the dry months.
+  // Above ground the three well-heads are identical; below ground each stores differently.
+  SCENES.wells = (hr) => {
+    const cam = CAM({ az: 0, s: 1, ox: 360, el: 26 });
+    const S = new Scene(); S.E = frame(cam, 0);
+    const Yb = 150;
+    const funnel = []; for (let i = 0; i < 5; i++) { const a = -175 + i * 11, b = -55 - i * 11; funnel.push([a, a + 11, -i * 26]); funnel.push([b - 11, b, -i * 26]); }
+    funnel.push([-175 + 55, -55 - 55, -5 * 26]);
+    const pits = [
+      { x0: -175, x1: -55, y1: Yb, cols: funnel, water: -96 },
+      { x0: -22, x1: 22, y1: Yb, cols: [[-22, 22, -1200]], water: -190 },
+      { x0: 55, x1: 185, y1: Yb, cols: [[55, 100, -46], [100, 140, -330], [140, 185, -46]], water: -30 },
+    ];
+    pitGround(S, hr, pits);
+    // identical well-heads: two posts and a beam over each well
+    for (const p of pits) {
+      const cx = (p.x0 + p.x1) / 2, yc = Yb + 26, half = Math.max(50, (p.x1 - p.x0) / 2 + 8), Hp = 190;
+      S.box(cx - half - 16, yc - 8, 0, cx - half, yc + 8, Hp, { mat: hr.stone });
+      S.box(cx + half, yc - 8, 0, cx + half + 16, yc + 8, Hp, { mat: hr.stone });
+      S.box(cx - half - 24, yc - 10, Hp, cx + half + 24, yc + 10, Hp + 16, { mat: hr.stone });
+      S.box(cx - half - 26, yc - 12, Hp + 16, cx + half + 26, yc + 12, Hp + 21, { mat: hr.marble });
+    }
+    return { S, cam };
+  };
+
   // ---------- books ----------
   const BOOKS = [
     { slug: 'mathematical-foundations-for-ml', title: ['Mathematical', 'Foundations for', 'Machine Learning'], level: 'beginner', capsules: 43, hours: 10, scene: 'samrat', fig: 'After the Samrat Yantra, Jaipur, 1734' },
