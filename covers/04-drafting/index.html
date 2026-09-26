@@ -1,0 +1,1234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Drawing Office — Vizuara Books cover system</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wdth,wght@0,75..100,400..700;1,75..100,400..700&family=Overpass+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#EBEAE4; --g:#1F2123; --g2:#474B4F; --g3:#8A8E91; --ink:#D0381B;
+  --table:#2A2C2E; --table2:#34373A;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--table);color:var(--paper);font-family:'Instrument Sans',system-ui,sans-serif}
+
+/* ─────────── the sheet ─────────── */
+.cover{position:relative;width:720px;height:888px;background:var(--paper);overflow:hidden;flex:none;color:var(--g)}
+.cover .sheet{position:absolute;left:0;top:0;display:block}
+.tb{position:absolute;left:40px;top:576px;width:640px;height:272px;border-top:2.6px solid var(--g);
+  display:grid;grid-template-rows:1fr 66px}
+.tb-title{position:relative;padding:12px 20px 14px 20px;display:flex;flex-direction:column;min-height:0}
+.lab{font:600 8.5px/1 'Overpass Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--g2)}
+.lab .ser{color:var(--g)}
+.title{font-family:'Instrument Sans',sans-serif;font-weight:600;font-variation-settings:'wdth' 88;
+  line-height:.97;letter-spacing:-.018em;margin:13px 0 0;color:var(--g);font-kerning:normal}
+.desc{margin-top:auto;padding-top:10px;font:400 15.5px/1.25 'Instrument Sans',sans-serif;
+  font-variation-settings:'wdth' 92;color:var(--g2)}
+.tb-row{display:grid;grid-template-columns:84px 170px 86px 64px 102px 134px;border-top:1px solid var(--g)}
+.cell{border-left:1px solid var(--g);padding:10px 11px 11px;display:flex;flex-direction:column;justify-content:space-between;min-width:0}
+.cell:first-child{border-left:0;padding-left:20px}
+.val{font:600 13px/1 'Overpass Mono',monospace;color:var(--g);letter-spacing:.01em;white-space:nowrap}
+.lvv{display:flex;align-items:center;gap:8px}
+.lv{display:block;flex:none}
+.imprint{display:flex;align-items:center;gap:8px;font:700 13.5px/1 'Instrument Sans',sans-serif;
+  font-variation-settings:'wdth' 100;letter-spacing:.19em;text-transform:uppercase}
+.imprint .mk{display:block;flex:none;margin:-8px 0 -3px}
+
+/* ─────────── presentation ─────────── */
+.wrapall{max-width:1560px;margin:0 auto;padding:56px 40px 80px}
+.sheets{display:flex;flex-wrap:wrap;gap:48px 40px;justify-content:center;margin-top:56px}
+.sheets figure{margin:0}
+.sheets figcaption{font:500 12px/20px 'Overpass Mono',monospace;height:20px;color:#B9BAB4;margin-top:12px;letter-spacing:.04em}
+</style>
+</head>
+<body>
+<div class="wrapall">
+  <header id="head"></header>
+  <main class="sheets" id="sheets"></main>
+</div>
+<script>
+/* Drawing Office — shared drafting primitives.
+   Every cover is plain SVG built from these helpers: line weights, dimension
+   lines, leaders, balloons, hatching and isometric boxes all follow one
+   convention so fifty drawings read as one drawing office. */
+(function () {
+  const C = {
+    paper: '#EBEAE4',
+    g: '#1F2123',     // graphite (outlines, text)
+    g2: '#474B4F',    // soft graphite (secondary text — still ≥7:1 on paper)
+    g3: '#8A8E91',    // construction lines only (never text)
+    ink: '#D0381B',   // the one engineering ink
+    inkDeep: '#A92C14'
+  };
+  const K = 2.6, M = 1.6, T = 1.0;          // thick / medium / thin pen (px @ trim)
+  const DASH = { center: '16 3 3 3', hidden: '6 3', phantom: '16 3 3 3 3 3', cut: '22 4 4 4' };
+  const F = "'Overpass Mono', ui-monospace, monospace";
+  const f = (n) => Math.round(n * 100) / 100;
+
+  function A(o) {
+    return Object.entries(o).filter(([, v]) => v !== undefined && v !== null && v !== false)
+      .map(([k, v]) => `${k}="${v}"`).join(' ');
+  }
+  function stroke(o) {
+    return { stroke: o.c === 'none' ? 'none' : (o.c || C.g), 'stroke-width': o.w || T,
+      'stroke-dasharray': o.d ? (DASH[o.d] || o.d) : undefined, 'stroke-linecap': o.cap,
+      'stroke-linejoin': o.join, opacity: o.op, 'stroke-dashoffset': o.doff };
+  }
+  const L = (x1, y1, x2, y2, o = {}) =>
+    `<line ${A({ x1: f(x1), y1: f(y1), x2: f(x2), y2: f(y2), ...stroke(o) })}/>`;
+  const P = (d, o = {}) => `<path ${A({ d, fill: o.fill || 'none', ...stroke(o) })}/>`;
+  const R = (x, y, w, h, o = {}) =>
+    `<rect ${A({ x: f(x), y: f(y), width: f(w), height: f(h), rx: o.rx, fill: o.fill || 'none', ...stroke(o) })}/>`;
+  const Ci = (cx, cy, r, o = {}) =>
+    `<circle ${A({ cx: f(cx), cy: f(cy), r: f(r), fill: o.fill || 'none', ...stroke(o) })}/>`;
+  const PG = (pts, o = {}) =>
+    `<polygon ${A({ points: pts.map((p) => f(p[0]) + ',' + f(p[1])).join(' '), fill: o.fill || 'none', ...stroke(o) })}/>`;
+  const PL = (pts, o = {}) =>
+    `<polyline ${A({ points: pts.map((p) => f(p[0]) + ',' + f(p[1])).join(' '), fill: 'none', ...stroke(o) })}/>`;
+  function Tx(x, y, s, o = {}) {
+    const esc = String(s);
+    return `<text ${A({ x: f(x), y: f(y), 'font-family': o.f || F, 'font-size': o.s || 11,
+      'font-weight': o.wt || 500, 'text-anchor': o.a || 'start', fill: o.c || C.g,
+      'letter-spacing': o.ls, 'font-style': o.it ? 'italic' : undefined,
+      'dominant-baseline': o.mid ? 'central' : undefined,
+      transform: o.rot ? `rotate(${f(o.rot)} ${f(x)} ${f(y)})` : undefined, opacity: o.op })}>${esc}</text>`;
+  }
+  // filled arrowhead, tip at (x,y) pointing along angle (radians)
+  function AH(x, y, ang, o = {}) {
+    const l = o.l || 10, h = o.h || 2.7;
+    const bx = x - l * Math.cos(ang), by = y - l * Math.sin(ang);
+    const nx = -Math.sin(ang) * h, ny = Math.cos(ang) * h;
+    return PG([[x, y], [bx + nx, by + ny], [bx - nx, by - ny]], { fill: o.c || C.g, c: 'none' });
+  }
+  // aligned dimension p1→p2 offset perpendicular by off (sign picks side)
+  function dim(x1, y1, x2, y2, off, label, o = {}) {
+    const c = o.c || C.g;
+    const dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy);
+    const ux = dx / len, uy = dy / len, nx = -uy, ny = ux;
+    const s = Math.sign(off) || 1;
+    const a1 = [x1 + nx * off, y1 + ny * off], a2 = [x2 + nx * off, y2 + ny * off];
+    let out = '';
+    if (o.ext !== false) {
+      const g0 = o.gap ?? 3, ov = 5;
+      out += L(x1 + nx * g0 * s, y1 + ny * g0 * s, a1[0] + nx * ov * s, a1[1] + ny * ov * s, { c, w: T });
+      out += L(x2 + nx * g0 * s, y2 + ny * g0 * s, a2[0] + nx * ov * s, a2[1] + ny * ov * s, { c, w: T });
+    }
+    out += L(a1[0], a1[1], a2[0], a2[1], { c, w: o.w || T });
+    const ang = Math.atan2(uy, ux);
+    if (o.a1 !== false) out += AH(a1[0], a1[1], ang + Math.PI, { c });
+    if (o.a2 !== false) out += AH(a2[0], a2[1], ang, { c });
+    if (label) {
+      let rot = ang * 180 / Math.PI; let flip = 1;
+      if (rot > 90.1 || rot <= -90.1) { rot += 180; flip = -1; }
+      const mx = (a1[0] + a2[0]) / 2 + (o.tx || 0), my = (a1[1] + a2[1]) / 2 + (o.ty || 0);
+      // text sits on the side away from the object; for horizontal dims, above the line
+      const side = o.below ? -1 : 1;
+      const tn = 5 * side;
+      // normal pointing "up" in the rotated text frame
+      const upx = Math.sin(rot * Math.PI / 180), upy = -Math.cos(rot * Math.PI / 180);
+      out += Tx(mx + upx * tn, my + upy * tn + (o.below ? 8 : 0) * 1, label,
+        { a: 'middle', rot: Math.abs(rot) < 0.01 ? undefined : rot, c, s: o.s || 11, wt: o.wt || 500 });
+    }
+    return out;
+  }
+  // leader: arrow (or dot) at pts[0], polyline to last point, label beyond
+  function leader(pts, label, o = {}) {
+    const c = o.c || C.g;
+    let out = PL(pts, { c, w: T });
+    const [p0, p1] = pts;
+    if (o.dot) out += Ci(p0[0], p0[1], 2.4, { fill: c, c: 'none' });
+    else out += AH(p0[0], p0[1], Math.atan2(p0[1] - p1[1], p0[0] - p1[0]), { c });
+    if (label !== undefined && label !== '') {
+      const q = pts[pts.length - 1], qp = pts[pts.length - 2];
+      const right = q[0] >= qp[0];
+      out += Tx(q[0] + (right ? 5 : -5), q[1] + 4, label, { a: right ? 'start' : 'end', c, s: o.s || 11, wt: o.wt });
+    }
+    return out;
+  }
+  function balloon(cx, cy, n, tx, ty, o = {}) {
+    const c = o.c || C.g, r = o.r || 11;
+    let out = '';
+    if (tx !== undefined) {
+      const ang = Math.atan2(ty - cy, tx - cx);
+      out += L(cx + Math.cos(ang) * r, cy + Math.sin(ang) * r, tx, ty, { c });
+      out += Ci(tx, ty, 2.2, { fill: c, c: 'none' });
+    }
+    out += Ci(cx, cy, r, { c, w: 1.3, fill: o.fill || C.paper });
+    out += Tx(cx, cy + 4, n, { a: 'middle', c: o.tc || c, s: o.s || 11, wt: 600 });
+    return out;
+  }
+  // centre mark for a circle: small cross + long dashes beyond the rim
+  function cmark(cx, cy, r, o = {}) {
+    const c = o.c || C.g, e = o.e ?? 5, w = T;
+    const g = Math.min(4, r * 0.35), l = r + e;
+    return L(cx - 3, cy, cx + 3, cy, { c, w }) + L(cx, cy - 3, cx, cy + 3, { c, w }) +
+      L(cx - l, cy, cx - g - 2, cy, { c, w }) + L(cx + g + 2, cy, cx + l, cy, { c, w }) +
+      L(cx, cy - l, cx, cy - g - 2, { c, w }) + L(cx, cy + g + 2, cx, cy + l, { c, w });
+  }
+  const center = (x1, y1, x2, y2, o = {}) => L(x1, y1, x2, y2, { d: 'center', ...o });
+  // zig-zag break line across a flat part (vertical, from y1 to y2 at x)
+  function breakZ(x, y1, y2, o = {}) {
+    const h = y2 - y1, m = (y1 + y2) / 2, a = o.amp || 5;
+    return PL([[x, y1 - 4], [x, m - h * 0.12], [x - a, m - h * 0.04], [x + a, m + h * 0.04], [x, m + h * 0.12], [x, y2 + 4]],
+      { c: o.c || C.g, w: T });
+  }
+  // S-break for a round shaft seen in elevation (vertical at x, between y1 and y2)
+  function breakS(x, y1, y2, o = {}) {
+    const r = (y2 - y1) / 2, m = (y1 + y2) / 2, k = o.k || r * 0.55, c = o.c || C.g;
+    return P(`M${f(x)},${f(y1)} C${f(x + k)},${f(y1 + r * 0.45)} ${f(x + k)},${f(m - r * 0.1)} ${f(x)},${f(m)} ` +
+      `C${f(x - k)},${f(m + r * 0.1)} ${f(x - k)},${f(y2 - r * 0.45)} ${f(x)},${f(y2)}`, { c, w: o.w || M }) +
+      P(`M${f(x)},${f(y1)} C${f(x - k * 0.7)},${f(y1 + r * 0.4)} ${f(x - k * 0.2)},${f(m - r * 0.05)} ${f(x)},${f(m)}`, { c, w: T });
+  }
+  // cutting-plane line with view arrows and letters
+  function cutPlane(x1, y1, x2, y2, letter, o = {}) {
+    const c = o.c || C.g, ang = Math.atan2(y2 - y1, x2 - x1);
+    const dir = o.dir ?? (ang - Math.PI / 2); // arrows point in viewing direction
+    const ux = Math.cos(ang), uy = Math.sin(ang);
+    let out = L(x1, y1, x2, y2, { c, w: T, d: 'cut' });
+    out += L(x1, y1, x1 + ux * 14, y1 + uy * 14, { c, w: K }) + L(x2 - ux * 14, y2 - uy * 14, x2, y2, { c, w: K });
+    for (const [px, py] of [[x1, y1], [x2, y2]]) {
+      const ex = px + Math.cos(dir) * 18, ey = py + Math.sin(dir) * 18;
+      out += L(px, py, ex, ey, { c, w: T }) + AH(ex, ey, dir, { c, l: 9 });
+      out += Tx(ex + Math.cos(dir) * 10, ey + Math.sin(dir) * 10 + 4, letter, { a: 'middle', c, s: 12, wt: 700 });
+    }
+    return out;
+  }
+  // isometric projection, origin (ox,oy), unit s
+  function isoP(ox, oy, s = 1) {
+    const c30 = Math.cos(Math.PI / 6);
+    return (x, y, z) => [ox + (x - y) * c30 * s, oy + (x + y) * 0.5 * s - z * s];
+  }
+  // isometric box: returns svg; faces: top / right(+x) / left(+y)
+  function isoBox(p, x, y, z, dx, dy, dz, o = {}) {
+    const X = x + dx, Y = y + dy, Z = z + dz;
+    const top = [p(x, y, Z), p(X, y, Z), p(X, Y, Z), p(x, Y, Z)];
+    const right = [p(X, y, z), p(X, Y, z), p(X, Y, Z), p(X, y, Z)];
+    const left = [p(x, Y, z), p(X, Y, z), p(X, Y, Z), p(x, Y, Z)];
+    const c = o.c || C.g;
+    let out = '';
+    out += PG(top, { fill: o.top || C.paper, c: 'none' });
+    out += PG(right, { fill: o.right || C.paper, c: 'none' });
+    out += PG(left, { fill: o.left || C.paper, c: 'none' });
+    // inner edges thin, silhouette thick
+    out += PL([p(X, y, Z), p(X, Y, Z), p(x, Y, Z)], { c, w: o.wi || T });
+    out += L(...p(X, Y, Z), ...p(X, Y, z), { c, w: o.wi || T });
+    out += PG([p(x, y, Z), p(X, y, Z), p(X, y, z), p(X, Y, z), p(x, Y, z), p(x, Y, Z)], { c, w: o.wo || M, join: 'round' });
+    return out;
+  }
+  function hatchDefs(id) {
+    const pat = (name, sp, ang, col, w = 1, extra = '') =>
+      `<pattern id="${id}-${name}" patternUnits="userSpaceOnUse" width="${sp}" height="${sp}" patternTransform="rotate(${ang})">` +
+      `<line x1="${sp / 2}" y1="-1" x2="${sp / 2}" y2="${sp + 1}" stroke="${col}" stroke-width="${w}"/>${extra}</pattern>`;
+    return pat('h', 6, 45, C.g) + pat('hr', 5, 45, C.ink, 1.1) + pat('hb', 6, -45, C.g) +
+      pat('hf', 4, 45, C.g, 0.9) + pat('hrb', 5, -45, C.ink, 1.1) +
+      `<pattern id="${id}-x" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(45)">` +
+      `<line x1="3.5" y1="-1" x2="3.5" y2="8" stroke="${C.g}" stroke-width="0.9"/><line x1="-1" y1="3.5" x2="8" y2="3.5" stroke="${C.g}" stroke-width="0.9"/></pattern>` +
+      `<pattern id="${id}-xr" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">` +
+      `<line x1="3" y1="-1" x2="3" y2="7" stroke="${C.ink}" stroke-width="1"/><line x1="-1" y1="3" x2="7" y2="3" stroke="${C.ink}" stroke-width="1"/></pattern>` +
+      `<pattern id="${id}-d" patternUnits="userSpaceOnUse" width="6" height="6"><circle cx="1.5" cy="1.5" r="0.9" fill="${C.g}"/><circle cx="4.5" cy="4.5" r="0.9" fill="${C.g}"/></pattern>` +
+      `<pattern id="${id}-dr" patternUnits="userSpaceOnUse" width="5" height="5"><circle cx="1.25" cy="1.25" r="0.95" fill="${C.ink}"/><circle cx="3.75" cy="3.75" r="0.95" fill="${C.ink}"/></pattern>` +
+      `<pattern id="${id}-hh" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)">` +
+      `<line x1="2.5" y1="-1" x2="2.5" y2="9" stroke="${C.g}" stroke-width="0.9"/><line x1="5.5" y1="-1" x2="5.5" y2="9" stroke="${C.g}" stroke-width="0.9"/></pattern>`;
+  }
+  // circular arc (screen angles, radians, clockwise positive)
+  function arc(cx, cy, r, a1, a2, o = {}) {
+    const x1 = cx + r * Math.cos(a1), y1 = cy + r * Math.sin(a1), x2 = cx + r * Math.cos(a2), y2 = cy + r * Math.sin(a2);
+    const large = Math.abs(a2 - a1) > Math.PI ? 1 : 0, sweep = a2 > a1 ? 1 : 0;
+    return P(`M${f(x1)},${f(y1)} A${f(r)},${f(r)} 0 ${large} ${sweep} ${f(x2)},${f(y2)}`, o);
+  }
+  function arcDim(cx, cy, r, a1, a2, label, o = {}) {
+    const c = o.c || C.g;
+    let s = arc(cx, cy, r, a1, a2, { c, w: T });
+    const t1 = a1 - Math.PI / 2 * Math.sign(a2 - a1), t2 = a2 + Math.PI / 2 * Math.sign(a2 - a1);
+    s += AH(cx + r * Math.cos(a1), cy + r * Math.sin(a1), t1, { c, l: 8, h: 2.4 });
+    s += AH(cx + r * Math.cos(a2), cy + r * Math.sin(a2), t2, { c, l: 8, h: 2.4 });
+    const am = (a1 + a2) / 2, rr = r + (o.tr || 12);
+    s += Tx(cx + rr * Math.cos(am) + (o.tx || 0), cy + rr * Math.sin(am) + 4 + (o.ty || 0), label, { a: o.a || 'middle', c, s: o.s || 10.5, wt: o.wt || 600 });
+    return s;
+  }
+  // isometric dimension: P1,P2 3-D points, off 3-D offset vector (extension direction)
+  function isoDim(p, P1, P2, off, label, o = {}) {
+    const c = o.c || C.g;
+    const n = Math.hypot(...off), u = off.map((v) => v / n);
+    const g = o.gap ?? 4, ov = 6;
+    const add = (Q, k) => [Q[0] + u[0] * k, Q[1] + u[1] * k, Q[2] + u[2] * k];
+    let s = L(...p(...add(P1, g)), ...p(...add(P1, n + ov)), { c }) + L(...p(...add(P2, g)), ...p(...add(P2, n + ov)), { c });
+    const a1 = p(...add(P1, n)), a2 = p(...add(P2, n));
+    const ang = Math.atan2(a2[1] - a1[1], a2[0] - a1[0]);
+    s += L(...a1, ...a2, { c }) + AH(...a1, ang + Math.PI, { c }) + AH(...a2, ang, { c });
+    let rot = ang * 180 / Math.PI; if (rot > 90.1 || rot <= -90.1) rot += 180;
+    const mx = (a1[0] + a2[0]) / 2, my = (a1[1] + a2[1]) / 2;
+    const up = rot * Math.PI / 180, tn = o.below ? 13 : -5;
+    s += Tx(mx - Math.sin(up) * tn, my + Math.cos(up) * tn, label, { a: 'middle', rot, c, s: o.s || 10.5, wt: o.wt || 600, ls: '0.04em' });
+    return s;
+  }
+  // a turned shaft in elevation. segs: [{l, r, fill}] from x0; returns {svg, x1}
+  function shaft(x0, cy, segs, o = {}) {
+    let x = x0, s = '', top = [], bot = [];
+    const xs = [];
+    segs.forEach((sg) => { xs.push([x, x + sg.l, sg.r, sg]); x += sg.l; });
+    // fills first
+    xs.forEach(([a, b, r, sg]) => { s += R(a, cy - r, b - a, 2 * r, { fill: C.paper, c: 'none' }); if (sg.fill) s += R(a, cy - r, b - a, 2 * r, { fill: sg.fill, c: 'none' }); });
+    // shoulders (visible edge spans the larger diameter)
+    for (let i = 1; i < xs.length; i++) {
+      const rr = Math.max(xs[i - 1][2], xs[i][2]);
+      if (!xs[i][3].noEdge) s += L(xs[i][0], cy - rr, xs[i][0], cy + rr, { w: T });
+    }
+    // silhouette
+    const ch = o.ch ?? 3;
+    let d = '';
+    xs.forEach(([a, b, r], i) => {
+      const first = i === 0, last = i === xs.length - 1;
+      if (first) d += `M${f(a)},${f(cy - r + ch)} L${f(a + ch)},${f(cy - r)} `;
+      else d += `L${f(a)},${f(cy - r)} `;
+      d += last ? `L${f(b - ch)},${f(cy - r)} L${f(b)},${f(cy - r + ch)} ` : `L${f(b)},${f(cy - r)} `;
+    });
+    for (let i = xs.length - 1; i >= 0; i--) {
+      const [a, b, r] = xs[i], first = i === 0, last = i === xs.length - 1;
+      if (last) d += `L${f(b)},${f(cy + r - ch)} L${f(b - ch)},${f(cy + r)} `; else d += `L${f(b)},${f(cy + r)} `;
+      d += first ? `L${f(a + ch)},${f(cy + r)} L${f(a)},${f(cy + r - ch)} Z` : `L${f(a)},${f(cy + r)} `;
+    }
+    s += P(d, { w: o.w || K, join: 'miter' });
+    // chamfer edges
+    const r0 = xs[0][2], rn = xs[xs.length - 1][2];
+    s += L(x0 + ch, cy - r0, x0 + ch, cy + r0, { w: T }) + L(x - ch, cy - rn, x - ch, cy + rn, { w: T });
+    return { svg: s, x1: x };
+  }
+  // the imprint: a V-block holding a round bar, drawn in section
+  function mark(x, y, s = 1, o = {}) {
+    const g = o.c || C.g, red = o.mono ? C.paper : C.ink, id = o.id || 'mk';
+    const q = (a, b) => [x + a * s, y + b * s];
+    const r = 6.3, ap = 18, cy = ap - r * Math.SQRT2;
+    const hs = o.hs || 3.2;
+    let out = `<defs><pattern id="${id}" patternUnits="userSpaceOnUse" width="${f(hs * s)}" height="${f(hs * s)}" patternTransform="rotate(45)">` +
+      `<line x1="${f(hs * s / 2)}" y1="-1" x2="${f(hs * s / 2)}" y2="${f(hs * s + 1)}" stroke="${g}" stroke-width="${f(Math.max(0.9, 0.95 * s))}"/></pattern></defs>`;
+    out += PG([q(0, ap - 12), q(12, ap), q(24, ap - 12), q(24, 26), q(0, 26)], { fill: `url(#${id})`, c: g, w: Math.max(1.2, 1.5 * s), join: 'miter' });
+    out += Ci(...q(12, cy), r * s, { fill: red, c: g, w: Math.max(1.1, 1.35 * s) });
+    const k = 2.6;
+    out += L(...q(12 - k, cy), ...q(12 + k, cy), { c: g, w: Math.max(0.8, 0.8 * s) });
+    out += L(...q(12, cy - k), ...q(12, cy + k), { c: g, w: Math.max(0.8, 0.8 * s) });
+    return out;
+  }
+  window.DO = { C, K, M, T, F, f, A, L, P, R, Ci, PG, PL, Tx, AH, dim, leader, balloon, cmark, center,
+    breakZ, breakS, cutPlane, isoP, isoBox, hatchDefs, mark, DASH, arc, arcDim, isoDim, shaft };
+})();
+
+</script>
+<script>
+/* Drawing Office — the sheet: frame, zones, title block. */
+(function () {
+  const { C, K, M, T, L, R, Tx, hatchDefs, mark, f } = DO;
+  const LEVELS = { beginner: 1, intermediate: 2, advanced: 3 };
+  const LEVEL_NAME = { beginner: 'Beginner', intermediate: 'Intermediate', advanced: 'Advanced' };
+  const TB_TOP = 576;
+
+  function frame(b) {
+    let s = '';
+    s += R(40, 40, 640, 808, { w: 2 });
+    for (let i = 1; i < 4; i++) {
+      const x = 40 + 160 * i, y = 40 + 202 * i;
+      s += L(x, 31, x, 40, { w: T }) + L(x, 848, x, 857, { w: T });
+      s += L(31, y, 40, y, { w: T }) + L(680, y, 689, y, { w: T });
+    }
+    for (let i = 0; i < 4; i++) {
+      const x = 120 + 160 * i, y = 141 + 202 * i;
+      s += Tx(x, 34.5, String(i + 1), { a: 'middle', s: 9, wt: 600, c: C.g2 });
+      s += Tx(x, 866, String(i + 1), { a: 'middle', s: 9, wt: 600, c: C.g2 });
+      s += Tx(31.5, y + 3.2, 'ABCD'[i], { a: 'middle', s: 9, wt: 600, c: C.g2 });
+      s += Tx(688.5, y + 3.2, 'ABCD'[i], { a: 'middle', s: 9, wt: 600, c: C.g2 });
+    }
+    s += L(360, 26, 360, 40, { w: M }) + L(360, 848, 360, 862, { w: M });
+    s += L(26, 444, 40, 444, { w: M }) + L(680, 444, 694, 444, { w: M });
+    // drawing number repeated upside-down, top-left (flat-file convention)
+    s += R(40, 40, 116, 26, { w: T });
+    s += Tx(98, 57.5, 'VB·' + b.no, { a: 'middle', s: 11, wt: 600, rot: 180, ls: '0.08em' });
+    return s;
+  }
+
+  function levelMarks(level) {
+    const n = LEVELS[level];
+    let s = '';
+    for (let i = 0; i < 3; i++) {
+      const on = i < n;
+      s += `<rect x="${1 + i * 13}" y="1" width="10" height="10" fill="${on ? C.ink : 'none'}" stroke="${on ? C.ink : C.g}" stroke-width="1.2"/>`;
+    }
+    return `<svg class="lv" width="38" height="12" viewBox="0 0 38 12">${s}</svg>`;
+  }
+
+  function markSvg(size = 1, id = 'mk', o = {}) {
+    const w = 24 * size + 3, h = 24.5 * size + 3;
+    return `<svg class="mk" width="${f(w)}" height="${f(h)}" viewBox="-1.5 ${f(1.8 * size - 1.5)} ${f(w)} ${f(h)}">${mark(0, 0, size, { id, ...o })}</svg>`;
+  }
+
+  function buildCover(b) {
+    const id = 'c' + b.no;
+    const svg = `<svg class="sheet" width="720" height="888" viewBox="0 0 720 888" xmlns="http://www.w3.org/2000/svg" font-family="${DO.F}">` +
+      `<defs>${hatchDefs(id)}</defs>${frame(b)}<g class="drawing">${b.draw(id)}</g>` +
+      (b.fig ? Tx(58, 558, b.fig, { s: 10, wt: 600, ls: '0.06em', c: C.g }) : '') +
+      (b.extra ? b.extra(id) : '') +
+      `</svg>`;
+    const lv = LEVELS[b.level];
+    const tb = `
+      <div class="tb">
+        <div class="tb-title">
+          <div class="lab">${b.series ? `Title · <span class="ser">${b.series}</span>` : 'Title'}</div>
+          <h2 class="title" style="font-size:${b.ts || 60}px">${b.title}</h2>
+          ${b.desc ? `<div class="desc">${b.desc}</div>` : ''}
+        </div>
+        <div class="tb-row">
+          <div class="cell"><div class="lab">Drg. no.</div><div class="val">VB·${b.no}</div></div>
+          <div class="cell"><div class="lab">Level</div><div class="val lvv">${levelMarks(b.level)}<span>${LEVEL_NAME[b.level]}</span></div></div>
+          <div class="cell"><div class="lab">Capsules</div><div class="val">${b.capsules ?? '—'}</div></div>
+          <div class="cell"><div class="lab">Hours</div><div class="val">${b.hours ?? '—'}</div></div>
+          <div class="cell"><div class="lab">Units</div><div class="val">${b.units}</div></div>
+          <div class="cell issuer"><div class="lab">Issued by</div><div class="val imprint">${markSvg(0.95, 'mk' + b.no)}<span>Vizuara</span></div></div>
+        </div>
+      </div>`;
+    return `<div class="cover" data-slug="${b.slug}" data-level="${b.level}">${svg}${tb}</div>`;
+  }
+  window.SHEET = { buildCover, markSvg, levelMarks, LEVELS, LEVEL_NAME, TB_TOP };
+})();
+
+</script>
+<script>
+/* Drawing Office — one drawing per book. Coordinates are sheet px (720×888).
+   Drawing field: x 40–680, y 40–576. Caption baseline y 558. */
+(function () {
+  const { C, K, M, T, L, P, R, Ci, PG, PL, Tx, AH, dim, leader, balloon, cmark, center, breakZ, breakS,
+    cutPlane, isoP, isoBox, isoDim, arc, arcDim, shaft, f } = DO;
+  const B = [];
+  const IS = "'Instrument Sans'";
+  const D2R = Math.PI / 180;
+
+  // two-line leader label: bold name + small red strategy word
+  function tag(x, y, name, sub, a = 'start', subC = C.ink) {
+    return Tx(x, y, name, { a, s: 11, wt: 700, ls: '0.05em' }) + (sub ? Tx(x, y + 14, sub, { a, s: 10, wt: 700, c: subC, ls: '0.08em' }) : '');
+  }
+
+  /* ───────────── 001 · AI Context Engineering ───────────── */
+  B.push({
+    slug: 'ai-context-engineering', no: '001', level: 'intermediate',
+    title: 'AI Context<br>Engineering', ts: 72,
+    desc: 'Engineer the context window like a system.',
+    capsules: 43, hours: 10, units: 'Tokens',
+    fig: 'FIG. 1   SECTION A–A THROUGH ONE CONTEXT WINDOW — FOUR STRATEGIES',
+    draw(id) {
+      let s = '';
+      const cx = 398, cy = 318, R0 = 150, R1 = 161;
+      // key view: the context as a cable, cut at A–A
+      {
+        const y = 118, x0 = 84, x1 = 214, hh = 11;
+        s += R(x0, y - hh, x1 - x0, 2 * hh, { w: M, fill: C.paper });
+        s += center(x0 - 8, y, x1 + 30, y);
+        s += L(x1, y, x1 + 16, y, { w: 1.3 }) + AH(x1 + 26, y, 0, { l: 10, h: 3 });
+        s += Tx(x1 + 32, y + 4, 'MODEL', { s: 10, wt: 700, ls: '0.06em' });
+        s += cutPlane(158, y - 30, 158, y + 30, 'A', { dir: Math.PI });
+      }
+      // sheath = the window (ink)
+      s += Ci(cx, cy, (R0 + R1) / 2, { c: C.ink, w: R1 - R0 });
+      s += Ci(cx, cy, R0, { fill: `url(#${id}-d)`, c: 'none', op: 0.5 });
+      s += cmark(cx, cy, R1, { e: 14 });
+      const strands = [
+        { x: -62, y: -58, r: 60, fill: 'h' },            // instructions
+        { x: 66, y: -66, r: 54, fill: 'x' },             // tools
+        { x: 78, y: 52, r: 56, fill: 'hh' },             // knowledge
+        { x: -20, y: 96, r: 46, fill: 'hb' },            // memory
+        { x: -104, y: 38, r: 36, fill: 'hf', jacket: 1 } // sub-agent
+      ];
+      strands.forEach((t) => {
+        const X = cx + t.x, Y = cy + t.y;
+        s += Ci(X, Y, t.r, { fill: C.paper, c: 'none' });
+        if (t.jacket) {
+          s += Ci(X, Y, t.r - 5, { c: C.g, w: 1 });
+          s += Ci(X, Y, t.r - 10, { fill: `url(#${id}-${t.fill})`, c: C.g, w: M });
+          s += Ci(X, Y, t.r, { c: C.g, w: K });
+        } else {
+          s += Ci(X, Y, t.r, { fill: `url(#${id}-${t.fill})`, c: C.g, w: K });
+        }
+      });
+      // compressed history: small solid strands
+      [[-6, -2, 12], [18, 0, 10], [4, 20, 10], [-14, 22, 8], [26, 20, 6]].forEach(([x, y, r]) => {
+        s += Ci(cx + x, cy + y, r, { fill: C.g, c: 'none' });
+      });
+      // leaders — left
+      s += leader([[cx - 62 - 42, cy - 58 - 43], [210, 196], [196, 196]], '', { dot: true });
+      s += tag(190, 200, 'INSTRUCTIONS', '', 'end');
+      s += leader([[cx - 104 - 30, cy + 38 - 12], [212, 334], [196, 334]], '', { dot: true });
+      s += tag(190, 332, 'SUB-AGENT', 'ISOLATE', 'end');
+      s += leader([[cx - 20 - 36, cy + 96 + 28], [248, 466], [196, 466]], '', { dot: true });
+      s += tag(190, 464, 'MEMORY', 'WRITE', 'end');
+      // leaders — right
+      s += leader([[cx + 66 + 38, cy - 66 - 38], [582, 186], [598, 186]], '', { dot: true });
+      s += tag(604, 190, 'TOOLS', '');
+      s += leader([[cx + 18 + 8, cy - 6], [548, 293], [598, 293]], '', { dot: true });
+      s += tag(604, 290, 'HISTORY', 'COMPRESS');
+      s += leader([[cx + 78 + 40, cy + 52 + 38], [570, 430], [598, 430]], '', { dot: true });
+      s += tag(604, 428, 'KNOWLEDGE', 'SELECT');
+      // diameter callout
+      const a = -58 * D2R, px = cx + R1 * Math.cos(a), py = cy + R1 * Math.sin(a);
+      s += PL([[px + 18 * Math.cos(a), py + 18 * Math.sin(a)], [520, 110], [604, 110]], { c: C.ink, w: T });
+      s += AH(px + 0.5 * Math.cos(a), py + 0.5 * Math.sin(a), a + Math.PI, { c: C.ink, l: 11, h: 3 });
+      s += Tx(526, 104, '⌀ WINDOW', { s: 11, wt: 700, c: C.ink, ls: '0.06em' });
+      s += Tx(398, 504, 'SECTION A–A', { a: 'middle', s: 11, wt: 700, ls: '0.08em' });
+      return s;
+    }
+  });
+
+  /* ───────────── 002 · Mathematical Foundations for ML ───────────── */
+  B.push({
+    slug: 'mathematical-foundations-for-ml', no: '002', level: 'beginner',
+    title: 'Mathematical Foundations<br>for Machine Learning', ts: 50,
+    desc: 'The linear algebra, probability, and calculus that make ML work.',
+    capsules: 43, hours: 10, units: '‖e₁‖ = 1',
+    fig: 'FIG. 1   A MATRIX IS A TRANSFORMATION — THE UNIT CIRCLE UNDER A',
+    draw(id) {
+      let s = '';
+      const ox = 300, oy = 318, u = 100;
+      const A = [[1.6, 0.6], [0.6, 1.0]];
+      const tr = A[0][0] + A[1][1], det = A[0][0] * A[1][1] - A[0][1] * A[1][0];
+      const disc = Math.sqrt(tr * tr / 4 - det), l1 = tr / 2 + disc, l2 = tr / 2 - disc;
+      const th = Math.atan2(l1 - A[0][0], A[0][1]);
+      const S = (x, y) => [ox + x * u, oy - y * u];
+      // axes + unit ticks
+      s += center(...S(-2.4, 0), ...S(3.3, 0)) + center(...S(0, -2.05), ...S(0, 2.28));
+      s += Tx(...S(3.3, 0).map((v, i) => v + [6, 4][i]), 'x₁', { s: 11, wt: 700 });
+      s += Tx(...S(0, 2.28).map((v, i) => v + [7, 4][i]), 'x₂', { s: 11, wt: 700 });
+      [-2, -1, 1, 2, 3].forEach((i) => { const [x, y] = S(i, 0); s += L(x, y - 4, x, y + 4, { w: 1.2 }); });
+      [-2, -1, 1, 2].forEach((j) => { const [x, y] = S(0, j); s += L(x - 4, y, x + 4, y, { w: 1.2 }); });
+      // before: unit circle + unit square (phantom)
+      s += Ci(ox, oy, u, { d: 'phantom', w: 1.2, c: C.g2 });
+      s += PG([S(0, 0), S(1, 0), S(1, 1), S(0, 1)], { d: 'phantom', w: 1.2, c: C.g2 });
+      s += Tx(...S(1, 0).map((v, i) => v + [4, 15][i]), 'e₁', { s: 10.5, wt: 600, c: C.g2 });
+      s += Tx(...S(0, 1).map((v, i) => v + [-16, -5][i]), 'e₂', { s: 10.5, wt: 600, c: C.g2 });
+      // after: parallelogram (hatched = det A) + ellipse
+      const a1 = [A[0][0], A[1][0]], a2 = [A[0][1], A[1][1]];
+      const para = [S(0, 0), S(...a1), S(a1[0] + a2[0], a1[1] + a2[1]), S(...a2)];
+      s += PG(para, { fill: `url(#${id}-hr)`, c: 'none' });
+      s += PG(para, { w: M });
+      s += `<ellipse cx="${ox}" cy="${oy}" rx="${f(l1 * u)}" ry="${f(l2 * u)}" transform="rotate(${f(-th / D2R)} ${ox} ${oy})" fill="none" stroke="${C.g}" stroke-width="${K}"/>`;
+      // eigen-axes (ink chain lines)
+      const e1 = [Math.cos(th), Math.sin(th)], e2 = [-Math.sin(th), Math.cos(th)];
+      s += L(...S(-e1[0] * 2.3, -e1[1] * 2.3), ...S(e1[0] * 2.45, e1[1] * 2.45), { c: C.ink, w: 1.5, d: 'center' });
+      s += L(...S(-e2[0] * 1.2, -e2[1] * 1.2), ...S(e2[0] * 1.2, e2[1] * 1.2), { c: C.ink, w: 1.5, d: 'center' });
+      // column vectors
+      const arrow = (v, lab, dx, dy, a) => {
+        const [x2, y2] = S(...v), ang = Math.atan2(y2 - oy, x2 - ox);
+        return L(ox, oy, x2 - Math.cos(ang) * 10, y2 - Math.sin(ang) * 10, { w: 2 }) + AH(x2, y2, ang, { l: 13, h: 3.6 }) +
+          Tx(x2 + dx, y2 + dy, lab, { s: 11.5, wt: 700, a });
+      };
+      s += arrow(a1, 'Ae₁', 10, 16) + arrow(a2, 'Ae₂', -8, -8, 'end');
+      s += Ci(ox, oy, 3.4, { fill: C.g, c: 'none' });
+      // eigen dimensions (lower-left semi-major, upper-left semi-minor)
+      const P1 = S(-e1[0] * l1, -e1[1] * l1), P2 = S(-e2[0] * l2, -e2[1] * l2);
+      s += dim(ox, oy, ...P1, 30, `λ₁ = ${l1.toFixed(2)}`, { c: C.ink, s: 11, wt: 700, gap: 5 });
+      s += dim(ox, oy, ...P2, -22, `λ₂ = ${l2.toFixed(2)}`, { c: C.ink, s: 11, wt: 700, gap: 5 });
+      // angle of the principal axis
+      s += arcDim(ox, oy, 236, -th, 0, `${(th / D2R).toFixed(1)}°`, { tr: 8, tx: 10, ty: 2, a: 'start' });
+      // det callout
+      const pc = S((a1[0] + a2[0]) * 0.66, (a1[1] + a2[1]) * 0.66);
+      s += leader([pc, [pc[0] + 52, 112], [pc[0] + 70, 112]], '', { dot: true });
+      s += Tx(pc[0] + 76, 109, 'AREA = det A', { s: 11, wt: 700, c: C.ink });
+      s += Tx(pc[0] + 76, 124, `= ${det.toFixed(2)}`, { s: 11, wt: 600, c: C.ink });
+      // the matrix, as a specification
+      const mx = 72, my = 96;
+      s += Tx(mx, my + 27, 'A =', { s: 17, wt: 600, f: IS });
+      s += P(`M${mx + 42},${my} h-5 v40 h5`, { w: 1.6 }) + P(`M${mx + 110},${my} h5 v40 h-5`, { w: 1.6 });
+      s += Tx(mx + 52, my + 16, '1.6', { s: 12, wt: 600 }) + Tx(mx + 82, my + 16, '0.6', { s: 12, wt: 600 });
+      s += Tx(mx + 52, my + 34, '0.6', { s: 12, wt: 600 }) + Tx(mx + 82, my + 34, '1.0', { s: 12, wt: 600 });
+      // line-type legend
+      const lx = 452, ly = 470;
+      s += L(lx, ly, lx + 30, ly, { d: 'phantom', w: 1.2, c: C.g2 }) + Tx(lx + 40, ly + 4, 'BEFORE A', { s: 9.5, wt: 700 });
+      s += L(lx, ly + 18, lx + 30, ly + 18, { w: K }) + Tx(lx + 40, ly + 22, 'AFTER A', { s: 9.5, wt: 700 });
+      s += L(lx, ly + 36, lx + 30, ly + 36, { d: 'center', w: 1.5, c: C.ink }) + Tx(lx + 40, ly + 40, 'EIGENVECTORS', { s: 9.5, wt: 700, c: C.ink });
+      return s;
+    }
+  });
+
+  /* ───────────── 003 · Neural Networks from Scratch ───────────── */
+  B.push({
+    slug: 'neural-networks-from-scratch', no: '003', level: 'beginner',
+    title: 'Neural Networks<br>from Scratch', ts: 66,
+    desc: 'Build a working neural network from an empty file.',
+    capsules: 33, hours: 7, units: 'Neurons',
+    fig: 'FIG. 1   MULTILAYER PERCEPTRON — FORWARD AND BACKWARD PASS',
+    draw(id) {
+      let s = '';
+      const layers = [{ x: 108, n: 4 }, { x: 222, n: 6 }, { x: 336, n: 6 }, { x: 450, n: 3 }];
+      const sp = 56, cy = 300, r = 14;
+      const ys = layers.map((l) => Array.from({ length: l.n }, (_, i) => cy + (i - (l.n - 1) / 2) * sp));
+      for (let k = 0; k < 3; k++) for (const y1 of ys[k]) for (const y2 of ys[k + 1]) {
+        const x1 = layers[k].x, x2 = layers[k + 1].x, a = Math.atan2(y2 - y1, x2 - x1);
+        s += L(x1 + Math.cos(a) * r, y1 + Math.sin(a) * r, x2 - Math.cos(a) * r, y2 - Math.sin(a) * r, { w: 0.9, op: 0.62 });
+      }
+      const Lx = 548, Ly = 392;
+      for (const y of ys[3]) {
+        const a = Math.atan2(Ly - y, Lx - 450);
+        s += L(450 + Math.cos(a) * r, y + Math.sin(a) * r, Lx - Math.cos(a) * 17, Ly - Math.sin(a) * 17, { w: 1 });
+      }
+      layers.forEach((l, k) => { s += center(l.x, ys[k][0] - r - 18, l.x, ys[k][l.n - 1] + r + 18); });
+      layers.forEach((l, k) => ys[k].forEach((y) => { s += Ci(l.x, y, r, { w: K, fill: C.paper }) + cmark(l.x, y, r, { e: 5 }); }));
+      const labs = ['4× INPUT x', '6× ReLU', '6× ReLU', '3× SOFTMAX'];
+      layers.forEach((l, k) => { s += Tx(l.x, 486, labs[k], { a: 'middle', s: 10, wt: 600 }); });
+      s += L(108, 112, 440, 112, { w: 1.3 }) + AH(452, 112, 0, { l: 12, h: 3.4 });
+      s += Tx(108, 102, 'FORWARD PASS  x → ŷ', { s: 10, wt: 600, ls: '0.04em' });
+      s += Ci(Lx, Ly, 17, { fill: C.ink, c: 'none' });
+      s += Tx(Lx, Ly + 6, 'L', { a: 'middle', s: 17, wt: 700, c: C.paper, f: IS });
+      s += Tx(Lx + 28, Ly - 2, 'CROSS-ENTROPY', { s: 10, wt: 600 });
+      s += Tx(Lx + 28, Ly + 12, 'L = −Σ y log ŷ', { s: 10.5, wt: 500 });
+      s += PL([[Lx, Ly + 17], [Lx, 520], [122, 520]], { c: C.ink, w: 3.2, join: 'miter' });
+      s += AH(104, 520, Math.PI, { c: C.ink, l: 18, h: 5.5 });
+      s += Tx(330, 509, 'BACKWARD PASS   ∂L/∂W', { a: 'middle', s: 11, wt: 700, c: C.ink, ls: '0.05em' });
+      const dx = 222, dy = ys[1][1];
+      s += Ci(dx, dy, 25, { w: 1.1 });
+      s += PL([[dx - 18, dy - 18], [dx - 38, dy - 38], [dx - 46, dy - 38]], { w: T });
+      s += Tx(dx - 50, dy - 34, 'A', { a: 'end', s: 13, wt: 700 });
+      const X = 574, Y = 196, RR = 80;
+      s += Ci(X, Y, RR, { w: 1.1, fill: C.paper });
+      const nx = X - 10, ny = Y;
+      [[X - 70, Y - 38], [X - 78, Y], [X - 70, Y + 38]].forEach(([ix, iy]) => {
+        const a = Math.atan2(ny - iy, nx - ix);
+        s += L(ix, iy, nx - Math.cos(a) * 33, ny - Math.sin(a) * 33, { w: 1.3 }) + AH(nx - Math.cos(a) * 25, ny - Math.sin(a) * 25, a, { l: 8, h: 2.4 });
+      });
+      s += Tx(X - 60, Y - 50, 'w₁', { s: 10.5, wt: 700 }) + Tx(X - 66, Y - 8, 'w₂', { s: 10.5, wt: 700 }) + Tx(X - 60, Y + 55, 'w₃', { s: 10.5, wt: 700 });
+      s += Ci(nx, ny, 25, { w: K, fill: C.paper });
+      s += Tx(nx, ny + 8, 'Σ', { a: 'middle', s: 24, wt: 500, f: IS });
+      s += Tx(nx + 2, ny + 42, '+ b', { a: 'middle', s: 10.5, wt: 700 });
+      s += L(nx + 25, ny, nx + 36, ny, { w: 1.3 });
+      s += R(nx + 36, ny - 15, 30, 30, { w: M, fill: C.paper });
+      s += PL([[nx + 40, ny + 9], [nx + 51, ny + 9], [nx + 62, ny - 10]], { w: 1.8 });
+      s += L(nx + 66, ny, X + RR - 4, ny, { w: 1.3 }) + AH(X + RR - 4, ny, 0, { l: 8, h: 2.4 });
+      s += Tx(X, Y + RR + 18, 'DETAIL A', { a: 'middle', s: 10, wt: 700, ls: '0.06em' });
+      s += Tx(X, Y + RR + 31, 'SCALE 3 : 1', { a: 'middle', s: 9.5, wt: 500 });
+      return s;
+    }
+  });
+
+  /* ───────────── 004 · Build LLMs from Scratch ───────────── */
+  B.push({
+    slug: 'build-llms-from-scratch', no: '004', level: 'intermediate',
+    title: 'Build Large Language<br>Models (LLMs) from Scratch', ts: 52,
+    desc: 'Build a GPT-style LLM from an empty file.',
+    capsules: 20, hours: 6, units: 'Tokens',
+    fig: 'FIG. 1   GPT-2 (124M), GENERAL ARRANGEMENT, WITH SECTION B–B',
+    draw(id) {
+      let s = '';
+      const x0 = 96, x1 = 236, cx = (x0 + x1) / 2, w = x1 - x0;
+      const layer = (y, h, o = {}) => R(x0, y, w, h, { w: o.w || M, fill: o.fill || C.paper, c: o.c });
+      // output
+      s += L(cx, 98, cx, 76, { w: 1.4 }) + AH(cx, 70, -Math.PI / 2, { l: 11, h: 3.2 });
+      s += Tx(cx + 12, 80, 'NEXT TOKEN', { s: 10, wt: 700, ls: '0.05em' });
+      s += layer(100, 32, { w: K });
+      s += Tx(cx, 120, 'LM HEAD', { a: 'middle', s: 10, wt: 700 });
+      s += layer(140, 9, { fill: `url(#${id}-hf)` });
+      const block = (y0, label) => {
+        let b = '';
+        const rows = [[y0, 9, 'ln'], [y0 + 13, 42, 'mha'], [y0 + 59, 9, 'ln'], [y0 + 72, 42, 'ffn']];
+        rows.forEach(([y, h, k]) => {
+          if (k === 'ln') b += layer(y, h, { fill: `url(#${id}-hf)`, w: T });
+          if (k === 'mha') { b += layer(y, h, { fill: `url(#${id}-hr)`, w: M }); }
+          if (k === 'ffn') b += layer(y, h, { w: M });
+        });
+        b += R(cx - 36, y0 + 23, 72, 14, { fill: C.paper, c: 'none' });
+        b += Tx(cx, y0 + 33.5, 'MASKED MHA', { a: 'middle', s: 9.5, wt: 700 });
+        b += Tx(cx, y0 + 97, 'FFN · GELU', { a: 'middle', s: 9.5, wt: 700 });
+        // residual bypasses (left side)
+        const byp = (ya, yb) => PL([[x0, ya], [x0 - 18, ya], [x0 - 18, yb], [x0 - 8, yb]], { w: 1.3 }) +
+          Ci(x0 - 4, yb, 4, { w: 1.2, fill: C.paper }) + L(x0 - 6.5, yb, x0 - 1.5, yb, { w: 1 }) + L(x0 - 4, yb - 2.5, x0 - 4, yb + 2.5, { w: 1 });
+        b += byp(y0 + 66 - 7 + 11, y0 + 11 - 2) + byp(y0 + 114 + 6, y0 + 66 + 2 - 7);
+        // outline of the whole block
+        b += R(x0 - 26, y0 - 6, w + 36, 128, { w: 1, d: 'phantom', c: C.g2 });
+        b += Tx(x1 + 16, y0 + 2, label, { s: 9.5, wt: 700, c: C.g2 });
+        return b;
+      };
+      s += block(162, 'BLOCK 12');
+      // repetition break
+      const hz = (y) => PL([[x0 - 32, y], [cx - 9, y], [cx - 4, y - 5], [cx + 4, y + 5], [cx + 9, y], [x1 + 16, y]], { w: T });
+      s += hz(296) + hz(318);
+      s += Tx(x1 + 24, 311, '× 12', { s: 11, wt: 700 });
+      s += Tx(cx, 311, '', {});
+      s += block(330, 'BLOCK 1');
+      s += layer(470, 30, { w: K });
+      s += Tx(cx, 489, 'EMBEDDING', { a: 'middle', s: 9.5, wt: 700 });
+      for (let i = 0; i < 6; i++) {
+        const tx = x0 + 6 + i * 22.5;
+        s += R(tx, 514, 15, 15, { w: 1.3 }) + L(tx + 7.5, 512, tx + 7.5, 506, { w: 1 }) + AH(tx + 7.5, 502, -Math.PI / 2, { l: 5, h: 2 });
+      }
+      // leaders to the right
+      const lab = (y, t1, t2, c) => leader([[x1 + 2, y], [x1 + 30, y]], '', { dot: true }) +
+        Tx(x1 + 36, y + 4, t1, { s: 10, wt: 700, ls: '0.03em' }) + (t2 ? Tx(x1 + 36, y + 17, t2, { s: 9.5, wt: 500, c: c || C.g2 }) : '');
+      s += lab(116, 'VOCAB PROJECTION', '50 257 LOGITS');
+      s += lab(354, 'MASKED ATTENTION', '12 HEADS', C.ink);
+      s += lab(420, 'FEED-FORWARD', '4 × d_model');
+      s += lab(485, 'TOKEN + POSITION', '');
+      s += lab(522, 'TOKEN IDS · BPE', '');
+      // cutting plane B-B through block 12 attention
+      const yc = 210;
+      s += cutPlane(x0 - 40, yc, x1 + 26, yc, 'B', { dir: Math.PI / 2 });
+      // SECTION B-B: causal mask
+      const gx = 420, gy = 150, n = 8, c = 25, G = n * c;
+      for (let i = 0; i < n; i++) for (let j = 0; j <= i; j++) {
+        s += R(gx + j * c, gy + i * c, c, c, { fill: `url(#${id}-hr)`, c: 'none' });
+      }
+      let tri = `M${gx},${gy} `;
+      for (let i = 0; i < n; i++) tri += `L${gx + (i + 1) * c},${gy + i * c} L${gx + (i + 1) * c},${gy + (i + 1) * c} `;
+      tri += `L${gx},${gy + G} Z`;
+      for (let i = 1; i < n; i++) { s += L(gx + i * c, gy, gx + i * c, gy + G, { w: 0.9, c: C.g2 }) + L(gx, gy + i * c, gx + G, gy + i * c, { w: 0.9, c: C.g2 }); }
+      s += P(tri, { w: M, c: C.ink });
+      s += R(gx, gy, G, G, { w: K });
+      {
+        const ix = gx + G * 0.74, iy = gy + G * 0.27, a = 9;
+        s += L(ix - 30, iy, ix - 19, iy, { w: 2 });
+        s += P(`M${ix},${iy} C${ix + a * 0.6},${iy - a} ${ix + a * 1.8},${iy - a} ${ix + a * 1.8},${iy} C${ix + a * 1.8},${iy + a} ${ix + a * 0.6},${iy + a} ${ix},${iy} ` +
+          `C${ix - a * 0.6},${iy - a} ${ix - a * 1.8},${iy - a} ${ix - a * 1.8},${iy} C${ix - a * 1.8},${iy + a} ${ix - a * 0.6},${iy + a} ${ix},${iy} Z`, { w: 2 });
+        s += Tx(ix, iy + 26, 'MASKED', { a: 'middle', s: 9.5, wt: 700, c: C.g2 });
+      }
+      s += dim(gx, gy, gx + G, gy, -16, 'KEYS  j = 1 … T', { s: 10, wt: 600 });
+      s += dim(gx, gy + G, gx, gy, -16, 'QUERIES  i', { s: 10, wt: 600 });
+      s += Tx(gx + G / 2, gy + G + 26, 'SECTION B–B', { a: 'middle', s: 11, wt: 700, ls: '0.08em' });
+      s += Tx(gx + G / 2, gy + G + 41, 'CAUSAL MASK · j ≤ i', { a: 'middle', s: 10, wt: 600, c: C.ink });
+      // spec note
+      s += Tx(420, 470, 'd_model = 768', { s: 10.5, wt: 700 });
+      s += Tx(420, 485, 'n_layers = 12 · n_heads = 12', { s: 10, wt: 500 });
+      s += Tx(420, 500, 'context = 1 024 tokens', { s: 10, wt: 500 });
+      return s;
+    }
+  });
+
+  /* ───────────── 005 · 5D Parallelism ───────────── */
+  B.push({
+    slug: '5d-parallelism', no: '005', level: 'advanced',
+    title: '5D Parallelism for<br>Large Model Training', ts: 56,
+    desc: 'Scale a model across a cluster of GPUs.',
+    capsules: 40, hours: 9, units: 'GPUs',
+    fig: 'FIG. 1   DATA × TENSOR × PIPELINE, WITH AUXILIARY VIEWS C AND E',
+    draw(id) {
+      let s = '';
+      const p = isoP(290, 302, 1);
+      const u = 32, pitch = 43, zp = 60, n = 4, ext = (n - 1) * pitch + u;
+      const cubes = [];
+      for (let z = 0; z < n; z++) for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) cubes.push([x, y, z]);
+      cubes.sort((a, b) => (a[0] + a[1] + a[2]) - (b[0] + b[1] + b[2]) || a[2] - b[2]);
+      // stage outlines (phantom) behind
+      for (let z = 0; z < n; z++) {
+        const zz = z * zp;
+        s += PG([p(-6, -6, zz - 4), p(ext + 6, -6, zz - 4), p(ext + 6, ext + 6, zz - 4), p(-6, ext + 6, zz - 4)], { w: 1, d: 'phantom', c: C.g2 });
+      }
+      cubes.forEach(([x, y, z]) => {
+        const red = x === 3 && y === 3 && z === 3;
+        s += isoBox(p, x * pitch, y * pitch, z * zp, u, u, u, {
+          top: red ? C.ink : C.paper, right: red ? `url(#${id}-hr)` : `url(#${id}-hf)`, left: C.paper,
+          wo: red ? K : M, wi: T
+        });
+      });
+      // centre line (vertical axis)
+      const top = p(ext / 2, ext / 2, 3 * zp + u + 30), bot = p(ext / 2, ext / 2, -30);
+      // dimensions
+      s += isoDim(p, [0, ext, 0], [ext, ext, 0], [0, 38, 0], 'DATA × 4', { below: true });
+      s += isoDim(p, [ext, 0, 0], [ext, ext, 0], [38, 0, 0], 'TENSOR × 4', { below: true });
+      s += isoDim(p, [0, ext, 0], [0, ext, 3 * zp + u], [-40, 40, 0], 'PIPELINE × 4');
+      // leader to the red GPU
+      const g = p(3 * pitch + u / 2, 3 * pitch + u / 2, 3 * zp + u);
+      s += leader([[g[0] + 2, g[1] - 2], [g[0] + 70, 100], [g[0] + 86, 100]], '', { dot: true, c: C.ink });
+      s += Tx(g[0] + 92, 104, '1 GPU · RANK 0', { s: 10.5, wt: 700, c: C.ink, ls: '0.04em' });
+      // VIEW C — context parallel (ring)
+      {
+        const vx = 576, vy = 214, rr = 44;
+        s += Tx(vx, 130, 'VIEW C', { a: 'middle', s: 10.5, wt: 700, ls: '0.08em' });
+        s += Tx(vx, 144, 'CONTEXT · RING', { a: 'middle', s: 9.5, wt: 600, c: C.g2 });
+        s += Ci(vx, vy, rr, { w: 1.2 });
+        for (let i = 0; i < 4; i++) {
+          const a = (-90 + i * 90) * D2R, x = vx + rr * Math.cos(a), y = vy + rr * Math.sin(a);
+          s += R(x - 9, y - 9, 18, 18, { w: M, fill: C.paper });
+          s += Tx(x, y + 3.5, 'S' + (i + 1), { a: 'middle', s: 8.5, wt: 700 });
+          const am = a + 45 * D2R;
+          s += AH(vx + rr * Math.cos(am), vy + rr * Math.sin(am), am + Math.PI / 2, { l: 8, h: 2.6 });
+        }
+      }
+      // VIEW E — expert parallel (router)
+      {
+        const vx = 576, vy = 410;
+        s += Tx(vx, 346, 'VIEW E', { a: 'middle', s: 10.5, wt: 700, ls: '0.08em' });
+        s += Tx(vx, 360, 'EXPERTS · ROUTER', { a: 'middle', s: 9.5, wt: 600, c: C.g2 });
+        s += R(vx - 24, vy - 30, 48, 18, { w: M, fill: C.paper });
+        s += Tx(vx, vy - 17, 'ROUTE', { a: 'middle', s: 8.5, wt: 700 });
+        for (let i = 0; i < 4; i++) {
+          const ex = vx - 54 + i * 36, on = i === 1 || i === 2;
+          s += L(vx, vy - 12, ex, vy + 22, { w: on ? 1.6 : 1, c: on ? C.ink : C.g2, d: on ? undefined : 'hidden' });
+          s += R(ex - 13, vy + 22, 26, 30, { w: M, fill: on ? `url(#${id}-hr)` : C.paper });
+          s += Tx(ex, vy + 66, 'E' + (i + 1), { a: 'middle', s: 9, wt: 700 });
+        }
+      }
+      return s;
+    }
+  });
+
+  /* ───────────── 006 · Pi vs Hermes vs Codex ───────────── */
+  B.push({
+    slug: 'pi-vs-hermes-vs-codex', no: '006', level: 'advanced',
+    title: 'Pi vs Hermes vs Codex:<br>Context Compaction<br>and Memory', ts: 44,
+    desc: 'Three open-source coding harnesses, read out of their source.',
+    capsules: 9, hours: 1, units: 'Tokens',
+    fig: 'FIG. 1   ONE OVERFLOWING SESSION, THREE COMPACTIONS — CUT, BREAK, HANDOFF',
+    draw(id) {
+      let s = '';
+      const x0 = 104, lim = 540, x9 = 648;
+      // one session: turns of varying length / diameter
+      const turns = [[30, 20], [26, 15], [40, 23], [22, 17], [34, 21], [28, 14], [44, 24], [24, 18], [36, 21],
+        [26, 15], [42, 23], [30, 18], [38, 22], [26, 16], [36, 20], [34, 23]];
+      const tot = turns.reduce((a, t) => a + t[0], 0), k = (x9 - x0) / tot;
+      const T2 = turns.map(([l, r]) => ({ l: l * k, r }));
+      const red = `url(#${id}-hr)`;
+      const rows = [
+        { y: 180, name: 'PI', note: 'CUT AT A TURN, SUMMARISE THE PREFIX' },
+        { y: 330, name: 'HERMES', note: 'KEEP HEAD AND TAIL, PRUNE THE MIDDLE' },
+        { y: 480, name: 'CODEX', note: 'SUMMARY WRITTEN AS A HANDOFF' }
+      ];
+      // window + limit datum
+      s += dim(x0, 120, lim, 120, -38, 'CONTEXT WINDOW', { s: 10.5, wt: 700, gap: 6 });
+      s += L(lim, 76, lim, 516, { c: C.ink, w: 1.8, d: 'center' });
+      s += R(lim - 8, 524, 16, 16, { c: C.ink, w: 1.4, fill: C.paper }) + Tx(lim, 536, 'L', { a: 'middle', s: 11, wt: 700, c: C.ink });
+      s += PG([[lim - 6, 524], [lim + 6, 524], [lim, 515]], { fill: C.ink, c: 'none' });
+      s += Tx(lim + 14, 536, 'LIMIT', { s: 10, wt: 700, c: C.ink, ls: '0.06em' });
+      rows.forEach((r) => {
+        s += R(x0, r.y - 24, x9 - x0, 48, { d: 'phantom', w: 1.1, c: C.g2 });
+        s += center(x0 - 16, r.y, x9 + 16, r.y);
+        s += Tx(x0, r.y - 40, r.name, { s: 13, wt: 700, ls: '0.1em' });
+        s += Tx(lim - 14, r.y - 40, r.note, { s: 9.5, wt: 600, c: C.g2, ls: '0.03em', a: 'end' });
+      });
+      s += dim(lim, 204, x9, 204, 18, 'OVERFLOW', { c: C.ink, s: 10, wt: 700, gap: 2, below: true });
+      // tail turns that fit after a prefix of length `pre`
+      const tailFit = (pre) => { const out = []; let acc = pre; for (let i = T2.length - 1; i >= 0; i--) { if (acc + T2[i].l > lim - x0 - 22) break; out.unshift(T2[i]); acc += T2[i].l; } return out; };
+      // PI
+      {
+        const y = rows[0].y, sum = { l: 62, r: 24, fill: red };
+        const sh = shaft(x0, y, [sum, ...tailFit(62)]);
+        s += sh.svg;
+        const xc = x0 + 62;
+        s += L(xc, y - 42, xc, y - 28, { w: K }) + L(xc, y + 28, xc, y + 42, { w: K });
+        s += L(xc, y - 42, xc + 12, y - 42, { w: T }) + AH(xc + 20, y - 42, 0, { l: 8, h: 2.6 });
+        s += L(xc, y + 42, xc + 12, y + 42, { w: T }) + AH(xc + 20, y + 42, 0, { l: 8, h: 2.6 });
+        s += Tx(x0 + 31, y + 44, 'SUMMARY', { a: 'middle', s: 9.5, wt: 700, c: C.ink });
+        s += Tx(xc + 26, y + 46, 'CUT', { s: 9.5, wt: 700 });
+      }
+      // HERMES
+      {
+        const y = rows[1].y, head = T2.slice(0, 2), mid = { l: 58, r: 19, fill: red };
+        const hl = head[0].l + head[1].l;
+        const tail = tailFit(hl + 58 + 8);
+        const sh = shaft(x0, y, [...head, mid, ...tail]);
+        s += sh.svg;
+        const b1 = x0 + hl, b2 = b1 + 58;
+        s += breakS(b1, y - 24, y + 24, { k: 10 }) + breakS(b2, y - 24, y + 24, { k: 10 });
+        s += Tx(x0 + hl / 2, y + 44, 'HEAD', { a: 'middle', s: 9.5, wt: 700 });
+        s += Tx((b1 + b2) / 2, y + 44, 'MIDDLE', { a: 'middle', s: 9.5, wt: 700, c: C.ink });
+        s += Tx((b2 + sh.x1) / 2, y + 44, 'TAIL', { a: 'middle', s: 9.5, wt: 700 });
+      }
+      // CODEX
+      {
+        const y = rows[2].y;
+        const sh = shaft(x0, y, [{ l: 86, r: 24, fill: red }, { l: 8, r: 32 }, { l: 8, r: 32, noEdge: false }, { l: 60, r: 17 }, { l: 44, r: 19 }]);
+        s += sh.svg;
+        s += Tx(x0 + 43, y + 44, 'HANDOFF', { a: 'middle', s: 9.5, wt: 700, c: C.ink });
+        s += Tx(x0 + 102, y + 52, 'COUPLING', { a: 'middle', s: 9, wt: 600, c: C.g2 });
+        s += Tx(x0 + 154, y + 44, 'NEXT MODEL', { s: 9.5, wt: 700 });
+      }
+      return s;
+    }
+  });
+
+  window.BOOKS = B;
+})();
+
+</script>
+<script>
+/* Drawing Office — sub-series (architectural sheets) and range books. */
+(function () {
+  const { C, K, M, T, L, P, R, Ci, PG, PL, Tx, AH, dim, leader, balloon, cmark, center, breakZ, arc, f } = DO;
+  const B = window.BOOKS;
+  const IS = "'Instrument Sans'";
+  const D2R = Math.PI / 180;
+
+  /* ─── Charlie and the Intelligence Factory: each book is one room of one building ─── */
+  const RX = 96, RY = 150, RW = 412, RH = 340, WT = 10; // room shell (outer)
+  const IX0 = RX + WT, IY0 = RY + WT, IX1 = RX + RW - WT, IY1 = RY + RH - WT;
+
+  function wallsWithOpenings(id, openings) {
+    // poché walls: outer rect minus inner rect, then paper "cuts" for openings
+    let s = `<path d="M${RX},${RY} h${RW} v${RH} h${-RW} Z M${IX0},${IY0} v${IY1 - IY0} h${IX1 - IX0} v${IY0 - IY1} Z" fill="${C.g}" fill-rule="evenodd"/>`;
+    openings.forEach((o) => {
+      if (o.side === 'L' || o.side === 'R') {
+        const x = o.side === 'L' ? RX : IX1;
+        s += R(x - 0.5, o.a, WT + 1, o.b - o.a, { fill: C.paper, c: 'none' });
+        s += L(x, o.a, x + WT, o.a, { w: 1.2 }) + L(x, o.b, x + WT, o.b, { w: 1.2 });
+        if (o.win) { for (const k of [0.25, 0.5, 0.75]) s += L(x + WT * k, o.a, x + WT * k, o.b, { w: T }); }
+        if (o.door) {
+          const hx = o.side === 'L' ? IX0 : IX1, dir = o.side === 'L' ? 1 : -1, r = o.b - o.a;
+          s += L(hx, o.a, hx + dir * r, o.a, { w: 1.4 });
+          s += arc(hx, o.a, r, o.side === 'L' ? 0 : Math.PI, o.side === 'L' ? Math.PI / 2 : Math.PI / 2, { w: T, c: C.g2 });
+        }
+      } else {
+        const y = o.side === 'T' ? RY : IY1;
+        s += R(o.a, y - 0.5, o.b - o.a, WT + 1, { fill: C.paper, c: 'none' });
+        s += L(o.a, y, o.a, y + WT, { w: 1.2 }) + L(o.b, y, o.b, y + WT, { w: 1.2 });
+        if (o.win) { for (const k of [0.25, 0.5, 0.75]) s += L(o.a, y + WT * k, o.b, y + WT * k, { w: T }); }
+        if (o.door) {
+          const hy = o.side === 'T' ? IY0 : IY1, r = o.b - o.a, dir = o.side === 'T' ? 1 : -1;
+          s += L(o.a, hy, o.a, hy + dir * r, { w: 1.4 });
+          s += arc(o.a, hy, r, o.side === 'T' ? 0 : -Math.PI / 2, o.side === 'T' ? Math.PI / 2 : 0, { w: T, c: C.g2 });
+        }
+      }
+    });
+    return s;
+  }
+  function gridBubbles() {
+    let s = '';
+    const gx = [RX + WT / 2, RX + RW / 2, RX + RW - WT / 2], gy = [RY + WT / 2, RY + RH - WT / 2];
+    gx.forEach((x, i) => { s += center(x, RY - 26, x, RY + RH + 8, { c: C.g2 }); s += Ci(x, RY - 37, 11, { w: 1.2, fill: C.paper }) + Tx(x, RY - 33, 'ABC'[i], { a: 'middle', s: 11, wt: 700 }); });
+    gy.forEach((y, i) => { s += center(RX - 26, y, RX + RW + 8, y, { c: C.g2 }); s += Ci(RX - 37, y, 11, { w: 1.2, fill: C.paper }) + Tx(RX - 37, y + 4, String(i + 1), { a: 'middle', s: 11, wt: 700 }); });
+    return s;
+  }
+  function keyPlan(n, id) {
+    const x = 540, y = 96, w = 116, h = 44, rw = w / 4;
+    let s = Tx(x, y - 10, 'KEY PLAN', { s: 9.5, wt: 700, ls: '0.08em' });
+    s += R(x, y, w, h + 14, { w: 2.4 });
+    for (let i = 0; i < 4; i++) {
+      if (i === n) s += R(x + i * rw, y, rw, h, { fill: C.ink, c: 'none' });
+      if (i > 0) s += L(x + i * rw, y, x + i * rw, y + h, { w: 1.4 });
+      s += Tx(x + i * rw + rw / 2, y + h / 2 + 4, ['I', 'II', 'III', 'IV'][i], { a: 'middle', s: 11, wt: 700, c: i === n ? C.paper : C.g, f: IS });
+    }
+    s += L(x, y + h, x + w, y + h, { w: 1.4 });
+    s += Tx(x + w / 2, y + h + 10.5, 'CORRIDOR', { a: 'middle', s: 7.5, wt: 600, c: C.g2, ls: '0.1em' });
+    // north arrow
+    const nx = x + w / 2, ny = y + 102;
+    s += Ci(nx, ny, 16, { w: 1.2 }) + PG([[nx, ny - 16], [nx + 6, ny + 8], [nx, ny + 3], [nx - 6, ny + 8]], { fill: C.g, c: 'none' });
+    s += Tx(nx, ny - 21, 'N', { a: 'middle', s: 10.5, wt: 700 });
+    return s;
+  }
+  function schedule(items, y0 = 262) {
+    const x = 536;
+    let s = Tx(x, y0, 'EQUIPMENT', { s: 9.5, wt: 700, ls: '0.08em' }) + L(x, y0 + 6, x + 116, y0 + 6, { w: 1.4 });
+    items.forEach((it, i) => {
+      const y = y0 + 26 + i * 40;
+      s += Ci(x + 9, y - 4, 9, { w: 1.2, c: it.red ? C.ink : C.g }) + Tx(x + 9, y, String(i + 1), { a: 'middle', s: 10, wt: 700, c: it.red ? C.ink : C.g });
+      s += Tx(x + 24, y - 1, it.a, { s: 9.5, wt: 700, c: it.red ? C.ink : C.g });
+      if (it.b) s += Tx(x + 24, y + 11, it.b, { s: 8.5, wt: 500, c: C.g2 });
+    });
+    return s;
+  }
+  const bal = (x, y, n, tx, ty, red) => balloon(x, y, String(n), tx, ty, { r: 9.5, s: 10, c: red ? C.ink : C.g });
+  function conveyor(x1, x2, y, h = 18, pitch = 9) {
+    let s = R(x1, y - h / 2, x2 - x1, h, { w: 1.4, fill: C.paper });
+    for (let x = x1 + pitch; x < x2 - 2; x += pitch) s += L(x, y - h / 2, x, y + h / 2, { w: 0.9, c: C.g2 });
+    return s;
+  }
+  function room(n, id, openings, interior, dims) {
+    let s = gridBubbles();
+    s += R(IX0, IY0, IX1 - IX0, IY1 - IY0, { fill: C.paper, c: 'none' });
+    s += `<g transform="translate(0 11)">${interior}</g>`;
+    s += wallsWithOpenings(id, openings.map((o) => (o.side === 'L' || o.side === 'R') ? { ...o, a: o.a + 11, b: o.b + 11 } : o));
+    s += keyPlan(n, id);
+    return s;
+  }
+  const doors = [{ side: 'L', a: 284, b: 334, door: 1 }, { side: 'R', a: 284, b: 334, door: 0 }];
+  const wins = [{ side: 'T', a: 150, b: 214, win: 1 }, { side: 'T', a: 390, b: 454, win: 1 }];
+  const common = { level: 'advanced', ts: 54 };
+
+  // I — Language: inference engineering
+  B.push({
+    ...common, slug: 'charlie-language-room', no: '046', level: 'advanced',
+    title: 'Charlie and the<br>Language Room',
+    series: 'Charlie and the Intelligence Factory', seriesNo: 'I',
+    desc: 'Book I · Language — Inference Engineering',
+    capsules: 22, hours: 5, units: 'Tokens',
+    fig: 'ENLARGED PLAN — ROOM I · LANGUAGE (INFERENCE)',
+    draw(id) {
+      let t = '';
+      const cy = 309;
+      t += conveyor(IX0, IX1, cy);
+      // scheduler at the door
+      t += R(118, 250, 34, 26, { w: M, fill: C.paper }) + Tx(135, 267, 'Q', { a: 'middle', s: 11, wt: 700 });
+      // prefill: one wide pass over the whole prompt
+      t += R(172, 262, 78, 94, { fill: `url(#${id}-h)`, c: 'none' }) + R(172, 262, 78, 94, { w: K });
+      // decode: one token per step, loops back on itself
+      t += R(318, 272, 50, 74, { w: K, fill: C.paper });
+      for (let i = 0; i < 3; i++) t += L(324 + i * 13, 280, 324 + i * 13, 338, { w: T });
+      t += P(`M368,288 C400,248 290,236 318,284`, { w: 1.8, c: C.ink }) + AH(318.5, 284, 1.25, { c: C.ink, l: 9, h: 3 });
+      // KV cache racks (paged)
+      const racks = (y, used) => {
+        let r = '';
+        for (let i = 0; i < 8; i++) {
+          const x = 266 + i * 28;
+          r += R(x, y, 24, 26, { w: 1.3, fill: i < used ? `url(#${id}-hr)` : C.paper });
+        }
+        return r;
+      };
+      t += racks(178, 6) + racks(414, 3);
+      t += L(343, 272, 343, 206, { w: T, d: 'hidden' }) + L(343, 346, 343, 414, { w: T, d: 'hidden' });
+      // output tokens
+      for (let i = 0; i < 4; i++) t += R(392 + i * 24, cy - 6, 12, 12, { fill: C.g, c: 'none' });
+      t += bal(135, 226, 1, 135, 250) + bal(211, 232, 2, 211, 262) + bal(420, 262, 3, 368, 300) + bal(484, 206, 4, 486, 192, true);
+      let s = room(0, id, doors, t, '');
+      s += schedule([{ a: 'SCHEDULER', b: 'continuous batching' }, { a: 'PREFILL', b: 'whole prompt at once' },
+        { a: 'DECODE', b: 'one token per step' }, { a: 'KV CACHE', b: 'paged blocks', red: true }]);
+      return s;
+    }
+  });
+
+  // II — Vision: vision transformers
+  B.push({
+    ...common, slug: 'charlie-vision-room', no: '047', level: 'intermediate',
+    title: 'Charlie and the<br>Vision Room',
+    series: 'Charlie and the Intelligence Factory', seriesNo: 'II',
+    desc: 'Book II · Vision — Vision Transformers',
+    capsules: 20, hours: 6, units: 'Patches',
+    fig: 'ENLARGED PLAN — ROOM II · VISION (PATCHES ARE TOKENS)',
+    draw(id) {
+      let t = '';
+      const cy = 309;
+      // image table cut into 4×4 patches, one lifted out
+      const ix = 130, iy = 184, cs = 32;
+      for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) {
+        if (i === 1 && j === 2) continue;
+        t += R(ix + j * cs, iy + i * cs, cs, cs, { w: 1.2, fill: C.paper });
+      }
+      t += R(ix + 2 * cs, iy + cs, cs, cs, { w: 1, d: 'hidden', c: C.g2 });
+      t += R(ix, iy, 4 * cs, 4 * cs, { w: K });
+      const px = 300, py = 176;
+      t += R(px, py, cs, cs, { fill: C.ink, c: 'none' });
+      t += L(ix + 3 * cs - 2, iy + cs + 6, px - 8, py + cs - 6, { w: 1.2, c: C.ink }) + AH(px - 3, py + cs - 9, -0.36, { c: C.ink, l: 9, h: 2.8 });
+      // flattened: a row of patch tokens on the conveyor
+      const cvy = 380;
+      t += conveyor(IX0, 418, cvy, 18);
+      t += R(126, cvy - 9, 14, 18, { fill: C.g, c: 'none' });
+      for (let i = 0; i < 12; i++) t += R(146 + i * 18, cvy - 7, 12, 14, { w: 1.2, fill: i === 6 ? C.ink : C.paper, c: i === 6 ? C.ink : C.g });
+      t += L(ix + 2 * cs, iy + 4 * cs + 4, ix + 2 * cs, cvy - 20, { w: T }) + AH(ix + 2 * cs, cvy - 13, Math.PI / 2, { l: 8, h: 2.5 });
+      t += Tx(ix + 2 * cs + 8, 352, 'FLATTEN', { s: 9, wt: 700, c: C.g2 });
+      // encoder
+      t += R(418, 206, 64, 200, { w: K, fill: C.paper });
+      for (let i = 1; i < 6; i++) t += L(418, 206 + i * 33.3, 482, 206 + i * 33.3, { w: T });
+      t += Tx(450, 198, '× L', { a: 'middle', s: 10, wt: 700 });
+      t += bal(116, 172, 1, ix + 3, iy + 3) + bal(356, 192, 2, px + cs + 1, py + 12, true) + bal(116, 340, 3, 133, cvy - 9) + bal(450, 436, 4, 450, 406);
+      let s = room(1, id, [{ side: 'B', a: 170, b: 220, door: 1 }, { side: 'R', a: 284, b: 334 }, ...wins], t, '');
+      s += schedule([{ a: 'IMAGE', b: 'split into patches' }, { a: 'PATCH → TOKEN', b: 'linear projection', red: true },
+        { a: '[CLS] TOKEN', b: 'prepended' }, { a: 'ENCODER', b: 'L attention blocks' }]);
+      return s;
+    }
+  });
+
+  // III — Sound: voice agents
+  B.push({
+    ...common, slug: 'charlie-sound-room', no: '048', level: 'intermediate',
+    title: 'Charlie and the<br>Sound Room',
+    series: 'Charlie and the Intelligence Factory', seriesNo: 'III',
+    desc: 'Book III · Audio — Voice Agents',
+    capsules: 20, hours: 6, units: 'ms',
+    fig: 'ENLARGED PLAN — ROOM III · SOUND (EAR TO MOUTH)',
+    draw(id) {
+      let t = '';
+      const cy = 322;
+      t += conveyor(IX0 + 30, IX1 - 30, cy, 14, 8);
+      // mic
+      t += Ci(130, cy, 15, { w: K, fill: C.paper }) + Ci(130, cy, 6, { fill: C.g, c: 'none' });
+      // waveform arriving
+      let d = `M${IX0 + 2},${cy - 50} `;
+      for (let x = 0; x <= 150; x += 2) {
+        const env = Math.sin(Math.PI * x / 150) ** 1.4;
+        d += `L${f(IX0 + 2 + x)},${f(cy - 50 + Math.sin(x * 0.42) * 22 * env * (0.6 + 0.4 * Math.sin(x * 0.07)))} `;
+      }
+      t += P(d, { w: 1.6 });
+      t += L(IX0 + 2, cy - 50, IX0 + 154, cy - 50, { w: T, d: 'center', c: C.g2 });
+      // stations
+      const st = [[170, 'VAD', 38], [226, 'ASR', 46], [296, 'LLM', 60], [380, 'TTS', 46]];
+      st.forEach(([x, lab, w]) => { t += R(x, cy - 26, w, 52, { w: K, fill: C.paper }) + Tx(x + w / 2, cy + 4, lab, { a: 'middle', s: 10, wt: 700 }); });
+      // speaker
+      t += PG([[446, cy - 8], [456, cy - 8], [472, cy - 22], [472, cy + 22], [456, cy + 8], [446, cy + 8]], { w: M, fill: C.paper });
+      t += arc(472, cy, 12, -0.7, 0.7, { w: 1.2 }) + arc(472, cy, 20, -0.7, 0.7, { w: 1.2 });
+      // barge-in path
+      t += PL([[130, cy + 15], [130, cy + 70], [403, cy + 70], [403, cy + 26]], { w: 1.2, d: 'hidden' }) + AH(403, cy + 27, -Math.PI / 2, { l: 8, h: 2.5 });
+      t += Tx(266, cy + 64, 'BARGE-IN', { a: 'middle', s: 9.5, wt: 700, c: C.g2 });
+      // latency budget (ink)
+      t += dim(130, cy - 26, 472, cy - 26, -118, 'LATENCY BUDGET', { c: C.ink, s: 10.5, wt: 700, gap: 80 });
+      t += bal(130, 380, 1, 130, cy + 15 + 2) ;
+      let s = room(2, id, [{ side: 'L', a: 200, b: 250, door: 1 }, ...wins.slice(1), { side: 'B', a: 380, b: 440, win: 1 }], t, '');
+      s += schedule([{ a: 'MIC · VAD', b: 'who is speaking?' }, { a: 'ASR', b: 'speech to text' },
+        { a: 'LLM · TTS', b: 'text back to voice' }, { a: 'LATENCY', b: 'the budget', red: true }]);
+      return s;
+    }
+  });
+
+  // IV — Reason: reinforcement learning
+  B.push({
+    ...common, slug: 'charlie-reasoning-room', no: '049', level: 'advanced',
+    title: 'Charlie and the<br>Reasoning Room',
+    series: 'Charlie and the Intelligence Factory', seriesNo: 'IV',
+    desc: 'Book IV · Reason — RL, from bandits to reasoning models',
+    capsules: 21, hours: 6, units: 'Reward',
+    fig: 'ENLARGED PLAN — ROOM IV · REASON (AGENT AND ENVIRONMENT)',
+    draw(id) {
+      let t = '';
+      // bandit arms along the top wall
+      for (let i = 0; i < 5; i++) {
+        const x = 150 + i * 44;
+        t += R(x, 176, 30, 34, { w: M, fill: C.paper }) + Ci(x + 15, 190, 5, { w: 1.2 });
+        t += L(x + 30, 186, x + 38, 186, { w: 1.2 }) + Ci(x + 40, 186, 2.6, { fill: C.g, c: 'none' });
+      }
+      // the loop track
+      const lx = 150, ly = 258, lw = 300, lh = 150, rr = 40;
+      t += R(lx, ly, lw, lh, { rx: rr, w: 18, c: C.g3, op: 0.35 });
+      t += R(lx - 9, ly - 9, lw + 18, lh + 18, { rx: rr + 9, w: 1.4 }) + R(lx + 9, ly + 9, lw - 18, lh - 18, { rx: rr - 9, w: 1.4 });
+      // agent + environment stations
+      t += R(118, 296, 70, 74, { w: K, fill: C.paper }) + Tx(153, 330, 'AGENT', { a: 'middle', s: 10, wt: 700 }) + Tx(153, 346, 'π(a|s)', { a: 'middle', s: 10, wt: 500 });
+      t += R(410, 290, 76, 86, { w: K, fill: `url(#${id}-h)` });
+      t += R(418, 322, 60, 22, { fill: C.paper, c: 'none' }) + Tx(448, 337, 'ENV', { a: 'middle', s: 10, wt: 700 });
+      // action on top, state + reward below (ink)
+      t += L(230, ly, 360, ly, { w: 2.4 }) + AH(372, ly, 0, { l: 12, h: 4 });
+      t += Tx(300, ly - 16, 'ACTION  aₜ', { a: 'middle', s: 10.5, wt: 700 });
+      t += L(372, ly + lh, 242, ly + lh, { w: 2.8, c: C.ink }) + AH(230, ly + lh, Math.PI, { l: 13, h: 4.4, c: C.ink });
+      t += Tx(300, ly + lh + 26, 'STATE  sₜ₊₁ · REWARD  rₜ₊₁', { a: 'middle', s: 10.5, wt: 700, c: C.ink });
+      t += bal(404, 193, 1, 367, 186);
+      let s = room(3, id, [{ side: 'L', a: 408, b: 452, door: 1 }, ...wins], t, '');
+      s += schedule([{ a: 'BANDITS', b: 'where it starts' }, { a: 'AGENT', b: 'policy π' },
+        { a: 'ENVIRONMENT', b: 'answers with a state' }, { a: 'REWARD', b: 'the only teacher', red: true }]);
+      return s;
+    }
+  });
+
+  /* ───────────── Build Decision Trees from Scratch (beginner) ───────────── */
+  B.push({
+    slug: 'decision-trees-from-scratch', no: '014', level: 'beginner',
+    title: 'Build Decision Trees<br>from Scratch', ts: 60,
+    desc: 'Grow classification and regression trees by hand.',
+    capsules: 23, hours: 5, units: 'Gini',
+    fig: 'FIG. 1   FEATURE SPACE, CUT BY GREEDY SPLITS — AND THE TREE THAT CUTS IT',
+    draw(id) {
+      let s = '';
+      const x0 = 86, y0 = 118, W = 300, H = 300;
+      const t1 = x0 + 138, t2 = y0 + 112, t3 = x0 + 220;
+      // regions
+      s += R(x0, y0, t1 - x0, H, { fill: `url(#${id}-h)`, c: 'none', op: 0.9 });
+      s += R(t1, y0, x0 + W - t1, t2 - y0, { fill: `url(#${id}-d)`, c: 'none' });
+      s += R(t1, t2, t3 - t1, y0 + H - t2, { fill: `url(#${id}-x)`, c: 'none', op: 0.9 });
+      s += R(t3, t2, x0 + W - t3, y0 + H - t2, { fill: `url(#${id}-d)`, c: 'none' });
+      // samples
+      const pts = [[30, 40, 0], [70, 90, 0], [44, 150, 0], [100, 210, 0], [60, 260, 0], [112, 120, 0], [20, 200, 0],
+        [170, 40, 1], [240, 70, 1], [200, 20, 1], [270, 96, 1], [160, 160, 2], [190, 230, 2], [175, 280, 2], [210, 190, 2],
+        [250, 170, 1], [280, 250, 1], [240, 280, 1]];
+      pts.forEach(([x, y, k]) => {
+        const X = x0 + x, Y = y0 + y;
+        s += Ci(X, Y, 7, { fill: C.paper, c: 'none' });
+        if (k === 0) s += Ci(X, Y, 5.5, { w: 1.6, fill: C.paper });
+        if (k === 1) s += Ci(X, Y, 5.5, { fill: C.g, c: 'none' });
+        if (k === 2) s += PG([[X, Y - 6], [X + 6, Y + 5], [X - 6, Y + 5]], { fill: C.paper, w: 1.5 });
+      });
+      // splits
+      s += L(t1, y0 - 18, t1, y0 + H + 4, { c: C.ink, w: 2.8 });
+      s += L(t1, t2, x0 + W + 16, t2, { w: 2 });
+      s += L(t3, t2, t3, y0 + H + 4, { w: 2 });
+      s += R(x0, y0, W, H, { w: K });
+      // axes labels + threshold dims
+      s += Tx(x0 + W / 2, y0 + H + 58, 'FEATURE x₁', { a: 'middle', s: 10, wt: 700 });
+      s += Tx(x0 - 30, y0 + H / 2, 'FEATURE x₂', { a: 'middle', s: 10, wt: 700, rot: -90 });
+      s += dim(x0, y0 + H, t1, y0 + H, 22, 't₁', { c: C.ink, s: 11, wt: 700 });
+      s += dim(t1, y0 + H, t3, y0 + H, 22, 't₃', { s: 11, wt: 700, gap: 6 });
+      s += dim(x0 + W, t2, x0 + W, y0, 24, 't₂', { s: 11, wt: 700, gap: 17 });
+      // the tree
+      const node = (x, y, w, lab, sub, red) => R(x - w / 2, y - 15, w, 30, { w: red ? 2.4 : M, c: red ? C.ink : C.g, fill: C.paper }) +
+        Tx(x, y + 1, lab, { a: 'middle', s: 10.5, wt: 700, c: red ? C.ink : C.g }) + (sub ? Tx(x, y + 12, sub, { a: 'middle', s: 8, wt: 500, c: C.g2 }) : '');
+      const leaf = (x, y, k) => {
+        let o = R(x - 16, y - 13, 32, 26, { w: M, fill: k === 0 ? `url(#${id}-h)` : k === 1 ? `url(#${id}-d)` : `url(#${id}-x)` });
+        o += R(x - 16, y - 13, 32, 26, { w: M });
+        return o;
+      };
+      const edge = (x1, y1, x2, y2, lab, left) => PL([[x1, y1], [x1, (y1 + y2) / 2], [x2, (y1 + y2) / 2], [x2, y2]], { w: 1.2 }) +
+        Tx((x1 + x2) / 2 + (left ? -4 : 4), (y1 + y2) / 2 - 5, lab, { a: left ? 'end' : 'start', s: 9, wt: 600, c: C.g2 });
+      const rx = 540;
+      s += edge(rx, 143, 458, 214, 'yes', true) + edge(rx, 143, 594, 214, 'no');
+      s += edge(594, 243, 548, 318, 'yes', true) + edge(594, 243, 632, 318, 'no');
+      s += edge(548, 347, 512, 412, 'yes', true) + edge(548, 347, 584, 412, 'no');
+      s += node(rx, 128, 92, 'x₁ ≤ t₁', 'gini 0.66', true);
+      s += leaf(458, 227, 0);
+      s += node(594, 228, 78, 'x₂ ≤ t₂', 'gini 0.49');
+      s += leaf(632, 331, 1);
+      s += node(548, 332, 78, 'x₁ ≤ t₃', 'gini 0.44');
+      s += leaf(512, 425, 2) + leaf(584, 425, 1);
+      s += Tx(rx, 96, 'ROOT', { a: 'middle', s: 9.5, wt: 700, ls: '0.1em', c: C.ink });
+      s += Tx(560, 470, 'BEST SPLIT FIRST,', { a: 'middle', s: 9.5, wt: 700 }) + Tx(560, 484, 'THEN RECURSE', { a: 'middle', s: 9.5, wt: 700 });
+      return s;
+    }
+  });
+
+  /* ───────────── Kernel Engineering (coming soon) ───────────── */
+  B.push({
+    slug: 'kernel-engineering', no: '051', level: 'advanced', prelim: true,
+    title: 'Kernel<br>Engineering', ts: 72,
+    desc: 'From silicon to speculative decoding — GPU kernels for modern LLMs.',
+    capsules: '—', hours: '—', units: 'Bytes',
+    fig: 'FIG. 1   TILED MATRIX MULTIPLY — C = A·B, ONE TILE PER THREAD BLOCK',
+    draw(id) {
+      let s = '';
+      const ax = 92, ay = 214, kw = 104, mh = 272;      // A: M × K
+      const bx = 226, by = 82, nw = 272, kh = 104;      // B: K × N
+      const cx = bx, cy = ay;                            // C: M × N
+      const tm = 4, tn = 4, tk = 4, th = mh / tm, tw = nw / tn, kk = kw / tk;
+      const ti = 1, tj = 2, kstep = 1;
+      // strips read by the tile
+      s += R(ax, ay + ti * th, kw, th, { fill: `url(#${id}-hf)`, c: 'none' });
+      s += R(bx + tj * tw, by, tw, kh, { fill: `url(#${id}-hf)`, c: 'none' });
+      // current k-step chunks (ink)
+      s += R(ax + kstep * kk, ay + ti * th, kk, th, { fill: `url(#${id}-xr)`, c: 'none' }) + R(ax + kstep * kk, ay + ti * th, kk, th, { c: C.ink, w: 2 });
+      s += R(bx + tj * tw, by + kstep * kk, tw, kk, { fill: `url(#${id}-xr)`, c: 'none' }) + R(bx + tj * tw, by + kstep * kk, tw, kk, { c: C.ink, w: 2 });
+      // output tile
+      s += R(cx + tj * tw, cy + ti * th, tw, th, { fill: C.ink, c: 'none' });
+      // grids
+      for (let i = 1; i < tm; i++) s += L(ax, ay + i * th, ax + kw, ay + i * th, { w: T }) + L(cx, cy + i * th, cx + nw, cy + i * th, { w: T });
+      for (let j = 1; j < tn; j++) s += L(bx + j * tw, by, bx + j * tw, by + kh, { w: T }) + L(cx + j * tw, cy, cx + j * tw, cy + mh, { w: T });
+      for (let k = 1; k < tk; k++) s += L(ax + k * kk, ay, ax + k * kk, ay + mh, { w: 0.9, d: 'hidden', c: C.g2 }) + L(bx, by + k * kk, bx + nw, by + k * kk, { w: 0.9, d: 'hidden', c: C.g2 });
+      s += R(ax, ay, kw, mh, { w: K }) + R(bx, by, nw, kh, { w: K }) + R(cx, cy, nw, mh, { w: K });
+      s += Tx(ax + kw / 2, ay + mh + 20, 'A', { a: 'middle', s: 16, wt: 600, f: IS });
+      s += Tx(bx - 18, by + kh / 2 + 6, 'B', { a: 'middle', s: 16, wt: 600, f: IS });
+      s += Tx(cx + nw / 2, cy + mh + 20, 'C', { a: 'middle', s: 16, wt: 600, f: IS });
+      // dimensions
+      s += dim(ax, ay, ax + kw, ay, -16, 'K', { s: 11, wt: 700 });
+      s += dim(ax, ay + mh, ax, ay, -16, 'M', { s: 11, wt: 700, gap: 4 });
+      s += dim(bx + nw, by + kh, bx + nw, by, 16, 'K', { s: 11, wt: 700 });
+      s += dim(bx, by, bx + nw, by, -16, 'N', { s: 11, wt: 700 });
+      s += dim(cx + nw, cy + ti * th, cx + nw, cy + (ti + 1) * th, -18, 'BLOCK_M', { s: 9.5, wt: 700, c: C.ink });
+      s += dim(cx + tj * tw, cy + mh, cx + (tj + 1) * tw, cy + mh, 30, 'BLOCK_N', { s: 9.5, wt: 700, c: C.ink });
+      // memory hierarchy, in section: the nearer the core, the smaller and faster
+      const mx = 598, my = 118;
+      s += Tx(mx, my - 22, 'SECTION M–M', { a: 'middle', s: 9.5, wt: 700, ls: '0.06em' });
+      [[44, 'REG', null], [84, 'SRAM', 'hf'], [120, 'HBM', 'h']].forEach(([w, lab, fill], i) => {
+        const x = mx - w / 2, y = my + i * 30;
+        s += R(x, y, w, 30, { fill: fill ? `url(#${id}-${fill})` : C.paper, c: 'none' }) + R(x, y, w, 30, { w: i === 0 ? K : M });
+        s += R(mx - lab.length * 3.4 - 4, y + 8, lab.length * 6.8 + 8, 14, { fill: C.paper, c: 'none' });
+        s += Tx(mx, y + 19, lab, { a: 'middle', s: 9.5, wt: 700 });
+      });
+      s += L(mx + 70, my + 84, mx + 70, my + 8, { w: 1.2 }) + AH(mx + 70, my + 2, -Math.PI / 2, { l: 8, h: 2.5 });
+      s += Tx(mx, my + 110, 'CLOSER = FASTER', { a: 'middle', s: 8.5, wt: 700, c: C.g2 });
+      return s;
+    },
+    extra(id) {
+      // PRELIMINARY stamp
+      const x = 590, y = 330;
+      return `<g transform="rotate(-8 ${x} ${y})">` +
+        R(x - 80, y - 36, 160, 72, { c: C.ink, w: 3, fill: C.paper }) + R(x - 74, y - 30, 148, 60, { c: C.ink, w: 1.1 }) +
+        Tx(x, y - 6, 'PRELIMINARY', { a: 'middle', s: 16.5, wt: 700, c: C.ink, ls: '0.1em' }) +
+        Tx(x, y + 10, 'NOT FOR CONSTRUCTION', { a: 'middle', s: 8, wt: 700, c: C.ink, ls: '0.08em' }) +
+        Tx(x, y + 22, 'COMING SOON', { a: 'middle', s: 8, wt: 700, c: C.ink, ls: '0.2em' }) + `</g>`;
+    }
+  });
+})();
+
+</script>
+<script>
+(function(){
+  const host = document.getElementById('sheets');
+  host.innerHTML = BOOKS.map(b => `<figure>${SHEET.buildCover(b)}<figcaption>VB·${b.no} — ${b.slug}</figcaption></figure>`).join('');
+})();
+</script>
+</body>
+</html>

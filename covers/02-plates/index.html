@@ -1,0 +1,1033 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Specimen Plates</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#15171c;
+  --hi:#fbf8f0;
+  --sage:#9fb7a4;
+  --ingres:#9eb1c7;
+  --madder:#c68d79;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:#2a2c30;color:#e9e6de}
+body{font-family:'Bodoni Moda',serif;font-optical-sizing:auto}
+
+.covers{display:flex;flex-wrap:wrap;gap:56px;padding:56px;justify-content:center}
+
+/* ---------------- the cover ---------------- */
+.cover{position:relative;width:720px;height:888px;overflow:hidden;flex:none;
+  background:var(--ground);color:var(--ink);font-family:'Bodoni Moda',serif;font-optical-sizing:auto}
+.cover.beginner{--ground:var(--sage)}
+.cover.intermediate{--ground:var(--ingres)}
+.cover.advanced{--ground:var(--madder)}
+.cover .art{position:absolute;left:0;top:0;width:720px;height:888px;display:block}
+.cover .head{position:absolute;left:40px;right:40px;top:32px;display:flex;justify-content:space-between;align-items:center;
+  font-size:11px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;font-variation-settings:'opsz' 8}
+.cover .head .lv{display:flex;align-items:center;gap:10px}
+.cover .head .lv svg{display:block}
+.cover .title{position:absolute;left:37px;right:36px;top:58px;margin:0;font-weight:600;font-size:64px;line-height:1.0;letter-spacing:-.022em;
+  font-variation-settings:'opsz' 14}
+.cover .title .l{display:block;white-space:nowrap}
+.cover .title .sub{display:block;font-style:italic;font-weight:500;font-size:27px;line-height:1.14;letter-spacing:0;margin-top:12px;max-width:560px;
+  font-variation-settings:'opsz' 12}
+.cover .rule{position:absolute;left:40px;right:40px;height:0;border-top:1.2px solid var(--ink)}
+.cover .legend{position:absolute;left:40px;right:40px;font-style:italic;font-size:13.5px;line-height:1.36;font-weight:500;
+  font-variation-settings:'opsz' 11}
+.cover .legend b{font-weight:700}
+.cover .foot{position:absolute;left:40px;right:40px;bottom:28px;display:flex;justify-content:space-between;align-items:center;
+  font-size:11px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;font-variation-settings:'opsz' 8}
+.cover .imprint{display:flex;align-items:center;gap:9px}
+.cover .imprint svg{width:19px;height:19px;display:block}
+.cover .foot .meta{letter-spacing:.16em}
+
+/* svg classes */
+.i{fill:var(--ink)} .h{fill:var(--hi)} .g{fill:var(--ground)}
+.si{fill:none;stroke:var(--ink);stroke-linecap:round;stroke-linejoin:round}
+.sh{fill:none;stroke:var(--hi);stroke-linecap:round;stroke-linejoin:round}
+.sg{fill:none;stroke:var(--ground);stroke-linecap:round;stroke-linejoin:round}
+.lab{font-family:'Bodoni Moda',serif;font-style:italic;font-size:19px;font-weight:600;fill:var(--ink);
+  paint-order:stroke;stroke:var(--ground);stroke-width:5px;stroke-linejoin:round;font-variation-settings:'opsz' 12}
+.labs{font-family:'Bodoni Moda',serif;font-size:10px;font-weight:700;letter-spacing:.18em;fill:var(--ink);
+  paint-order:stroke;stroke:var(--ground);stroke-width:4px;stroke-linejoin:round;font-variation-settings:'opsz' 8}
+.fig{font-family:'Bodoni Moda',serif;font-style:italic;font-size:14px;font-weight:600;fill:var(--ink);font-variation-settings:'opsz' 11;
+  paint-order:stroke;stroke:var(--ground);stroke-width:4px;stroke-linejoin:round}
+</style>
+</head>
+<body>
+
+<main class="covers" id="covers"></main>
+
+<script>
+/* =====================================================================
+   ENGRAVING ENGINE — everything is vector, generated from the subject.
+   ===================================================================== */
+const TAU = Math.PI * 2;
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+const sstep = (e0, e1, x) => { const t = clamp((x - e0) / (e1 - e0)); return t * t * (3 - 2 * t); };
+const lerp = (a, b, t) => a + (b - a) * t;
+const f1 = (n) => (Math.round(n * 10) / 10).toString();
+const V = {
+  add: (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]],
+  sub: (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]],
+  mul: (a, s) => [a[0] * s, a[1] * s, a[2] * s],
+  dot: (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2],
+  cross: (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]],
+  norm: (a) => { const l = Math.hypot(a[0], a[1], a[2]) || 1; return [a[0] / l, a[1] / l, a[2] / l]; },
+};
+const M3 = {
+  rot(yaw, pitch, roll = 0) { // local -> world = Ry(yaw) · Rx(pitch) · Rz(roll)
+    const cy = Math.cos(yaw), sy = Math.sin(yaw), cp = Math.cos(pitch), sp = Math.sin(pitch), cr = Math.cos(roll), sr = Math.sin(roll);
+    const Ry = [[cy, 0, sy], [0, 1, 0], [-sy, 0, cy]], Rx = [[1, 0, 0], [0, cp, -sp], [0, sp, cp]], Rz = [[cr, -sr, 0], [sr, cr, 0], [0, 0, 1]];
+    return M3.mm(Ry, M3.mm(Rx, Rz));
+  },
+  mm(A, B) { return A.map((r) => [0, 1, 2].map((j) => r[0] * B[0][j] + r[1] * B[1][j] + r[2] * B[2][j])); },
+  mv(M, p) { return [M[0][0] * p[0] + M[0][1] * p[1] + M[0][2] * p[2], M[1][0] * p[0] + M[1][1] * p[1] + M[1][2] * p[2], M[2][0] * p[0] + M[2][1] * p[1] + M[2][2] * p[2]]; },
+  T(M) { return [[M[0][0], M[1][0], M[2][0]], [M[0][1], M[1][1], M[2][1]], [M[0][2], M[1][2], M[2][2]]]; },
+};
+function rng(seed) { let s = seed >>> 0; return () => { s |= 0; s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+// screen space: x right, y down, z toward the viewer. Light from the upper left, in front.
+const LIGHT = V.norm([-0.55, -0.72, 0.62]);
+const MINW = 0.6;          // print floor for ink lines (px at trim, ≈0.45pt)
+const MINH = 0.9;          // print floor for knocked-out (paper-white) lines
+
+class Plate {
+  constructor() { this.items = []; }
+  _push(key, kind, cls, sw, d) {
+    const last = this.items[this.items.length - 1];
+    if (last && last.key === key) last.d.push(d);
+    else this.items.push({ key, kind, cls, sw, d: [d] });
+  }
+  fill(cls, d) { if (d) this._push('f' + cls, 'f', cls, 0, d); return this; }
+  line(cls, sw, d, extra = '') { if (d) this._push('s' + cls + sw + extra, 's', cls, sw + '"' + (extra ? ' ' + extra : ''), d); return this; }
+  raw(svg) { this.items.push({ key: 'raw' + Math.random(), kind: 'raw', svg }); return this; }
+  text(x, y, str, cls = 'lab', anchor = 'start', extra = '') {
+    return this.raw(`<text x="${f1(x)}" y="${f1(y)}" class="${cls}" text-anchor="${anchor}" ${extra}>${str}</text>`);
+  }
+  toString() {
+    return this.items.map((it) => it.kind === 'raw' ? it.svg :
+      it.kind === 'f' ? `<path class="${it.cls}" d="${it.d.join('')}"/>` :
+      `<path class="${it.cls}" stroke-width="${it.sw} d="${it.d.join('')}"/>`).join('\n');
+  }
+}
+
+/* ribbon: a filled polygon that follows a polyline with varying width — the engraver's swelling line */
+function ribbon(pts, ws) {
+  const n = pts.length; if (n < 2) return '';
+  const Lp = [], Rp = [];
+  for (let i = 0; i < n; i++) {
+    const p = pts[i], a = pts[Math.max(0, i - 1)], b = pts[Math.min(n - 1, i + 1)];
+    let dx = b[0] - a[0], dy = b[1] - a[1]; const l = Math.hypot(dx, dy) || 1; dx /= l; dy /= l;
+    const h = ws[i] / 2;
+    Lp.push(f1(p[0] - dy * h) + ' ' + f1(p[1] + dx * h));
+    Rp.push(f1(p[0] + dy * h) + ' ' + f1(p[1] - dx * h));
+  }
+  return 'M' + Lp.join('L') + 'L' + Rp.reverse().join('L') + 'Z';
+}
+/* stroke a polyline whose width comes from a function; it breaks into runs where the line vanishes */
+function swell(P, cls, pts, wfn, o = {}) {
+  const min = o.min ?? (cls === 'h' ? MINH : MINW), cut = o.cut ?? min * 0.55, taper = o.taper ?? 0.35;
+  let run = [], ws = [];
+  const flush = () => {
+    if (run.length >= 2) { ws[0] *= taper; ws[ws.length - 1] *= taper; P.fill(cls, ribbon(run, ws)); }
+    run = []; ws = [];
+  };
+  for (let i = 0; i < pts.length; i++) {
+    const p = pts[i]; if (!p) { flush(); continue; }
+    const w = wfn(i, p);
+    if (w > cut) { run.push(p); ws.push(Math.max(w, min)); } else flush();
+  }
+  flush();
+}
+/* chiaroscuro rule for toned paper: shadow → the ink line swells; light → a paper-white line swells */
+function tone(b, o = {}) {
+  const k0 = o.k0 ?? 0.50, h0 = o.h0 ?? 0.80;
+  const W = o.W ?? 2.2, Wh = o.Wh ?? 1.6;
+  if (o.thin) {
+    if (b < h0 - 0.07) return { c: 'i', w: Math.max(MINW, W * Math.pow(clamp(1 - b / k0), o.gamma ?? 0.8)) };
+    if (b > h0) return { c: 'h', w: Wh * Math.pow((b - h0) / (1 - h0), 0.9) };
+    return { c: null, w: 0 };
+  }
+  if (b < k0) return { c: 'i', w: W * Math.pow(1 - b / k0, o.gamma ?? 0.8) };
+  if (b > h0) return { c: 'h', w: Wh * Math.pow((b - h0) / (1 - h0), 0.9) };
+  return { c: null, w: 0 };
+}
+function toneLine(P, pts, bfn, o = {}) {
+  const tones = pts.map((p, i) => p ? tone(bfn(i, p), o) : { c: null, w: 0 });
+  swell(P, 'i', pts, (i) => tones[i].c === 'i' ? tones[i].w : 0, o);
+  if (!o.noHi) swell(P, 'h', pts, (i) => tones[i].c === 'h' ? tones[i].w : 0, o);
+}
+
+function circ(cx, cy, r) { return `M${f1(cx - r)} ${f1(cy)}a${f1(r)} ${f1(r)} 0 1 0 ${f1(2 * r)} 0a${f1(r)} ${f1(r)} 0 1 0 ${f1(-2 * r)} 0Z`; }
+function poly(pts, close = true) { return 'M' + pts.map((p) => f1(p[0]) + ' ' + f1(p[1])).join('L') + (close ? 'Z' : ''); }
+function seg(a, b) { return `M${f1(a[0])} ${f1(a[1])}L${f1(b[0])} ${f1(b[1])}`; }
+function sample(fn, n) { const a = []; for (let i = 0; i <= n; i++) a.push(fn(i / n)); return a; }
+function bez(p0, p1, p2, p3) { return (t) => { const m = 1 - t; return [m * m * m * p0[0] + 3 * m * m * t * p1[0] + 3 * m * t * t * p2[0] + t * t * t * p3[0], m * m * m * p0[1] + 3 * m * m * t * p1[1] + 3 * m * t * t * p2[1] + t * t * t * p3[1]]; }; }
+
+/* ---------- engraved sphere: latitude lines around a tilted axis, swelling with shade ----------
+   o.skip(pWorld) lets a caller cut part of the sphere away (see cutSphere). */
+function sphere(P, cx, cy, r, o = {}) {
+  const Lt = o.light || LIGHT;
+  const axis = V.norm(o.axis || [0.42, -1, 0.5]);
+  const u = V.norm(V.cross(axis, [0, 0, 1]));
+  const w = V.cross(axis, u);
+  const sp = o.spacing || clamp(r / 8, 2.3, 4.0);
+  const n = Math.max(5, Math.round(2 * r / sp));
+  if (!o.skip) P.fill('g', circ(cx, cy, r + (o.halo ?? 1.8)));
+  const lines = (ax, uu, ww, filter, opt) => {
+    for (let k = 0; k < n; k++) {
+      const t = -1 + (k + 0.5) * 2 / n, c = Math.sqrt(1 - t * t);
+      const th0 = Math.atan2(-ww[2], -uu[2]);
+      const steps = Math.max(24, Math.ceil(TAU * r * c / 1.4));
+      const pts = [], bs = [];
+      for (let j = 0; j <= steps; j++) {
+        const th = th0 + j / steps * TAU, ct = Math.cos(th), st = Math.sin(th);
+        const p = [c * ct * uu[0] + c * st * ww[0] + t * ax[0], c * ct * uu[1] + c * st * ww[1] + t * ax[1], c * ct * uu[2] + c * st * ww[2] + t * ax[2]];
+        if (p[2] < 0.02 || (o.skip && o.skip(p))) { pts.push(null); bs.push(0); continue; }
+        let b = Math.max(0, V.dot(p, Lt));
+        b += (o.rim ?? 0.18) * sstep(0.4, 0, p[2]) * sstep(0.15, -0.35, V.dot(p, Lt)); // reflected light at the shadow rim
+        if (filter && !filter(b)) { pts.push(null); bs.push(0); continue; }
+        pts.push([cx + r * p[0], cy + r * p[1]]); bs.push(b);
+      }
+      toneLine(P, pts, (i) => bs[i], opt);
+    }
+  };
+  lines(axis, u, w, null, { W: sp * (o.inkK ?? 0.8), Wh: sp * (o.hiK ?? 0.5), k0: o.k0 ?? 0.56, h0: o.h0 ?? 0.82, noHi: o.noHi, thin: o.thin });
+  if (o.cross !== false && r > 18) { // cross-hatching in the core shadow
+    const ax2 = V.norm([1, 0.35, 0.25]); const u2 = V.norm(V.cross(ax2, [0, 0, 1])); const w2 = V.cross(ax2, u2);
+    lines(ax2, u2, w2, (b) => b < 0.2, { W: sp * 0.55, k0: 0.26, noHi: true });
+  }
+  // contour: heavier on the shadow side
+  const cp = [], cw = [];
+  for (let j = 0; j <= 180; j++) {
+    const a = j / 180 * TAU, nx = Math.cos(a), ny = Math.sin(a);
+    if (o.skip && o.skip([nx, ny, 0.001])) { cp.push(null); cw.push(0); continue; }
+    cp.push([cx + r * nx, cy + r * ny]);
+    cw.push((o.outline ?? 1) * (0.8 + 1.7 * sstep(0.1, -0.7, nx * Lt[0] + ny * Lt[1])));
+  }
+  swell(P, 'i', cp, (i) => cw[i], { taper: 1 });
+}
+
+/* ---------- a sphere with one octant cut away, its three section walls engraved (an anatomical cutaway) ---------- */
+function cutSphere(P, cx, cy, R, o = {}) {
+  const M = M3.rot(o.yaw ?? -0.62, o.pitch ?? -0.42), Mt = M3.T(M);
+  const inOct = (l) => l[0] > 0 && l[1] < 0 && l[2] > 0;
+  P.fill('g', circ(cx, cy, R + 2));
+  sphere(P, cx, cy, R, { ...o.sphere, skip: (pw) => inOct(M3.mv(Mt, pw)) });
+  const vis = (pw) => { // is this interior point seen through the notch?
+    const x = pw[0], y = pw[1], z = Math.sqrt(Math.max(0, 1 - x * x - y * y));
+    return inOct(M3.mv(Mt, [x, y, z]));
+  };
+  const scr = (pl) => { const pw = M3.mv(M, pl); return [cx + R * pw[0], cy + R * pw[1]]; };
+  const walls = [
+    { e1: [0, -1, 0], e2: [0, 0, 1], n: [1, 0, 0] },
+    { e1: [1, 0, 0], e2: [0, 0, 1], n: [0, -1, 0] },
+    { e1: [0, -1, 0], e2: [1, 0, 0], n: [0, 0, 1] },
+  ];
+  const rings = o.rings || [{ r: 0.42, mat: 'core' }, { r: 0.93, mat: 'shell' }, { r: 1, mat: 'rind' }];
+  const sp = o.spacing || 3.4;
+  const N = Math.round(R / sp);
+  walls.forEach((wl, wi) => {
+    const nb = V.dot(M3.mv(M, wl.n), LIGHT);
+    const bright = clamp(0.35 + nb * 0.75);
+    const al = (o.angles || [0.18, 0.62, 0.9])[wi] * Math.PI, dv = [Math.cos(al), Math.sin(al)], nv = [-dv[1], dv[0]];
+    const step = sp / R;
+    for (let c = -1.5; c <= 1.5; c += step) {
+      const pts = [], mats = [];
+      for (let lam = -1.5; lam <= 1.5; lam += 1.4 / R) {
+        const s2 = c * nv[0] + lam * dv[0], t2 = c * nv[1] + lam * dv[1];
+        if (s2 < 0 || t2 < 0 || s2 * s2 + t2 * t2 > 1) { pts.push(null); mats.push(null); continue; }
+        const pl = [wl.e1[0] * s2 + wl.e2[0] * t2, wl.e1[1] * s2 + wl.e2[1] * t2, wl.e1[2] * s2 + wl.e2[2] * t2];
+        const pw = M3.mv(M, pl);
+        if (!vis(pw)) { pts.push(null); mats.push(null); continue; }
+        pts.push([cx + R * pw[0], cy + R * pw[1]]);
+        const rr = Math.hypot(s2, t2);
+        mats.push(rings.find((q) => rr <= q.r)?.mat || 'rind');
+      }
+      if (pts.every((q) => !q)) continue;
+      const W = o.wallW ?? 2.1;
+      swell(P, 'i', pts, (i) => mats[i] === 'shell' ? Math.max(MINW, W * (1 - bright) * 1.15) : mats[i] === 'rind' ? sp * 0.9 : 0, { taper: 1 });
+      swell(P, 'h', pts, (i) => mats[i] === 'core' ? 1.4 + 0.7 * bright : 0, { taper: 1 });
+    }
+    // edge of the core on this wall
+    const arc = sample((t) => { const a = t * Math.PI / 2, rc = rings[0].r; return [wl.e1[0] * rc * Math.cos(a) + wl.e2[0] * rc * Math.sin(a), wl.e1[1] * rc * Math.cos(a) + wl.e2[1] * rc * Math.sin(a), wl.e1[2] * rc * Math.cos(a) + wl.e2[2] * rc * Math.sin(a)]; }, 40);
+    P.line('si', 1.1, poly(arc.map(scr), false));
+  });
+  // the three radial edges and the three rim arcs
+  [[1, 0, 0], [0, -1, 0], [0, 0, 1]].forEach((ax) => P.line('si', 1.6, seg(scr([0, 0, 0]), scr(ax))));
+  walls.forEach((wl) => {
+    const arc = sample((t) => { const a = t * Math.PI / 2; return [wl.e1[0] * Math.cos(a) + wl.e2[0] * Math.sin(a), wl.e1[1] * Math.cos(a) + wl.e2[1] * Math.sin(a), wl.e1[2] * Math.cos(a) + wl.e2[2] * Math.sin(a)]; }, 60);
+    const pts = arc.map((pl) => M3.mv(M, pl)[2] > -0.01 ? scr(pl) : null);
+    swell(P, 'i', pts, () => 1.8, { taper: 1 });
+  });
+  return { M, scr, pt: (pl) => scr(pl) };
+}
+
+/* ---------- a hatched planar face: Q = [A,B,C,D]; lines run parallel to A→B and step from AB to DC ---------- */
+function quad(P, Q, o = {}) {
+  if (o.fill !== false) P.fill('g', poly(Q));
+  const [A, B, C, D] = Q;
+  const len = Math.max(Math.hypot(D[0] - A[0], D[1] - A[1]), Math.hypot(C[0] - B[0], C[1] - B[1]));
+  const n = Math.max(1, Math.round(len / (o.sp || 3.2)));
+  const cls = o.cls || 'i', min = cls === 'h' ? MINH : MINW;
+  for (let k = 0; k < n; k++) {
+    const t = (k + 0.5) / n;
+    const a = [lerp(A[0], D[0], t), lerp(A[1], D[1], t)], b = [lerp(B[0], C[0], t), lerp(B[1], C[1], t)];
+    const w = typeof o.w === 'function' ? o.w(t) : (o.w ?? 1);
+    if (w > min * 0.5) P.fill(cls, ribbon([a, b], [Math.max(w, min), Math.max(w, min)]));
+  }
+  if (o.outline !== false) P.line('si', o.ow || 1.2, poly(Q));
+}
+/* iso box: visible faces are the top (+z), the left-front (+y, lit) and the right-front (+x, in shade) */
+function isoBox(P, pr, x0, y0, z0, x1, y1, z1, o = {}) {
+  const top = [pr(x0, y0, z1), pr(x1, y0, z1), pr(x1, y1, z1), pr(x0, y1, z1)];
+  const L = [pr(x0, y1, z1), pr(x1, y1, z1), pr(x1, y1, z0), pr(x0, y1, z0)];
+  const Rt = [pr(x1, y0, z1), pr(x1, y0, z0), pr(x1, y1, z0), pr(x1, y1, z1)];
+  quad(P, L, { sp: o.sp || 3, w: o.lw ?? 0.75, ow: o.ow });
+  quad(P, Rt, { sp: o.sp || 3, w: o.rw ?? 1.7, ow: o.ow });
+  if (o.cross) quad(P, [Rt[1], Rt[2], Rt[3], Rt[0]], { sp: (o.sp || 3) * 1.3, w: 0.7, fill: false, outline: false });
+  if (o.tw) quad(P, top, { sp: o.tsp || 4, w: o.tw, cls: o.tcls || 'h', ow: o.ow });
+  else { P.fill('g', poly(top)); P.line('si', o.ow || 1.2, poly(top)); }
+  return { top, L, Rt };
+}
+
+/* ---------- stipple: dots whose density follows a tone field ---------- */
+function stipple(P, cls, x0, y0, x1, y1, dens, o = {}) {
+  const R = rng(o.seed || 7), rad = o.r || 0.75, step = o.step || 2.2;
+  let d = '';
+  for (let y = y0; y < y1; y += step) for (let x = x0; x < x1; x += step) {
+    const jx = x + (R() - 0.5) * step, jy = y + (R() - 0.5) * step;
+    const p = dens(jx, jy);
+    if (p > 0 && R() < p) d += circ(jx, jy, rad * (o.vary ? (0.8 + 0.4 * R()) : 1));
+  }
+  P.fill(cls, d);
+}
+
+/* ---------- an engraved rod / filament: ink body, ground halo, a white glint along its lit edge ---------- */
+function rod(P, pts, w0, w1, o = {}) {
+  const ws = pts.map((_, i) => lerp(w0, w1, i / (pts.length - 1)));
+  if (o.halo !== false) P.fill('g', ribbon(pts, ws.map((w) => w + (o.halo ?? 4))));
+  P.fill(o.cls || 'i', ribbon(pts, ws));
+  if (o.glint !== false && Math.min(w0, w1) > 2.4) {
+    // offset toward the light
+    const off = pts.map((p, i) => {
+      const a = pts[Math.max(0, i - 1)], b = pts[Math.min(pts.length - 1, i + 1)];
+      let dx = b[0] - a[0], dy = b[1] - a[1]; const l = Math.hypot(dx, dy) || 1; let nx = -dy / l, ny = dx / l;
+      if (nx * LIGHT[0] + ny * LIGHT[1] < 0) { nx = -nx; ny = -ny; }
+      return [p[0] + nx * ws[i] * 0.2, p[1] + ny * ws[i] * 0.2];
+    });
+    swell(P, 'h', off, (i) => ws[i] * 0.22, { taper: 0.2, min: 0.9 });
+  }
+}
+
+/* ---------- label with a leader line, in the manner of a plate ---------- */
+function label(P, tx, ty, lx, ly, str, o = {}) {
+  const dx = lx - tx, dy = ly - ty, l = Math.hypot(dx, dy) || 1;
+  const gap = o.gap ?? 10;
+  const ex = lx - dx / l * gap, ey = ly - dy / l * gap;
+  P.line('sg', 3.4, seg([tx, ty], [ex, ey]));
+  P.line('si', 0.75, seg([tx, ty], [ex, ey]));
+  if (o.dot !== false) { P.fill('g', circ(tx, ty, 3.2)); P.fill('i', circ(tx, ty, 1.7)); }
+  P.text(lx, ly + 6, str, o.cls || 'lab', 'middle');
+}
+function arrowHead(P, x, y, ang, s = 7, cls = 'i') {
+  const a1 = ang + Math.PI * 0.86, a2 = ang - Math.PI * 0.86;
+  P.fill(cls, poly([[x, y], [x + Math.cos(a1) * s, y + Math.sin(a1) * s], [x + Math.cos(ang + Math.PI) * s * 0.5, y + Math.sin(ang + Math.PI) * s * 0.5], [x + Math.cos(a2) * s, y + Math.sin(a2) * s]]));
+}
+function toRoman(n) { const m = [[50, 'L'], [40, 'XL'], [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']]; let s = ''; for (const [v, r] of m) while (n >= v) { s += r; n -= v; } return s; }
+
+/* =====================================================================
+   FIGURES — one specimen per book, derived from the book's mechanism
+   ===================================================================== */
+const FIG = {};
+
+/* Neural Networks from Scratch — one unit, dissected: inputs on weighted filaments, a summing core, an activating shell */
+FIG['neural-networks-from-scratch'] = (P) => {
+  const cx = 420, cy = 532, R = 156;
+  const ins = [[-2.55, 92, 336, 0.9], [-2.9, 70, 456, -0.45], [3.02, 78, 584, 0.7], [2.62, 112, 712, -0.25]];
+  const W = [];
+  ins.forEach(([ang, x0, y0, wv]) => {
+    const e = [cx + (R - 6) * Math.cos(ang), cy + (R - 6) * Math.sin(ang)];
+    const c1 = [x0 + 90, y0], c2 = [e[0] - 40 + 70 * Math.cos(ang), e[1] + (y0 - e[1]) * 0.15];
+    const pts = sample(bez([x0, y0], c1, c2, e), 60);
+    rod(P, pts, 2.8, 7);
+    W.push({ pts, wv, x0, y0 });
+  });
+  const oStart = [cx + (R - 8) * Math.cos(0.32), cy + (R - 8) * Math.sin(0.32)];
+  const oEnd = [650, 742];
+  const opts = sample(bez(oStart, [oStart[0] + 70, oStart[1] + 20], [oEnd[0] - 10, oEnd[1] - 90], oEnd), 60);
+  rod(P, opts, 8.5, 3.4);
+  const bStart = [476, 290];
+  const bEnd = [cx + (R - 6) * Math.cos(-1.35), cy + (R - 6) * Math.sin(-1.35)];
+  const bpts = sample(bez(bStart, [474, 320], [bEnd[0] + 8, bEnd[1] - 40], bEnd), 40);
+  rod(P, bpts, 2.6, 5.2);
+  const axN = M3.mv(M3.rot(-0.62, -0.42), V.norm([1, -1, 1]));
+  const cs = cutSphere(P, cx, cy, R, { spacing: 3.3, sphere: { spacing: 3.4, inkK: 0.62, k0: 0.5, axis: axN } });
+  W.forEach(({ pts, wv, x0, y0 }) => {
+    const m = pts[26];
+    sphere(P, m[0], m[1], 5 + Math.abs(wv) * 8, { spacing: 2.3, cross: false });
+    sphere(P, x0, y0, 15, { spacing: 2.6, cross: false });
+  });
+  sphere(P, bStart[0], bStart[1], 11, { spacing: 2.4, cross: false });
+  sphere(P, oEnd[0], oEnd[1], 19, { spacing: 2.8 });
+  label(P, W[0].x0 - 4, W[0].y0 - 14, 62, 296, 'a');
+  const wb = W[1].pts[26]; label(P, wb[0] + 2, wb[1] - 12, 222, 352, 'b');
+  label(P, bStart[0] + 10, bStart[1] - 4, 536, 306, 'c');
+  const core = cs.pt([0.16, -0.16, 0.2]);
+  label(P, core[0], core[1], 612, 368, 'd');
+  const shell = cs.pt([0.6, -0.1, 0.62]);
+  label(P, shell[0], shell[1], 648, 456, 'e');
+  label(P, oEnd[0] - 8, oEnd[1] - 18, 606, 662, 'f');
+};
+
+/* Mathematical Foundations — the loss surface, surveyed and sectioned, with two paths of steepest descent */
+FIG['mathematical-foundations-for-ml'] = (P) => {
+  const g = (u, v, cu, cv, s) => Math.exp(-((u - cu) ** 2 + (v - cv) ** 2) / (2 * s * s));
+  const f = (u, v) => 0.50 + 0.30 * (1 - (u + v) / 2) - 0.50 * g(u, v, 0.62, 0.58, 0.17) - 0.22 * g(u, v, 0.22, 0.62, 0.10)
+    + 0.34 * g(u, v, 0.20, 0.22, 0.15) + 0.20 * g(u, v, 0.82, 0.18, 0.11) + 0.035 * Math.sin(u * 11) * Math.cos(v * 8);
+  const A = 246, B = 122, H = 166, x0 = 360, y0 = 438, zb = -0.26;
+  const pr = (u, v, z) => [x0 + (u - v) * A, y0 + (u + v) * B - z * H];
+  const grad = (u, v) => { const e = 1e-3; return [(f(u + e, v) - f(u - e, v)) / (2 * e), (f(u, v + e) - f(u, v - e)) / (2 * e)]; };
+  const Lw = V.norm([-0.25, -0.62, 0.75]);
+  const bright = (u, v) => { const [gu, gv] = grad(u, v); const n = V.norm([-gu * 1.4, -gv * 1.4, 1]); return clamp((V.dot(n, Lw) - 0.62) * 2.4 + 0.55); };
+  const NV = 76, NU = 230;
+  for (let k = 0; k <= NV; k++) {
+    const v = k / NV;
+    const pts = [], bs = [];
+    for (let j = 0; j <= NU; j++) { const u = j / NU; pts.push(pr(u, v, f(u, v))); bs.push(bright(u, v)); }
+    P.fill('g', poly(pts.concat([pr(1, v, zb - 1), pr(0, v, zb - 1)])));
+    toneLine(P, pts, (i) => bs[i], { W: 2.3, Wh: 1.4, k0: 0.5, h0: 0.84, thin: true });
+  }
+  const face = (edge, W, NL) => {
+    const N = 120, top = sample((t) => { const [u, v] = edge(t); return [u, v, f(u, v)]; }, N);
+    const outline = top.map(([u, v, z]) => pr(u, v, z)).concat(top.slice().reverse().map(([u, v]) => pr(u, v, zb)));
+    P.fill('g', poly(outline));
+    for (let k = 1; k < NL; k++) {
+      const s = k / NL;
+      const pts = top.map(([u, v, z]) => pr(u, v, lerp(z, zb, Math.pow(s, 0.85))));
+      swell(P, 'i', pts, () => W * (0.7 + 0.6 * s), { taper: 1 });
+    }
+    P.line('si', 1.7, poly(outline));
+  };
+  face((t) => [t, 1], 1.45, 24);
+  face((t) => [1, 1 - t], 0.72, 24);
+  // steepest descent, integrated finely, marked every ~38px on the page
+  const descend = (u, v) => {
+    const out = [[u, v]];
+    for (let i = 0; i < 6000; i++) { const [gu, gv] = grad(u, v); const l = Math.hypot(gu, gv); if (l < 1e-3) break; u -= gu / l * 0.0015; v -= gv / l * 0.0015; out.push([u, v]); }
+    const sp = out.map(([uu, vv]) => pr(uu, vv, f(uu, vv)));
+    const keep = [sp[0]]; sp.forEach((p) => { const q = keep[keep.length - 1]; if (Math.hypot(p[0] - q[0], p[1] - q[1]) > 38) keep.push(p); });
+    const e = sp[sp.length - 1], q = keep[keep.length - 1];
+    if (Math.hypot(e[0] - q[0], e[1] - q[1]) > 14) keep.push(e); else keep[keep.length - 1] = e;
+    return keep;
+  };
+  const drawPath = (keep, main) => {
+    for (let i = 0; i < keep.length - 1; i++) {
+      const a = keep[i], b = keep[i + 1], ang = Math.atan2(b[1] - a[1], b[0] - a[0]);
+      const s = [a[0] + Math.cos(ang) * 8, a[1] + Math.sin(ang) * 8], e = [b[0] - Math.cos(ang) * 9, b[1] - Math.sin(ang) * 9];
+      P.line('sg', 5, seg(s, e)); P.line('si', main ? 1.6 : 1.1, seg(s, e)); arrowHead(P, e[0], e[1], ang, main ? 7.5 : 6);
+    }
+    keep.forEach(([x, y], i) => {
+      const last = i === keep.length - 1, r = last ? 6.2 : (main ? 4.4 : 3.6);
+      P.fill('g', circ(x, y, r + 2.3)); P.fill(last && main ? 'i' : 'h', circ(x, y, r)); P.line('si', 1.3, circ(x, y, r));
+    });
+  };
+  const pA = descend(0.46, 0.08), pB = descend(0.06, 0.40);
+  drawPath(pB, false); drawPath(pA, true);
+  const s0 = pA[0], sN = pA[pA.length - 1], t0 = pB[0], tN = pB[pB.length - 1];
+  label(P, s0[0] + 5, s0[1] - 5, s0[0] + 40, s0[1] - 60, 'a');
+  label(P, sN[0] + 6, sN[1] + 5, 590, 700, 'b');
+  const mid = pA[Math.floor(pA.length / 2)], mid2 = pA[Math.floor(pA.length / 2) + 1];
+  label(P, (mid[0] + mid2[0]) / 2 + 4, (mid[1] + mid2[1]) / 2, 640, 420, 'c');
+  label(P, tN[0] - 6, tN[1] + 2, 84, 560, 'd');
+};
+
+/* 5D Parallelism — the device mesh 2⁵, projected: a penteract in ball and rod */
+FIG['5d-parallelism'] = (P) => {
+  const dirs = [0, 1, 2, 3, 4].map((k) => { const a = k * Math.PI / 5 + Math.PI / 10; return [Math.cos(a), Math.sin(a), 0.62 * (k % 2 ? 1 : -1)]; });
+  const M = M3.rot(0.16, 0.2, 0);
+  const S = 136, cx = 360, cy = 512;
+  const verts = [];
+  for (let m = 0; m < 32; m++) {
+    let p = [0, 0, 0];
+    for (let k = 0; k < 5; k++) p = V.add(p, V.mul(dirs[k], ((m >> k) & 1 ? 1 : -1) / 2));
+    const w = M3.mv(M, p);
+    verts.push({ m, x: cx + S * w[0], y: cy + S * w[1], z: w[2] });
+  }
+  const zs = verts.map((v) => v.z), zmin = Math.min(...zs), zmax = Math.max(...zs);
+  const dn = (z) => (z - zmin) / (zmax - zmin);
+  const front = verts.reduce((a, b) => (b.z > a.z ? b : a));
+  const items = [];
+  for (const v of verts) {
+    items.push({ z: v.z, draw: () => sphere(P, v.x, v.y, 9 + 7 * dn(v.z), { spacing: 2.4, cross: dn(v.z) > 0.5 }) });
+    for (let k = 0; k < 5; k++) if (!((v.m >> k) & 1)) {
+      const u = verts[v.m | (1 << k)];
+      const hi = v === front || u === front;
+      items.push({ z: (v.z + u.z) / 2 - 0.02, draw: () => {
+        const pts = sample((t) => [lerp(v.x, u.x, t), lerp(v.y, u.y, t)], 12);
+        const w = 2.6 + 3.6 * dn((v.z + u.z) / 2);
+        if (hi) { P.fill('g', ribbon(pts, pts.map(() => w + 7))); P.fill('i', ribbon(pts, pts.map(() => w + 3.4))); P.fill('h', ribbon(pts, pts.map(() => w))); }
+        else rod(P, pts, w, w, { halo: 3.2 });
+      } });
+    }
+  }
+  items.sort((a, b) => a.z - b.z).forEach((it) => it.draw());
+  // the five axes of one device, lettered
+  const L = ['a', 'b', 'c', 'd', 'e'];
+  for (let k = 0; k < 5; k++) {
+    const u = verts[front.m ^ (1 << k)];
+    const mx = lerp(front.x, u.x, 0.66), my = lerp(front.y, u.y, 0.66);
+    const ang = Math.atan2(u.y - front.y, u.x - front.x) + Math.PI / 2;
+    const flip = ((mx - front.x) * Math.cos(ang) + (my - front.y) * Math.sin(ang)) < 0 ? 1 : 1;
+    const lx = mx + Math.cos(ang) * 17 * flip, ly = my + Math.sin(ang) * 17 * flip;
+    P.text(lx, ly + 6, L[k], 'lab', 'middle');
+  }
+};
+
+/* AI Context Engineering — a context window, cored and sectioned: its strata in the order they were laid down */
+FIG['ai-context-engineering'] = (P) => {
+  const cx = 404, rx = 108, ry = 26, top = 290, bot = 758;
+  const H = bot - top;
+  const bright = (th) => clamp(0.55 + 0.5 * Math.cos(th - 0.8));
+  const X = (th) => cx - rx * Math.cos(th);
+  const arc = (y, n = 100) => sample((t) => { const th = t * Math.PI; return [X(th), y + ry * Math.sin(th)]; }, n);
+  const R = rng(17);
+  // strata, top to bottom
+  const strata = [['query', 0.07], ['history', 0.25], ['memory', 0.14], ['docs', 0.22], ['tools', 0.13], ['system', 0.19]];
+  let y = top; const bands = strata.map(([k, h]) => { const b = { k, y0: y, y1: y + h * H }; y += h * H; return b; });
+  // silhouette fill (occludes nothing, but gives the core its body)
+  P.fill('g', poly(arc(top).slice().reverse().concat(arc(bot))));
+  const shadeW = (th, W, base = 0.6) => Math.max(MINW, base + W * (1 - bright(th)));
+  for (const b of bands) {
+    const { k, y0, y1 } = b;
+    if (k === 'query') {
+      for (let yy = y0 + 3; yy < y1 - 1; yy += 3.2) { const pts = arc(yy); toneLine(P, pts, (i) => bright(i / 100 * Math.PI), { W: 1.6, Wh: 1.5, k0: 0.45, h0: 0.55, thin: true }); }
+    } else if (k === 'history') {
+      // one pair of varves per turn: a dark lamina and a pale one
+      const turns = 9, hh = (y1 - y0) / turns;
+      for (let t = 0; t < turns; t++) {
+        const a = y0 + t * hh;
+        for (let yy = a + 2; yy < a + hh * 0.55; yy += 2.3) swell(P, 'i', arc(yy), (i) => shadeW(i / 100 * Math.PI, 1.3, 0.7), { taper: 1 });
+        swell(P, 'h', arc(a + hh * 0.77), (i) => 0.9 + 0.8 * bright(i / 100 * Math.PI), { taper: 0.4 });
+      }
+    } else if (k === 'memory') {
+      for (let yy = y0 + 3; yy < y1; yy += 4.2) swell(P, 'i', arc(yy), (i) => shadeW(i / 100 * Math.PI, 0.9, 0.2), { taper: 1 });
+      // pebbles, foreshortened toward the limbs
+      for (let n = 0; n < 34; n++) {
+        const th = 0.18 + R() * (Math.PI - 0.36), yy = y0 + 8 + R() * (y1 - y0 - 16);
+        const px = X(th), py = yy + ry * Math.sin(th), rw = (5 + R() * 7) * Math.sin(th), rh = 3.5 + R() * 3.5;
+        P.fill('g', `M${f1(px - rw - 1.2)} ${f1(py)}a${f1(rw + 1.2)} ${f1(rh + 1.2)} 0 1 0 ${f1(2 * rw + 2.4)} 0a${f1(rw + 1.2)} ${f1(rh + 1.2)} 0 1 0 ${f1(-2 * rw - 2.4)} 0Z`);
+        const cp = sample((t) => [px + rw * Math.cos(t * TAU), py + rh * Math.sin(t * TAU)], 40);
+        swell(P, 'i', cp, (i) => { const a = i / 40 * TAU; return 0.6 + 1.4 * sstep(-0.2, 0.8, Math.cos(a) * 0.5 + Math.sin(a) * 0.8) * (1.2 - bright(th)); }, { taper: 1 });
+        if (bright(th) > 0.5) P.fill('h', circ(px - rw * 0.35, py - rh * 0.35, 1.1));
+      }
+    } else if (k === 'docs') {
+      // laminae: fine beds, with a heavier parting at each document boundary
+      let yy = y0 + 2.5, c = 0;
+      while (yy < y1 - 1) { const part = c % 6 === 5; swell(P, 'i', arc(yy), (i) => part ? shadeW(i / 100 * Math.PI, 1.6, 1.2) : shadeW(i / 100 * Math.PI, 0.9, 0.1), { taper: 1 }); yy += part ? 3.6 : 2.6; c++; }
+    } else if (k === 'tools') {
+      // brickwork: rows of cells, one per tool schema
+      const rows = 5, rh = (y1 - y0) / rows;
+      for (let r = 0; r < rows; r++) {
+        const yy = y0 + r * rh;
+        swell(P, 'i', arc(yy + rh - 1), (i) => shadeW(i / 100 * Math.PI, 1.0, 0.7), { taper: 1 });
+        for (let q = 0; q < 9; q++) {
+          const th = (q + (r % 2 ? 0.5 : 0) + 0.25) / 9 * Math.PI; if (th > Math.PI - 0.05) continue;
+          const xx = X(th), yb = yy + ry * Math.sin(th);
+          P.fill('i', ribbon([[xx, yb + 1.5], [xx, yb + rh - 2]], [shadeW(th, 1.2, 0.8), shadeW(th, 1.2, 0.8)]));
+          // fill each cell with short hatching in the shade
+          const th2 = th + Math.PI / 9;
+          for (let yy2 = yy + 4; yy2 < yy + rh - 3; yy2 += 2.8) {
+            const pts = sample((t) => { const tt = lerp(th + 0.05, Math.min(th2 - 0.05, Math.PI), t); return [X(tt), yy2 + ry * Math.sin(tt)]; }, 12);
+            swell(P, 'i', pts, (i) => 1.6 * (1 - bright(lerp(th, th2, i / 12))) - 0.15, { taper: 1 });
+          }
+        }
+      }
+    } else if (k === 'system') {
+      // bedrock: dense, cross-hatched
+      for (let x = cx - rx + 1.5; x < cx + rx; x += 3) {
+        const th = Math.acos(clamp((cx - x) / rx, -1, 1)), yo = ry * Math.sin(th);
+        const w = shadeW(th, 1.8, 0.5);
+        P.fill('i', ribbon([[x, y0 + yo + 1], [x, y1 + yo - 1]], [w, w]));
+      }
+      for (let yy = y0 + 3; yy < y1; yy += 3.2) swell(P, 'i', arc(yy), (i) => 1.4 * (1 - bright(i / 100 * Math.PI)) - 0.2, { taper: 1 });
+    }
+    swell(P, 'i', arc(y0), () => 1.5, { taper: 1 });
+  }
+  // the core shadow, engraved over every stratum below the query
+  for (let x = cx + rx * 0.12; x < cx + rx - 1; x += 3.1) {
+    const th = Math.acos(clamp((cx - x) / rx, -1, 1)), yo = ry * Math.sin(th);
+    const w = 0.2 + 2.3 * sstep(0.1, 0.98, (x - cx) / rx);
+    if (w > 0.45) P.fill('i', ribbon([[x, bands[1].y0 + yo + 2], [x, bands[5].y0 + yo - 2]], [Math.max(MINW, w), Math.max(MINW, w)]));
+  }
+  [[-0.74, 1.6], [-0.69, 1.0], [-0.79, 1.0]].forEach(([fx, wd]) => {
+    const x = cx + rx * fx, th = Math.acos(clamp(-fx, -1, 1)), yo = ry * Math.sin(th);
+    P.fill('g', ribbon([[x, bands[1].y0 + yo + 4], [x, bands[5].y0 + yo - 4]], [wd + 1.4, wd + 1.4]));
+    P.fill('h', ribbon([[x, bands[1].y0 + yo + 4], [x, bands[5].y0 + yo - 4]], [wd, wd]));
+  });
+  // top face: the newest token lies here, lit
+  const topE = sample((t) => [cx + rx * Math.cos(t * TAU), top + ry * Math.sin(t * TAU)], 120);
+  P.fill('g', poly(topE));
+  for (let yy = top - ry + 3; yy < top + ry; yy += 3.4) {
+    const hw = rx * Math.sqrt(Math.max(0, 1 - ((yy - top) / ry) ** 2)) - 3;
+    if (hw > 4) P.fill('h', ribbon([[cx - hw, yy], [cx + hw * 0.55, yy]], [1.1, 1.1]));
+  }
+  swell(P, 'i', topE, (i) => 1.2 + 0.6 * sstep(-0.3, 1, Math.sin(i / 120 * TAU)), { taper: 1 });
+  // sides and base
+  P.fill('i', ribbon([[cx - rx, top], [cx - rx, bot]], [1.3, 1.3]));
+  P.fill('i', ribbon([[cx + rx, top], [cx + rx, bot]], [2.6, 2.6]));
+  swell(P, 'i', arc(bot), (i) => 1.6 + 1.4 * (i / 100), { taper: 1 });
+  // the ruler: token positions, first token at the bottom
+  const rxp = cx - rx - 64;
+  P.line('si', 1.4, seg([rxp, top], [rxp, bot]));
+  for (let k = 0; k <= 16; k++) {
+    const yy = bot - k / 16 * H, big = k % 4 === 0;
+    P.line('si', big ? 1.4 : 0.9, seg([rxp, yy], [rxp + (big ? 14 : 8), yy]));
+  }
+  P.text(rxp - 8, bot + 4, '0', 'labs', 'end');
+  P.text(rxp - 8, top + 4, 'LIMIT', 'labs', 'end');
+  P.raw(`<text class="labs" transform="translate(${rxp - 14} ${(top + bot) / 2}) rotate(-90)" text-anchor="middle">TOKEN POSITION</text>`);
+  // lettered strata
+  const L = ['a', 'b', 'c', 'd', 'e', 'f'];
+  bands.forEach((b, k) => {
+    const yy = (b.y0 + b.y1) / 2 + ry * 0.6;
+    label(P, cx + rx * 0.72, yy, 616, yy, L[k]);
+  });
+};
+
+/* Build Decision Trees from Scratch — a tree pressed like a botanical specimen; Fig. 2, the plane it partitions */
+FIG['decision-trees-from-scratch'] = (P) => {
+  const nodes = {
+    r: { p: [300, 700], split: 'x₁ ≤ 0.50', kids: ['L', 'Rn'] },
+    L: { p: [178, 566], split: 'x₂ ≤ 0.35', kids: ['LL', 'LR'] },
+    Rn: { p: [398, 548], split: 'x₂ ≤ 0.65', kids: ['RL', 'RR'] },
+    LL: { p: [96, 452], leaf: 'B' }, LR: { p: [214, 404], leaf: 'A' },
+    RL: { p: [328, 404], split: 'x₁ ≤ 0.78', kids: ['RLL', 'RLR'] },
+    RR: { p: [512, 424], leaf: 'B' },
+    RLL: { p: [262, 300], leaf: 'A' }, RLR: { p: [410, 292], leaf: 'B' },
+  };
+  const depth = { r: 0, L: 1, Rn: 1, LL: 2, LR: 2, RL: 2, RR: 2, RLL: 3, RLR: 3 };
+  // stem below the root
+  rod(P, sample(bez([300, 772], [300, 752], [302, 730], [300, 700]), 20), 9, 8);
+  const stems = [];
+  for (const [k, n] of Object.entries(nodes)) if (n.kids) n.kids.forEach((c) => {
+    const a = n.p, b = nodes[c].p; const mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2;
+    const bend = (b[0] - a[0]) * 0.18;
+    const pts = sample(bez(a, [a[0] + (b[0] - a[0]) * 0.1, a[1] - 40], [b[0] - bend, b[1] + 44], b), 40);
+    const w0 = 8 - depth[k] * 1.8, w1 = Math.max(2.8, w0 - 2.2);
+    stems.push(() => rod(P, pts, w0, w1));
+  });
+  stems.forEach((d) => d());
+  // leaves: ovate blades with midrib and veins; class A in white, class B engraved dark
+  const leaf = (x, y, ang, cls) => {
+    const Lg = 64, Wd = 23;
+    const ca = Math.cos(ang), sa = Math.sin(ang);
+    const T = (u, v) => [x + ca * u - sa * v, y + sa * u + ca * v];
+    const edge = (side) => sample((t) => { const u = t * Lg; const v = side * Wd * Math.sin(Math.PI * Math.pow(t, 0.8)) * (1 - 0.25 * t); return T(u, v); }, 40);
+    const e1 = edge(1), e2 = edge(-1);
+    const shape = e1.concat(e2.slice().reverse());
+    P.fill('g', poly(shape));
+    P.fill('g', ribbon(shape.concat([shape[0]]), shape.concat([shape[0]]).map(() => 4)));
+    for (let q = 1; q < 9; q++) { // veins, running out to the margin
+      const t = q / 9.5, u0 = t * Lg;
+      for (const side of [1, -1]) {
+        const tt = Math.min(1, t + 0.16), v1 = side * Wd * Math.sin(Math.PI * Math.pow(tt, 0.8)) * (1 - 0.25 * tt) * 0.9;
+        const pts = sample((s) => T(lerp(u0, tt * Lg, s), lerp(0, v1, Math.pow(s, 0.8))), 10);
+        swell(P, cls === 'A' ? 'h' : 'i', pts, (i) => (cls === 'A' ? 1.3 : 1.7) * (1 - i / 14), { taper: 0.6 });
+      }
+    }
+    if (cls === 'B') { // cross-contour shading on the dark blades
+      for (let u = 4; u < Lg - 4; u += 2.8) {
+        const t = u / Lg, hw = Wd * Math.sin(Math.PI * Math.pow(t, 0.8)) * (1 - 0.25 * t) - 1.5;
+        if (hw > 2) P.fill('i', ribbon([T(u, -hw), T(u, hw)], [0.8, 0.8]));
+      }
+    }
+    swell(P, 'i', shape.concat([shape[0]]), (i) => 1.1 + 0.9 * (i > 40 ? 1 : 0), { taper: 1 });
+    swell(P, cls === 'A' ? 'i' : 'h', sample((t) => T(t * Lg * 0.92, 0), 12), (i) => 1.6 * (1 - i / 16), { taper: 0.5 });
+  };
+  for (const [k, n] of Object.entries(nodes)) if (n.leaf) {
+    const par = Object.values(nodes).find((q) => q.kids && q.kids.some((c) => nodes[c] === n));
+    const ang = Math.atan2(n.p[1] - par.p[1], n.p[0] - par.p[0]) * 0.6 - Math.PI / 2 * 0.4;
+    leaf(n.p[0], n.p[1], ang, n.leaf);
+  }
+  for (const [k, n] of Object.entries(nodes)) if (n.split) {
+    sphere(P, n.p[0], n.p[1], 11 - depth[k] * 1.2, { spacing: 2.4, cross: false });
+    const right = n.p[0] > 300 || k === 'r';
+    P.text(n.p[0] + (right ? 18 : -18), n.p[1] + 5, n.split, 'fig', right ? 'start' : 'end');
+  }
+  // Fig. 2 — the plane, partitioned by the same splits
+  const X0 = 494, Y0 = 560, S = 152;
+  const cell = (a, b, c, d, cls) => {
+    const Q = [[X0 + a * S, Y0 + (1 - d) * S], [X0 + b * S, Y0 + (1 - d) * S], [X0 + b * S, Y0 + (1 - c) * S], [X0 + a * S, Y0 + (1 - c) * S]];
+    if (cls === 'B') quad(P, [Q[0], Q[3], Q[2], Q[1]], { sp: 3.2, w: 1.0, outline: false });
+    else quad(P, Q, { sp: 4.2, w: 1.1, cls: 'h', outline: false });
+  };
+  cell(0, 0.5, 0, 0.35, 'B'); cell(0, 0.5, 0.35, 1, 'A');
+  cell(0.5, 0.78, 0, 0.65, 'A'); cell(0.78, 1, 0, 0.65, 'B'); cell(0.5, 1, 0.65, 1, 'B');
+  P.line('si', 1.8, `M${X0} ${Y0}H${X0 + S}V${Y0 + S}H${X0}Z`);
+  P.line('si', 1.4, `M${X0 + 0.5 * S} ${Y0}V${Y0 + S}M${X0} ${Y0 + 0.65 * S}H${X0 + 0.5 * S}M${X0 + 0.5 * S} ${Y0 + 0.35 * S}H${X0 + S}M${X0 + 0.78 * S} ${Y0 + 0.35 * S}V${Y0 + S}`);
+  const R = rng(5);
+  for (let n = 0; n < 34; n++) {
+    const a = R(), b = R();
+    const cls = a <= 0.5 ? (b <= 0.35 ? 'B' : 'A') : (b > 0.65 ? 'B' : (a <= 0.78 ? 'A' : 'B'));
+    const x = X0 + a * S, y = Y0 + (1 - b) * S;
+    if (Math.min(a, b, 1 - a, 1 - b) < 0.04) continue;
+    P.fill('g', circ(x, y, 4.4)); P.fill(cls === 'A' ? 'h' : 'i', circ(x, y, 2.8)); P.line('si', 1, circ(x, y, 2.8));
+  }
+  P.text(X0 + S / 2, Y0 + S + 22, 'x₁', 'fig', 'middle');
+  P.text(X0 - 10, Y0 + S / 2 + 5, 'x₂', 'fig', 'end');
+  P.text(X0, Y0 - 12, 'Fig. 2', 'fig', 'start');
+  label(P, 300, 722, 190, 742, 'a', { dot: true });
+  label(P, nodes.LR.p[0] + 20, nodes.LR.p[1] - 34, 150, 318, 'b');
+  label(P, nodes.RR.p[0] + 30, nodes.RR.p[1] - 22, 610, 380, 'c');
+};
+
+/* Build LLMs from Scratch — the stack as a column: token course, embedding plinth, drums on the dowel of the residual stream, the head as capital */
+FIG['build-llms-from-scratch'] = (P) => {
+  const cx = 322, k = 0.22, base = 716;
+  const pr = (x, y, z) => [cx + (x - y) * 0.7071, base + (x + y) * 0.7071 * k - z];
+  const bc = (th) => clamp(0.55 + 0.5 * Math.cos(th - 0.8));
+  const ellipse = (y, r, n = 120) => sample((t) => [cx + r * Math.cos(t * TAU), y + r * k * Math.sin(t * TAU)], n);
+  const frontArc = (y, r, n = 80) => sample((t) => { const th = t * Math.PI; return [cx - r * Math.cos(th), y + r * k * Math.sin(th)]; }, n);
+  const dowel = (y0, y1) => rod(P, [[cx, y0], [cx, y1]], 15, 15, { halo: 2.5 });
+  // drum: a fluted cylinder between screen heights yTop (top-face centre) and yBot
+  const drum = (yTop, yBot, rT, rB) => {
+    const outline = frontArc(yBot, rB).concat(frontArc(yTop, rT).reverse().map((p) => p)).concat([[cx - rT, yTop]]);
+    const body = [[cx - rB, yBot]].concat(frontArc(yBot, rB)).concat([[cx + rT, yTop]]).concat(sample((t) => { const th = t * Math.PI; return [cx + rT * Math.cos(th), yTop - rT * k * Math.sin(th)]; }, 60));
+    P.fill('g', poly(body));
+    const nF = 20;
+    for (let x = -1; x <= 1.0001; x += 2.5 / rB) {
+      const th = Math.acos(clamp(-x, -1, 1));
+      const phi = ((th * nF / TAU) % 1 + 1) % 1;
+      const b = bc(th - (phi - 0.5) * 1.5);
+      const xa = cx + x * rT, xb = cx + x * rB;
+      const ya = yTop + rT * k * Math.sin(th), yb = yBot + rB * k * Math.sin(th);
+      const arris = phi < 0.07 || phi > 0.93;
+      if (arris && bc(th) > 0.45) { P.fill('h', ribbon([[xa, ya + 1], [xb, yb - 1]], [1.1, 1.1])); continue; }
+      const t = tone(b, { W: 2.4, Wh: 1.2, k0: 0.74, h0: 0.9, thin: true });
+      if (t.c) P.fill(t.c, ribbon([[xa, ya + 1], [xb, yb - 1]], [t.w, t.w]));
+    }
+    // top face, lit
+    const te = ellipse(yTop, rT);
+    P.fill('g', poly(te));
+    for (let yy = yTop - rT * k + 3; yy < yTop + rT * k - 1; yy += 3.2) {
+      const hw = rT * Math.sqrt(Math.max(0, 1 - ((yy - yTop) / (rT * k)) ** 2)) - 3;
+      if (hw > 6) P.fill('h', ribbon([[cx - hw, yy], [cx - hw + hw * 1.25, yy]], [1, 1]));
+    }
+    P.fill('i', `M${f1(cx - 9)} ${f1(yTop)}a9 ${f1(9 * k * 1.3)} 0 1 0 18 0a9 ${f1(9 * k * 1.3)} 0 1 0 -18 0Z`);
+    swell(P, 'i', te.concat([te[0]]), (i) => 1.1 + 0.7 * sstep(0, 1, Math.sin(i / 120 * TAU)), { taper: 1 });
+    P.fill('i', ribbon([[cx - rT, yTop], [cx - rB, yBot]], [1.2, 1.2]));
+    P.fill('i', ribbon([[cx + rT, yTop], [cx + rB, yBot]], [2.4, 2.4]));
+    swell(P, 'i', frontArc(yBot, rB), (i) => 1.3 + 1.2 * i / 80, { taper: 1 });
+  };
+  // b — plinth: the embedding
+  isoBox(P, pr, -112, -112, 0, 112, 112, 26, { lw: 0.8, rw: 1.9, cross: true, tw: 1, tsp: 4.2 });
+  // drums on the dowel
+  const zs = [30, 112, 194, 276], H = 42;
+  let prevTop = pr(0, 0, 26)[1];
+  zs.forEach((z, i) => {
+    const yb = pr(0, 0, z)[1], yt = pr(0, 0, z + H)[1];
+    dowel(prevTop, yb + 6);
+    drum(yt, yb, 82 - i * 2.5 - 2.5, 82 - i * 2.5);
+    prevTop = yt;
+  });
+  // e — the head as capital: echinus flaring into an abacus
+  const zE = 322, yE0 = pr(0, 0, zE)[1], yE1 = pr(0, 0, zE + 20)[1];
+  dowel(prevTop, yE0 + 6);
+  {
+    const rB = 70, rT = 94;
+    const body = [[cx - rB, yE0]].concat(frontArc(yE0, rB)).concat([[cx + rT, yE1]]).concat(sample((t) => { const th = t * Math.PI; return [cx + rT * Math.cos(th), yE1 - rT * k * Math.sin(th)]; }, 60));
+    P.fill('g', poly(body));
+    for (let q = 1; q < 7; q++) {
+      const s = q / 7, yy = lerp(yE0, yE1, s), rr = lerp(rB, rT, Math.pow(s, 0.7));
+      swell(P, 'i', frontArc(yy, rr), (i) => 0.7 + 1.5 * (1 - bc(i / 80 * Math.PI)) + 0.6 * (1 - s), { taper: 1 });
+    }
+    P.fill('i', ribbon([[cx - rT, yE1], [cx - rB, yE0]], [1.2, 1.2]));
+    P.fill('i', ribbon([[cx + rT, yE1], [cx + rB, yE0]], [2.2, 2.2]));
+    swell(P, 'i', frontArc(yE0, rB), (i) => 1.3 + 1.2 * i / 80, { taper: 1 });
+  }
+  isoBox(P, pr, -104, -104, zE + 20, 104, 104, zE + 36, { lw: 0.8, rw: 1.9, cross: true });
+  // a — tokens laid on the plinth, in front of the column
+  for (let q = 0; q < 8; q++) {
+    const x = -104 + q * 26;
+    isoBox(P, pr, x, 90, 26, x + 19, 109, 45, { lw: 0.75, rw: 1.6, sp: 2.4, ow: 1, tw: 1, tsp: 3 });
+  }
+  // f — the next-token distribution standing on the abacus
+  const probs = [0.04, 0.09, 0.05, 0.13, 0.52, 0.08, 0.03, 0.06];
+  probs.forEach((p, q) => {
+    const x = -86 + q * 22, big = p > 0.4, h = 8 + p * 150;
+    isoBox(P, pr, x, -6, zE + 36, x + 13, 7, zE + 36 + h, { lw: big ? 0 : 0.7, rw: big ? 1.3 : 1.6, sp: 2.3, ow: 1, tw: big ? 1.2 : 0, tsp: 2.6 });
+    if (big) { const Q = [pr(x, 7, zE + 36 + h), pr(x + 13, 7, zE + 36 + h), pr(x + 13, 7, zE + 36), pr(x, 7, zE + 36)]; quad(P, Q, { sp: 2.4, w: 1.2, cls: 'h', ow: 1 }); }
+  });
+  // labels
+  const tk = pr(-104 + 9, 109, 36); label(P, tk[0] - 4, tk[1] + 2, 84, 742, 'a');
+  const pl = pr(-112, 40, 13); label(P, pl[0] + 2, pl[1], 84, 680, 'b');
+  const d2 = pr(0, 0, 112 + H / 2); label(P, d2[0] + 76, d2[1] + 8, 560, d2[1] + 8, 'c');
+  const dw = pr(0, 0, 90); label(P, dw[0] + 8, dw[1] - 6, 560, dw[1] - 22, 'd');
+  const ec = pr(0, 0, zE + 10); label(P, ec[0] + 84, ec[1] + 10, 560, ec[1] + 4, 'e');
+  const tb = pr(-86 + 4 * 22 + 13, 7, zE + 36 + 60); label(P, tb[0] + 2, tb[1], 560, tb[1] - 50, 'f');
+  // bracket for ×N
+  const yA = pr(0, 0, 30)[1] + 18, yB = pr(0, 0, 276 + H)[1] - 18;
+  P.line('si', 1.1, `M600 ${f1(yB)}h8v${f1(yA - yB)}h-8M608 ${f1((yA + yB) / 2)}h8`);
+  P.text(624, (yA + yB) / 2 + 6, '× N', 'lab', 'start');
+};
+
+/* Transformers — one attention head over a sentence of tokens, drawn as arches; Fig. 2, the same weights as a matrix */
+FIG['transformers-from-scratch'] = (P) => {
+  const n = 9, x0 = 118, dx = 60, base = 536;
+  const X = (i) => x0 + i * dx;
+  const R = rng(21);
+  const W = [];
+  for (let i = 0; i < n; i++) {
+    const row = []; let sum = 0;
+    for (let j = 0; j <= i; j++) { const v = Math.exp(1.3 * R() + (j === 0 ? 1.6 : 0) + (j === i ? 0.9 : 0) + (j === i - 1 ? 0.7 : 0)); row.push(v); sum += v; }
+    W.push(row.map((v) => v / sum));
+  }
+  // arches, widest first
+  const arcs = [];
+  for (let i = 1; i < n; i++) for (let j = 0; j < i; j++) if (W[i][j] > 0.07) arcs.push([i, j]);
+  arcs.sort((a, b) => (b[0] - b[1]) - (a[0] - a[1]) || a[0] - b[0]);
+  for (const [i, j] of arcs) {
+    const w = W[i][j], last = i === n - 1;
+    const a = X(j), b = X(i), h = (b - a) / 2 * 0.9;
+    const pts = sample((t) => [lerp(a, b, t), base - 14 - Math.sin(t * Math.PI) * h], 90);
+    const ws = pts.map((_, q) => 0.7 + 6.5 * w * Math.pow(Math.sin(q / 90 * Math.PI), 0.6));
+    P.fill('g', ribbon(pts, ws.map((v) => v + 4)));
+    if (last) { P.fill('i', ribbon(pts, ws.map((v) => v + 2.2))); P.fill('h', ribbon(pts, ws.map((v) => Math.max(MINH, v)))); }
+    else P.fill('i', ribbon(pts, ws));
+  }
+  // the sequence rod and its tokens
+  rod(P, [[X(0) - 34, base], [X(n - 1) + 34, base]], 6, 6, { halo: 3 });
+  for (let i = 0; i < n; i++) {
+    sphere(P, X(i), base, 14, { spacing: 2.4 });
+  }
+  // Fig. 2 — the same weights as a lower-triangular matrix, keys aligned with the tokens above
+  const my = 582, ch = 20, cw = 20;
+  const wmax = Math.max(...W.flat());
+  for (let i = 0; i < n; i++) for (let j = 0; j <= i; j++) {
+    const w = W[i][j] / wmax, last = i === n - 1;
+    const Q = [[X(j) - cw / 2, my + i * ch], [X(j) + cw / 2, my + i * ch], [X(j) + cw / 2, my + i * ch + cw - 2], [X(j) - cw / 2, my + i * ch + cw - 2]];
+    P.fill('g', poly(Q));
+    if (last) P.fill('h', poly(Q.map(([x, y]) => [x + (x < X(j) ? 2.5 : -2.5) * (1 - w), y + (y < my + i * ch + 5 ? 2.5 : -2.5) * (1 - w)])));
+    else quad(P, Q, { sp: lerp(5, 1.9, Math.sqrt(w)), w: lerp(0.7, 1.4, w), fill: false, outline: false });
+    P.line('si', 1, poly(Q));
+  }
+  P.text(X(n - 1) + 22, my + 14, 'Fig. 2', 'fig', 'start');
+  const peak = [(X(0) + X(n - 1)) / 2, base - 14 - (X(n - 1) - X(0)) / 2 * 0.9];
+  label(P, X(0) - 10, base + 8, 64, 606, 'a', { gap: 10 });
+  label(P, peak[0] + 60, peak[1] + 8, 620, 300, 'b');
+  label(P, X(0) + 10, base - 30, 70, 420, 'c');
+  label(P, X(6), my + 6 * ch + 9, 470, my + 6 * ch + 9 - 70, 'd', { dot: true });
+};
+
+/* Pi vs Hermes vs Codex — one triple spiral: three agents' histories wound together, each older turn sealed into a smaller chamber */
+FIG['pi-vs-hermes-vs-codex'] = (P) => {
+  const cx = 356, cy = 512, R = 232, b = 0.155, beta = TAU * b / 3, Th = 0, rot = -1.05;
+  const dths = [0.44, 0.58, 0.74];
+  const names = ['PI', 'HERMES', 'CODEX'];
+  const rr = (th, s) => R * Math.exp(b * (th - Th) - s * beta);
+  const pt = (i, th, s) => { const r = rr(th, s), a = th + TAU * i / 3 + rot; return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; };
+  const thMin = -Math.log(R / 1.5) / b;
+  // body
+  const disc = sample((t) => { const th = lerp(Th, Th - TAU / 3, t); return pt(0, th, 0); }, 60)
+    .concat(sample((t) => { const th = lerp(Th, Th - TAU / 3, t); return pt(2, th, 0); }, 60))
+    .concat(sample((t) => { const th = lerp(Th, Th - TAU / 3, t); return pt(1, th, 0); }, 60));
+  P.fill('g', circ(cx, cy, R + 6));
+  for (let i = 0; i < 3; i++) {
+    const dth = dths[i];
+    const live = (th) => th > Th - dth;
+    // laminae running along the channel: the same count across, so they crowd together as the channel narrows
+    const NL = 7;
+    for (let q = 1; q < NL; q++) {
+      const s = q / NL;
+      const pts = sample((t) => pt(i, lerp(Th, thMin, t), s), 900);
+      const ths = sample((t) => lerp(Th, thMin, t), 900);
+      swell(P, 'i', pts, (k) => { const th = ths[k]; if (live(th)) return 0; const age = clamp((Th - th) / 14); const r = rr(th, s); const q = pts[k]; const dome = clamp(0.5 + 0.5 * ((q[0] - cx) * 0.55 + (q[1] - cy) * 0.72) / R); return r < 9 ? 0 : lerp(0.6, 1.8, age) * clamp(r / 26, 0.55, 1) * lerp(0.7, 1.35, dome); }, { taper: 1 });
+      swell(P, 'h', pts, (k) => live(ths[k]) ? 1.25 : 0, { taper: 0.5 });
+    }
+    // septa, bowed toward the mouth
+    for (let th = Th - dth; rr(th, 0) > 6; th -= dth) {
+      const pts = sample((s) => pt(i, th + Math.sin(s * Math.PI) * dth * 0.22, s), 14);
+      const w = clamp(rr(th, 0.5) * 0.022, 0.7, 2.6);
+      swell(P, 'i', pts, () => w, { taper: 1 });
+    }
+    // memory: a thread down the middle of the channel
+    const mem = sample((t) => pt(i, lerp(Th - 0.08, thMin * 0.8, t), 0.5), 700);
+    const mw = sample((t) => clamp(rr(lerp(Th - 0.08, thMin * 0.8, t), 0.5) * 0.028, 0.9, 4.6), 700);
+    P.fill('i', ribbon(mem, mw.map((w) => w + 2.2)));
+    P.fill('h', ribbon(mem, mw.map((w) => Math.max(MINH, w - 0.3))));
+    // wall
+    const wall = sample((t) => pt(i, lerp(Th, thMin, t), 0), 900);
+    const ww = sample((t) => clamp(rr(lerp(Th, thMin, t), 0) * 0.02, 0.7, 4.4), 900);
+    P.fill('i', ribbon(wall, ww));
+    // mouth
+    swell(P, 'i', sample((s) => pt(i, Th, s), 10), () => 3.2, { taper: 1 });
+    // name at the mouth, set just ahead of the opening
+    const m = pt(i, Th, 0.5), m2 = pt(i, Th + 0.02, 0.5);
+    const tx = m2[0] - m[0], ty = m2[1] - m[1], tl = Math.hypot(tx, ty);
+    const lx = m[0] + tx / tl * 22, ly = m[1] + ty / tl * 22;
+    P.text(lx, ly + 4, names[i], 'labs', tx / tl > 0.3 ? 'start' : tx / tl < -0.3 ? 'end' : 'middle');
+  }
+  P.fill('i', circ(cx, cy, 3.2));
+  // lettered parts
+  const lv = pt(0, Th - dths[0] * 0.5, 0.3); label(P, lv[0], lv[1], lv[0] - 30, lv[1] - 62, 'a');
+  const sp = pt(1, Th - dths[1] * 2, 0.2); label(P, sp[0], sp[1], 650, sp[1] - 20, 'b');
+  const old = pt(1, Th - 6.8, 0.3); label(P, old[0], old[1], 650, 560, 'c');
+  const mm = pt(2, Th - dths[2] * 1.6, 0.5); label(P, mm[0], mm[1], 70, mm[1] + 30, 'd');
+};
+
+/* Harness Engineering — an armillary: the model at the centre, held by the rings of the harness */
+FIG['harness-engineering'] = (P) => {
+  const cx = 350, cy = 488, Rs = 58, SC = 0.9;
+  const VIEW = M3.rot(0.0, -0.32);
+  const nMer = V.norm([0.2, 0, 1]);
+  const A = V.norm(V.add(V.mul(V.norm(V.cross([0, 1, 0], nMer)), -0.42), [0, -1, 0])); // polar axis, in the meridian plane
+  const rotAbout = (v, ax, ang) => { const c = Math.cos(ang), s = Math.sin(ang); return V.add(V.add(V.mul(v, c), V.mul(V.cross(ax, v), s)), V.mul(ax, V.dot(ax, v) * (1 - c))); };
+  const nEcl = V.norm(rotAbout(A, V.norm(V.cross(A, [0, 0, 1])), 0.41));
+  const rings = [
+    { n: nMer, R: 196, w: 17, off: 0, kind: 'meridian', tick: 3 },
+    { n: [0, 1, 0], R: 196, w: 22, off: 0, kind: 'horizon', tick: 4 },
+    { n: A, R: 150, w: 13, off: 0, kind: 'equator', tick: 2 },
+    { n: nEcl, R: 150, w: 20, off: 0, kind: 'loop', tick: 2 },
+    { n: A, R: 150 * Math.cos(0.72), w: 9, off: 150 * Math.sin(0.72), kind: 'memory', tick: 3 },
+    { n: A, R: 150 * Math.cos(0.72), w: 9, off: -150 * Math.sin(0.72), kind: 'memory', tick: 3 },
+  ];
+  const segs = [];
+  rings.forEach((rd) => {
+    const n = V.norm(rd.n);
+    const u = V.norm(V.cross(n, Math.abs(n[1]) > 0.9 ? [0, 0, 1] : [0, 1, 0])), w = V.cross(n, u);
+    const c0 = V.mul(n, rd.off);
+    const N = 200;
+    const P3 = (t, r) => M3.mv(VIEW, V.mul(V.add(c0, V.add(V.mul(u, r * Math.cos(t)), V.mul(w, r * Math.sin(t)))), SC));
+    rd.P3 = P3; rd.nv = M3.mv(VIEW, n);
+    for (let k = 0; k < N; k++) {
+      const t0 = k / N * TAU, t1 = (k + 1.08) / N * TAU;
+      const a0 = P3(t0, rd.R - rd.w / 2), a1 = P3(t1, rd.R - rd.w / 2), b0 = P3(t0, rd.R + rd.w / 2), b1 = P3(t1, rd.R + rd.w / 2);
+      const z = (a0[2] + b0[2]) / 2;
+      segs.push({ z, draw: () => {
+        const S = (p) => [cx + p[0], cy + p[1]];
+        P.fill('g', poly([S(a0), S(b0), S(b1), S(a1)]));
+        const facing = Math.abs(V.dot(rd.nv, LIGHT));
+        const bright = clamp((z > 0 ? 0.35 : 0.12) + 0.55 * facing + 0.25 * Math.cos(t0 - 2.4));
+        // engraved band: fine lines along the band, heavier where it turns from the light
+        for (const f of [0.3, 0.5, 0.7]) {
+          const p0 = S(P3(t0, rd.R - rd.w / 2 + rd.w * f)), p1 = S(P3(t1, rd.R - rd.w / 2 + rd.w * f));
+          const wd = 1.7 * (1 - bright);
+          if (wd > 0.35) P.fill('i', ribbon([p0, p1], [Math.max(MINW, wd), Math.max(MINW, wd)]));
+          else if (bright > 0.8 && f === 0.5) P.fill('h', ribbon([p0, p1], [1, 1]));
+        }
+        if (k % rd.tick === 0) P.fill('i', ribbon([S(b0), S(P3(t0, rd.R + rd.w / 2 - rd.w * (k % (rd.tick * 5) === 0 ? 0.62 : 0.3)))], [0.8, 0.8]));
+        P.fill('i', ribbon([S(a0), S(a1)], [1.0, 1.0]));
+        P.fill('i', ribbon([S(b0), S(b1)], [z > 0 ? 1.7 : 1.1, z > 0 ? 1.7 : 1.1]));
+      } });
+    }
+  });
+  // polar axis
+  const axisSegs = 30;
+  for (let k = 0; k < axisSegs; k++) {
+    const t0 = lerp(-1.18, 1.18, k / axisSegs), t1 = lerp(-1.18, 1.18, (k + 1.05) / axisSegs);
+    const p0 = M3.mv(VIEW, V.mul(A, 196 * SC * t0)), p1 = M3.mv(VIEW, V.mul(A, 196 * SC * t1));
+    if (Math.hypot(p0[0], p0[1]) < Rs + 8 || Math.hypot(p1[0], p1[1]) < Rs + 8) continue;
+    segs.push({ z: (p0[2] + p1[2]) / 2 + 0.5, draw: () => rod(P, [[cx + p0[0], cy + p0[1]], [cx + p1[0], cy + p1[1]]], 5, 5, { halo: 2 }) });
+  }
+  segs.push({ z: 0, draw: () => sphere(P, cx, cy, Rs, { spacing: 3 }) });
+  // stand
+  const stand = () => {
+    const mb = M3.mv(VIEW, [0, 196 * SC, 0]);
+    rod(P, [[cx, cy + mb[1]], [cx, 738]], 12, 18, { halo: 3 });
+    sphere(P, cx, 722, 12, { spacing: 2.4, cross: false });
+    const yb = 748, rw = 92, rk = 0.26;
+    const top = sample((t) => [cx + rw * Math.cos(t * TAU), yb + rw * rk * Math.sin(t * TAU)], 80);
+    P.fill('g', poly(sample((t) => [cx - rw * Math.cos(t * Math.PI), yb + 12 + rw * rk * Math.sin(t * Math.PI)], 40).concat(sample((t) => [cx + rw * Math.cos(t * Math.PI), yb - rw * rk * Math.sin(t * Math.PI)], 40))));
+    for (let x = -rw + 2; x < rw; x += 2.6) { const th = Math.acos(clamp(-x / rw, -1, 1)); const b2 = clamp(0.55 + 0.5 * Math.cos(th - 0.8)); const wd = 2.2 * (1 - b2); if (wd > 0.4) P.fill('i', ribbon([[cx + x, yb + rw * rk * Math.sin(th)], [cx + x, yb + 12 + rw * rk * Math.sin(th)]], [Math.max(MINW, wd), Math.max(MINW, wd)])); }
+    P.fill('g', poly(top));
+    swell(P, 'i', top.concat([top[0]]), (i) => 1.1 + 0.8 * sstep(0, 1, Math.sin(i / 80 * TAU)), { taper: 1 });
+    swell(P, 'i', sample((t) => [cx - rw * Math.cos(t * Math.PI), yb + 12 + rw * rk * Math.sin(t * Math.PI)], 40), (i) => 1.3 + i / 40 * 1.4, { taper: 1 });
+    P.fill('i', ribbon([[cx - rw, yb], [cx - rw, yb + 12]], [1.2, 1.2])); P.fill('i', ribbon([[cx + rw, yb], [cx + rw, yb + 12]], [2, 2]));
+    rod(P, [[cx, 748], [cx, 736]], 22, 20, { halo: 0 });
+  };
+  stand();
+  segs.sort((a, b) => a.z - b.z).forEach((s) => s.draw());
+  // tools, mounted on the equator where it faces us
+  const eq = rings[2];
+  const beads = [];
+  for (let q = 0; q < 7; q++) { const p = eq.P3(q / 7 * TAU + 0.2, eq.R + eq.w / 2 + 7); if (p[2] > 10) beads.push([cx + p[0], cy + p[1]]); }
+  beads.forEach(([x, y]) => sphere(P, x, y, 8.5, { spacing: 2.3, cross: false }));
+  // the loop: arrowheads riding the ecliptic
+  const lp = rings[3];
+  for (const t of [0.3, 1.3, 2.3, 3.3, 4.3, 5.3]) {
+    const p = lp.P3(t, lp.R), p2 = lp.P3(t + 0.04, lp.R);
+    if (p[2] < 20) continue;
+    const ang = Math.atan2(p2[1] - p[1], p2[0] - p[0]);
+    P.fill('g', circ(cx + p[0], cy + p[1], 8)); arrowHead(P, cx + p[0] + Math.cos(ang) * 5, cy + p[1] + Math.sin(ang) * 5, ang, 11);
+  }
+  const front = (rd, pick) => { let best = null; for (let t = 0; t < TAU; t += 0.02) { const p = rd.P3(t, rd.R); if (p[2] > 0 && (!best || pick(p, best))) best = p; } return [cx + best[0], cy + best[1]]; };
+  label(P, cx - 20, cy - 16, 206, 316, 'a');
+  const lb = front(lp, (p, q) => p[0] > q[0]); label(P, lb[0], lb[1], 640, 470, 'b');
+  if (beads.length) { const bb = beads.reduce((a, c) => (c[0] > a[0] ? c : a)); label(P, bb[0] + 6, bb[1] + 4, 640, 590, 'c'); }
+  const mm = front(rings[4], (p, q) => p[0] < q[0]); label(P, mm[0], mm[1], 76, 420, 'd');
+  const hz = front(rings[1], (p, q) => p[0] < q[0]); label(P, hz[0], hz[1] + 6, 76, 600, 'e');
+  const mr = front(rings[0], (p, q) => p[1] < q[1]); label(P, mr[0] + 60, mr[1] + 12, 520, 304, 'f');
+};
+
+/* =====================================================================
+   THE BOOKS
+   ===================================================================== */
+const ORDER = ['ai-context-engineering', 'mathematical-foundations-for-ml', 'neural-networks-from-scratch', 'build-llms-from-scratch', '5d-parallelism', 'pi-vs-hermes-vs-codex', 'deepseek-harness', 'how-to-host-kimi-k3', 'machine-learning-fundamentals', 'pretraining-mini-kimi-k3', 'prompt-engineering', 'python-for-data-science', 'rag-in-production', 'decision-trees-from-scratch', 'deep-learning-fundamentals', 'foundations-for-ai-ml', 'generative-ai-fundamentals', 'git-github-masterclass', 'modern-software-developer', 'r-masterclass', 'sql-masterclass', 'ai-agents-bootcamp', 'claude-certified-architect', 'cnn-fundamentals', 'computer-vision-bootcamp', 'dsa-in-python', 'llm-finetuning', 'llm-production-deployment', 'memory-in-ai-systems', 'mini-clawdbot', 'ml-dl-mastery', 'nlp-cv-mastery', 'reinforcement-learning', 'transformers-from-scratch', 'vit-from-scratch', 'writing-papers', 'deit-from-scratch', 'diffusion-lm-from-scratch', 'kimi-k3-from-scratch', 'modern-robot-learning', 'nanovlm-from-scratch', 'rlhf-from-scratch', 'sciml', 'transformers-vision-multimodal', 'vla-world-models', 'charlie-language-room', 'charlie-vision-room', 'charlie-sound-room', 'charlie-reasoning-room', 'harness-engineering', 'kernel-engineering', 'inference-engineering'];
+
+const BOOKS = [
+  { slug: 'ai-context-engineering', level: 'intermediate', lines: ['AI Context', 'Engineering'], meta: '43 capsules · 10 hours',
+    cap: '<b>Fig. 1.</b> A context window, cored; first token at the base. <b>a</b> the query; <b>b</b> conversation, two laminae a turn; <b>c</b> recalled memory; <b>d</b> retrieved documents; <b>e</b> tool definitions; <b>f</b> the system prompt.' },
+  { slug: 'mathematical-foundations-for-ml', level: 'beginner', lines: ['Mathematical', 'Foundations for', 'Machine Learning'], meta: '43 capsules · 10 hours',
+    cap: '<b>Fig. 1.</b> A loss surface, surveyed and sectioned, with two paths of steepest descent. <b>a</b> initial parameters; <b>b</b> the minimum; <b>c</b> one step along −∇L; <b>d</b> a local minimum, where the second path is caught.' },
+  { slug: 'neural-networks-from-scratch', level: 'beginner', lines: ['Neural Networks', 'from Scratch'], meta: '33 capsules · 7 hours',
+    cap: '<b>Fig. 1.</b> A single unit, dissected. <b>a</b> inputs; <b>b</b> weights, each bead sized to its magnitude; <b>c</b> bias; <b>d</b> the core, where the weighted sum is formed; <b>e</b> the shell of activation; <b>f</b> output.' },
+  { slug: 'build-llms-from-scratch', level: 'intermediate', lines: ['Build Large Language', 'Models (LLMs)', 'from Scratch'], size: 58, meta: '20 capsules · 6 hours',
+    cap: '<b>Fig. 1.</b> A decoder-only language model, raised as a column. <b>a</b> tokens; <b>b</b> the embedding; <b>c</b> a transformer block, one of N; <b>d</b> the residual stream on which they are threaded; <b>e</b> the output head; <b>f</b> the next-token distribution.' },
+  { slug: '5d-parallelism', level: 'advanced', lines: ['5D Parallelism for', 'Large Model Training'], size: 58, meta: '40 capsules · 9 hours',
+    cap: '<b>Fig. 1.</b> A device mesh of 2 × 2 × 2 × 2 × 2, projected out of five dimensions. From the nearest device, one rod along each axis: <b>a</b> data; <b>b</b> tensor; <b>c</b> pipeline; <b>d</b> sequence; <b>e</b> expert.' },
+  { slug: 'pi-vs-hermes-vs-codex', level: 'advanced', lines: ['Pi vs Hermes vs Codex'], size: 56, sub: 'Context Compaction and Memory', meta: '9 capsules · 1 hour',
+    cap: '<b>Fig. 1.</b> Three agents’ histories wound as one spiral, each older span sealed into a smaller chamber. <b>a</b> the live context; <b>b</b> a compaction; <b>c</b> the compacted past; <b>d</b> memory, the thread through it all.' },
+  { slug: 'decision-trees-from-scratch', level: 'beginner', lines: ['Build Decision Trees', 'from Scratch'], size: 60, meta: '23 capsules · 5 hours',
+    cap: '<b>Fig. 1.</b> A decision tree, pressed. <b>a</b> the root split; <b>b</b> a leaf of class A, pale; <b>c</b> a leaf of class B, dark. <b>Fig. 2.</b> The plane, partitioned by the same four splits.' },
+  { slug: 'transformers-from-scratch', level: 'intermediate', lines: ['Transformers'], sub: 'Theory, Intuition, and Building from Scratch', meta: '20 capsules · 5 hours',
+    cap: '<b>Fig. 1.</b> One causal attention head over nine tokens, each arch weighted by softmax(QK<sup>T</sup>/√d). <b>a</b> tokens; <b>b</b> the last query, in white; <b>c</b> the attention sink. <b>Fig. 2.</b> The weights as a matrix; <b>d</b> its diagonal.' },
+  { slug: 'harness-engineering', level: 'advanced', lines: ['Harness', 'Engineering'], sub: 'Build the layer that turns<br>a model into an agent.', soon: true,
+    cap: '<b>Fig. 1.</b> The harness, as an armillary. <b>a</b> the model; <b>b</b> the agent loop; <b>c</b> tools, mounted; <b>d</b> memory; <b>e</b> the horizon of the sandbox; <b>f</b> the frame of permissions that holds it all.' },
+];
+
+const LEVEL = { beginner: 1, intermediate: 2, advanced: 3 };
+const MARK = `<svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="8.7" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M5.3 5.6 L10 15.2 L14.7 5.6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="miter"/></svg>`;
+function levelGlyph(n) { // a micrograph scale bar; one, two or three bars filled
+  let s = '<svg width="52" height="9" viewBox="0 0 52 9">';
+  for (let i = 0; i < 3; i++) s += `<rect x="${0.75 + i * 17}" y="0.75" width="15.5" height="7.5" ${i < n ? 'fill="currentColor"' : 'fill="none"'} stroke="currentColor" stroke-width="1.5"/>`;
+  return s + '</svg>';
+}
+
+function build(b) {
+  const P = new Plate();
+  FIG[b.slug]?.(P);
+  const pl = toRoman(ORDER.indexOf(b.slug) + 1);
+  const el = document.createElement('div');
+  el.className = `cover ${b.level}`; el.dataset.slug = b.slug;
+  const lv = b.level[0].toUpperCase() + b.level.slice(1);
+  el.innerHTML = `
+    <svg class="art" viewBox="0 0 720 888" xmlns="http://www.w3.org/2000/svg"><g transform="translate(0 ${b.dy || 0})">${P}</g></svg>
+    <div class="head"><span>Plate ${pl}</span><span class="lv">${lv}${levelGlyph(LEVEL[b.level])}</span></div>
+    <h2 class="title" style="${b.size ? `font-size:${b.size}px` : ''}">${b.lines.map((l) => `<span class="l">${l}</span>`).join('')}${b.sub ? `<span class="sub">${b.sub}</span>` : ''}</h2>
+    <div class="rule" style="top:792px"></div>
+    <div class="legend" style="top:801px">${b.cap}</div>
+    <div class="foot"><span class="imprint">${MARK}<span>Vizuara Books</span></span><span class="meta">${b.soon ? 'In preparation' : (b.meta || '')}</span></div>`;
+  return el;
+}
+const root = document.getElementById('covers');
+BOOKS.forEach((b) => root.appendChild(build(b)));
+</script>
+</body>
+</html>

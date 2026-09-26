@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Overprint — a risograph cover system for Vizuara Books</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Direction 07 for Vizuara Books: every cover designed as a two- or three-drum risograph print, with overprinting spot inks, procedural halftones and controlled misregistration.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Instrument+Serif:ital@0;1&display=block" rel="stylesheet">
+<style>
+  :root {
+    --paper: #F4F0E6; --table: #E4DFD2; --ink: #232121; --federal: #3D5588; --pink: #FF48B0; --muted: #5c5750;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--table); color: var(--ink); }
+  body { font-family: 'Instrument Serif', serif; -webkit-font-smoothing: antialiased; }
+  .page { width: 1488px; margin: 0 auto; padding: 48px 0 120px; }
+  .mono { font-family: 'DM Mono', monospace; font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; }
+  .panel { display: block; box-shadow: 0 1px 0 rgba(0,0,0,.06), 0 18px 40px -24px rgba(40,30,10,.35); }
+  .panel svg { display: block; }
+
+  .intro { display: grid; grid-template-columns: 820px 1fr; gap: 72px; margin: 56px 0 40px; align-items: start; }
+  .lede { font-size: 33px; line-height: 1.22; margin: 0; letter-spacing: -0.005em; }
+  .lede em { font-style: italic; }
+  .rules { margin: 6px 0 0; padding: 0; list-style: none; counter-reset: r; }
+  .rules li { counter-increment: r; position: relative; padding: 0 0 16px 46px; margin: 0 0 16px; font-size: 21px; line-height: 1.3; border-bottom: 1.5px solid rgba(35,33,33,.16); }
+  .rules li::before { content: counter(r, decimal-leading-zero); position: absolute; left: 0; top: 4px; font-family: 'DM Mono', monospace; font-size: 13px; letter-spacing: .1em; color: var(--federal); }
+  .rules b { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 19px; letter-spacing: -0.005em; }
+
+  h2.sec { display: flex; align-items: baseline; gap: 18px; margin: 88px 0 26px; padding-top: 18px; border-top: 3px solid var(--ink);
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 44px; letter-spacing: -0.02em; font-variation-settings: 'opsz' 72, 'wdth' 88; }
+  h2.sec .mono { font-weight: 500; font-size: 13px; color: var(--muted); margin-left: auto; }
+  .sub { font-size: 23px; line-height: 1.3; max-width: 980px; margin: -8px 0 30px; color: #3a3632; }
+
+  .type { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin-top: 30px; }
+  .type div { border-top: 1.5px solid rgba(35,33,33,.25); padding-top: 12px; }
+  .type .s1 { font-family: 'Bricolage Grotesque'; font-weight: 800; font-size: 58px; line-height: .95; letter-spacing: -0.02em; font-variation-settings: 'opsz' 96, 'wdth' 86; }
+  .type .s2 { font-family: 'Instrument Serif'; font-style: italic; font-size: 52px; line-height: 1; }
+  .type .s3 { font-family: 'DM Mono'; font-weight: 500; font-size: 22px; line-height: 1.5; letter-spacing: 0.1em; }
+  .type p { font-size: 19px; line-height: 1.3; margin: 12px 0 0; color: #3a3632; }
+
+  .shelf { display: grid; grid-template-columns: repeat(7, 180px); justify-content: space-between; row-gap: 30px; padding: 44px 44px 40px; background: #D9D3C4; }
+  .shelf .t { width: 180px; }
+  .shelf .t svg { display: block; width: 180px; height: 222px; box-shadow: 0 1px 2px rgba(0,0,0,.18), 0 8px 18px -10px rgba(40,30,10,.5); }
+  .shelf .t span { display: block; margin-top: 9px; font-family: 'DM Mono', monospace; font-size: 10.5px; letter-spacing: .08em; color: #4a453f; text-transform: uppercase; line-height: 1.35; }
+
+  .covers { display: grid; grid-template-columns: 720px 720px; column-gap: 48px; row-gap: 64px; }
+  figure { margin: 0; }
+  .cover { width: 720px; height: 888px; position: relative; overflow: hidden; background: var(--paper);
+    box-shadow: 0 1px 0 rgba(0,0,0,.08), 0 24px 44px -26px rgba(40,30,10,.55); }
+  .cover svg { display: block; }
+  figcaption { display: grid; grid-template-columns: 260px 1fr; gap: 24px; margin-top: 20px; }
+  figcaption .ft { font-family: 'Bricolage Grotesque'; font-weight: 700; font-size: 19px; line-height: 1.15; letter-spacing: -0.005em; }
+  figcaption .fm { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #5c5750; margin-top: 8px; line-height: 1.5; }
+  figcaption .fn { font-size: 19px; line-height: 1.3; color: #33302c; }
+  .fm i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; mix-blend-mode: multiply; }
+
+  .wrap { display: flex; width: 1488px; height: 888px; box-shadow: 0 24px 44px -26px rgba(40,30,10,.55); }
+  .wrap > div { flex: none; }
+  .wrap svg { display: block; }
+  .wrapnote { display: flex; justify-content: space-between; margin-top: 14px; color: #5c5750; }
+
+  .foot { margin-top: 90px; padding-top: 16px; border-top: 1.5px solid rgba(35,33,33,.25); display: flex; justify-content: space-between; color: #5c5750; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="panel" id="hero"></div>
+
+  <section class="intro">
+    <p class="lede">Every Vizuara book is designed as if it had been pulled off a risograph: natural uncoated paper, two or three spot inks that <em>overprint</em> one another, halftone screens, and the slight misregistration of drums that never quite line up. The system is strict — one title face, one grid, the imprint always bottom-left, the level always carried by the key ink — and all the freedom lives in the emblem, which is always the book’s own mechanism drawn in ink. Where the inks cross is usually where the idea is: the overprint <em>is</em> the dot product, the inner join, the part of the context the model actually sees.</p>
+    <ol class="rules">
+      <li><b>Paper + drums.</b> Every cover is one sheet of natural stock and 2–3 spot inks, printed in multiply. No gradients, no images: tone only comes from halftone dots and line screens.</li>
+      <li><b>Key ink = level.</b> Title, text and line-work print in one key ink, coded like a ski run: green circle, blue square, black diamond.</li>
+      <li><b>Flash ink + emblem = subject.</b> One or two bright inks per book, and one bold figure derived from what the book actually teaches.</li>
+      <li><b>Fixed chrome.</b> Level and length top; title top-left; the V press-mark bottom-left; the inks the cover is printed in, bottom-right.</li>
+      <li><b>Special states.</b> Forthcoming titles print as press proofs. Series share a building, a series ink and a numbered door.</li>
+    </ol>
+  </section>
+
+  <div class="panel" id="inks"></div>
+
+  <div class="type">
+    <div><div class="s1">Bricolage Grotesque</div><p>ExtraBold, optical size 96, width 82–92 fitted per title. Its ink traps were drawn for exactly this: ink that spreads.</p></div>
+    <div><div class="s2">Instrument Serif</div><p>Italic for kickers, title continuations, maths and room numbers — the human voice against the grotesque.</p></div>
+    <div><div class="s3">DM MONO 12.5</div><p>Slug lines, labels, the ink colophon. The job-ticket layer of the cover.</p></div>
+  </div>
+
+  <h2 class="sec">The shelf at 180 px <span class="mono">Web library thumbnail size — unscaled renders are below</span></h2>
+  <div class="shelf" id="shelf"></div>
+
+  <h2 class="sec">Core set <span class="mono">Six books</span></h2>
+  <div class="covers" id="core"></div>
+
+  <h2 class="sec">Charlie and the Intelligence Factory <span class="mono">A sub-series of four</span></h2>
+  <p class="sub">One building for the whole series, printed in Sunflower — a golden-ticket ink. Each book opens a numbered door; the room behind it is printed in that room’s own ink and holds the room’s subject.</p>
+  <div class="covers" id="series"></div>
+
+  <h2 class="sec">Range <span class="mono">Forthcoming · very long title · very short title</span></h2>
+  <div class="covers" id="range"></div>
+
+  <h2 class="sec">Print wrap <span class="mono">Back · spine · front — 15.5 × 9.25 in</span></h2>
+  <div id="wrap"></div>
+  <div class="wrapnote mono"><span>Back cover</span><span>Spine 0.5 in</span><span>Front cover</span></div>
+
+  <div class="foot mono"><span>Overprint · Direction 07 · Vizuara Books cover system</span><span>All art is vector SVG generated in code — no raster images</span></div>
+</div>
+<!--SCRIPTS-->
+</body>
+</html>

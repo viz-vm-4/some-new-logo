@@ -1,0 +1,685 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Figure 0 — Vizuara Books</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#EEEDE7; --signal:#D8372B; --carbon:#141518;
+  --serif:'Newsreader', Georgia, serif; --mono:'IBM Plex Mono', ui-monospace, monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:#DCDBD5;color:var(--carbon)}
+body{font-family:var(--serif)}
+.wall{display:flex;flex-wrap:wrap;gap:48px;padding:0 64px}
+
+/* ---------- the cover system ---------- */
+.cover,.front{position:relative;width:720px;height:888px;overflow:hidden;background:var(--ground);color:var(--ink);flex:none}
+.beginner{--ground:var(--paper);--ink:var(--carbon);--ink2:#96968F;--sig:var(--signal)}
+.intermediate{--ground:var(--signal);--ink:var(--carbon);--ink2:#9C2A21;--sig:#F4F2EB}
+.advanced{--ground:var(--carbon);--ink:#ECEAE3;--ink2:#5E5F63;--sig:#EF4031}
+svg.plate{position:absolute;left:0;top:0;width:720px;height:888px;display:block}
+.plate .k{stroke:var(--ink);fill:none}
+.plate .k2{stroke:var(--ink2);fill:none}
+.plate .r{stroke:var(--sig);fill:none}
+.plate .fk{fill:var(--ink);stroke:none}
+.plate .fk2{fill:var(--ink2);stroke:none}
+.plate .fr{fill:var(--sig);stroke:none}
+.plate .ring{fill:var(--ground);stroke:var(--ink)}
+.plate text{font-family:var(--mono);fill:var(--ink)}
+.plate text.acc{fill:var(--sig)}
+
+.meta{position:absolute;left:40px;right:40px;top:34px;display:flex;justify-content:space-between;
+  font:500 11px/1 var(--mono);letter-spacing:.09em;text-transform:uppercase}
+.lvl{display:flex;align-items:center;gap:10px}
+.lvl i{display:inline-block;width:9px;height:9px;border:1.2px solid currentColor;margin-right:3px}
+.lvl i.on{background:currentColor}
+.cover h1,.front h1{position:absolute;left:38px;right:40px;top:76px;margin:0;font-family:var(--serif);font-weight:500;
+  font-variation-settings:'opsz' 72;letter-spacing:-.018em;line-height:.98}
+h1 .pre{display:block;font-style:italic;font-weight:400;letter-spacing:-.01em;margin-bottom:.06em}
+h1 .sub{display:block;font-style:italic;font-weight:400;letter-spacing:-.005em;margin-top:16px;line-height:1.14}
+.cap{position:absolute;left:40px;bottom:32px;width:486px;font:400 10px/1.45 var(--mono);letter-spacing:.005em}
+.cap b{font-weight:600;letter-spacing:.06em;margin-right:.6em}
+.imp{position:absolute;right:40px;bottom:32px;display:flex;align-items:center;gap:9px;
+  font:600 19px/1 var(--serif);font-variation-settings:'opsz' 36;letter-spacing:.005em}
+.imp svg{width:20px;height:20px;display:block}
+
+/* ---------- presentation ---------- */
+.intro{padding:72px 64px 40px;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:40px 72px;max-width:1640px}
+.kicker{grid-column:1/-1;font:500 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;display:flex;gap:18px;align-items:center}
+.kicker svg{width:22px;height:22px;--sig:var(--signal)}
+.dir{font:500 148px/.9 var(--serif);font-variation-settings:'opsz' 72;letter-spacing:-.03em;margin:0}
+.dir small{display:block;font:italic 400 34px/1.15 var(--serif);letter-spacing:-.01em;margin-top:22px;max-width:15em}
+.lede{font:400 19px/1.5 var(--serif);font-variation-settings:'opsz' 16;margin:0 0 18px;max-width:34em}
+.lede em{font-style:italic}
+.spec{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:26px}
+.sw{border-radius:2px;padding:14px 14px 12px;min-height:150px;display:flex;flex-direction:column;justify-content:space-between;font:500 10.5px/1.4 var(--mono);letter-spacing:.04em}
+.sw b{font:500 24px/1 var(--serif);letter-spacing:-.01em;display:block;margin-bottom:6px}
+.sw .lvl{font:500 10px/1 var(--mono);letter-spacing:.09em;text-transform:uppercase}
+.specrow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px;margin-top:30px;font:400 15px/1.45 var(--serif)}
+.specrow h3{font:600 10.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;margin:0 0 10px}
+.specrow .t1{font:500 44px/1 var(--serif);font-variation-settings:'opsz' 72;letter-spacing:-.02em}
+.specrow .t2{font:400 13px/1.5 var(--mono)}
+.sec{padding:72px 64px 28px;display:flex;align-items:baseline;gap:24px;max-width:1640px}
+.sec h2{font:500 40px/1 var(--serif);font-variation-settings:'opsz' 72;letter-spacing:-.02em;margin:0}
+.sec p{font:400 12px/1.5 var(--mono);margin:0;max-width:62em}
+.wrapbox{padding:0 64px 96px;overflow-x:auto}
+.wrap{position:relative;width:1512px;height:888px;display:flex;flex:none}
+.wrap .back{position:relative;width:720px;height:888px;background:var(--ground);color:var(--ink);overflow:hidden}
+.wrap .spine{position:relative;width:72px;height:888px;background:var(--ground);color:var(--ink);border-left:1px dashed rgba(20,21,24,.18);border-right:1px dashed rgba(20,21,24,.18)}
+.spine .st{position:absolute;left:50%;top:44px;transform-origin:0 0;transform:rotate(90deg) translateY(-50%);white-space:nowrap;
+  font:500 25px/1 var(--serif);font-variation-settings:'opsz' 36;letter-spacing:-.005em;display:flex;gap:22px;align-items:baseline}
+.spine .st i{font:500 10px/1 var(--mono);font-style:normal;letter-spacing:.1em;text-transform:uppercase}
+.spine .sm{position:absolute;left:0;right:0;bottom:36px;display:flex;flex-direction:column;align-items:center;gap:14px}
+.spine .sm svg{width:24px;height:24px}
+.spine .lv{display:flex;flex-direction:column;gap:3px}
+.spine .lv i{display:block;width:9px;height:9px;border:1.2px solid currentColor}
+.spine .lv i.on{background:currentColor}
+.back .bk{position:absolute;left:48px;right:48px;top:56px}
+.back .bk h4{font:500 34px/1.05 var(--serif);font-variation-settings:'opsz' 60;letter-spacing:-.015em;margin:0 0 16px}
+.back .bk p{font:400 15px/1.5 var(--serif);font-variation-settings:'opsz' 14;margin:0 0 12px;max-width:33em}
+.back pre{position:absolute;left:48px;right:48px;top:292px;margin:0;font:400 8.6px/1.42 var(--mono);white-space:pre-wrap;word-break:break-all;opacity:.86}
+.back .bar{position:absolute;right:48px;bottom:40px;width:170px;height:92px;background:#fff;border:1px solid var(--ink);display:flex;align-items:flex-end;justify-content:center;font:500 9px/1 var(--mono);letter-spacing:.12em;padding-bottom:8px;color:var(--carbon)}
+.back .bi{position:absolute;left:48px;bottom:40px;font:600 19px/1 var(--serif);display:flex;align-items:center;gap:9px}
+.back .bi svg{width:20px;height:20px}
+.foot{padding:24px 64px 80px;font:400 11px/1.5 var(--mono);max-width:1100px}
+</style>
+</head>
+<body>
+
+<header class="intro">
+  <div class="kicker"><span id="kmark"></span><span>Vizuara Books — cover system proposal 05 — algorithmic</span></div>
+  <div>
+    <h1 class="dir">Figure&nbsp;0<small>Every cover is one run of the book’s own algorithm.</small></h1>
+  </div>
+  <div>
+    <p class="lede">A technical book’s cover should be evidence, not decoration. In <em>Figure 0</em> each plate is computed in the page, at print time, by the subject of the book itself: gradient descent draws the maths book, a network trained right here draws <em>Neural Networks</em>, a pipeline schedule draws <em>5D Parallelism</em>, an agent session run through three compaction policies draws <em>Pi vs Hermes vs Codex</em>.</p>
+    <p class="lede">The caption is always “Fig. 0” and says exactly what ran, with every number read back from the run — so the cover is the book’s first worked example. Everything around it stays quiet: one serif for the title, one mono for data, three grounds for three levels, and one signal colour that always marks the answer.</p>
+    <div class="spec">
+      <div class="sw beginner" style="background:var(--ground);color:var(--ink)"><div><b>Paper</b>#EEEDE7</div><span class="lvl"><span><i class="on"></i><i></i><i></i></span>Beginner ground</span></div>
+      <div class="sw intermediate" style="background:var(--ground);color:var(--ink)"><div><b>Signal</b>#D8372B</div><span class="lvl"><span><i class="on"></i><i class="on"></i><i></i></span>Intermediate ground</span></div>
+      <div class="sw advanced" style="background:var(--ground);color:var(--ink)"><div><b>Carbon</b>#141518</div><span class="lvl"><span><i class="on"></i><i class="on"></i><i class="on"></i></span>Advanced ground</span></div>
+    </div>
+    <div class="specrow">
+      <div><h3>Level is depth</h3>The same three colours, rotated: the deeper the book, the darker the plate. The accent is whichever colour the ground is not, and it only ever marks the result — the minimum, the boundary, the shock. Three squares top-left repeat the level for greyscale print.</div>
+      <div><h3>Type</h3><div class="t1">Newsreader</div><div class="t2">IBM Plex Mono — captions, level, capsules</div><p style="margin:10px 0 0">The mark is a valley: a V for Vizuara drawn as a loss curve, with its minimum found.</p></div>
+    </div>
+  </div>
+</header>
+
+<div class="sec"><h2>The core six</h2><p>Plates are SVG, generated deterministically from a seed hashed from each slug — reload and you get the same cover; change the algorithm and the cover changes with it.</p></div>
+<div class="wall" id="core"></div>
+<div class="sec"><h2>Range</h2><p>A beginner title, an advanced one with a long parenthetical, and a forthcoming book that has a subtitle but no capsule count yet.</p></div>
+<div class="wall" id="range"></div>
+<div class="sec"><h2>Sub-series — Charlie and the Intelligence Factory</h2><p>The four rooms trade the full-bleed field for a square “room” plate and an italic lead-in; the room number rides the top line. Each room computes its own subject.</p></div>
+<div class="wall" id="series"></div>
+<div class="sec"><h2>Print wrap</h2><p>Back, spine and front at trim for Mathematical Foundations. The back cover prints the exact function that drew the front.</p></div>
+<div class="wrapbox" id="wrapbox"></div>
+<div class="foot" id="foot"></div>
+
+<script>
+/* =========================================================================
+   FIGURE 0 — every cover is one deterministic run of its book's subject.
+   Nothing here is drawn by hand: each plate is computed on page load,
+   from a seed derived from the book's slug. Same seed, same cover.
+   ========================================================================= */
+'use strict';
+
+/* ---------- seeded randomness & tiny utilities ---------- */
+const hash = (s) => { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
+const RNG = (seed) => { let a = seed >>> 0; return () => { a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; };
+const Gauss = (r) => () => { let u = 0; while (!u) u = r(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * r()); };
+const f1 = (n) => Math.round(n * 10) / 10;
+const fmt = (n) => n.toLocaleString('en-US');
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const D = (pts) => { let s = ''; for (let i = 0; i < pts.length; i++) s += (i ? 'L' : 'M') + f1(pts[i][0]) + ' ' + f1(pts[i][1]); return s; };
+const seg = (x0, y0, x1, y1) => `M${f1(x0)} ${f1(y0)}L${f1(x1)} ${f1(y1)}`;
+const box = (x, y, w, h) => `M${f1(x)} ${f1(y)}h${f1(w)}v${f1(h)}h${f1(-w)}z`;
+const path = (d, cls, w, extra = '') => d ? `<path class="${cls}" d="${d}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" ${extra}/>` : '';
+const unit = (v) => { let n = 0; for (const x of v) n += x * x; n = Math.sqrt(n) || 1; return v.map((x) => x / n); };
+const dot = (a, b) => { let s = 0; for (let i = 0; i < a.length; i++) s += a[i] * b[i]; return s; };
+
+/* the plate: the figure's field, identical on every cover of the main list */
+const P = { x: 0, y: 306, w: 720, h: 484 };
+/* the "room": a square plate used only by the Charlie sub-series */
+const Q = { x: 132, y: 318, w: 456, h: 456 };
+
+/* marching squares -> joined polylines. F: Float64Array (nx*ny), X(i), Y(j) map grid -> page */
+function contours(F, nx, ny, level, X, Y) {
+  const adj = new Map(), pos = new Map();
+  const key = (t, i, j) => t + i * 4 + j * 65536;
+  const edgePt = (t, i, j) => {
+    const k = key(t, i, j); if (pos.has(k)) return k;
+    const a = F[j * nx + i], b = t === 0 ? F[j * nx + i + 1] : F[(j + 1) * nx + i], u = (level - a) / (b - a);
+    pos.set(k, t === 0 ? [X(i + u), Y(j)] : [X(i), Y(j + u)]); return k;
+  };
+  const link = (p, q) => { (adj.get(p) || adj.set(p, []).get(p)).push(q); (adj.get(q) || adj.set(q, []).get(q)).push(p); };
+  for (let j = 0; j < ny - 1; j++) for (let i = 0; i < nx - 1; i++) {
+    const v00 = F[j * nx + i], v10 = F[j * nx + i + 1], v11 = F[(j + 1) * nx + i + 1], v01 = F[(j + 1) * nx + i];
+    const c = (v00 > level) | (v10 > level) << 1 | (v11 > level) << 2 | (v01 > level) << 3;
+    if (c === 0 || c === 15) continue;
+    const e0 = () => edgePt(0, i, j), e2 = () => edgePt(0, i, j + 1), e3 = () => edgePt(1, i, j), e1 = () => edgePt(1, i + 1, j);
+    const mid = (v00 + v10 + v11 + v01) / 4 > level;
+    switch (c) {
+      case 1: case 14: link(e3(), e0()); break;
+      case 2: case 13: link(e0(), e1()); break;
+      case 3: case 12: link(e3(), e1()); break;
+      case 4: case 11: link(e1(), e2()); break;
+      case 6: case 9: link(e0(), e2()); break;
+      case 7: case 8: link(e3(), e2()); break;
+      case 5: if (mid) { link(e3(), e2()); link(e0(), e1()); } else { link(e3(), e0()); link(e1(), e2()); } break;
+      case 10: if (mid) { link(e0(), e3()); link(e1(), e2()); } else { link(e0(), e1()); link(e3(), e2()); } break;
+    }
+  }
+  const seen = new Set(), lines = [];
+  const walk = (start) => {
+    const line = [pos.get(start)]; seen.add(start); let cur = start, prev = -1;
+    for (;;) {
+      const nb = adj.get(cur) || [], n = nb.find((q) => q !== prev && !seen.has(q));
+      if (n === undefined) { if (line.length > 2 && nb.includes(start) && prev !== start) line.push(pos.get(start)); break; }
+      seen.add(n); line.push(pos.get(n)); prev = cur; cur = n;
+    }
+    return line;
+  };
+  for (const [k, v] of adj) if (v.length === 1 && !seen.has(k)) lines.push(walk(k));
+  for (const k of adj.keys()) if (!seen.has(k)) lines.push(walk(k));
+  return lines;
+}
+
+/* the Vizuara mark: a valley, and the minimum found at the bottom of it */
+const MARK = (sz = 20) => `<svg viewBox="0 0 20 20" width="${sz}" height="${sz}" aria-hidden="true">
+  <path d="M2.2 3.2 C4.6 3.4 7.2 15.6 10 15.6 C12.8 15.6 15.4 3.4 17.8 3.2" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/>
+  <circle cx="10" cy="15.6" r="2.35" fill="var(--sig)"/></svg>`;
+
+/* every title in the library — the corpus for the two language covers */
+const TITLES = ["AI Context Engineering", "Mathematical Foundations for Machine Learning", "Neural Networks from Scratch", "Build Large Language Models (LLMs) from Scratch", "5D Parallelism for Large Model Training", "Pi vs Hermes vs Codex: Context Compaction and Memory", "DeepSeek Harness", "How to Host Kimi K3", "Machine Learning Fundamentals", "Pretraining a Mini Kimi K3", "Prompt Engineering", "Python for Data Science", "RAG in Production", "Build Decision Trees from Scratch", "Deep Learning Fundamentals", "Foundations for AI & ML", "Generative AI Fundamentals", "Git & GitHub Masterclass", "The Modern Software Developer", "R Masterclass", "SQL Masterclass", "AI Agents Bootcamp", "Claude Certified Architect (CCAF)", "Convolutional Neural Networks Fundamentals", "Computer Vision Bootcamp", "Data Structures & Algorithms in Python", "LLM Finetuning", "LLM Production & Deployment", "Memory in AI Systems", "Build a Mini ClawdBot from Scratch", "Machine Learning & Deep Learning Mastery", "NLP & Computer Vision Mastery", "Reinforcement Learning", "Transformers: Theory, Intuition, and Building from Scratch", "Build a Vision Transformer (ViT) from Scratch", "Writing Journal & Conference Papers", "Build a Data-Efficient Image Transformer (DeiT) from Scratch", "Build a Diffusion Language Model from Scratch", "Build Kimi K3 from Scratch", "Modern Robot Learning", "Build a NanoVLM from Scratch", "RLHF from Scratch", "Scientific Machine Learning (SciML)", "Transformers for Vision & Multimodal LLMs", "Vision-Language-Action & World Models for Robotics", "Charlie and the Language Room", "Charlie and the Vision Room", "Charlie and the Sound Room", "Charlie and the Reasoning Room", "Harness Engineering", "Kernel Engineering", "Inference Engineering"];
+
+/* =========================================================================
+   GENERATORS — one per book: (rng, book, accentName) -> { svg, caption }.
+   Every number in a caption is read back from the computation that drew it.
+   ========================================================================= */
+const GEN = {};
+
+/* ---- Mathematical Foundations: gradient descent on Himmelblau's function ---- */
+GEN['mathematical-foundations-for-ml'] = (r, b, acc) => {
+  const grad = (x, y) => { const a = x * x + y - 11, c = x + y * y - 7; return [4 * x * a + 2 * c, 2 * a + 4 * y * c]; };
+  const s = 54, cx = P.x + P.w / 2 + 8, cy = P.y + P.h / 2 + 10, toS = (x, y) => [cx + x * s, cy - y * s];
+  const x0 = (P.x - cx) / s - 0.2, x1 = (P.x + P.w - cx) / s + 0.2, y1 = (cy - P.y) / s + 0.1, y0 = (cy - P.y - P.h) / s - 0.1;
+  const eta = 0.0006, NX = 46, NY = 32; let trails = '', steps = 0; const ends = [];
+  for (let j = 0; j < NY; j++) for (let i = 0; i < NX; i++) {
+    let x = x0 + (i + 0.15 + 0.7 * r()) * (x1 - x0) / NX, y = y0 + (j + 0.15 + 0.7 * r()) * (y1 - y0) / NY;
+    const pts = [toS(x, y)];
+    for (let k = 0; k < 3000; k++) {
+      const [gx, gy] = grad(x, y); x -= eta * gx; y -= eta * gy; steps++;
+      const p = toS(x, y), q = pts[pts.length - 1];
+      if (Math.hypot(p[0] - q[0], p[1] - q[1]) > 0.8) pts.push(p);
+      if (Math.hypot(gx, gy) < 0.02) break;
+    }
+    trails += D(pts);
+    if (!ends.some((e) => Math.hypot(e[0] - x, e[1] - y) < 0.05)) ends.push([x, y]);
+  }
+  let mins = ''; for (const [x, y] of ends) { const [px, py] = toS(x, y); mins += `<circle class="fr" cx="${f1(px)}" cy="${f1(py)}" r="6"/>`; }
+  return {
+    svg: path(trails, 'k', 0.7, 'opacity=".74"') + mins,
+    caption: `Gradient descent (η = ${eta}) from ${fmt(NX * NY)} starting points on Himmelblau’s function, f(x,y) = (x²+y−11)² + (x+y²−7)². ${fmt(steps)} steps in all; every path ends in one of its ${ends.length} minima, in ${acc}.`
+  };
+};
+
+/* ---- Neural Networks from Scratch: a 2–16–16–1 net trained in-page on two spirals ---- */
+GEN['neural-networks-from-scratch'] = (r, b, acc) => {
+  const g = Gauss(r), N = 96, M = 2 * N, X0 = new Float64Array(M), X1 = new Float64Array(M), Yd = new Uint8Array(M);
+  for (let c = 0; c < 2; c++) for (let k = 0; k < N; k++) { const tn = 0.1 + 0.9 * k / (N - 1), t = tn * 3 * Math.PI, n = c * N + k; X0[n] = tn * Math.cos(t + c * Math.PI) + g() * 0.018; X1[n] = tn * Math.sin(t + c * Math.PI) + g() * 0.018; Yd[n] = c; }
+  const H = 16, E = 700, LR = 0.02, WD = 2e-4;
+  const W1 = new Float64Array(H * 2), b1 = new Float64Array(H), W2 = new Float64Array(H * H), b2 = new Float64Array(H), w3 = new Float64Array(H), b3 = new Float64Array(1);
+  for (let i = 0; i < H * 2; i++) W1[i] = g() * 2; for (let i = 0; i < H * H; i++) W2[i] = g() / Math.sqrt(H); for (let i = 0; i < H; i++) w3[i] = g() / Math.sqrt(H);
+  const ps = [W1, b1, W2, b2, w3, b3], gs = ps.map((p) => new Float64Array(p.length)), ms = ps.map((p) => new Float64Array(p.length)), vs = ps.map((p) => new Float64Array(p.length));
+  const [gW1, gb1, gW2, gb2, gw3, gb3] = gs;
+  const a1 = new Float64Array(H), a2 = new Float64Array(H), d1 = new Float64Array(H), d2 = new Float64Array(H);
+  const fwd = (x0, x1) => { for (let i = 0; i < H; i++) a1[i] = Math.tanh(W1[2 * i] * x0 + W1[2 * i + 1] * x1 + b1[i]); for (let i = 0; i < H; i++) { let s = b2[i]; for (let j = 0; j < H; j++) s += W2[i * H + j] * a1[j]; a2[i] = Math.tanh(s); } let z = b3[0]; for (let i = 0; i < H; i++) z += w3[i] * a2[i]; return z; };
+  let right = 0;
+  for (let ep = 1; ep <= E; ep++) {
+    for (const a of gs) a.fill(0); right = 0;
+    for (let n = 0; n < M; n++) {
+      const x0 = X0[n], x1 = X1[n], z = fwd(x0, x1), p = 1 / (1 + Math.exp(-z)), y = Yd[n];
+      if ((p > 0.5) === (y === 1)) right++;
+      const dz = (p - y) / M; gb3[0] += dz;
+      for (let i = 0; i < H; i++) { gw3[i] += dz * a2[i]; d2[i] = dz * w3[i] * (1 - a2[i] * a2[i]); gb2[i] += d2[i]; }
+      for (let j = 0; j < H; j++) { let s = 0; for (let i = 0; i < H; i++) { gW2[i * H + j] += d2[i] * a1[j]; s += W2[i * H + j] * d2[i]; } d1[j] = s * (1 - a1[j] * a1[j]); gb1[j] += d1[j]; gW1[2 * j] += d1[j] * x0; gW1[2 * j + 1] += d1[j] * x1; }
+    }
+    const c1 = 1 - 0.9 ** ep, c2 = 1 - 0.999 ** ep;
+    for (let k = 0; k < ps.length; k++) { const p = ps[k], gg = gs[k], m = ms[k], v = vs[k]; for (let i = 0; i < p.length; i++) { const gr = gg[i] + WD * p[i]; m[i] = 0.9 * m[i] + 0.1 * gr; v[i] = 0.999 * v[i] + 0.001 * gr * gr; p[i] -= LR * (m[i] / c1) / (Math.sqrt(v[i] / c2) + 1e-8); } }
+  }
+  // the image: the trained network's own output (logit) over its input plane
+  const s = 212, cx = P.x + P.w / 2, cy = P.y + P.h / 2, nx = 241, ny = 163, F = new Float64Array(nx * ny);
+  for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) F[j * nx + i] = fwd((P.x + P.w * i / (nx - 1) - cx) / s, -(P.y + P.h * j / (ny - 1) - cy) / s);
+  const X = (i) => P.x + P.w * i / (nx - 1), Y = (j) => P.y + P.h * j / (ny - 1);
+  let lo = Infinity, hi = -Infinity; for (const v of F) { lo = Math.min(lo, v); hi = Math.max(hi, v); }
+  let con = '', bnd = '', nLev = 0; const stepL = 1.1;
+  for (let L = Math.ceil(lo / stepL) * stepL; L < hi; L += stepL) { if (Math.abs(L) < 1e-9) continue; nLev++; for (const ln of contours(F, nx, ny, L, X, Y)) con += D(ln); }
+  for (const ln of contours(F, nx, ny, 0, X, Y)) bnd += D(ln);
+  let dots = '';
+  for (let n = 0; n < M; n++) { const px = cx + X0[n] * s, py = cy - X1[n] * s; dots += Yd[n] ? `<circle class="fk" cx="${f1(px)}" cy="${f1(py)}" r="2.7"/>` : `<circle class="ring" cx="${f1(px)}" cy="${f1(py)}" r="2.4" stroke-width="1.1"/>`; }
+  return {
+    svg: path(con, 'k', 0.75, 'opacity=".66"') + path(bnd, 'r', 2.4) + dots,
+    caption: `A 2–16–16–1 tanh network trained in this page — ${E} steps of Adam on ${M} points of two interleaved spirals. The lines are its output, ${nLev} levels of it; ${acc} is the decision boundary it learned (training accuracy ${(100 * right / M).toFixed(0)}%).`
+  };
+};
+
+/* ---- AI Context Engineering: retrieve, select by MMR, and lay out an 8k window ---- */
+GEN['ai-context-engineering'] = (r, b, acc) => {
+  const g = Gauss(r), dim = 48, K = 9, N = 1100, budget = 8192, lam = 0.7;
+  const cents = Array.from({ length: K }, () => unit(Array.from({ length: dim }, g))), wts = cents.map(() => 0.3 + r()), wsum = wts.reduce((a, c) => a + c, 0);
+  const E = [], L = [];
+  for (let n = 0; n < N; n++) {
+    let u = r() * wsum, k = 0; while (u > wts[k]) { u -= wts[k]; k++; }
+    const sp = 0.55 + 0.55 * r(); E.push(unit(cents[k].map((c) => c + sp * g() / Math.sqrt(dim))));
+    L.push(Math.round(clamp(Math.exp(Math.log(360) + 0.6 * g()), 60, 2000)));
+  }
+  const q = unit(cents[0].map((c, d) => c + 0.7 * cents[1][d] + 0.3 * g() / Math.sqrt(dim))), rel = E.map((e) => dot(e, q));
+  // selection: maximal marginal relevance under the token budget
+  const S = [], inS = new Uint8Array(N), maxSim = new Float64Array(N); let used = 0;
+  for (;;) {
+    let best = -1, bs = -Infinity;
+    for (let c = 0; c < N; c++) { if (inS[c] || used + L[c] > budget) continue; const sc = lam * rel[c] - (1 - lam) * (S.length ? maxSim[c] : 0); if (sc > bs) { bs = sc; best = c; } }
+    if (best < 0) break; S.push(best); inS[best] = 1; used += L[best];
+    for (let c = 0; c < N; c++) maxSim[c] = Math.max(maxSim[c], dot(E[c], E[best]));
+  }
+  // flatten the 48-d space to 2-D for the picture: PCA by power iteration
+  const mean = new Array(dim).fill(0); for (const e of E) for (let d = 0; d < dim; d++) mean[d] += e[d] / N;
+  const cen = (v) => v.map((x, d) => x - mean[d]), Xc = E.map(cen), cov = Array.from({ length: dim }, () => new Float64Array(dim));
+  for (const x of Xc) for (let i = 0; i < dim; i++) { const xi = x[i], row = cov[i]; for (let j = 0; j < dim; j++) row[j] += xi * x[j]; }
+  const eig = (defl) => { let v = unit(Array.from({ length: dim }, g)); for (let it = 0; it < 120; it++) { let w = cov.map((row) => dot(row, v)); for (const u of defl) { const c = dot(w, u); w = w.map((x, d) => x - c * u[d]); } v = unit(w); } return v; };
+  const v1 = eig([]), v2 = eig([v1]), pr = Xc.map((x) => [dot(x, v1), dot(x, v2)]), qp = [dot(cen(q), v1), dot(cen(q), v2)];
+  const xs = pr.map((p) => p[0]), ys = pr.map((p) => p[1]), [ax, bx, ay, by] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
+  const sx0 = 44, sx1 = 676, sy0 = P.y + 16, sy1 = P.y + P.h - 196;
+  const M2 = ([u, v]) => [sx0 + (u - ax) / (bx - ax) * (sx1 - sx0), sy0 + (v - ay) / (by - ay) * (sy1 - sy0)];
+  // the window: most relevant chunks at both ends (where long-context models recall best)
+  const sel = S.slice().sort((a, c) => rel[c] - rel[a]), front = [], back = []; sel.forEach((c, i) => (i % 2 ? back : front).push(c));
+  const ord = front.concat(back.reverse()), bx0 = 36, bw = 648, byy = P.y + P.h - 30, bh = 16; let a0 = 0; const slot = new Map();
+  for (const c of ord) { slot.set(c, [bx0 + bw * a0 / budget, bw * L[c] / budget]); a0 += L[c]; }
+  let dots = '', threads = '', chosen = '', segs = '';
+  for (let c = 0; c < N; c++) { if (inS[c]) continue; const [x, y] = M2(pr[c]), rr = 0.8 + 2.1 * clamp(rel[c], 0, 1) ** 3; dots += `M${f1(x - rr)} ${f1(y)}a${f1(rr)} ${f1(rr)} 0 1 0 ${f1(2 * rr)} 0a${f1(rr)} ${f1(rr)} 0 1 0 ${f1(-2 * rr)} 0`; }
+  for (const c of S) { const [x, y] = M2(pr[c]), [sa, sw] = slot.get(c), tx = sa + sw / 2, h = byy - y; threads += `M${f1(x)} ${f1(y)}C${f1(x)} ${f1(y + h * 0.55)} ${f1(tx)} ${f1(byy - h * 0.4)} ${f1(tx)} ${f1(byy)}`; chosen += `<circle class="fr" cx="${f1(x)}" cy="${f1(y)}" r="3.4"/>`; segs += box(sa + 1, byy, sw - 2, bh); }
+  const [qx, qy] = M2(qp);
+  return {
+    svg: `<path class="fk" d="${dots}"/>` + path(threads, 'k', 0.9) + `<path class="fr" d="${segs}"/>` + path(box(bx0, byy, bw, bh), 'k', 1) + chosen +
+      `<circle class="ring" cx="${f1(qx)}" cy="${f1(qy)}" r="7" stroke-width="1.8"/><circle class="fk" cx="${f1(qx)}" cy="${f1(qy)}" r="2"/>`,
+    caption: `${fmt(N)} document chunks in a ${dim}-dimensional embedding space, flattened here by PCA; ◎ is the query. Maximal marginal relevance (λ = ${lam}) picks the ${S.length} that fill an ${fmt(budget)}-token window (${fmt(used)} used), laid out most-relevant-at-the-ends. The chosen are in ${acc}.`
+  };
+};
+
+/* ---- Build LLMs from Scratch: a byte-pair tokenizer trained on this library's titles ---- */
+GEN['build-llms-from-scratch'] = (r, b, acc) => {
+  const text = TITLES.join('\n'), words = text.match(/\n| ?[A-Za-z]+| ?[0-9]+| ?[^\sA-Za-z0-9]+/g);
+  const freq = new Map(); for (const w of words) freq.set(w, (freq.get(w) || 0) + 1);
+  const vocab = new Map(); for (const w of freq.keys()) vocab.set(w, [...w].map((ch, i) => ({ s: ch, a: i, b: i + 1 })));
+  let merges = 0;
+  for (;;) {
+    const pc = new Map();
+    for (const [w, sy] of vocab) { const f = freq.get(w); for (let i = 0; i < sy.length - 1; i++) { const k = sy[i].s + '\u0001' + sy[i + 1].s; pc.set(k, (pc.get(k) || 0) + f); } }
+    let bk = null, bc = 1; for (const [k, c] of pc) if (c > bc || (c === bc && bk !== null && k < bk)) { bk = k; bc = c; }
+    if (!bk || bc < 2) break;
+    const [A, B] = bk.split('\u0001'); merges++;
+    for (const [w, sy] of vocab) { const out = []; for (let i = 0; i < sy.length; i++) { if (i < sy.length - 1 && sy[i].s === A && sy[i + 1].s === B) { out.push({ s: A + B, a: sy[i].a, b: sy[i + 1].b }); i++; } else out.push(sy[i]); } vocab.set(w, out); }
+  }
+  const toks = []; let off = 0;
+  for (const w of words) { vocab.get(w).forEach((t, k) => toks.push({ s: t.s, a: off + t.a, b: off + t.b, head: k === 0 })); off += w.length; }
+  const total = off, X = (c) => 36 + 648 * c / total;
+  const cnt = new Map(); for (const t of toks) cnt.set(t.s, (cnt.get(t.s) || 0) + 1);
+  let sig = null; for (const [s, c] of cnt) if (s.trim().length >= 5 && (!sig || c > cnt.get(sig))) sig = s;
+  // arcs: consecutive uses of the same token. Word-initial tokens above the line, word-pieces below.
+  const last = new Map(), arcs = [];
+  for (const t of toks) { if (t.s === '\n') continue; const m = (X(t.a) + X(t.b)) / 2; if (last.has(t.s)) arcs.push([last.get(t.s), m, t.head, t.s === sig]); last.set(t.s, m); }
+  const mA = Math.max(...arcs.filter((a) => a[2]).map((a) => (a[1] - a[0]) / 2)), mB = Math.max(...arcs.filter((a) => !a[2]).map((a) => (a[1] - a[0]) / 2));
+  const k = (P.h - 22) / (mA + mB), base = P.y + 11 + mA * k;
+  let up = '', down = '', red = '', nUp = 0;
+  for (const [p, m, head, isSig] of arcs) { const rx = (m - p) / 2, ry = rx * k, d = `M${f1(p)} ${f1(base)}A${f1(rx)} ${f1(ry)} 0 0 ${head ? 1 : 0} ${f1(m)} ${f1(base)}`; if (isSig) red += d; else if (head) { up += d; nUp++; } else down += d; }
+  let ticks = ''; for (const t of toks) if (t.s !== '\n' && t.head) ticks += seg(X(t.a), base - 3, X(t.a), base + 3);
+  return {
+    svg: path(up, 'k', 0.7, 'opacity=".78"') + path(down, 'k', 0.7, 'opacity=".5"') + path(red, 'r', 1.6) + path(seg(36, base, 684, base), 'k', 1.2) + path(ticks, 'k', 0.8),
+    caption: `The titles of all ${TITLES.length} Vizuara books, tokenised by a byte-pair encoder trained on them in this page: ${merges} merges turn ${fmt(total)} characters into ${fmt(toks.length)} tokens. Each arc joins two uses of one token — whole words above the line, word-pieces below; ${acc} is “${sig.trim()}”, used ${cnt.get(sig)} times.`
+  };
+};
+
+/* ---- 5D Parallelism: one step on a 128-GPU mesh, 1F1B pipeline with jittered kernels ---- */
+GEN['5d-parallelism'] = (r, b, acc) => {
+  const g = Gauss(r), DP = 2, PP = 8, TP = 2, CP = 2, EP = 2, M = 16, grp = TP * CP * EP, gpus = DP * PP * grp, JIT = 0.07;
+  const order = [];
+  for (let s = 0; s < PP; s++) { const warm = Math.min(PP - s - 1, M), ops = []; let f = 0, bb = 0;
+    for (let k = 0; k < warm; k++) ops.push(['F', f++]);
+    while (f < M) { ops.push(['F', f++]); ops.push(['B', bb++]); }
+    while (bb < M) ops.push(['B', bb++]); order.push(ops); }
+  // discrete-event simulation per data-parallel replica. Every op is synchronised across its
+  // tensor×context×expert group (8 GPUs): the group waits for its slowest member.
+  const bars = [], stageEnd = [...Array(PP)].map(() => new Array(DP).fill(0));
+  for (let d = 0; d < DP; d++) {
+    const endF = [...Array(PP)].map(() => new Array(M).fill(-1)), endB = [...Array(PP)].map(() => new Array(M).fill(-1));
+    const idx = new Array(PP).fill(0), free = new Array(PP).fill(0); let progress = true;
+    while (progress) { progress = false;
+      for (let s = 0; s < PP; s++) { if (idx[s] >= order[s].length) continue; const [op, m] = order[s][idx[s]];
+        const ready = op === 'F' ? (s === 0 ? 0 : endF[s - 1][m]) : (s === PP - 1 ? endF[s][m] : endB[s + 1][m]);
+        if (ready < 0) continue;
+        const st = Math.max(ready, free[s]) + (s > 0 || op === 'B' ? 0.06 : 0), base = op === 'F' ? 1 : 2;
+        let en = st; for (let k = 0; k < grp; k++) { const dur = base * (1 + JIT * g()); en = Math.max(en, st + dur); bars.push([s, d, k, op, st, st + dur]); }
+        (op === 'F' ? endF : endB)[s][m] = en; free[s] = en; idx[s]++; progress = true; } }
+    for (let s = 0; s < PP; s++) stageEnd[s][d] = free[s];
+  }
+  const T = Math.max(...stageEnd.flat()), tEnd = T + 3.4, x0 = 36, x1 = 684, y0 = P.y + 6, y1 = P.y + P.h - 6, rowH = (y1 - y0) / gpus, sx = (x1 - x0) / tEnd;
+  const rowOf = (s, d, k) => s * DP * grp + d * grp + k;
+  let fw = '', bw = '', ar = '';
+  for (const [s, d, k, op, st, en] of bars) { const y = y0 + rowH * (rowOf(s, d, k) + 0.5), a = x0 + st * sx + 0.8, e = x0 + en * sx - 0.8; if (op === 'F') fw += seg(a, y, e, y); else bw += seg(a, y, e, y); }
+  for (let s = 0; s < PP; s++) { const st = Math.max(...stageEnd[s]) + 0.35; for (let d = 0; d < DP; d++) for (let k = 0; k < grp; k++) { const y = y0 + rowH * (rowOf(s, d, k) + 0.5); ar += seg(x0 + st * sx, y, x0 + (st + 2.2) * sx, y); } }
+  return {
+    svg: path(fw, 'k', rowH * 0.3, 'stroke-linecap="butt" opacity=".85"') + path(bw, 'k', rowH * 0.66, 'stroke-linecap="butt"') + path(ar, 'r', rowH * 0.66, 'stroke-linecap="butt"'),
+    caption: `One training step on a ${gpus}-GPU mesh — data ${DP} × pipeline ${PP} × tensor ${TP} × context ${CP} × expert ${EP} — simulated under a 1F1B schedule of ${M} micro-batches with ±${Math.round(JIT * 100)}% kernel-time noise. Each row is a GPU: thin = forward, thick = backward, ${acc} = gradient all-reduce.`
+  };
+};
+
+/* ---- Pi vs Hermes vs Codex: one session, three compaction policies ---- */
+GEN['pi-vs-hermes-vs-codex'] = (r, b, acc) => {
+  const T = 200, CAP = 300, SYS = 10, msgs = [];
+  for (let t = 0; t < T; t++) {
+    msgs.push({ t, len: 1 + Math.floor(r() * 2) });                        // user turn
+    if (r() < 0.35) msgs.push({ t, len: 2 + Math.floor(r() * 9) });        // tool result
+    msgs.push({ t, len: 2 + Math.floor(r() * 3) });                        // assistant turn
+  }
+  const total = (st) => st.reduce((a, x) => a + x.len, 0);
+  const policies = [
+    ['drop oldest', (st) => { const gone = []; while (total(st) > CAP) gone.push(st.splice(1, 1)[0]); return gone.length ? [{ gone }] : []; }],
+    ['rolling summary', (st) => { const tot = total(st); if (tot <= CAP) return []; let a = 0, k = 1; while (k < st.length - 1 && a < 0.6 * (tot - SYS)) a += st[k++].len;
+      const members = st.splice(1, k - 1), s = { sum: 1, len: Math.max(4, Math.round(a * 0.08)) }; st.splice(1, 0, s); return [{ members, into: s }]; }],
+    ['tiered memory', (st) => { if (total(st) <= CAP) return []; const ev = []; let f = 1; while (f < st.length && st[f].sum) f++;
+      const raw = total(st.slice(f)); let a = 0, k = f; while (k < st.length - 1 && a < 0.5 * raw) a += st[k++].len;
+      const m1 = st.splice(f, k - f), s1 = { sum: 1, tier: 1, len: Math.max(3, Math.round(a * 0.12)) }; st.splice(f, 0, s1); ev.push({ members: m1, into: s1 });
+      for (const tier of [1, 2]) { const tt = st.filter((x) => x.tier === tier); if (tt.length >= 3) { const at = st.indexOf(tt[0]); st.splice(at, tt.length); const up = { sum: 1, tier: tier + 1, len: Math.max(4, Math.round(total(tt) * 0.5)) }; st.splice(at, 0, up); ev.push({ members: tt, into: up }); } }
+      return ev; }],
+  ];
+  const gut = 30, cw = (648 - 2 * gut) / 3, y0 = P.y + 34, dy = (P.h - 50) / T, FAN = 18;
+  let raw = '', sums = '', sys = '', labels = ''; const counts = [];
+  const draw = (tr, isSum) => { let d = D(tr); if (tr.fan) { const [lx, ly, tx, ty] = tr.fan; d += `C${f1(lx)} ${f1(ly + (ty - ly) * 0.6)} ${f1(tx)} ${f1(ty - (ty - ly) * 0.5)} ${f1(tx)} ${f1(ty)}`; } if (isSum) sums += d; else raw += d; };
+  policies.forEach(([name, compact], pi) => {
+    const cx0 = 36 + pi * (cw + gut), ux = cw / CAP, st = [{ sys: 1, len: SYS }], trail = new Map();
+    const X = (it) => { let a = 0; for (const x of st) { if (x === it) return cx0 + (a + x.len / 2) * ux; a += x.len; } return null; };
+    let mi = 0, events = 0;
+    for (let t = 0; t < T; t++) {
+      const y = y0 + t * dy;
+      while (mi < msgs.length && msgs[mi].t === t) st.push({ ...msgs[mi++] });
+      const ev = compact(st); if (ev.length) events++;
+      const fin = (s) => { for (const e of ev) if (e.members && e.members.includes(s)) return fin(e.into); return s; };
+      for (const e of ev) {
+        if (e.gone) { for (const m of e.gone) { const tr = trail.get(m); if (tr) { draw(tr, m.sum); trail.delete(m); } } continue; }
+        const tx = X(fin(e.into));
+        for (const m of e.members) { const tr = trail.get(m); if (!tr) continue; const [lx, ly] = tr[tr.length - 1]; tr.fan = [lx, ly, tx, y + FAN]; draw(tr, m.sum); trail.delete(m); }
+      }
+      for (const it of st) { if (it.sys) continue; const x = X(it), tr = trail.get(it); if (!tr) trail.set(it, [[x, y]]); else tr.push([x, y]); }
+    }
+    for (const [it, tr] of trail) draw(tr, it.sum);
+    sys += seg(cx0 + SYS * ux / 2, y0, cx0 + SYS * ux / 2, y0 + (T - 1) * dy);
+    counts.push(events);
+    labels += `<text x="${f1(cx0)}" y="${f1(P.y + 12)}" font-size="9.5" letter-spacing=".06em">${['I', 'II', 'III'][pi]} · ${name.toUpperCase()}</text>`;
+  });
+  return {
+    svg: path(sys, 'k2', 1.4, 'stroke-linecap="butt"') + path(raw, 'k', 0.55, 'opacity=".85"') + path(sums, 'r', 1.5) + labels,
+    caption: `One simulated ${T}-turn agent session (${fmt(msgs.length)} messages) replayed under three compaction policies. Each line is one message’s place in the context window, time running down; where lines converge, the window was compacted (${counts[0]}, ${counts[1]} and ${counts[2]} times). Summaries in ${acc}.`
+  };
+};
+
+/* ---- Build Decision Trees from Scratch: CART grown in-page ---- */
+GEN['decision-trees-from-scratch'] = (r, b, acc) => {
+  const bumps = [0, 1, 2].map(() => [0, 1, 2].map(() => [r(), r(), 0.13 + r() * 0.16, 0.6 + r()]));
+  const field = (c, x, y) => bumps[c].reduce((a, [bx, by, s, w]) => a + w * Math.exp(-((x - bx) ** 2 + (y - by) ** 2) / (2 * s * s)), 0);
+  const N = 300, pts = [];
+  for (let n = 0; n < N; n++) { const x = r(), y = r(); let c = [0, 1, 2].reduce((bb, c) => field(c, x, y) > field(bb, x, y) ? c : bb, 0); if (r() < 0.04) c = Math.floor(r() * 3); pts.push([x, y, c]); }
+  const gini = (a) => { const k = [0, 0, 0]; for (const p of a) k[p[2]]++; return 1 - k.reduce((s, v) => s + (v / a.length) ** 2, 0); };
+  const splits = [], leaves = [], MAXD = 7;
+  const grow = (a, bx0, by0, bx1, by1, depth) => {
+    const k = [0, 0, 0]; for (const p of a) k[p[2]]++; const maj = k.indexOf(Math.max(...k));
+    if (depth >= MAXD || a.length < 10 || Math.max(...k) === a.length) { leaves.push([bx0, by0, bx1, by1, maj]); return; }
+    let best = null;
+    for (const ax of [0, 1]) { const s = [...a].sort((p, q) => p[ax] - q[ax]); for (let i = 3; i < s.length - 3; i++) { if (s[i][ax] === s[i - 1][ax]) continue; const L = s.slice(0, i), R = s.slice(i), cost = (L.length * gini(L) + R.length * gini(R)) / s.length; if (!best || cost < best.cost) best = { ax, thr: (s[i][ax] + s[i - 1][ax]) / 2, cost, L, R }; } }
+    if (!best || best.cost >= gini(a) - 0.005) { leaves.push([bx0, by0, bx1, by1, maj]); return; }
+    splits.push([best.ax, best.thr, bx0, by0, bx1, by1, depth]);
+    if (best.ax === 0) { grow(best.L, bx0, by0, best.thr, by1, depth + 1); grow(best.R, best.thr, by0, bx1, by1, depth + 1); }
+    else { grow(best.L, bx0, by0, bx1, best.thr, depth + 1); grow(best.R, bx0, best.thr, bx1, by1, depth + 1); }
+  };
+  grow(pts, 0, 0, 1, 1, 0);
+  const x0 = 36, y0 = P.y + 6, W = 648, H = P.h - 12, X = (u) => x0 + u * W, Y = (v) => y0 + v * H;
+  let hatch = '', dense = '', lines = '';
+  const rule = (a, bq, w, h, sp, dir) => { let d = ''; for (let o = -h; o < w; o += sp) { const u0 = Math.max(o, 0), u1 = Math.min(o + h, w); if (u1 <= u0) continue; const v0 = u0 - o, v1 = u1 - o; d += dir > 0 ? seg(a + u0, bq + v0, a + u1, bq + v1) : seg(a + u0, bq + h - v0, a + u1, bq + h - v1); } return d; };
+  for (const [bx0, by0, bx1, by1, c] of leaves) { const a = X(bx0), bq = Y(by0), w = X(bx1) - a, h = Y(by1) - bq; if (c === 1) hatch += rule(a, bq, w, h, 6, 1); if (c === 2) dense += rule(a, bq, w, h, 3.2, -1); }
+  splits.sort((p, q) => q[6] - p[6]);
+  for (const [ax, thr, bx0, by0, bx1, by1, depth] of splits) { const d = ax === 0 ? seg(X(thr), Y(by0), X(thr), Y(by1)) : seg(X(bx0), Y(thr), X(bx1), Y(thr)); lines += path(d, depth === 0 ? 'r' : 'k', depth === 0 ? 5 : Math.max(0.9, 4.2 - depth * 0.6), 'stroke-linecap="square"'); }
+  let dots = ''; for (const [x, y] of pts) dots += `<circle class="ring" cx="${f1(X(x))}" cy="${f1(Y(y))}" r="1.9" stroke-width="0.9"/>`;
+  return {
+    svg: path(hatch, 'k', 0.7, 'stroke-linecap="butt"') + path(dense, 'k', 0.7, 'stroke-linecap="butt"') + path(box(x0, y0, W, H), 'k', 1.2) + lines + dots,
+    caption: `A classification tree grown in this page by CART — Gini impurity, depth ≤ ${MAXD} — on ${N} labelled points of three classes. Every line is one question the tree asks, heavier the earlier it is asked; the first is ${acc}. ${splits.length} questions, ${leaves.length} leaves, shaded by the class they vote for.`
+  };
+};
+
+/* ---- Scientific ML: viscous Burgers' equation, finite volumes, particle paths ---- */
+GEN['sciml'] = (r, b, acc) => {
+  const N = 400, dx = 2 / N, nu = 0.01 / Math.PI, a3 = (0.3 + 0.2 * r()) * (r() < 0.5 ? -1 : 1), a5 = (0.12 + 0.12 * r()) * (r() < 0.5 ? -1 : 1);
+  let u = new Float64Array(N); const xs = (i) => -1 + (i + 0.5) * dx;
+  for (let i = 0; i < N; i++) { const x = xs(i); u[i] = -Math.sin(Math.PI * x) + a3 * Math.sin(3 * Math.PI * x) + a5 * Math.sin(5 * Math.PI * x); }
+  const flux = (a, c) => a >= c ? Math.max(a * a, c * c) / 2 : (a > 0 ? a * a / 2 : c < 0 ? c * c / 2 : 0);
+  const Tend = 1.5, snaps = 260, np = 170, parts = Array.from({ length: np }, (_, k) => -1 + 2 * (k + 0.5) / np), tracks = parts.map((x) => [[x, 0]]);
+  const interp = (x) => { const f = (x + 1) / dx - 0.5, i = Math.floor(f), t = f - i; const a = i < 0 ? 0 : u[i], c = i + 1 >= N ? 0 : u[i + 1]; return a * (1 - t) + c * t; };
+  let t = 0, steps = 0, nextSnap = Tend / snaps; const shocks = [], F = new Float64Array(N + 1);
+  while (t < Tend) {
+    let mx = 1e-6; for (let i = 0; i < N; i++) mx = Math.max(mx, Math.abs(u[i]));
+    const dt = Math.min(0.4 * dx / mx, 0.2 * dx * dx / nu, Tend - t);
+    for (let i = 0; i <= N; i++) { const a = i === 0 ? 0 : u[i - 1], c = i === N ? 0 : u[i]; F[i] = flux(a, c) - nu * (c - a) / dx; }
+    for (let k = 0; k < np; k++) parts[k] += dt * interp(parts[k]);
+    const nu2 = new Float64Array(N); for (let i = 0; i < N; i++) nu2[i] = u[i] - dt / dx * (F[i + 1] - F[i]); u = nu2; t += dt; steps++;
+    if (t >= nextSnap - 1e-12) { nextSnap += Tend / snaps; for (let k = 0; k < np; k++) tracks[k].push([parts[k], t]);
+      for (let i = 2; i < N - 2; i++) { const s = -(u[i + 1] - u[i - 1]) / (2 * dx), sl = -(u[i] - u[i - 2]) / (2 * dx), sr = -(u[i + 2] - u[i]) / (2 * dx); if (s > 9 && s >= sl && s > sr) shocks.push([xs(i), t]); } }
+  }
+  const x0 = 36, W = 648, y0 = P.y + 6, H = P.h - 12, X = (x) => x0 + (x + 1) / 2 * W, Y = (tt) => y0 + tt / Tend * H;
+  let lines = ''; for (const tr of tracks) lines += D(tr.map(([x, tt]) => [X(x), Y(tt)]));
+  let red = ''; for (const [x, tt] of shocks) red += seg(X(x), Y(tt) - 0.9, X(x), Y(tt) + 0.9);
+  return {
+    svg: path(lines, 'k', 0.7, 'opacity=".8"') + path(red, 'r', 2.6, 'stroke-linecap="butt"'),
+    caption: `Burgers’ equation, uₜ + u·uₓ = (0.01/π)·uₓₓ — the classic benchmark for physics-informed networks — solved in this page by finite volumes (${N} cells, ${fmt(steps)} time steps). Lines: ${np} fluid particles carried by the flow, time running down; ${acc}: shocks, where they collide.`
+  };
+};
+
+/* ---- Kernel Engineering: a Kogge–Stone parallel prefix sum across GPU lanes ---- */
+GEN['kernel-engineering'] = (r, b, acc) => {
+  const LN = 64, ST = 6, target = 40 + Math.floor(r() * 20);
+  const X = (i) => 36 + (i + 0.5) * 648 / LN, Y = (k) => P.y + 26 + k * (P.h - 40) / ST;
+  const vals0 = Array.from({ length: LN }, () => 1 + Math.floor(r() * 9));
+  let vals = vals0.slice();
+  const cone = Array.from({ length: ST + 1 }, () => new Set()); cone[ST].add(target);
+  for (let k = ST - 1; k >= 0; k--) for (const i of cone[k + 1]) { cone[k].add(i); if (i - (1 << k) >= 0) cone[k].add(i - (1 << k)); }
+  let lanes = '', diag = '', red = '', adds = '', nOps = 0;
+  for (let k = 0; k < ST; k++) {
+    const d = 1 << k, nv = vals.slice();
+    for (let i = 0; i < LN; i++) {
+      const v = seg(X(i), Y(k), X(i), Y(k + 1)); if (cone[k + 1].has(i)) red += v; else lanes += v;
+      if (i >= d) { nv[i] = vals[i] + vals[i - d]; nOps++; const e = seg(X(i - d), Y(k), X(i), Y(k + 1)); if (cone[k + 1].has(i)) red += e; else diag += e; adds += `M${f1(X(i) - 1.6)} ${f1(Y(k + 1))}a1.6 1.6 0 1 0 3.2 0a1.6 1.6 0 1 0 -3.2 0`; }
+    }
+    vals = nv;
+  }
+  const ok = vals.every((v, i) => v === vals0.slice(0, i + 1).reduce((a, c) => a + c, 0));
+  let digits = ''; vals0.forEach((v, i) => { digits += `<text x="${f1(X(i))}" y="${f1(P.y + 12)}" font-size="8" text-anchor="middle"${cone[0].has(i) ? ' class="acc"' : ''}>${v}</text>`; });
+  digits += `<text x="${f1(X(target))}" y="${f1(Y(ST) + 16)}" font-size="9" text-anchor="middle" class="acc">${vals[target]}</text>`;
+  return {
+    svg: path(lanes, 'k2', 0.8) + path(diag, 'k', 0.7, 'opacity=".9"') + `<path class="fk" d="${adds}"/>` + path(red, 'r', 1.7) + digits,
+    caption: `A Kogge–Stone prefix sum, the pattern inside warp-level scans: ${LN} GPU lanes, ${ST} steps, ${nOps} additions. At step k each lane adds the partial sum 2ᵏ lanes to its left. In ${acc}: everything lane ${target} depends on — ${cone[0].size} of the digits above, which it sums to ${vals[target]}${ok ? '' : ' (check failed)'}.`
+  };
+};
+
+/* ================= the Charlie sub-series: a square “room” plate ================= */
+
+/* ---- I · Language Room: beam search through a character n-gram model of the library ---- */
+GEN['charlie-language-room'] = (r, b, acc) => {
+  const corpus = TITLES.map((t) => '^^^^' + t + '\n'), V = new Set(); corpus.join('').split('').forEach((c) => V.add(c)); V.delete('^');
+  const Vs = [...V].sort(), cnt = [0, 1, 2, 3, 4].map(() => new Map());
+  for (const s of corpus) for (let i = 4; i < s.length; i++) for (let o = 0; o <= 4; o++) { const ctx = s.slice(i - o, i), m = cnt[o].get(ctx) || cnt[o].set(ctx, new Map()).get(ctx); m.set(s[i], (m.get(s[i]) || 0) + 1); }
+  const lam = [0.02, 0.08, 0.15, 0.3, 0.45];
+  const prob = (ctx) => { const p = new Map(Vs.map((c) => [c, 0])); let wsum = 0;
+    for (let o = 0; o <= 4; o++) { const m = cnt[o].get(ctx.slice(ctx.length - o)); if (!m) continue; let tot = 0; for (const v of m.values()) tot += v; for (const [c, v] of m) p.set(c, p.get(c) + lam[o] * v / tot); wsum += lam[o]; }
+    for (const c of Vs) p.set(c, (p.get(c) + 1e-4) / (wsum + 1e-4 * Vs.length)); return p; };
+  const prompt = 'Charlie and the ', goal = 'Language Room', B = 20, depth = 16;
+  let beams = [{ s: '^^^^' + prompt, lp: 0, id: 0, done: false }], nid = 1; const all = new Map([[0, { id: 0, parent: -1, s: prompt, kids: [] }]]);
+  for (let d = 1; d <= depth; d++) {
+    const cand = [];
+    for (const bm of beams) { if (bm.done) { cand.push({ ...bm }); continue; } const p = prob(bm.s.slice(-4)); const top = [...p].sort((a, c) => c[1] - a[1]).slice(0, 5); for (const [c, pr] of top) cand.push({ s: bm.s + c, lp: bm.lp + Math.log(pr), parent: bm.id, done: c === '\n', fresh: true }); }
+    cand.sort((a, c) => c.lp - a.lp); beams = cand.slice(0, B);
+    for (const bm of beams) if (bm.fresh) { bm.id = nid++; bm.fresh = false; const nd = { id: bm.id, parent: bm.parent, s: bm.s.slice(4), done: bm.done, kids: [] }; all.set(nd.id, nd); all.get(bm.parent).kids.push(nd); }
+  }
+  // tidy layout: leaves in alphabetical order, parents centred on their children, x = letters generated
+  let leafN = 0; const lay = (nd, d) => { nd.d = d; if (!nd.kids.length) { nd.y = leafN++; return; } nd.kids.sort((a, c) => (a.s < c.s ? -1 : 1)); nd.kids.forEach((k) => lay(k, d + 1)); nd.y = (nd.kids[0].y + nd.kids[nd.kids.length - 1].y) / 2; };
+  const root = all.get(0); lay(root, 0);
+  const dx = 16.5, X = (nd) => Q.x + 4 + nd.d * dx, Y = (nd) => Q.y + 6 + (Q.h - 12) * nd.y / (leafN - 1);
+  const ranked = beams.filter((bm) => bm.done).map((bm) => bm.s.slice(4)), goalRank = ranked.indexOf(prompt + goal + '\n') + 1;
+  let lines = '', red = '', labels = '';
+  for (const nd of all.values()) { if (nd.parent < 0) continue; const p = all.get(nd.parent), x0 = X(p), y0 = Y(p), x1 = X(nd), y1 = Y(nd), mx = (x0 + x1) / 2, d = `M${f1(x0)} ${f1(y0)}C${f1(mx)} ${f1(y0)} ${f1(mx)} ${f1(y1)} ${f1(x1)} ${f1(y1)}`;
+    if ((prompt + goal + '\n').startsWith(nd.s)) red += d; else lines += d;
+    if (nd.done) { const txt = nd.s.slice(prompt.length).replace('\n', ''); labels += `<text x="${f1(x1 + 6)}" y="${f1(y1 + 2.9)}" font-size="8.5"${txt === goal ? ' class="acc"' : ''}>${txt}</text>`; } }
+  return {
+    svg: path(lines, 'k', 0.8, 'opacity=".85"') + path(red, 'r', 2) + labels,
+    caption: `Beam search (width ${B}) through a character 5-gram model trained in this page on the ${TITLES.length} titles of this library, continuing the words “${prompt.trim()}”. Each branch is a letter it considered; the labels are titles it finished. In ${acc}: this one, its no. ${goalRank} guess.`
+  };
+};
+
+/* ---- II · Vision Room: 2-D sin–cos position embeddings of a ViT, compared patch by patch ---- */
+GEN['charlie-vision-room'] = (r, b, acc) => {
+  const G = 12, d = 256, q = d / 4, om = Array.from({ length: q }, (_, k) => 1 / Math.pow(10000, k / q));
+  const half = (p) => { const v = []; for (const w of om) v.push(Math.sin(p * w), Math.cos(p * w)); return v; };   // one axis of the embedding
+  const S = 3, NS = (G - 1) * S + 1, sp = Array.from({ length: NS }, (_, i) => i / S), hs = sp.map(half), ha = Array.from({ length: G }, (_, i) => half(i));
+  const dd = ha.map((a) => hs.map((h) => dot(a, h)));                 // exact: cos-sim = (row part + column part) / 2q
+  const map = Q.w / G, pad = 4, cell = (map - 2 * pad) / (NS - 1), levels = [0.975, 0.945, 0.91, 0.875, 0.84];
+  let lines = '', self = '';
+  for (let ai = 0; ai < G; ai++) for (let aj = 0; aj < G; aj++) {
+    const F = new Float64Array(NS * NS); for (let j = 0; j < NS; j++) for (let i = 0; i < NS; i++) F[j * NS + i] = (dd[ai][j] + dd[aj][i]) / (2 * q);
+    const ox = Q.x + aj * map + pad, oy = Q.y + ai * map + pad, X = (i) => ox + i * cell, Y = (j) => oy + j * cell;
+    for (const L of levels) for (const ln of contours(F, NS, NS, L, X, Y)) lines += D(ln);
+    self += `<circle class="fr" cx="${f1(ox + aj * S * cell)}" cy="${f1(oy + ai * S * cell)}" r="1.9"/>`;
+  }
+  return {
+    svg: path(lines, 'k', 0.7) + self,
+    caption: `A Vision Transformer sees a picture as a ${G} × ${G} grid of patches and tells them apart by position embeddings. These are its fixed 2-D sine–cosine embeddings (d = ${d}): each small field is one patch’s cosine similarity to every position, contoured at ${levels.join(', ')}; ${acc} marks the patch itself.`
+  };
+};
+
+/* ---- III · Sound Room: a synthesised voice, analysed by a short-time Fourier transform ---- */
+GEN['charlie-sound-room'] = (r, b, acc) => {
+  const fs = 8000, dur = 1.8, n = Math.round(fs * dur), sig = new Float64Array(n);
+  const V = { a: [730, 1090, 2440], i: [270, 2290, 3010], u: [300, 870, 2240] }, seq = ['a', 'i', 'u'], BW = [90, 110, 170];
+  const form = (t) => { const pos = clamp(t / dur * 3 - 0.5, 0, 2), k = Math.floor(Math.min(pos, 1.999)), f = pos - k, e = f < 0.35 ? 0 : f > 0.65 ? 1 : (f - 0.35) / 0.3, s = e * e * (3 - 2 * e); return [0, 1, 2].map((m) => V[seq[k]][m] * (1 - s) + V[seq[k + 1]][m] * s); };
+  const f0 = (t) => 118 + 34 * Math.sin(Math.PI * t / dur) - 10 * (t / dur);
+  let ph = 0, src = 0; const y1 = [0, 0, 0], y2 = [0, 0, 0];
+  for (let k = 0; k < n; k++) {
+    const t = k / fs; ph += f0(t) / fs; let x = 0; if (ph >= 1) { ph -= 1; x = 1; }
+    src = 0.96 * src + x; let v = src; const Fm = form(t);
+    for (let m = 0; m < 3; m++) { const C = -Math.exp(-2 * Math.PI * BW[m] / fs), Bc = 2 * Math.exp(-Math.PI * BW[m] / fs) * Math.cos(2 * Math.PI * Fm[m] / fs), A = 1 - Bc - C, o = A * v + Bc * y1[m] + C * y2[m]; y2[m] = y1[m]; y1[m] = o; v = o; }
+    sig[k] = v * Math.min(1, t / 0.08, (dur - t) / 0.12);
+  }
+  const Nf = 512, hop = 40, frames = Math.floor((n - Nf) / hop), win = Float64Array.from({ length: Nf }, (_, i) => 0.5 - 0.5 * Math.cos(2 * Math.PI * i / (Nf - 1)));
+  const fft = (re, im) => { const N2 = re.length; for (let i = 1, j = 0; i < N2; i++) { let bit = N2 >> 1; for (; j & bit; bit >>= 1) j ^= bit; j ^= bit; if (i < j) { [re[i], re[j]] = [re[j], re[i]]; [im[i], im[j]] = [im[j], im[i]]; } }
+    for (let len = 2; len <= N2; len <<= 1) { const a = -2 * Math.PI / len, wr = Math.cos(a), wi = Math.sin(a); for (let i = 0; i < N2; i += len) { let cr = 1, ci = 0; for (let j = 0; j < len / 2; j++) { const h = i + j + len / 2, ur = re[i + j], ui = im[i + j], vr = re[h] * cr - im[h] * ci, vi = re[h] * ci + im[h] * cr; re[i + j] = ur + vr; im[i + j] = ui + vi; re[h] = ur - vr; im[h] = ui - vi; const nr = cr * wr - ci * wi; ci = cr * wi + ci * wr; cr = nr; } } } };
+  const spec = [], pitch = []; let gmax = -Infinity;
+  for (let f = 0; f < frames; f++) {
+    const o = f * hop, re = new Float64Array(Nf), im = new Float64Array(Nf); for (let i = 0; i < Nf; i++) re[i] = sig[o + i] * win[i]; fft(re, im);
+    const db = new Float64Array(Nf / 2); for (let k = 0; k < Nf / 2; k++) { db[k] = 10 * Math.log10(re[k] * re[k] + im[k] * im[k] + 1e-12); gmax = Math.max(gmax, db[k]); } spec.push(db);
+    // pitch by autocorrelation over 80–200 Hz
+    let best = 0, bl = 40, ac = []; for (let lag = 38; lag <= 102; lag++) { let s = 0; for (let i = 0; i < Nf - lag; i++) s += sig[o + i] * sig[o + i + lag]; ac[lag] = s; if (lag >= 40 && lag <= 100 && s > best) { best = s; bl = lag; } }
+    const a = ac[bl - 1], c = ac[bl + 1], off = 0.5 * (a - c) / (a - 2 * ac[bl] + c); pitch.push(fs / (bl + (isFinite(off) ? off : 0)));
+  }
+  const floor = gmax - 62, X = (f) => Q.x + Q.w * f / (frames - 1), Y = (hz) => Q.y + Q.h - Q.h * hz / 4000;
+  let ribbons = '', fund = '', nh = 0;
+  for (let h = 1; h < 40; h++) {
+    const top = [], bot = [];
+    for (let f = 0; f < frames; f++) { const hz = h * pitch[f]; if (hz > 3950) continue; const kb = hz * Nf / fs, k0 = Math.floor(kb), db = Math.max(spec[f][k0], spec[f][k0 + 1]); const w = clamp((db - floor) / 62, 0, 1) ** 1.8 * 9 + 0.45; top.push([X(f), Y(hz) - w / 2]); bot.push([X(f), Y(hz) + w / 2]); }
+    if (top.length < 2) continue; nh++;
+    const dd = D(top.concat(bot.reverse())) + 'Z'; if (h === 1) fund += dd; else ribbons += dd;
+  }
+  return {
+    svg: `<path class="fk" d="${ribbons}"/><path class="fr" d="${fund}"/>`,
+    caption: `A voice made in this page — glottal pulses through three formant filters, gliding /a/ → /i/ → /u/ — then listened to: pitch found by autocorrelation, loudness by a ${Nf}-point short-time Fourier transform. Each ribbon is one of ${nh} harmonics, as wide as it is loud; the fundamental is ${acc}.`
+  };
+};
+
+/* ---- IV · Reasoning Room: Thompson sampling on a 12-armed bandit ---- */
+GEN['charlie-reasoning-room'] = (r, b, acc) => {
+  const g = Gauss(r), K = 12, T = 1600;
+  const gamma = (a) => { const d = a - 1 / 3, c = 1 / Math.sqrt(9 * d); for (;;) { let x, v; do { x = g(); v = 1 + c * x; } while (v <= 0); v = v * v * v; const u = r(); if (u < 1 - 0.0331 * x ** 4 || Math.log(u) < 0.5 * x * x + d * (1 - v + Math.log(v))) return d * v; } };
+  const beta = (a, c) => { const x = gamma(a); return x / (x + gamma(c)); };
+  const p = Array.from({ length: K }, (_, k) => k === K - 1 ? 0.78 : 0.12 + 0.5 * k / (K - 2)); for (let i = K - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [p[i], p[j]] = [p[j], p[i]]; }
+  const bestArm = p.indexOf(Math.max(...p)), A = new Array(K).fill(1), Bb = new Array(K).fill(1), pulls = [], means = Array.from({ length: K }, () => []);
+  for (let t = 0; t < T; t++) { let arm = 0, bv = -1; for (let k = 0; k < K; k++) { const s = beta(A[k], Bb[k]); if (s > bv) { bv = s; arm = k; } } const rew = r() < p[arm] ? 1 : 0; A[arm] += rew; Bb[arm] += 1 - rew; pulls.push(arm);
+    if (t % 6 === 0 || t === T - 1) for (let k = 0; k < K; k++) means[k].push([t, A[k] / (A[k] + Bb[k])]); }
+  // settled: from here on, every window of 100 pulls is at least 90% the best arm
+  const W = 100, pre = [0]; pulls.forEach((a) => pre.push(pre[pre.length - 1] + (a === bestArm)));
+  let settled = -1, ok = true; for (let t = T - W; t >= 0; t--) { if ((pre[t + W] - pre[t]) / W < 0.9) { ok = false; } if (ok) settled = t; }
+  const cw = Q.w / K, Y = (t) => Q.y + Q.h * t / (T - 1);
+  let dash = '', red = '', mean = '';
+  pulls.forEach((a, t) => { const x = Q.x + a * cw, d = seg(x + 3, Y(t), x + cw - 3, Y(t)); if (a === bestArm) red += d; else dash += d; });
+  for (let k = 0; k < K; k++) mean += D(means[k].map(([t, m]) => [Q.x + k * cw + 3 + (cw - 6) * m, Y(t)]));
+  return {
+    svg: path(dash, 'k', 0.8, 'stroke-linecap="butt"') + path(red, 'r', 0.8, 'stroke-linecap="butt"') + path(mean, 'k2', 1),
+    caption: `Thompson sampling on a ${K}-armed bandit, ${fmt(T)} pulls computed in this page, time running down. Each dash is one pull; the thin line in each column is the agent’s belief about that arm. The best arm (p = ${p[bestArm].toFixed(2)}) is ${acc}${settled >= 0 ? `; from pull ${fmt(settled + 1)} on, it takes 9 pulls in 10` : ''}.`
+  };
+};
+
+/* =========================================================================
+   BOOKS & ASSEMBLY
+   ========================================================================= */
+const BOOKS = [
+  { set: 'core', slug: 'ai-context-engineering', title: 'AI Context<br>Engineering', level: 'intermediate', capsules: 43, hours: 10, size: 84 },
+  { set: 'core', slug: 'mathematical-foundations-for-ml', title: 'Mathematical Foundations<br>for Machine Learning', level: 'beginner', capsules: 43, hours: 10, size: 62 },
+  { set: 'core', slug: 'neural-networks-from-scratch', title: 'Neural Networks<br>from Scratch', level: 'beginner', capsules: 33, hours: 7, size: 80 },
+  { set: 'core', slug: 'build-llms-from-scratch', title: 'Build Large Language<br>Models (LLMs)<br>from Scratch', level: 'intermediate', capsules: 20, hours: 6, size: 62 },
+  { set: 'core', slug: '5d-parallelism', title: '5D Parallelism<br>for Large Model Training', level: 'advanced', capsules: 40, hours: 9, size: 62 },
+  { set: 'core', slug: 'pi-vs-hermes-vs-codex', title: 'Pi vs Hermes vs Codex:<br>Context Compaction<br>and Memory', level: 'advanced', capsules: 9, hours: 1, size: 60 },
+  { set: 'range', slug: 'decision-trees-from-scratch', title: 'Build Decision Trees<br>from Scratch', level: 'beginner', capsules: 23, hours: 5, size: 68 },
+  { set: 'range', slug: 'sciml', title: 'Scientific Machine<br>Learning (SciML)', level: 'advanced', capsules: 39, hours: 9, size: 70 },
+  { set: 'range', slug: 'kernel-engineering', title: 'Kernel<br>Engineering', level: 'advanced', soon: true, size: 84, sub: 'From silicon to speculative decoding —<br>GPU kernels for modern LLMs.' },
+  { set: 'series', slug: 'charlie-language-room', pre: 'Charlie and the', title: 'Language Room', level: 'advanced', capsules: 22, hours: 5, size: 70, series: 'I', sub: 'Language — Inference Engineering' },
+  { set: 'series', slug: 'charlie-vision-room', pre: 'Charlie and the', title: 'Vision Room', level: 'intermediate', capsules: 20, hours: 6, size: 70, series: 'II', sub: 'Vision — Vision Transformers' },
+  { set: 'series', slug: 'charlie-sound-room', pre: 'Charlie and the', title: 'Sound Room', level: 'intermediate', capsules: 20, hours: 6, size: 70, series: 'III', sub: 'Audio — Voice Agents' },
+  { set: 'series', slug: 'charlie-reasoning-room', pre: 'Charlie and the', title: 'Reasoning Room', level: 'advanced', capsules: 21, hours: 6, size: 70, series: 'IV', sub: 'Reason — Reinforcement Learning,<br>from bandits to reasoning models' },
+];
+const LEVEL_N = { beginner: 1, intermediate: 2, advanced: 3 }, ACC = { beginner: 'red', intermediate: 'white', advanced: 'red' };
+const boxes = (n) => [1, 2, 3].map((k) => `<i class="${k <= n ? 'on' : ''}"></i>`).join('');
+
+function render(b) { return GEN[b.slug](RNG(hash(b.slug)), b, ACC[b.level]); }
+function cover(b, out, cls = 'cover') {
+  const right = b.soon ? 'Forthcoming' : `${b.series ? `Room ${b.series} of IV · ` : ''}${b.capsules} capsules · ${b.hours} h`;
+  return `<div class="${cls} ${b.level}"${cls === 'cover' ? ` data-slug="${b.slug}"` : ''}>
+    <svg class="plate" viewBox="0 0 720 888" xmlns="http://www.w3.org/2000/svg">${out.svg}</svg>
+    <div class="meta"><span class="lvl"><span>${boxes(LEVEL_N[b.level])}</span>${b.level}</span><span>${right}</span></div>
+    <h1 style="font-size:${b.size}px">${b.pre ? `<span class="pre">${b.pre}</span>` : ''}${b.title}${b.sub ? `<span class="sub" style="font-size:${b.subSize || 23}px">${b.sub}</span>` : ''}</h1>
+    <div class="cap"><b>FIG. 0</b>${out.caption}</div>
+    <div class="imp">${MARK(20)}Vizuara</div>
+  </div>`;
+}
+function wrap(b, out) {
+  const src = GEN[b.slug].toString();
+  return `<div class="wrap ${b.level}">
+    <div class="back"><div class="bk"><h4>This cover is a program.</h4>
+      <p>The front of this book was not drawn. It was computed — by the function printed below, the same way every figure in the book is: ${fmt(46 * 32)} starting points on Himmelblau’s function, each walked downhill by gradient descent until it came to rest in one of the four minima.</p>
+      <p>Run it again and you get the same picture. Change the learning rate and the cover changes with it.</p></div>
+      <pre>${src.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</pre>
+      <div class="bi">${MARK(20)}Vizuara Books</div>
+      <div class="bar">ISBN / BARCODE</div></div>
+    <div class="spine"><div class="st">Mathematical Foundations for Machine Learning<i>43 capsules</i></div>
+      <div class="sm"><span class="lv">${boxes(LEVEL_N[b.level])}</span>${MARK(24)}</div></div>
+    ${cover(b, out, 'front')}
+  </div>`;
+}
+if (typeof document !== 'undefined') {
+  const outs = new Map(BOOKS.map((b) => [b.slug, render(b)]));
+  for (const set of ['core', 'range', 'series']) document.getElementById(set).innerHTML = BOOKS.filter((b) => b.set === set).map((b) => cover(b, outs.get(b.slug))).join('');
+  const mf = BOOKS.find((b) => b.slug === 'mathematical-foundations-for-ml');
+  document.getElementById('wrapbox').innerHTML = wrap(mf, outs.get(mf.slug));
+  document.getElementById('kmark').innerHTML = MARK(22);
+}
+</script>
+</body>
+</html>

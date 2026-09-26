@@ -1,0 +1,926 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Buckram — Vizuara Books</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#e9e3d6; --paper-2:#e1d9c9; --ink:#1e1b17; --mute:#655c50; --rule:#c9bfae;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--ink)}
+body{font:19px/1.55 "EB Garamond",Georgia,serif;font-feature-settings:"onum" 1,"kern" 1}
+.page{max-width:1600px;margin:0 auto;padding:80px 38px 140px}
+.eyebrow{font:600 13px/1 "EB Garamond",serif;letter-spacing:.28em;text-transform:uppercase;color:var(--mute)}
+h1{font:italic 700 132px/.9 "Cormorant Garamond",serif;margin:18px 0 8px;letter-spacing:-.01em}
+h1 small{display:block;font:500 italic 34px/1.2 "Cormorant Garamond",serif;letter-spacing:0;color:var(--mute);margin-top:14px}
+h2{font:700 15px/1 "EB Garamond",serif;letter-spacing:.3em;text-transform:uppercase;margin:0 0 22px;color:var(--ink)}
+.lede{display:grid;grid-template-columns:1.25fr 1fr;gap:64px;margin:46px 0 70px;align-items:start}
+.lede p{margin:0 0 14px;max-width:44em}
+.lede p:first-child::first-letter{font:700 64px/.8 "Cormorant Garamond",serif;float:left;margin:8px 10px 0 0}
+.spec{border-top:2px solid var(--ink);padding-top:14px}
+.spec dl{margin:0;display:grid;grid-template-columns:130px 1fr;gap:9px 18px;font-size:16.5px}
+.spec dt{font-weight:600;letter-spacing:.14em;text-transform:uppercase;font-size:12.5px;padding-top:3px;color:var(--mute)}
+.spec dd{margin:0}
+section{margin:0 0 84px}
+.rowrule{border-top:1px solid var(--rule);padding-top:26px}
+.swatches{display:flex;flex-wrap:wrap;gap:18px}
+.sw{width:128px;font-size:14px;line-height:1.3}
+.sw svg{display:block;width:128px;height:92px;box-shadow:0 8px 16px -10px rgba(40,25,10,.6)}
+.sw b{display:block;font-weight:600;margin-top:8px}
+.sw code{font:13px/1.2 "EB Garamond",serif;color:var(--mute);letter-spacing:.04em}
+.foils .sw svg{height:64px}
+.keyrow{display:flex;gap:40px;flex-wrap:wrap}
+.key{width:230px;font-size:15.5px;line-height:1.4}
+.key svg{display:block;width:150px;height:185px;margin-bottom:12px;box-shadow:0 10px 18px -12px rgba(40,25,10,.7)}
+.key b{font:700 13px/1 "EB Garamond";letter-spacing:.22em;text-transform:uppercase;display:block;margin-bottom:6px}
+.type{display:grid;grid-template-columns:repeat(3,1fr);gap:40px}
+.type .s1{font:700 54px/1 "Cormorant Garamond";letter-spacing:.04em}
+.type .s2{font:600 italic 40px/1.1 "Cormorant Garamond"}
+.type .s3{font:700 15px/1.2 "Cormorant Garamond";letter-spacing:.24em}
+.type p{font-size:15.5px;color:var(--mute);margin:10px 0 0}
+.covers{display:flex;flex-wrap:wrap;gap:70px 64px;justify-content:center}
+figure{margin:0;width:720px}
+figcaption{display:flex;justify-content:space-between;gap:20px;margin-top:16px;font-size:15px;color:var(--mute);line-height:1.35}
+figcaption b{color:var(--ink);font-weight:600}
+.cover{width:720px;height:888px;position:relative;flex:none;overflow:hidden;background:#222;
+  box-shadow:0 2px 0 rgba(0,0,0,.18),0 26px 50px -18px rgba(40,22,8,.55)}
+.cover svg{display:block;width:720px;height:888px}
+.shelf{display:flex;flex-wrap:wrap;gap:22px 18px;padding:34px 30px;background:var(--paper-2);border-radius:2px}
+.shelf .t{width:180px}
+.shelf img{display:block;width:180px;height:222px;box-shadow:0 6px 12px -8px rgba(40,22,8,.7);background:#2a2622}
+.shelf span{display:block;font-size:12.5px;color:var(--mute);margin-top:7px;line-height:1.25}
+.wrapbox{overflow-x:auto;padding:10px 0 30px}
+.wrap{width:1524px;height:888px;flex:none;box-shadow:0 2px 0 rgba(0,0,0,.18),0 26px 50px -18px rgba(40,22,8,.55)}
+.wrap svg{display:block;width:1524px;height:888px}
+.print{display:grid;grid-template-columns:repeat(3,1fr);gap:26px 40px;font-size:16px}
+.print div{border-top:1px solid var(--rule);padding-top:12px}
+.print b{display:block;font-weight:600;letter-spacing:.16em;text-transform:uppercase;font-size:12.5px;margin-bottom:4px}
+@media screen{.po{display:none}}
+@media print{.so{display:none!important}.fx{filter:none!important}}
+footer{color:var(--mute);font-size:15px;border-top:1px solid var(--rule);padding-top:20px}
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <div class="eyebrow">Vizuara Books · Cover system proposal 08</div>
+    <h1>Buckram<small>The Vizuara bindery edition: every book bound in cloth, blocked in one foil, pressed with one blind die</small></h1>
+  </header>
+
+  <div class="lede">
+    <div>
+      <p>A technical library should feel like something you keep. So every Vizuara book is designed as a real case-bound hardcover: a deep bookcloth, a single foil and a single blind die. The title is blocked in foil at the head of the board. Below it, in a sunk roundel, is the book's own device, drawn from the mechanism the book teaches: a causal mask, a penteract, a gradient descent through its contours. A blind-blocked band repeats that subject as texture, in the way a clothbound classic repeats its motif.</p>
+      <p>You can read the level from the binding itself. Beginner books are <i>quarter-bound</i>, intermediate books are <i>half-bound</i> (spine and corners) and advanced books are in <i>full cloth</i>, so a book with more binding goes deeper. The Vizuara mark is a small stamped device at the tail of the board: an open book seen end-on, which is also a V.</p>
+    </div>
+    <div class="spec">
+      <dl>
+        <dt>Trim</dt><dd>7.5 × 9.25 in case-bound; front board shown at 720 × 888 px</dd>
+        <dt>Grid</dt><dd>Title zone 70–395 · blind band 418–792 · roundel ⌀300 on the band · imprint at 848. Centred on the board, which is offset by the hinge or the quarter-cloth</dd>
+        <dt>Title</dt><dd>Cormorant Garamond Bold capitals, +4% tracking; continuations in Semibold Italic</dd>
+        <dt>Labels</dt><dd>Cormorant Garamond Bold capitals, +24% tracking</dd>
+        <dt>Finishes</dt><dd>One foil per book (gold, copper, palladium or black pigment), one blind die, and a two-cloth case for quarter and half bindings</dd>
+        <dt>Level</dt><dd>Quarter = beginner · Half = intermediate · Full = advanced</dd>
+      </dl>
+    </div>
+  </div>
+
+  <section class="rowrule">
+    <h2>The cloth book</h2>
+    <div class="swatches" id="cloths"></div>
+  </section>
+
+  <section class="rowrule foils">
+    <h2>Foils</h2>
+    <div class="swatches" id="foils"></div>
+  </section>
+
+  <section class="rowrule">
+    <h2>Reading the binding</h2>
+    <div class="keyrow" id="key"></div>
+  </section>
+
+  <section class="rowrule">
+    <h2>Type</h2>
+    <div class="type">
+      <div><div class="s1">NEURAL NETWORKS</div><p>Title: Cormorant Garamond Bold in capitals. The strokes are heavy enough to take foil on cloth without closing up, and the serifs are sharp enough to keep the stamp crisp.</p></div>
+      <div><div class="s2">from Scratch</div><p>Continuations: Semibold Italic. Long titles are broken the way a title page is, with the substance in capitals and the connecting words in italic, so the capitals never run past three lines.</p></div>
+      <div><div class="s3">BEGINNER · THIRTY-THREE CAPSULES</div><p>Labels are spaced capitals at 10 pt. Capsule counts are written out in words, as an old binding would give its volume count.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>The covers</h2>
+    <div class="covers" id="covers"></div>
+  </section>
+
+  <section class="rowrule">
+    <h2>At 180 pixels, as the web library shows them</h2>
+    <div class="shelf" id="shelf"></div>
+  </section>
+
+  <section class="rowrule">
+    <h2>Full case wrap: Neural Networks from Scratch (quarter-bound)</h2>
+    <div class="wrapbox"><div class="wrap" id="wrap"></div></div>
+  </section>
+
+  <section class="rowrule">
+    <h2>How it prints</h2>
+    <div class="print">
+      <div><b>Cloth</b>Real bookcloth (a buckram or linen-finish cloth) matched to the swatch. The weave, mottle and lighting on screen only stand in for it and are never printed.</div>
+      <div><b>Foil</b>Hot-foil blocking from one brass die per book, in gold, copper, palladium or black pigment foil. Every foil line is at least 1.5 px (1.1 pt), and counters are open.</div>
+      <div><b>Blind band</b>A second brass die pressed with no foil (blind blocking). The pressed cloth darkens and burnishes, which is the darker tone shown here.</div>
+      <div><b>Roundel</b>A sunk panel made by a deeper, two-level die: the roundel is pressed about 0.6 mm, and the foil device is blocked into it.</div>
+      <div><b>Quarter / half</b>A two-cloth case. The spine and corners are in house black leather-grain cloth, with a gilt fillet blocked along each join.</div>
+      <div><b>Paperback / POD</b>Printed as flat colour. The foil becomes a metallic ink (or a spot-gloss UV over a flat tone), and the blind band becomes a 25% darker tint under matt laminate.</div>
+    </div>
+  </section>
+
+  <footer>Buckram · proposal 08 for Vizuara Books. All artwork is procedural SVG (no raster images), set in Cormorant Garamond and EB Garamond from Google Fonts.</footer>
+</div>
+
+<script>
+/* ============================================================
+   BUCKRAM — procedural clothbound covers for Vizuara Books
+   ============================================================ */
+const W = 720, H = 888;
+const f = n => Math.round(n * 100) / 100;
+
+/* ---------- colour ---------- */
+const hex2rgb = h => { h = h.replace('#',''); return [0,2,4].map(i => parseInt(h.substr(i,2),16)); };
+const rgb2hex = a => '#' + a.map(v => Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0')).join('');
+const mix = (a,b,t) => { const A = hex2rgb(a), B = hex2rgb(b); return rgb2hex(A.map((v,i) => v + (B[i]-v)*t)); };
+const shade = (h,t) => t < 0 ? mix(h,'#000000',-t) : mix(h,'#ffffff',t);
+
+/* ---------- rng ---------- */
+function hash(s){ let h = 2166136261; for (const c of s){ h ^= c.charCodeAt(0); h = Math.imul(h,16777619); } return h >>> 0; }
+function rng(seed){ return function(){ seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+
+/* ---------- palette ---------- */
+const CLOTH = {
+  oxblood:  { name:'Oxblood',   hex:'#5b1a24' },
+  madder:   { name:'Madder',    hex:'#9a2f20' },
+  saffron:  { name:'Saffron',   hex:'#c68f1f' },
+  peacock:  { name:'Peacock',   hex:'#0f4e58' },
+  viridian: { name:'Viridian',  hex:'#145a47' },
+  bottle:   { name:'Bottle',    hex:'#1a3f2e' },
+  prussian: { name:'Prussian',  hex:'#18305a' },
+  cobalt:   { name:'Cobalt',    hex:'#233f86' },
+  aubergine:{ name:'Aubergine', hex:'#3f1c42' },
+  claret:   { name:'Claret',    hex:'#6a1c3c' },
+  moss:     { name:'Moss',      hex:'#515c27' },
+  tobacco:  { name:'Tobacco',   hex:'#6e4526' },
+  slate:    { name:'Slate',     hex:'#39444f' },
+  ink:      { name:'Ink',       hex:'#1a1c23' },
+};
+const HOUSE = { name:'House black', hex:'#1d1c20', note:'leather-grain, spine & corners' };
+
+const FOILS = {
+  gold:      { name:'Gold', edge:'#3a2a0a',
+               stops:['#7c5c1d','#caa24c','#f3dc93','#fff3c4','#c69c45','#8d6a25','#d7b565','#f7e5a4','#b58d3a','#7a5a1c'] },
+  copper:    { name:'Copper', edge:'#3a1a0c',
+               stops:['#6d3219','#b86b43','#eba882','#fbd6bd','#bf7650','#80401f','#cf8a62','#f4c3a3','#a65d38','#6a3017'] },
+  palladium: { name:'Palladium', edge:'#23262a',
+               stops:['#5d6267','#a8adb2','#e4e7ea','#ffffff','#b3b8bd','#72777c','#c9cdd1','#f2f4f5','#9ca1a6','#5a5f64'] },
+  black:     { name:'Black pigment', edge:'#000000', pigment:true,
+               stops:['#111112','#1b1b1c','#2a2a2b','#3a3a3a','#222223','#121213','#1f1f20','#303031','#1a1a1b','#0f0f10'] },
+};
+
+/* ---------- numbers ---------- */
+function words(n){
+  const a = ['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'];
+  const t = ['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
+  return n < 20 ? a[n] : t[Math.floor(n/10)] + (n%10 ? '-' + a[n%10] : '');
+}
+
+/* ---------- small geometry helpers ---------- */
+function rr(x,y,w,h,r){ r = Math.min(r,w/2,h/2);
+  return `M${f(x+r)} ${f(y)}H${f(x+w-r)}A${f(r)} ${f(r)} 0 0 1 ${f(x+w)} ${f(y+r)}V${f(y+h-r)}A${f(r)} ${f(r)} 0 0 1 ${f(x+w-r)} ${f(y+h)}H${f(x+r)}A${f(r)} ${f(r)} 0 0 1 ${f(x)} ${f(y+h-r)}V${f(y+r)}A${f(r)} ${f(r)} 0 0 1 ${f(x+r)} ${f(y)}Z`; }
+function arrow(x1,y1,x2,y2,head,wing=.55){
+  const dx = x2-x1, dy = y2-y1, L = Math.hypot(dx,dy) || 1, ux = dx/L, uy = dy/L;
+  const bx = x2 - ux*head, by = y2 - uy*head, px = -uy*head*wing, py = ux*head*wing;
+  return { line:`M${f(x1)} ${f(y1)}L${f(bx+ux*1)} ${f(by+uy*1)}`, head:`M${f(x2)} ${f(y2)}L${f(bx+px)} ${f(by+py)}L${f(bx-px)} ${f(by-py)}Z` };
+}
+function archPath(w,h,cx=0,cy=0){ // round-headed arch centred at (cx,cy)
+  const r = w/2, top = cy - h/2, bot = cy + h/2;
+  return `M${f(cx-r)} ${f(bot)}V${f(top+r)}A${f(r)} ${f(r)} 0 0 1 ${f(cx+r)} ${f(top+r)}V${f(bot)}Z`;
+}
+const WHT = '__F__', BLK = '__K__';   // tokens: foil/pressed art and knock-outs, resolved per output (screen mask or print vector)
+
+/* ============================================================
+   BLIND PATTERNS — the subject as an all-over repeat (white = pressed)
+   c = {x0,y0,x1,y1,cx,cy,r}
+   ============================================================ */
+const PATTERNS = {
+  // token stream: rows of pills of varying width
+  tokens(c){ let d = '';
+    for (let y = c.y0 + 7; y < c.y1; y += 16){ let x = c.x0 - c.r()*40;
+      while (x < c.x1){ const w = 10 + Math.floor(c.r()*34); d += rr(x,y,w,7,3.5); x += w + 6; } }
+    return `<path d="${d}" fill="${WHT}"/>`; },
+
+  // gradient field of an anisotropic quadratic: every arrow points down-hill, towards the roundel
+  field(c){ let L = '', Hd = ''; const th = -28*Math.PI/180, co = Math.cos(th), si = Math.sin(th);
+    for (let y = c.y0 + 16; y < c.y1; y += 32) for (let x = c.x0 + 14; x < c.x1 + 20; x += 32){
+      const dx = x - c.cx, dy = y - c.cy; const u = co*dx + si*dy, v = -si*dx + co*dy;
+      const gu = -u, gv = -3.7*v; let gx = co*gu - si*gv, gy = si*gu + co*gv; const n = Math.hypot(gx,gy) || 1; gx/=n; gy/=n;
+      const a = arrow(x - gx*10, y - gy*10, x + gx*11, y + gy*11, 7.5, .6); L += a.line; Hd += a.head; }
+    return `<path d="${L}" stroke="${WHT}" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="${Hd}" fill="${WHT}"/>`; },
+
+  // feed-forward lattice: columns of nodes, each wired to its neighbours in the next layer
+  lattice(c){ let L = '', N = ''; const dx = 36, dy = 30;
+    for (let i = 0, x = c.x0 + 8; x < c.x1 + dx; i++, x += dx){
+      const off = (i % 2) * dy/2;
+      for (let y = c.y0 + 6 + off; y < c.y1 + dy; y += dy){
+        L += `M${f(x)} ${f(y)}L${f(x+dx)} ${f(y-dy/2)}M${f(x)} ${f(y)}L${f(x+dx)} ${f(y+dy/2)}`;
+        N += `M${f(x+3.4)} ${f(y)}a3.4 3.4 0 1 0 -6.8 0a3.4 3.4 0 1 0 6.8 0Z`; } }
+    return `<path d="${L}" stroke="${WHT}" stroke-width="1.7" fill="none"/><path d="${N}" fill="${WHT}"/>`; },
+
+  // causal-mask staircases: lower-triangular 4×4 blocks, tiled
+  stairs(c){ let d = ''; const T = 46, s = 8, g = 3;
+    for (let ty = c.y0 + 4; ty < c.y1; ty += T) for (let tx = c.x0 + 4; tx < c.x1; tx += T)
+      for (let i = 0; i < 4; i++) for (let j = 0; j <= i; j++) d += `M${tx+j*(s+g)} ${ty+i*(s+g)}h${s}v${s}h-${s}Z`;
+    return `<path d="${d}" fill="${WHT}"/>`; },
+
+  // device mesh: nodes of 2×2 accelerators on a regular pitch
+  mesh(c){ let d = ''; const P = 34, s = 10.5, g = 3.2;
+    for (let y = c.y0 + 7; y < c.y1; y += P) for (let x = c.x0 + 7; x < c.x1; x += P)
+      for (let i = 0; i < 2; i++) for (let j = 0; j < 2; j++) d += rr(x + j*(s+g), y + i*(s+g), s, s, 1.6);
+    return `<path d="${d}" fill="${WHT}"/>`; },
+
+  // accordion fold: the context folded into chevrons
+  chevron(c){ let d = ''; const P = 22, A = 6, R = 15;
+    for (let y = c.y0 + 8; y < c.y1 + 10; y += R){ d += `M${c.x0 - 20} ${y}`;
+      for (let x = c.x0 - 20, k = 0; x < c.x1 + 30; x += P/2, k++) d += `L${x} ${y + (k%2 ? A : 0)}`; }
+    return `<path d="${d}" stroke="${WHT}" stroke-width="2.4" fill="none" stroke-linejoin="miter"/>`; },
+
+  // north-light factory roofs — shared by the Intelligence Factory series
+  sawtooth(c){ let d = ''; const P = 30, Hh = 15, R = 33;
+    for (let row = 0, y = c.y0 + 24; y < c.y1 + 20; row++, y += R){ const o = (row % 2) * P/2;
+      d += `M${c.x0 - 40 + o} ${y}`;
+      for (let x = c.x0 - 40 + o; x < c.x1 + 40; x += P) d += `L${x} ${y - Hh}L${x + P} ${y}`;
+      }
+    return `<path d="${d}" stroke="${WHT}" stroke-width="2.2" fill="none" stroke-linejoin="miter"/>`; },
+
+  // traces: signal tracks with vias, the wiring of the die
+  traces(c){ let d = '', v = ''; const R = 17;
+    for (let row = 0, y = c.y0 + 9; y < c.y1; row++, y += R){ let x = c.x0 - c.r()*70;
+      while (x < c.x1){ const L = 26 + c.r()*96;
+        d += `M${f(x)} ${y}H${f(x+L)}`; v += `M${f(x+3.2)} ${y}a3.2 3.2 0 1 0 -6.4 0a3.2 3.2 0 1 0 6.4 0ZM${f(x+L+3.2)} ${y}a3.2 3.2 0 1 0 -6.4 0a3.2 3.2 0 1 0 6.4 0Z`;
+        x += L + 16 + c.r()*26; } }
+    return `<path d="${d}" stroke="${WHT}" stroke-width="2.2" fill="none"/><path d="${v}" fill="${WHT}"/>`; },
+
+  // ledger: a relation, row after row
+  ledger(c){ let d = '', D = ''; const R = 17, C = 70;
+    for (let i = 0, y = c.y0 + 9; y < c.y1; i++, y += R){ d += `M${c.x0} ${y}H${c.x1}`; if (i % 6 === 0) d += `M${c.x0} ${y+4}H${c.x1}`; }
+    for (let x = c.x0 + 30; x < c.x1; x += C) D += `M${x} ${c.y0}V${c.y1}`;
+    return `<path d="${d}" stroke="${WHT}" stroke-width="1.7" fill="none"/><path d="${D}" stroke="${WHT}" stroke-width="3" fill="none"/>`; },
+
+  // image patches
+  patches(c){ let d = ''; const P = 21, s = 15;
+    for (let y = c.y0 + 5; y < c.y1; y += P) for (let x = c.x0 + 5; x < c.x1; x += P) d += `M${x} ${y}h${s}v${s}h-${s}Z`;
+    return `<path d="${d}" fill="${WHT}"/>`; },
+
+  // recursive axis-aligned splits (the feature space a decision tree carves)
+  kd(c){ let d = ''; const T = 116;
+    const split = (x,y,w,h,k) => { if (k === 0 || w < 26 || h < 26) return;
+      const vert = w > h ? c.r() < .8 : c.r() < .2; const t = .3 + c.r()*.4;
+      if (vert){ const sx = x + w*t; d += `M${f(sx)} ${f(y)}V${f(y+h)}`; split(x,y,sx-x,h,k-1); split(sx,y,x+w-sx,h,k-1); }
+      else { const sy = y + h*t; d += `M${f(x)} ${f(sy)}H${f(x+w)}`; split(x,y,w,sy-y,k-1); split(x,sy,w,y+h-sy,k-1); } };
+    for (let y = c.y0; y < c.y1; y += T) for (let x = c.x0; x < c.x1; x += T){ d += `M${x} ${y}h${T}v${T}`; split(x,y,T,T,4); }
+    return `<path d="${d}" stroke="${WHT}" stroke-width="2.2" fill="none"/>`; },
+};
+
+/* ============================================================
+   DEVICES — one per book, drawn from its subject (local coords, centred at 0,0)
+   Return mask art: white = foil, black = knock-out.
+   c = { r:rng, id:prefix }
+   ============================================================ */
+const DEVICES = {
+  /* AI Context Engineering — a finite window cut into a stream of tokens:
+     what falls inside is solid (selected context), what falls outside stays open (left out). */
+  context(c){
+    const rows = 9, rh = 11, gap = 9, tot = rows*rh + (rows-1)*gap, y0 = -tot/2;
+    const win = { x:-66, y:-62, w:132, h:124 };
+    let inD = '', outD = '';
+    for (let i = 0; i < rows; i++){
+      let x = -150 + c.r()*26; const y = y0 + i*(rh+gap);
+      const rowIn = y > win.y && y + rh < win.y + win.h;
+      while (x < 150){ const w = 12 + Math.floor(c.r()*34), mid = x + w/2;
+        if (rowIn && mid > win.x && mid < win.x + win.w) inD += rr(x, y, w, rh, rh/2);
+        else for (let k = x + 3; k < x + w - 2; k += 8.5) outD += `M${f(k+2.6)} ${f(y+rh/2)}a2.6 2.6 0 1 0 -5.2 0a2.6 2.6 0 1 0 5.2 0Z`;
+        x += w + 7; } }
+    const k = 28, e = 12, X0 = win.x - e, X1 = win.x + win.w + e, Y0 = win.y - e, Y1 = win.y + win.h + e;
+    const crop = `M${X0} ${Y0+k}V${Y0}H${X0+k}M${X1-k} ${Y0}H${X1}V${Y0+k}M${X1} ${Y1-k}V${Y1}H${X1-k}M${X0+k} ${Y1}H${X0}V${Y1-k}`;
+    return `
+      <clipPath id="${c.id}cw"><rect x="${win.x}" y="${win.y}" width="${win.w}" height="${win.h}"/></clipPath>
+      <clipPath id="${c.id}co"><path clip-rule="evenodd" d="M-124 0a124 124 0 1 0 248 0a124 124 0 1 0 -248 0Z M${win.x-4} ${win.y-4}h${win.w+8}v${win.h+8}h-${win.w+8}Z"/></clipPath>
+      <path d="${outD}" fill="${WHT}" clip-path="url(#${c.id}co)"/>
+      <path d="${inD}" fill="${WHT}" clip-path="url(#${c.id}cw)"/>
+      <path d="${crop}" fill="none" stroke="${BLK}" stroke-width="16"/>
+      <path d="${crop}" fill="none" stroke="${WHT}" stroke-width="6.5" stroke-linecap="square"/>`;
+  },
+
+  /* Mathematical Foundations — one figure holding all three pillars:
+     Gaussian level sets (probability), their eigen-axes (linear algebra),
+     and gradient descent zig-zagging down them (calculus). */
+  math(c){
+    const th = -28, lam = 3.7, eta = .45; let s = `<g transform="rotate(${th})">`;
+    [1,.8,.6,.4,.2].forEach((k,i) => { s += `<ellipse rx="${f(116*k)}" ry="${f(60*k)}" fill="none" stroke="${WHT}" stroke-width="${i===0?4:2.6}"/>`; });
+    // eigen-axes (linear algebra)
+    const a1 = arrow(14,0,104,0,15,.5), a2 = arrow(0,-14,0,-56,13,.55);
+    s += `<path d="${a1.line}${a2.line}" stroke="${BLK}" stroke-width="11"/><path d="${a1.line}${a2.line}" stroke="${WHT}" stroke-width="4.4"/><path d="${a1.head}${a2.head}" fill="${WHT}"/>`;
+    // gradient descent (calculus) — zig-zag across the narrow valley
+    let u = -98, v = 30; const pts = [];
+    for (let k = 0; k < 4; k++){ pts.push([u,v]); u = u*(1-eta); v = v*(1-eta*lam); }
+    pts.push([0,0]);
+    const d = 'M' + pts.map(p => f(p[0]) + ' ' + f(p[1])).join('L');
+    s += `<path d="${d}" fill="none" stroke="${BLK}" stroke-width="10" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="${WHT}" stroke-width="3.2" stroke-linejoin="round" stroke-dasharray="${pts.length>0?'none':''}"/>`;
+    pts.slice(0,-1).forEach(p => { s += `<circle cx="${f(p[0])}" cy="${f(p[1])}" r="9" fill="${BLK}"/><circle cx="${f(p[0])}" cy="${f(p[1])}" r="5.5" fill="${WHT}"/>`; });
+    s += `<circle r="12" fill="${BLK}"/><circle r="8.5" fill="${WHT}"/><circle r="15" fill="none" stroke="${WHT}" stroke-width="2"/>`;
+    return s + `</g>`;
+  },
+
+  /* Neural Networks from Scratch — a 3-5-5-2 perceptron with trained weights:
+     edge weight drawn as stroke width. */
+  nn(c){
+    const layers = [3,5,5,2], xs = [-96,-32,32,96], dy = 40; let e = '', n = '';
+    const ys = layers.map(k => Array.from({length:k}, (_,i) => (i - (k-1)/2) * dy));
+    for (let l = 0; l < 3; l++) for (const y1 of ys[l]) for (const y2 of ys[l+1]){
+      const q = c.r(), w = q < .22 ? 3.6 : q < .55 ? 2.2 : 1.4; e += `<path d="M${xs[l]} ${f(y1)}L${xs[l+1]} ${f(y2)}" stroke="${WHT}" stroke-width="${f(w)}"/>`; }
+    ys.forEach((col,l) => col.forEach(y => { n += `<circle cx="${xs[l]}" cy="${f(y)}" r="15" fill="${BLK}"/><circle cx="${xs[l]}" cy="${f(y)}" r="10" fill="${WHT}"/>`; }));
+    let io = '';
+    ys[0].forEach(y => { const a = arrow(-126, y, -112, y, 7); io += `<path d="${a.line}" stroke="${WHT}" stroke-width="2.6"/><path d="${a.head}" fill="${WHT}"/>`; });
+    ys[3].forEach(y => { const a = arrow(111, y, 128, y, 7); io += `<path d="${a.line}" stroke="${WHT}" stroke-width="2.6"/><path d="${a.head}" fill="${WHT}"/>`; });
+    return e + n + io;
+  },
+
+  /* Build LLMs from Scratch — the causal attention matrix: each token attends only to the past.
+     Dot area = attention weight (with the familiar "sink" on the first token); masked future = open rings. */
+  llm(c){
+    const N = 8, cell = 21.5, o = -(N*cell)/2 + cell/2; let s = '';
+    for (let i = 0; i < N; i++){
+      const sc = []; for (let j = 0; j <= i; j++) sc.push((j===0?1.6:0) + (j===i?1.3:0) - .28*(i-j) + (c.r()-.5)*.9);
+      const m = Math.max(...sc), ex = sc.map(v => Math.exp(v-m)), Z = ex.reduce((a,b)=>a+b,0);
+      for (let j = 0; j < N; j++){
+        const x = o + j*cell, y = o + i*cell;
+        if (j <= i){ const w = ex[j]/Z; s += `<circle cx="${f(x)}" cy="${f(y)}" r="${f(2.4 + 7.4*Math.sqrt(w))}" fill="${WHT}"/>`; }
+        else s += `<circle cx="${f(x)}" cy="${f(y)}" r="2.6" fill="none" stroke="${WHT}" stroke-width="1.5"/>`;
+      } }
+    // the diagonal rule and the frame of the matrix
+    const e = N*cell/2 + 8;
+    s += `<path d="M${-e} ${-e}V${e}H${e}" fill="none" stroke="${WHT}" stroke-width="3"/>`;
+    s += `<path d="M${-e+8} ${-e-9}H${e}M${e+9} ${-e+8}V${e-4}" fill="none" stroke="${WHT}" stroke-width="1.6" stroke-dasharray="2 5"/>`;
+    return s;
+  },
+
+  /* 5D Parallelism — the 5-cube projected to the plane (Petrie projection):
+     32 devices, 80 links; each of the five edge directions is one axis of parallelism. */
+  penteract(c){
+    const E = [0,1,2,3,4].map(k => [Math.cos(k*Math.PI/5 - Math.PI/2), Math.sin(k*Math.PI/5 - Math.PI/2)]);
+    const V = []; for (let m = 0; m < 32; m++){ let x = 0, y = 0; for (let k = 0; k < 5; k++){ const s = (m>>k)&1 ? 1 : -1; x += s*E[k][0]; y += s*E[k][1]; } V.push([x,y]); }
+    const R = Math.max(...V.map(p => Math.hypot(p[0],p[1]))), sc = 120/R;
+    let d = ''; for (let a = 0; a < 32; a++) for (let k = 0; k < 5; k++){ const b = a ^ (1<<k); if (b > a) d += `M${f(V[a][0]*sc)} ${f(V[a][1]*sc)}L${f(V[b][0]*sc)} ${f(V[b][1]*sc)}`; }
+    let s = `<path d="${d}" stroke="${WHT}" stroke-width="2.2" fill="none"/>`;
+    V.forEach(p => { s += `<circle cx="${f(p[0]*sc)}" cy="${f(p[1]*sc)}" r="7" fill="${BLK}"/><circle cx="${f(p[0]*sc)}" cy="${f(p[1]*sc)}" r="4.4" fill="${WHT}"/>`; });
+    return s;
+  },
+
+  /* Pi vs Hermes vs Codex — a triptych: three agents, three ways to compact the same history.
+     (evenly kept + summary below · progressively compressed · summary above + recent lines) */
+  triptych(c){
+    const xs = [-74,0,74], w = 58, top = -104, bot = 92; let s = '';
+    xs.forEach((x,k) => {
+      const x0 = x - w/2, x1 = x + w/2, lx0 = x0 + 11, lx1 = x1 - 11;
+      s += `<rect x="${x0}" y="${top}" width="${w}" height="${bot-top}" rx="4" fill="none" stroke="${WHT}" stroke-width="4.5"/>`;
+      let L = '';
+      if (k === 0){ s += `<rect x="${lx0}" y="${top+11}" width="${lx1-lx0}" height="46" fill="${WHT}"/>`; for (let y = top+72; y <= bot-10; y += 11.5) L += `M${lx0} ${f(y)}H${lx1}`; s += `<path d="${L}" stroke="${WHT}" stroke-width="3.6"/>`; }
+      if (k === 1){ let y = bot - 12, g = 16; while (y > top + 8){ L += `M${lx0} ${f(y)}H${lx1}`; y -= g; g = Math.max(4.4, g*.8); } s += `<path d="${L}" stroke="${WHT}" stroke-width="2.8"/>`; }
+      if (k === 2){ let G = ''; for (let y = top+14; y <= top+50; y += 11.5) G += `M${lx0} ${f(y)}H${lx1}`; for (let y = top+72; y <= bot-10; y += 11.5) L += `M${lx0} ${f(y)}H${lx1}`;
+        s += `<path d="${G}" stroke="${WHT}" stroke-width="2.4" stroke-dasharray="3 4"/><path d="${L}" stroke="${WHT}" stroke-width="3.6"/><path d="M${lx0-3} ${top+60}H${lx1+3}" stroke="${WHT}" stroke-width="1.6"/>`; }
+    });
+    s += `<path d="M-112 ${bot+12}H112" stroke="${WHT}" stroke-width="6"/><path d="M-96 ${bot+23}H96" stroke="${WHT}" stroke-width="2.2"/>`;
+    return s;
+  },
+
+  /* ---- The Intelligence Factory (arch devices) ---- */
+  /* I. Language — inference: the prompt is prefilled in parallel (a block),
+     then tokens are decoded one at a time, climbing out of it. */
+  lang(c){
+    let s = ''; const cols = 7, rows = 3, q = 13, g = 4.5, bw = cols*q + (cols-1)*g, x0 = -bw/2, y0 = 52;
+    for (let i = 0; i < rows; i++) for (let j = 0; j < cols; j++) s += `<rect x="${f(x0 + j*(q+g))}" y="${f(y0 + i*(q+g))}" width="${q}" height="${q}" fill="${WHT}"/>`;
+    s += `<path d="M${f(x0-9)} ${y0-9}V${f(y0 + rows*(q+g) + 4)}H${f(-x0+9)}V${y0-9}" fill="none" stroke="${WHT}" stroke-width="3"/>`;
+    s += `<path d="M0 ${y0-9}V-86" stroke="${WHT}" stroke-width="3"/>`;
+    for (let k = 0; k < 6; k++){ const y = 26 - k*22, z = 15 - k*1.2;
+      s += `<rect x="${f(-z/2-4)}" y="${f(y-z/2-4)}" width="${f(z+8)}" height="${f(z+8)}" fill="${BLK}"/>`;
+      s += k < 5 ? `<rect x="${f(-z/2)}" y="${f(y-z/2)}" width="${f(z)}" height="${f(z)}" fill="${WHT}"/>` : `<rect x="${f(-z/2+1.3)}" y="${f(y-z/2+1.3)}" width="${f(z-2.6)}" height="${f(z-2.6)}" fill="none" stroke="${WHT}" stroke-width="2.6"/>`; }
+    return s;
+  },
+  /* II. Vision — an eye whose iris is cut into ViT patches. */
+  vision(c){
+    let s = `<path d="M-100 8Q0 -84 100 8Q0 100 -100 8Z" fill="none" stroke="${WHT}" stroke-width="5"/>`;
+    s += `<clipPath id="${c.id}iris"><circle cx="0" cy="8" r="45"/></clipPath><g clip-path="url(#${c.id}iris)">`;
+    for (let y = -40; y < 56; y += 13) for (let x = -48; x < 48; x += 13) s += `<rect x="${x+1.5}" y="${y+1.5}" width="10" height="10" fill="${WHT}"/>`;
+    s += `</g><circle cx="0" cy="8" r="17" fill="${BLK}"/><circle cx="0" cy="8" r="9" fill="${WHT}"/><circle cx="0" cy="8" r="52" fill="none" stroke="${WHT}" stroke-width="2.6"/>`;
+    return s;
+  },
+  /* III. Sound — a voice-agent turn: the user speaks, then the agent answers. */
+  sound(c){
+    let s = ''; const wave = (x0, n, y, amp, seed) => { let d = ''; const r = rng(seed);
+      for (let i = 0; i < n; i++){ const env = Math.sin(Math.PI*(i+.5)/n) * (.45 + .55*r()); const h = Math.max(3, amp*env); d += `M${f(x0 + i*8)} ${f(y-h)}V${f(y+h)}`; } return d; };
+    s += `<path d="${wave(-92, 12, -44, 34, 7)}" stroke="${WHT}" stroke-width="4.6" stroke-linecap="round"/>`;
+    s += `<path d="${wave(-20, 14, 44, 42, 19)}" stroke="${WHT}" stroke-width="4.6" stroke-linecap="round"/>`;
+    s += `<path d="M-100 -44H-96M0 -44H100M-100 44H-24M92 44H100" stroke="${WHT}" stroke-width="1.8"/>`;
+    return s;
+  },
+  /* IV. Reason — from bandits to reasoning models: a search tree grown from three arms,
+     one chain carried through to the reward. */
+  reason(c){
+    const R0 = [0,100], L1 = [-64,0,64].map(x => [x,52]);
+    const L2 = [], L3 = []; L1.forEach(p => [-26,26].forEach(o => L2.push([p[0]+o, 4, p])));
+    L2.forEach(p => [-11,11].forEach(o => L3.push([p[0]+o, -44, p])));
+    const chosen = [R0, L1[1], L2[3], L3[6]]; const goal = [L3[6][0], -92];
+    let thin = '', dots = '', xs = '';
+    L1.forEach(p => { thin += `M${R0[0]} ${R0[1]}L${p[0]} ${p[1]}`; });
+    L2.forEach(p => { thin += `M${p[2][0]} ${p[2][1]}L${p[0]} ${p[1]}`; });
+    const pruned = new Set([0,3,5,9,10]);
+    L3.forEach((p,i) => { if (pruned.has(i)){ const mx = p[2][0] + (p[0]-p[2][0])*.55, my = p[2][1] + (p[1]-p[2][1])*.55; thin += `M${p[2][0]} ${p[2][1]}L${f(mx)} ${f(my)}`; xs += `M${f(mx-4)} ${f(my-4)}l8 8m0 -8l-8 8`; }
+      else { thin += `M${p[2][0]} ${p[2][1]}L${p[0]} ${p[1]}`; if (i !== 6) dots += `<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="${WHT}"/>`; } });
+    const bold = 'M' + chosen.concat([goal]).map(p => p[0] + ' ' + p[1]).join('L');
+    [R0].concat(L1, L2.map(p=>[p[0],p[1]])).forEach(p => { dots += `<circle cx="${p[0]}" cy="${p[1]}" r="4.6" fill="${WHT}"/>`; });
+    return `<path d="${thin}" stroke="${WHT}" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="${xs}" stroke="${WHT}" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="${bold}" stroke="${BLK}" stroke-width="13" fill="none" stroke-linecap="round" stroke-linejoin="round"/>${dots}
+      <path d="${bold}" stroke="${WHT}" stroke-width="5.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      ${chosen.map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="7" fill="${WHT}"/>`).join('')}
+      <circle cx="${goal[0]}" cy="${goal[1]}" r="13" fill="${BLK}"/><circle cx="${goal[0]}" cy="${goal[1]}" r="9" fill="${WHT}"/><circle cx="${goal[0]}" cy="${goal[1]}" r="16" fill="none" stroke="${WHT}" stroke-width="2.2"/>`;
+  },
+
+  /* Kernel Engineering — the die: a grid of streaming multiprocessors inside the package. */
+  kernel(c){
+    let s = `<rect x="-84" y="-84" width="168" height="168" rx="8" fill="none" stroke="${WHT}" stroke-width="5"/>`;
+    let pins = ''; for (let i = 0; i < 9; i++){ const t = -64 + i*16; pins += `M${t} -90V-106M${t} 90V106M-90 ${t}H-106M90 ${t}H106`; }
+    s += `<path d="${pins}" stroke="${WHT}" stroke-width="4"/>`;
+    for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++){ const x = -64 + j*33, y = -64 + i*33;
+      s += `<rect x="${x}" y="${y}" width="29" height="29" fill="${WHT}"/>`;
+      s += `<path d="M${x+14.5} ${y+5}V${y+24}M${x+5} ${y+14.5}H${x+24}" stroke="${BLK}" stroke-width="2.2"/>`; }
+    s += `<circle cx="-70" cy="-70" r="4" fill="${WHT}"/>`;
+    return s;
+  },
+
+  /* SQL Masterclass — ⋈, the join: two relations (rows) meeting at the key. */
+  sql(c){
+    let s = ''; const X = 108, Y = 78;
+    s += `<clipPath id="${c.id}L"><path d="M${-X+9} ${-Y+22}L${-X+9} ${Y-22}L-26 0Z"/></clipPath><clipPath id="${c.id}R"><path d="M${X-9} ${-Y+22}L${X-9} ${Y-22}L26 0Z"/></clipPath>`;
+    s += `<path d="M${-X} ${-Y}L${-X} ${Y}L-4 0Z M${X} ${-Y}L${X} ${Y}L4 0Z" fill="none" stroke="${WHT}" stroke-width="5.5" stroke-linejoin="miter"/>`;
+    let rows = ''; for (let y = -48; y <= 48; y += 12) rows += `M-120 ${y}H120`;
+    s += `<g clip-path="url(#${c.id}L)"><path d="${rows}" stroke="${WHT}" stroke-width="3.4"/></g><g clip-path="url(#${c.id}R)"><path d="${rows}" stroke="${WHT}" stroke-width="3.4"/></g>`;
+    s += `<path d="M${-X-14} ${-Y}V${Y}M${X+14} ${-Y}V${Y}" stroke="${WHT}" stroke-width="2.4"/>`;
+    s += `<circle r="12" fill="${BLK}"/><circle r="7" fill="${WHT}"/>`;
+    return s;
+  },
+
+  /* DeiT — sixteen image patches plus the two extra tokens: class (solid) and distillation (open),
+     each read out by its own head. */
+  deit(c){
+    let s = ''; const q = 25, g = 6, n = 4, bw = n*q + (n-1)*g, x0 = -bw/2, y0 = -bw/2;
+    for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) s += `<rect x="${x0 + j*(q+g)}" y="${y0 + i*(q+g)}" width="${q}" height="${q}" fill="${WHT}"/>`;
+    s += `<circle cx="-92" cy="0" r="15" fill="${WHT}"/><circle cx="92" cy="0" r="12.5" fill="none" stroke="${WHT}" stroke-width="5"/>`;
+    s += `<path d="M-92 22V${-y0+22}H92V22" fill="none" stroke="${WHT}" stroke-width="2.6"/><path d="M${x0} ${-y0+22}V${-y0+10}M${-x0} ${-y0+22}V${-y0+10}" stroke="${WHT}" stroke-width="2.6"/>`;
+    const a = arrow(-92, -22, -92, -78, 11), b = arrow(92, -22, 92, -78, 11);
+    s += `<path d="${a.line}${b.line}" stroke="${WHT}" stroke-width="3.4"/><path d="${a.head}${b.head}" fill="${WHT}"/>`;
+    return s;
+  },
+
+  /* Decision Trees — a trained tree: square splits, round leaves in two classes. */
+  dtree(c){
+    const nodes = { r:[0,-96,'s'], a:[-62,-38,'s'], b:[62,-38,'s'], aa:[-92,22,'f'], ab:[-32,22,'s'], ba:[34,22,'o'], bb:[92,22,'s'],
+      aba:[-50,82,'o'], abb:[-14,82,'f'], bba:[74,82,'f'], bbb:[110,82,'o'] };
+    const kids = { r:['a','b'], a:['aa','ab'], b:['ba','bb'], ab:['aba','abb'], bb:['bba','bbb'] };
+    let d = '', s = '';
+    for (const p in kids){ const [px,py] = nodes[p], [ax,ay] = nodes[kids[p][0]], [bx] = nodes[kids[p][1]], my = (py+ay)/2;
+      d += `M${px} ${py}V${my}M${ax} ${my}H${bx}M${ax} ${my}V${ay}M${bx} ${my}V${ay}`; }
+    s += `<path d="${d}" stroke="${WHT}" stroke-width="4" fill="none" stroke-linecap="square"/>`;
+    for (const k in nodes){ const [x,y,t] = nodes[k];
+      if (t === 's') s += `<rect x="${x-13}" y="${y-13}" width="26" height="26" fill="${BLK}"/><rect x="${x-9}" y="${y-9}" width="18" height="18" fill="${WHT}"/>`;
+      else s += `<circle cx="${x}" cy="${y}" r="14" fill="${BLK}"/>` + (t === 'f' ? `<circle cx="${x}" cy="${y}" r="10" fill="${WHT}"/>` : `<circle cx="${x}" cy="${y}" r="8" fill="none" stroke="${WHT}" stroke-width="4"/>`); }
+    return s;
+  },
+};
+
+/* ============================================================
+   THE BOOKS
+   title: pre (italic) · caps lines (array of lines; a line may mix {it:'vs '} segments) · post (italic)
+   ============================================================ */
+const BOOKS = [
+  { slug:'ai-context-engineering', title:'AI Context Engineering', level:'intermediate', capsules:43, cloth:'peacock', foil:'copper', device:'context', pattern:'tokens',
+    t:{ caps:['AI CONTEXT','ENGINEERING'] } },
+  { slug:'mathematical-foundations-for-ml', title:'Mathematical Foundations for Machine Learning', level:'beginner', capsules:43, cloth:'prussian', foil:'gold', device:'math', pattern:'field',
+    t:{ caps:['MATHEMATICAL','FOUNDATIONS'], post:'for Machine Learning' } },
+  { slug:'neural-networks-from-scratch', title:'Neural Networks from Scratch', level:'beginner', capsules:33, cloth:'bottle', foil:'gold', device:'nn', pattern:'lattice',
+    t:{ caps:['NEURAL','NETWORKS'], post:'from Scratch' } },
+  { slug:'build-llms-from-scratch', title:'Build Large Language Models (LLMs) from Scratch', level:'intermediate', capsules:20, cloth:'oxblood', foil:'gold', device:'llm', pattern:'stairs',
+    t:{ pre:'Build', caps:['LARGE LANGUAGE','MODELS'], post:'(LLMs) from Scratch' } },
+  { slug:'5d-parallelism', title:'5D Parallelism for Large Model Training', level:'advanced', capsules:40, cloth:'ink', foil:'palladium', device:'penteract', pattern:'mesh',
+    t:{ caps:['5D','PARALLELISM'], post:'for Large Model Training' } },
+  { slug:'pi-vs-hermes-vs-codex', title:'Pi vs Hermes vs Codex: Context Compaction and Memory', level:'advanced', capsules:9, cloth:'saffron', foil:'black', device:'triptych', pattern:'chevron',
+    t:{ caps:[['PI ',{it:'vs'},' HERMES'],[{it:'vs'},' CODEX']], post:'Context Compaction and Memory' } },
+
+  { slug:'charlie-language-room', title:'Charlie and the Language Room', series:'I', level:'advanced', capsules:22, cloth:'madder', foil:'gold', device:'lang', pattern:'sawtooth', arch:true,
+    t:{ pre:'Charlie and the', caps:['LANGUAGE','ROOM'], post:'Language — Inference Engineering' } },
+  { slug:'charlie-vision-room', title:'Charlie and the Vision Room', series:'II', level:'intermediate', capsules:20, cloth:'viridian', foil:'gold', device:'vision', pattern:'sawtooth', arch:true,
+    t:{ pre:'Charlie and the', caps:['VISION','ROOM'], post:'Vision — Vision Transformers' } },
+  { slug:'charlie-sound-room', title:'Charlie and the Sound Room', series:'III', level:'intermediate', capsules:20, cloth:'cobalt', foil:'gold', device:'sound', pattern:'sawtooth', arch:true,
+    t:{ pre:'Charlie and the', caps:['SOUND','ROOM'], post:'Audio — Voice Agents' } },
+  { slug:'charlie-reasoning-room', title:'Charlie and the Reasoning Room', series:'IV', level:'advanced', capsules:21, cloth:'aubergine', foil:'gold', device:'reason', pattern:'sawtooth', arch:true,
+    t:{ pre:'Charlie and the', caps:['REASONING','ROOM'], post:'Reason — Reinforcement Learning, from bandits to reasoning models' } },
+
+  { slug:'decision-trees-from-scratch', title:'Build Decision Trees from Scratch', level:'beginner', capsules:23, cloth:'moss', foil:'gold', device:'dtree', pattern:'kd',
+    t:{ pre:'Build', caps:['DECISION','TREES'], post:'from Scratch' } },
+  { slug:'sql-masterclass', title:'SQL Masterclass', level:'beginner', capsules:36, cloth:'tobacco', foil:'gold', device:'sql', pattern:'ledger',
+    t:{ caps:['SQL','MASTERCLASS'], scale:[1.9,1] } },
+  { slug:'deit-from-scratch', title:'Build a Data-Efficient Image Transformer (DeiT) from Scratch', level:'advanced', capsules:42, cloth:'claret', foil:'palladium', device:'deit', pattern:'patches',
+    t:{ pre:'Build a', caps:['DATA-EFFICIENT','IMAGE TRANSFORMER'], post:'(DeiT) from Scratch' } },
+  { slug:'kernel-engineering', title:'Kernel Engineering', level:'advanced', forthcoming:true, cloth:'slate', foil:'palladium', device:'kernel', pattern:'traces',
+    t:{ caps:['KERNEL','ENGINEERING'], post:'From silicon to speculative decoding — GPU kernels for modern LLMs.' } },
+];
+
+/* ============================================================
+   TYPE MEASUREMENT (canvas, after fonts load)
+   ============================================================ */
+const FACE = "'Cormorant Garamond'";
+const ctx2d = document.createElement('canvas').getContext('2d');
+const HAS_LS = 'letterSpacing' in ctx2d;
+function tw(str, font, ls){ ctx2d.font = font; if (HAS_LS) ctx2d.letterSpacing = (ls||0) + 'px'; const w = ctx2d.measureText(str).width; return HAS_LS ? w : w + (ls||0)*str.length; }
+const CAP_TRACK = .04, IT_TRACK = .005;
+function segs(line){ return (Array.isArray(line) ? line : [line]).map(s => typeof s === 'string' ? { t:s, it:false } : { t:s.it, it:true }); }
+function lineWidth(line, size){ return segs(line).reduce((w,s) => w + (s.it
+  ? tw(s.t, `600 italic ${size*.62}px ${FACE}`, size*.62*IT_TRACK)
+  : tw(s.t, `700 ${size}px ${FACE}`, size*CAP_TRACK)), 0); }
+/* Two-line breaking for italic continuations: balance the lines, prefer a break after
+   a dash or comma, never strand a single word. */
+function wrapItalic(text, size, maxW){
+  const font = `600 italic ${size}px ${FACE}`;
+  if (tw(text, font, 0) <= maxW) return [text];
+  const ws = text.split(' '); let best = null;
+  for (let i = 1; i < ws.length; i++){
+    const a = ws.slice(0,i).join(' '), b = ws.slice(i).join(' ');
+    const wa = tw(a, font, 0), wb = tw(b, font, 0);
+    let cost = Math.max(wa, wb) + Math.abs(wa - wb) * .25;
+    if (wa > maxW || wb > maxW) cost += 5000;
+    if (/[—,:;]$/.test(ws[i-1])) cost -= 90;
+    if (ws.length - i === 1 || i === 1) cost += 800;
+    if (!best || cost < best.cost) best = { cost, lines:[a,b] };
+  }
+  return best.lines;
+}
+
+/* ============================================================
+   COVER BUILDER
+   Every cover is two stacked renderings of the same artwork:
+   .so — screen: foil and blind art used as masks, with pressed-edge filters (the material simulation)
+   .po — print:  the same art painted directly as vectors (foil gradient, flat blind tone) for the PDF
+   ============================================================ */
+const tok = (s, F, K) => s.split('__F__').join(F).split('__K__').join(K);
+const circlePath = (x,y,r) => `M${f(x-r)} ${f(y)}a${f(r)} ${f(r)} 0 1 0 ${f(2*r)} 0a${f(r)} ${f(r)} 0 1 0 ${f(-2*r)} 0Z`;
+
+function layoutTitle(b, cx, zoneTop, zoneBot, maxW){
+  const T = b.t, scale = T.scale || T.caps.map(() => 1);
+  let size = T.size || 80;
+  const widest = Math.max(...T.caps.map((l,i) => lineWidth(l, size*scale[i])));
+  if (widest > maxW) size = Math.floor(size * maxW / widest);
+  const lv = b.level[0].toUpperCase() + b.level.slice(1);
+  const detail = (b.forthcoming ? `${lv} · Forthcoming` : b.series ? `Volume ${b.series} · ${lv} · ${words(b.capsules)} capsules` : `${lv} · ${words(b.capsules)} capsules`).toUpperCase();
+  let items, totH;
+  for (let pass = 0; pass < 14; pass++){
+    const ip = Math.max(26, Math.min(38, size * .5));
+    items = [];
+    if (T.pre) items.push({ k:'it', t:T.pre, size:ip, asc:ip*.72, desc:ip*.2, gap:size*.2 });
+    T.caps.forEach((l,i) => { const s = size*scale[i]; items.push({ k:'caps', line:l, size:s, asc:s*.64, desc:s*.02, gap: i < T.caps.length-1 ? s*.26 : size*.24 }); });
+    if (T.post){ const ps = T.post.length > 34 ? ip*.84 : ip; const L = wrapItalic(T.post, ps, maxW - 16);
+      L.forEach((t,i) => items.push({ k:'it', t, size:ps, asc:ps*.72, desc:ps*.22, gap: i < L.length-1 ? ps*.28 : 20 })); }
+    items.push({ k:'orn', asc:5, desc:5, gap:17 });
+    items.push({ k:'lab', t:detail, size:13.5, asc:10, desc:1, gap:0 });
+    totH = items.reduce((h,it) => h + it.asc + it.desc + it.gap, 0);
+    if (totH <= zoneBot - zoneTop) break;
+    size *= .95;
+  }
+  let y = zoneTop + Math.max(0, (zoneBot - zoneTop - totH) / 2), out = '';
+  for (const it of items){
+    const base = y + it.asc;
+    if (it.k === 'caps'){
+      const wLine = lineWidth(it.line, it.size); let x = cx - wLine/2, spans = '';
+      for (const s of segs(it.line)){
+        if (s.it){ const fsz = it.size*.62; spans += `<tspan x="${f(x)}" style="font:600 italic ${f(fsz)}px ${FACE};letter-spacing:${f(fsz*IT_TRACK)}px">${s.t}</tspan>`; x += tw(s.t, `600 italic ${fsz}px ${FACE}`, fsz*IT_TRACK); }
+        else { spans += `<tspan x="${f(x)}" style="font:700 ${f(it.size)}px ${FACE};letter-spacing:${f(it.size*CAP_TRACK)}px;font-variant-numeric:lining-nums">${s.t.replace(/ /g,'&#160;')}</tspan>`; x += tw(s.t, `700 ${it.size}px ${FACE}`, it.size*CAP_TRACK); }
+      }
+      out += `<text y="${f(base)}" fill="${WHT}">${spans}</text>`;
+    } else if (it.k === 'it'){
+      out += `<text x="${cx}" y="${f(base)}" text-anchor="middle" fill="${WHT}" style="font:600 italic ${f(it.size)}px ${FACE}">${it.t}</text>`;
+    } else if (it.k === 'orn'){
+      out += `<path d="M${cx-46} ${f(base)}H${cx-13}M${cx+13} ${f(base)}H${cx+46}" stroke="${WHT}" stroke-width="1.8"/><path d="M${cx} ${f(base-6)}L${cx+6} ${f(base)}L${cx} ${f(base+6)}L${cx-6} ${f(base)}Z" fill="${WHT}"/>`;
+    } else if (it.k === 'lab'){
+      const ls = it.size*.24;
+      out += `<text x="${f(cx + ls/2)}" y="${f(base)}" text-anchor="middle" fill="${WHT}" style="font:700 ${it.size}px ${FACE};letter-spacing:${f(ls)}px">${it.t}</text>`;
+    }
+    y = base + it.desc + it.gap;
+  }
+  return out;
+}
+
+/* the Vizuara device: an open book seen end-on — which is also a V */
+function vizMark(x, y, s = 1){
+  return `<g transform="translate(${f(x)} ${f(y)}) scale(${s})">
+      <circle r="17" fill="none" stroke="${WHT}" stroke-width="2"/>
+      <path d="M0 9.5Q-3.5 -1 -12 -6.5M0 9.5Q3.5 -1 12 -6.5" fill="none" stroke="${WHT}" stroke-width="2.8" stroke-linecap="round"/>
+      <path d="M0 9.5Q-2 -2 -7 -9.5M0 9.5Q2 -2 7 -9.5" fill="none" stroke="${WHT}" stroke-width="2" stroke-linecap="round"/>
+      <path d="M0 9.5Q-.6 -2.5 -2.4 -11M0 9.5Q.6 -2.5 2.4 -11" fill="none" stroke="${WHT}" stroke-width="1.6" stroke-linecap="round"/>
+    </g>`;
+}
+function imprint(cx, iy){
+  const ils = 14*.34;
+  return vizMark(cx, iy-5)
+    + `<text x="${cx-32}" y="${iy}" text-anchor="end" fill="${WHT}" style="font:700 14px ${FACE};letter-spacing:${f(ils)}px">VIZUARA</text>`
+    + `<text x="${f(cx+32+ils)}" y="${iy}" text-anchor="start" fill="${WHT}" style="font:700 14px ${FACE};letter-spacing:${f(ils)}px">BOOKS</text>`;
+}
+
+function clothDefs(P, cloth, foil, seed, ww = W){
+  const fs = foil.stops, n = fs.length;
+  const grad = fs.map((c,i) => `<stop offset="${f(i/(n-1))}" stop-color="${c}"/>`).join('');
+  return `
+  <linearGradient id="${P}fg" gradientUnits="userSpaceOnUse" x1="-40" y1="0" x2="760" y2="888">${grad}</linearGradient>
+  <linearGradient id="${P}light" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="720" y2="888">
+    <stop offset="0" stop-color="#fff" stop-opacity=".07"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".16"/></linearGradient>
+  <radialGradient id="${P}vig" cx="45%" cy="40%" r="75%"><stop offset=".6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".22"/></radialGradient>
+  <linearGradient id="${P}hinge" x1="0" x2="1"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset=".45" stop-color="#000" stop-opacity=".38"/><stop offset=".62" stop-color="#000" stop-opacity=".10"/><stop offset=".8" stop-color="#fff" stop-opacity=".10"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+  <linearGradient id="${P}lap" x1="0" x2="1"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></linearGradient>
+  <linearGradient id="${P}lapR" x1="1" x2="0"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></linearGradient>
+  <pattern id="${P}weave" width="4" height="4" patternUnits="userSpaceOnUse">
+    <rect width="2" height="2" fill="#fff" fill-opacity=".045"/><rect x="2" y="2" width="2" height="2" fill="#fff" fill-opacity=".045"/>
+    <rect x="2" width="2" height="2" fill="#000" fill-opacity=".05"/><rect y="2" width="2" height="2" fill="#000" fill-opacity=".05"/>
+    <path d="M0 .5H4M0 2.5H4" stroke="#000" stroke-opacity=".05" stroke-width=".6"/>
+  </pattern>
+  <filter id="${P}cloth" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB">
+    <feTurbulence type="fractalNoise" baseFrequency="0.012 0.75" numOctaves="2" seed="${seed}" result="h"/>
+    <feTurbulence type="fractalNoise" baseFrequency="0.75 0.012" numOctaves="2" seed="${seed+3}" result="v"/>
+    <feTurbulence type="fractalNoise" baseFrequency="0.0045" numOctaves="2" seed="${seed+7}" result="m"/>
+    <feComposite in="h" in2="v" operator="arithmetic" k2=".5" k3=".5" result="hv"/>
+    <feComposite in="hv" in2="m" operator="arithmetic" k2=".78" k3=".22" result="all"/>
+    <feColorMatrix in="all" type="matrix" values=".33 .33 .33 0 0 .33 .33 .33 0 0 .33 .33 .33 0 0 0 0 0 0 1" result="g"/>
+    <feComponentTransfer in="g" result="gc"><feFuncR type="linear" slope="2" intercept="-.5"/><feFuncG type="linear" slope="2" intercept="-.5"/><feFuncB type="linear" slope="2" intercept="-.5"/></feComponentTransfer>
+    <feBlend in="gc" in2="SourceGraphic" mode="soft-light"/>
+  </filter>
+  <filter id="${P}leather" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB">
+    <feTurbulence type="fractalNoise" baseFrequency=".16" numOctaves="3" seed="${seed+11}" result="t"/>
+    <feDiffuseLighting in="t" surfaceScale="2.6" diffuseConstant="1" lighting-color="#fff" result="d"><feDistantLight azimuth="225" elevation="48"/></feDiffuseLighting>
+    <feColorMatrix in="d" type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 .5 0 0 0 -.33" result="hl"/>
+    <feComposite in="hl" in2="SourceAlpha" operator="in" result="hli"/>
+    <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="hli"/></feMerge>
+  </filter>
+  <filter id="${P}blind" x="-2%" y="-2%" width="104%" height="104%" color-interpolation-filters="sRGB">
+    <feOffset in="SourceAlpha" dx="1.3" dy="1.3" result="o1"/><feGaussianBlur in="o1" stdDeviation=".6" result="o1b"/>
+    <feComposite in="SourceAlpha" in2="o1b" operator="out" result="e1"/>
+    <feFlood flood-color="#000" flood-opacity=".6"/><feComposite in2="e1" operator="in" result="sh"/>
+    <feOffset in="SourceAlpha" dx="-1" dy="-1" result="o2"/><feGaussianBlur in="o2" stdDeviation=".5" result="o2b"/>
+    <feComposite in="SourceAlpha" in2="o2b" operator="out" result="e2"/>
+    <feFlood flood-color="#fff" flood-opacity=".2"/><feComposite in2="e2" operator="in" result="hl"/>
+    <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="sh"/><feMergeNode in="hl"/></feMerge>
+  </filter>
+  <filter id="${P}sunk" x="-4%" y="-4%" width="108%" height="108%" color-interpolation-filters="sRGB">
+    <feOffset in="SourceAlpha" dx="3" dy="3" result="o1"/><feGaussianBlur in="o1" stdDeviation="2.2" result="o1b"/>
+    <feComposite in="SourceAlpha" in2="o1b" operator="out" result="e1"/>
+    <feFlood flood-color="#000" flood-opacity=".7"/><feComposite in2="e1" operator="in" result="sh"/>
+    <feOffset in="SourceAlpha" dx="-2" dy="-2" result="o2"/><feGaussianBlur in="o2" stdDeviation="1.4" result="o2b"/>
+    <feComposite in="SourceAlpha" in2="o2b" operator="out" result="e2"/>
+    <feFlood flood-color="#fff" flood-opacity=".16"/><feComposite in2="e2" operator="in" result="hl"/>
+    <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="sh"/><feMergeNode in="hl"/></feMerge>
+  </filter>
+  <filter id="${P}foilfx" filterUnits="userSpaceOnUse" x="0" y="0" width="${ww}" height="${H}" color-interpolation-filters="sRGB">
+    <feOffset in="SourceAlpha" dx=".9" dy=".9" result="o1"/>
+    <feComposite in="SourceAlpha" in2="o1" operator="out" result="e1"/>
+    <feFlood flood-color="${foil.edge}" flood-opacity="${foil.pigment ? .25 : .7}"/><feComposite in2="e1" operator="in" result="sh"/>
+    <feOffset in="SourceAlpha" dx="-.8" dy="-.8" result="o2"/>
+    <feComposite in="SourceAlpha" in2="o2" operator="out" result="e2"/>
+    <feFlood flood-color="#fff" flood-opacity="${foil.pigment ? .05 : .5}"/><feComposite in2="e2" operator="in" result="hl"/>
+    <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="${seed+5}" result="n"/>
+    <feColorMatrix in="n" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 ${foil.pigment ? '1.2 -.62' : '1.6 -.72'}" result="nd"/>
+    <feComposite in="nd" in2="SourceAlpha" operator="in" result="speck"/>
+    <feOffset in="SourceAlpha" dx="1.2" dy="1.6" result="dro"/><feGaussianBlur in="dro" stdDeviation="1" result="drob"/>
+    <feComposite in="drob" in2="SourceAlpha" operator="out" result="dr"/>
+    <feFlood flood-color="#000" flood-opacity="${foil.pigment ? .1 : .35}"/><feComposite in2="dr" operator="in" result="drop"/>
+    <feMerge><feMergeNode in="drop"/><feMergeNode in="SourceGraphic"/><feMergeNode in="speck"/><feMergeNode in="sh"/><feMergeNode in="hl"/></feMerge>
+  </filter>`;
+}
+
+function buildCover(b, P, opts = {}){
+  const cloth = CLOTH[b.cloth].hex, foil = FOILS[b.foil], R = rng(hash(b.slug));
+  const lvl = b.level;
+  const S = lvl === 'advanced' ? 0 : 92;           // quarter-cloth on the front board
+  const CN = lvl === 'intermediate' ? 132 : 0;     // corner leg (half binding)
+  const HINGE = 30;
+  const cx = Math.round(((S || HINGE) + W) / 2);   // centred on the board, not the case
+  const band = { x0: S || 40, y0: 418, x1: W, y1: 792 };
+  const cy = 605, RING = 150;
+  const arch = !!b.arch, AW = 262, AH = 340;
+  const dark = shade(cloth, -.30), sunk = shade(cloth, -.10), blindDev = shade(cloth, -.34);
+  const seed = hash(b.slug) % 97;
+
+  /* --- blind band art --- */
+  const pattern = PATTERNS[b.pattern]({ x0:band.x0, y0:band.y0, x1:band.x1, y1:band.y1, cx, cy, r:R });
+  const bandLines = `<path d="M${band.x0} ${band.y0+1.5}H${band.x1}M${band.x0} ${band.y1-1.5}H${band.x1}" stroke="${WHT}" stroke-width="3"/>`;
+  const clearD = arch ? archPath(AW+34, AH+34, cx, cy) : circlePath(cx, cy, RING+18);
+
+  /* --- device --- */
+  const dctx = { r:rng(hash(b.slug+'d')), id:P };
+  const devY = arch ? cy + 22 : cy;
+  const devInner = DEVICES[b.device](dctx);
+  const devExtra = arch ? `<text x="${cx}" y="${cy - AH/2 + 64}" text-anchor="middle" style="font:700 30px ${FACE};letter-spacing:.08em" fill="${WHT}">${b.series}</text><path d="M${cx-40} ${cy - AH/2 + 78}H${cx+40}" stroke="${WHT}" stroke-width="1.8"/>` : '';
+  const frame = arch
+    ? `<path d="${archPath(AW, AH, cx, cy)}" fill="none" stroke="${WHT}" stroke-width="4"/><path d="${archPath(AW-18, AH-18, cx, cy)}" fill="none" stroke="${WHT}" stroke-width="1.6"/>`
+    : `<circle cx="${cx}" cy="${cy}" r="${RING}" fill="none" stroke="${WHT}" stroke-width="4"/><circle cx="${cx}" cy="${cy}" r="${RING-9}" fill="none" stroke="${WHT}" stroke-width="1.6"/>`;
+  const sunkD = arch ? archPath(AW+12, AH+12, cx, cy) : circlePath(cx, cy, RING+7);
+
+  /* --- type --- */
+  const title = layoutTitle(b, cx, b.series ? 96 : 66, 392, lvl === 'advanced' ? 560 : 520);
+  let head = '';
+  if (b.series){
+    const ls = 12.5*.26, t = 'CHARLIE AND THE INTELLIGENCE FACTORY', wv = tw(t, `700 12.5px ${FACE}`, ls);
+    head = `<text x="${f(cx+ls/2)}" y="62" text-anchor="middle" fill="${WHT}" style="font:700 12.5px ${FACE};letter-spacing:${f(ls)}px">${t}</text>
+      <path d="M${f(cx - wv/2 - 40)} 57.5H${f(cx - wv/2 - 12)}M${f(cx + wv/2 + 12)} 57.5H${f(cx + wv/2 + 40)}" stroke="${WHT}" stroke-width="1.6"/>`;
+  }
+  let fillets = '';
+  if (S) fillets += `<path d="M${S-9} 0V${H}" stroke="${WHT}" stroke-width="2.2"/>`;
+  if (CN) fillets += `<path d="M${W-CN-12.7} 0L${W} ${CN+12.7}M${W-CN-12.7} ${H}L${W} ${H-CN-12.7}" stroke="${WHT}" stroke-width="2.2"/>`;
+  const foilDev = !b.forthcoming;
+  const foilAbs = head + title + frame + devExtra + imprint(cx, 848) + fillets;   // absolute coordinates
+  const devG = (inner) => `<g transform="translate(${cx} ${devY})">${inner}</g>`;
+
+  /* --- house cloth (quarter / half) --- */
+  let house = '';
+  if (S){
+    house += `<rect width="${S}" height="${H}" fill="${HOUSE.hex}" filter="url(#${P}leather)"/>`;
+    house += `<rect x="${S-7}" width="7" height="${H}" fill="url(#${P}lap)"/><path d="M${S+.6} 0V${H}" stroke="#fff" stroke-opacity=".14" stroke-width="1.2"/>`;
+  }
+  if (CN){
+    house += `<path d="M${W-CN} 0H${W}V${CN}ZM${W-CN} ${H}H${W}V${H-CN}Z" fill="${HOUSE.hex}" filter="url(#${P}leather)"/>`;
+    house += `<path d="M${W-CN} 0L${W} ${CN}M${W-CN} ${H}L${W} ${H-CN}" stroke="#000" stroke-opacity=".5" stroke-width="5"/><path d="M${W-CN-1.2} 0L${W} ${CN+1.2}M${W-CN-1.2} ${H}L${W} ${H-CN-1.2}" stroke="#fff" stroke-opacity=".14" stroke-width="1.2"/>`;
+  }
+
+  const M = (inner) => `<rect width="${W}" height="${H}" fill="#000"/>${tok(inner, '#fff', '#000')}`;
+  const bandClip = `<clipPath id="${P}bc"><rect x="${band.x0}" y="${band.y0+10}" width="${band.x1-band.x0}" height="${band.y1-band.y0-20}"/></clipPath>
+    <clipPath id="${P}cc"><path clip-rule="evenodd" d="M0 0H${W}V${H}H0Z ${clearD}"/></clipPath>`;
+
+  const svgOpen = opts.x !== undefined
+    ? `<svg x="${opts.x}" y="0" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`
+    : `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">`;
+  return `${svgOpen}
+  <defs>${clothDefs(P, cloth, foil, seed)}
+    <linearGradient id="${P}fgd" href="#${P}fg" gradientTransform="translate(${-cx} ${-devY})"/>
+    ${bandClip}
+    <mask id="${P}bm" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}" height="${H}">${M(`<g clip-path="url(#${P}bc)">${pattern}</g>${bandLines}`)}<path d="${clearD}" fill="#000"/></mask>
+    <mask id="${P}fm" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}" height="${H}">${M(foilAbs + (foilDev ? devG(devInner) : ''))}</mask>
+    ${foilDev ? '' : `<mask id="${P}dm" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}" height="${H}">${M(devG(devInner))}</mask>`}
+  </defs>
+  <rect width="${W}" height="${H}" fill="${cloth}" filter="url(#${P}cloth)"/>
+
+  <g class="so">
+    <g class="fx" filter="url(#${P}blind)"><rect x="${band.x0}" y="${band.y0}" width="${band.x1-band.x0}" height="${band.y1-band.y0}" fill="${dark}" mask="url(#${P}bm)"/></g>
+    <g class="fx" filter="url(#${P}sunk)"><path d="${sunkD}" fill="${sunk}"/></g>
+    ${foilDev ? '' : `<g class="fx" filter="url(#${P}blind)"><rect x="${cx-RING}" y="${cy-RING}" width="${2*RING}" height="${2*RING}" fill="${blindDev}" mask="url(#${P}dm)"/></g>`}
+  </g>
+  <g class="po">
+    <g clip-path="url(#${P}cc)"><g clip-path="url(#${P}bc)">${tok(pattern, dark, dark)}</g>${tok(bandLines, dark, dark)}</g>
+    <path d="${sunkD}" fill="${sunk}"/>
+    ${foilDev ? '' : devG(tok(devInner, blindDev, sunk))}
+  </g>
+
+  ${house}
+  <rect x="${HINGE-9}" width="18" height="${H}" fill="url(#${P}hinge)"/>
+
+  <g class="so fx" filter="url(#${P}foilfx)"><rect width="${W}" height="${H}" fill="url(#${P}fg)" mask="url(#${P}fm)"/></g>
+  <g class="po">${tok(foilAbs, `url(#${P}fg)`, sunk)}${foilDev ? devG(tok(devInner, `url(#${P}fgd)`, sunk)) : ''}</g>
+
+  <rect class="so" width="${W}" height="${H}" fill="url(#${P}weave)"/>
+  <rect width="${W}" height="${H}" fill="url(#${P}light)"/>
+  <rect width="${W}" height="${H}" fill="url(#${P}vig)"/>
+  <path class="so" d="M0 .75H${W-.75}V${H-.75}H0" fill="none" stroke="#fff" stroke-opacity=".10" stroke-width="1.5"/>
+</svg>`;
+}
+
+/* ============================================================
+   FULL CASE WRAP — back board · spine · front board (quarter-bound)
+   ============================================================ */
+function buildWrap(){
+  const b = BOOKS.find(x => x.slug === 'neural-networks-from-scratch');
+  const SP = 84, WW = W*2 + SP, P = 'wr-', S = 92, HINGE = 30;
+  const cloth = CLOTH[b.cloth].hex, foil = FOILS[b.foil], seed = hash(b.slug) % 97;
+  const dark = shade(cloth, -.30);
+  // back board: the band continues, a blind colophon sits where the device would be
+  const bcx = Math.round((W - S) / 2), cy = 605;
+  const band = { x0:0, y0:418, x1:W - S, y1:792 };
+  const pattern = PATTERNS[b.pattern]({ ...band, cx:bcx, cy, r:rng(hash(b.slug)) });
+  const bandLines = `<path d="M${band.x0} ${band.y0+1.5}H${band.x1}M${band.x0} ${band.y1-1.5}H${band.x1}" stroke="${WHT}" stroke-width="3"/>`;
+  const clearD = circlePath(bcx, cy, 92);
+  const colophon = vizMark(bcx, cy + 4, 3.4);
+  const backFoot = `<text x="${bcx + 2}" y="848" text-anchor="middle" fill="${WHT}" style="font:700 12.5px ${FACE};letter-spacing:4px">VIZUARA BOOKS</text>`;
+  // spine (house cloth), stamped in the book's foil
+  const sx = W, scx = W + SP/2;
+  const rules = y => `<path d="M${sx+10} ${y}H${sx+SP-10}M${sx+10} ${y+6}H${sx+SP-10}" stroke="${WHT}" stroke-width="2"/>`;
+  const ls = 30*CAP_TRACK;
+  const spineTitle = `<g transform="translate(${scx} 90) rotate(90)">
+      <text x="0" y="${10.5}" fill="${WHT}" style="font:700 30px ${FACE};letter-spacing:${f(ls)}px">NEURAL NETWORKS</text>
+      <text x="${f(tw('NEURAL NETWORKS', `700 30px ${FACE}`, ls) + 14)}" y="${9}" fill="${WHT}" style="font:600 italic 22px ${FACE}">from Scratch</text>
+    </g>`;
+  const spineArt = rules(34) + spineTitle + rules(560)
+    + `<path d="M${scx} 598 l6 8 -6 8 -6 -8Z" fill="${WHT}"/>`
+    + vizMark(scx, 800, .95) + rules(846);
+  const spineArtFull = spineArt + `<g transform="translate(${scx} 700)"><path d="M-18 0H18" stroke="${WHT}" stroke-width="1.6"/></g>`;
+  const foilBack = backFoot + `<path d="M${W-S+9} 0V${H}" stroke="${WHT}" stroke-width="2.2"/>`;
+  const blindBack = colophon + `<circle cx="${bcx}" cy="${cy}" r="76" fill="none" stroke="${WHT}" stroke-width="3"/>`;
+  const M = (inner) => `<rect width="${WW}" height="${H}" fill="#000"/>${tok(inner, '#fff', '#000')}`;
+  const front = buildCover(b, 'wf-', { x: W + SP });
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${WW} ${H}" width="${WW}" height="${H}">
+    <defs>${clothDefs(P, cloth, foil, seed, WW)}
+      <clipPath id="${P}bc"><rect x="${band.x0}" y="${band.y0+10}" width="${band.x1-band.x0}" height="${band.y1-band.y0-20}"/></clipPath>
+      <mask id="${P}bm" maskUnits="userSpaceOnUse" x="0" y="0" width="${WW}" height="${H}">${M(`<g clip-path="url(#${P}bc)">${pattern}</g>${bandLines}`)}<path d="${clearD}" fill="#000"/>${tok(blindBack, '#fff', '#000')}</mask>
+      <mask id="${P}fm" maskUnits="userSpaceOnUse" x="0" y="0" width="${WW}" height="${H}">${M(foilBack + spineArtFull)}</mask>
+      <clipPath id="${P}cc"><path clip-rule="evenodd" d="M0 0H${W}V${H}H0Z ${clearD}"/></clipPath>
+    </defs>
+    <rect width="${W}" height="${H}" fill="${cloth}" filter="url(#${P}cloth)"/>
+    <g class="so fx" filter="url(#${P}blind)"><rect width="${W}" height="${H}" fill="${dark}" mask="url(#${P}bm)"/></g>
+    <g class="po"><g clip-path="url(#${P}cc)"><g clip-path="url(#${P}bc)">${tok(pattern, dark, dark)}</g>${tok(bandLines, dark, dark)}</g>${tok(blindBack, dark, cloth)}</g>
+    <rect x="${W-S}" width="${S+SP}" height="${H}" fill="${HOUSE.hex}" filter="url(#${P}leather)"/>
+    <rect x="${W-S}" width="7" height="${H}" fill="url(#${P}lapR)"/><path d="M${W-S-.6} 0V${H}" stroke="#fff" stroke-opacity=".14" stroke-width="1.2"/>
+    <rect x="${W-HINGE-9}" width="18" height="${H}" fill="url(#${P}hinge)" transform="rotate(180 ${W-HINGE} ${H/2})"/>
+    <rect x="${W}" width="${SP}" height="${H}" fill="url(#${P}light)" opacity=".6"/>
+    <path d="M${W+.5} 0V${H}M${W+SP-.5} 0V${H}" stroke="#000" stroke-opacity=".35" stroke-width="1"/>
+    <g class="so fx" filter="url(#${P}foilfx)"><rect width="${WW}" height="${H}" fill="url(#${P}fg)" mask="url(#${P}fm)"/></g>
+    <g class="po">${tok(foilBack + spineArtFull, `url(#${P}fg)`, HOUSE.hex)}</g>
+    <rect class="so" width="${W+SP}" height="${H}" fill="url(#${P}weave)"/>
+    <rect width="${W}" height="${H}" fill="url(#${P}vig)"/>
+    ${front}
+  </svg>`;
+  document.getElementById('wrap').innerHTML = svg;
+}
+
+/* ============================================================
+   PAGE
+   ============================================================ */
+function swatchSVG(hex, P, leather){
+  return `<svg viewBox="0 0 128 92" xmlns="http://www.w3.org/2000/svg"><defs>
+    <filter id="${P}c" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB">
+      ${leather ? `<feTurbulence type="fractalNoise" baseFrequency=".16" numOctaves="3" seed="4" result="t"/><feDiffuseLighting in="t" surfaceScale="2.6" diffuseConstant="1" lighting-color="#fff" result="d"><feDistantLight azimuth="225" elevation="48"/></feDiffuseLighting><feColorMatrix in="d" type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 .5 0 0 0 -.33" result="hl"/><feComposite in="hl" in2="SourceAlpha" operator="in" result="hli"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="hli"/></feMerge>`
+      : `<feTurbulence type="fractalNoise" baseFrequency="0.012 0.75" numOctaves="2" seed="3" result="h"/><feTurbulence type="fractalNoise" baseFrequency="0.75 0.012" numOctaves="2" seed="6" result="v"/><feComposite in="h" in2="v" operator="arithmetic" k2=".5" k3=".5" result="hv"/><feColorMatrix in="hv" type="matrix" values=".33 .33 .33 0 0 .33 .33 .33 0 0 .33 .33 .33 0 0 0 0 0 0 1" result="g"/><feComponentTransfer in="g" result="gc"><feFuncR type="linear" slope="2" intercept="-.5"/><feFuncG type="linear" slope="2" intercept="-.5"/><feFuncB type="linear" slope="2" intercept="-.5"/></feComponentTransfer><feBlend in="gc" in2="SourceGraphic" mode="soft-light"/>`}
+    </filter>
+    <pattern id="${P}w" width="4" height="4" patternUnits="userSpaceOnUse"><rect width="2" height="2" fill="#fff" fill-opacity=".045"/><rect x="2" y="2" width="2" height="2" fill="#fff" fill-opacity=".045"/><rect x="2" width="2" height="2" fill="#000" fill-opacity=".05"/><rect y="2" width="2" height="2" fill="#000" fill-opacity=".05"/></pattern>
+  </defs><rect width="128" height="92" fill="${hex}" filter="url(#${P}c)"/><rect width="128" height="92" fill="url(#${P}w)"/></svg>`;
+}
+function foilSVG(k, P){
+  const fo = FOILS[k], n = fo.stops.length;
+  return `<svg viewBox="0 0 128 64" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="${P}g" x1="0" y1="0" x2="1" y2="1">${fo.stops.map((c,i)=>`<stop offset="${f(i/(n-1))}" stop-color="${c}"/>`).join('')}</linearGradient></defs><rect width="128" height="64" fill="url(#${P}g)"/></svg>`;
+}
+function keySVG(level){
+  const hs = HOUSE.hex, gold = '#c9a24c'; const S = level==='advanced'?0:19, C = level==='intermediate'?27:0;
+  const bg = level==='beginner' ? CLOTH.prussian.hex : level==='intermediate' ? CLOTH.oxblood.hex : CLOTH.ink.hex;
+  const x0 = S || 6, cx = (x0 + 150)/2;
+  return `<svg viewBox="0 0 150 185" xmlns="http://www.w3.org/2000/svg">
+    <rect width="150" height="185" fill="${bg}"/>
+    <rect x="${x0}" y="86" width="${150-x0}" height="78" fill="#000" opacity=".22"/>
+    ${S ? `<rect width="${S}" height="185" fill="${hs}"/><path d="M${S-2} 0V185" stroke="${gold}" stroke-width="1.2"/>` : ''}
+    ${C ? `<path d="M${150-C} 0H150V${C}ZM${150-C} 185H150V${185-C}Z" fill="${hs}"/><path d="M${150-C-2.6} 0L150 ${C+2.6}M${150-C-2.6} 185L150 ${185-C-2.6}" stroke="${gold}" stroke-width="1.2"/>` : ''}
+    <rect x="4" width="4" height="185" fill="#000" opacity=".25"/>
+    <rect x="${cx-40}" y="30" width="80" height="9" fill="${gold}"/><rect x="${cx-32}" y="44" width="64" height="9" fill="${gold}"/><rect x="${cx-18}" y="60" width="36" height="3" fill="${gold}"/>
+    <circle cx="${cx}" cy="125" r="31" fill="${bg}"/><circle cx="${cx}" cy="125" r="31" fill="none" stroke="${gold}" stroke-width="2"/>
+    <rect x="${cx-16}" y="172" width="32" height="3" fill="${gold}"/>
+  </svg>`;
+}
+
+function render(){
+  document.getElementById('cloths').innerHTML = Object.entries(CLOTH).map(([k,c]) => `<div class="sw">${swatchSVG(c.hex,'s'+k)}<b>${c.name}</b><code>${c.hex.toUpperCase()}</code></div>`).join('')
+    + `<div class="sw">${swatchSVG(HOUSE.hex,'shouse',true)}<b>${HOUSE.name}</b><code>${HOUSE.hex.toUpperCase()} · spine &amp; corners</code></div>`;
+  document.getElementById('foils').innerHTML = Object.entries(FOILS).map(([k,fo]) => `<div class="sw">${foilSVG(k,'f'+k)}<b>${fo.name}</b><code>${fo.pigment ? 'matt pigment foil' : 'metallic foil'}</code></div>`).join('');
+  document.getElementById('key').innerHTML = [
+    ['beginner','Quarter-bound · Beginner','A strip of house cloth along the spine, with a gilt fillet at the join.'],
+    ['intermediate','Half-bound · Intermediate','The spine strip plus two corners, each finished with a gilt fillet.'],
+    ['advanced','Full cloth · Advanced','One cloth over the whole board, with no strip or corners.'],
+  ].map(([l,t,d]) => `<div class="key">${keySVG(l)}<b>${t}</b>${d}</div>`).join('');
+
+  let html = '';
+  for (const b of BOOKS){
+    const bind = b.level === 'beginner' ? 'quarter-bound' : b.level === 'intermediate' ? 'half-bound' : 'full cloth';
+    html += `<figure><div class="cover" data-slug="${b.slug}">${buildCover(b, 'c' + hash(b.slug).toString(36) + '-')}</div>
+      <figcaption><span><b>${b.title}</b><br>${b.level} · ${bind}${b.forthcoming ? ' · forthcoming: device blind until publication' : ''}</span><span style="text-align:right">${CLOTH[b.cloth].name} cloth<br>${FOILS[b.foil].name} foil · ${b.series ? 'arch device (series)' : 'roundel device'}</span></figcaption></figure>`;
+  }
+  document.getElementById('covers').innerHTML = html;
+  // the web-library view: the actual 1× renders, shown at 180 px
+  document.getElementById('shelf').innerHTML = BOOKS.map(b => `<div class="t"><img src="renders/${b.slug}.jpg" width="180" height="222" alt="${b.title}"><span>${b.title}</span></div>`).join('');
+  buildWrap();
+}
+
+Promise.all([`700 80px ${FACE}`, `600 italic 40px ${FACE}`, `700 14px ${FACE}`, `400 18px "EB Garamond"`].map(s => document.fonts.load(s)))
+  .catch(() => {}).then(() => document.fonts.ready).then(render);
+</script>
+</body>
+</html>

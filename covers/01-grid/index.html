@@ -1,0 +1,651 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Figure/Ground — Vizuara Books</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&display=swap" rel="stylesheet">
+<style>
+:root{ --paper:#F3F2EE; --ink:#141414; --red:#DC2A1E; --page:#E6E5E1; }
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--page);color:var(--ink);font-family:Archivo,sans-serif;-webkit-font-smoothing:antialiased}
+
+/* ================= THE COVER (class .cv; the real covers are .cover.cv) ================= */
+.cv{position:relative;width:720px;height:888px;overflow:hidden;background:var(--g);color:var(--k);flex:none;text-align:left}
+.lv1{--g:var(--paper);--k:var(--ink);--s:var(--red)}
+.lv2{--g:var(--red);--k:var(--ink);--s:var(--paper)}
+.lv3{--g:var(--ink);--k:var(--paper);--s:var(--red)}
+.cv svg.fig{position:absolute;left:0;top:0;width:720px;height:888px}
+.fk{fill:var(--k)} .fs{fill:var(--s)} .fg{fill:var(--g)}
+.sk{stroke:var(--k);fill:none} .ss{stroke:var(--s);fill:none} .sg{stroke:var(--g);fill:none}
+.fk.sk{fill:var(--k)} .fg.sk{fill:var(--g)} .fg.ss{fill:var(--g)} .fs.sk{fill:var(--s)} .fs.ss{fill:var(--s)}
+.lab{font-family:Archivo;font-size:13px;font-weight:600;fill:var(--k);letter-spacing:.01em}
+.cv .head{position:absolute;left:30px;top:30px;width:604px}
+.cv .title{margin:0;font-weight:700;font-size:68px;line-height:64px;letter-spacing:-.024em;font-variation-settings:"wdth" 100;text-box:trim-both cap alphabetic}
+.cv .title span{display:block;width:max-content;max-width:none}
+.cv .title.m{font-size:60px;line-height:57px}
+.cv .title.s{font-size:50px;line-height:48px}
+.cv .title.xs{font-size:46px;line-height:45px}
+.cv .sub{margin-top:22px;font-size:21px;line-height:26px;font-weight:400;letter-spacing:-.005em;text-box:trim-both cap alphabetic}
+.cv .sub span{display:block}
+.cv .colo{position:absolute;left:0;top:0;width:720px;height:888px;pointer-events:none}
+.cv .colo .rule{position:absolute;left:30px;top:814px;width:660px;height:4px;background:var(--k)}
+.cv .colo .cell{position:absolute;top:827px;font-size:13.5px;line-height:17px;font-weight:400;letter-spacing:.005em}
+.cv .colo .cell b{font-weight:700;display:block}
+.cv .ribbon{position:absolute;left:646px;top:0;width:44px}
+.cv .ribbon svg{display:block}
+
+/* ================= PRESENTATION PAGE ================= */
+.page{width:1520px;margin:0 auto;padding:40px 0 160px}
+.bar{height:8px;background:var(--ink)}
+.row{display:grid;grid-template-columns:repeat(12,1fr);column-gap:40px}
+.kick{font-size:14px;line-height:18px;font-weight:700;letter-spacing:.01em}
+.kick span{font-weight:400}
+.mast{padding:18px 0 0}
+.mast .meta{display:grid;grid-template-columns:repeat(4,1fr);gap:40px;font-size:14px;line-height:18px}
+.mast .meta b{display:block}
+h1.name{font-size:212px;line-height:.86;font-weight:800;letter-spacing:-.055em;margin:64px 0 0;text-box:trim-both cap alphabetic}
+h1.name i{font-style:normal;color:var(--red)}
+.tag{font-size:40px;line-height:44px;font-weight:700;letter-spacing:-.02em;margin:40px 0 0;max-width:1180px}
+.lede{font-size:22px;line-height:31px;letter-spacing:-.003em}
+.lede p{margin:0 0 16px}
+section{margin-top:112px}
+section > h2{font-size:14px;line-height:18px;font-weight:700;margin:0 0 28px;padding-top:12px;border-top:4px solid var(--ink);display:grid;grid-template-columns:120px 1fr}
+section > h2 span{font-weight:400}
+.rules{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:36px 40px}
+.rules li{font-size:16px;line-height:23px;border-top:2px solid var(--ink);padding-top:12px}
+.rules li b{display:block;font-size:22px;line-height:26px;letter-spacing:-.01em;margin-bottom:8px}
+.rules li b em{font-style:normal;font-weight:400;margin-right:10px}
+.inks{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
+.ink{height:300px;padding:24px 26px;display:flex;flex-direction:column;justify-content:space-between;font-size:15px;line-height:21px}
+.ink b{font-size:34px;line-height:36px;letter-spacing:-.02em;display:block}
+.levels{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;margin-top:40px}
+.lvcard{height:260px;position:relative;padding:26px;font-size:15px;line-height:21px}
+.lvcard b{display:block;font-size:34px;line-height:36px;letter-spacing:-.02em}
+.lvcard .rb{position:absolute;right:26px;top:0;width:44px}
+.lvcard .roles{position:absolute;left:26px;bottom:24px;display:flex;gap:18px;align-items:center}
+.lvcard .roles i{display:inline-block;width:22px;height:22px;vertical-align:-5px;margin-right:6px}
+.type{display:grid;grid-template-columns:repeat(12,1fr);column-gap:40px;align-items:end}
+.spec-a{grid-column:span 7;font-size:150px;line-height:.9;font-weight:700;letter-spacing:-.04em}
+.spec-b{grid-column:span 5;font-size:16px;line-height:23px}
+.spec-b p{margin:0 0 14px}
+.twocol{display:grid;grid-template-columns:720px 1fr;column-gap:80px;align-items:start}
+.gridnotes{font-size:16px;line-height:23px}
+.gridnotes dl{margin:0;display:grid;grid-template-columns:130px 1fr;row-gap:14px;column-gap:20px}
+.gridnotes dt{font-weight:700}
+.gridnotes dd{margin:0}
+.gridnotes dt i{display:inline-block;width:12px;height:12px;margin-right:8px;vertical-align:0}
+.shelf2{display:grid;grid-template-columns:720px 720px;gap:72px 80px}
+figure{margin:0}
+figcaption{margin-top:14px;font-size:15px;line-height:21px;display:grid;grid-template-columns:90px 1fr;column-gap:20px;max-width:720px}
+figcaption b{font-weight:700}
+figcaption code{font-family:inherit;font-weight:400;opacity:1}
+.corridor{display:flex;gap:0;margin-top:56px}
+.mini{position:relative;overflow:hidden;flex:none}
+.mini .cv{transform-origin:0 0}
+.library{display:grid;grid-template-columns:repeat(7,180px);justify-content:space-between;row-gap:36px;padding:44px 40px;background:#FBFBF9}
+.library .mini{box-shadow:0 1px 2px rgba(0,0,0,.18),0 4px 14px rgba(0,0,0,.08)}
+.library figcaption{display:block;margin-top:10px;font-size:12px;line-height:16px}
+.note{font-size:16px;line-height:23px;max-width:720px}
+.wrapbox{position:relative}
+.wrap{position:relative;width:1496px;height:888px;display:flex;overflow:hidden}
+.wrap .back,.wrap .spine{position:relative;height:888px;background:var(--g);color:var(--k)}
+.wrap .back{width:720px}
+.wrap .spine{width:56px;border-left:1px dashed rgba(20,20,20,.35);border-right:1px dashed rgba(20,20,20,.35)}
+.back .blurb{position:absolute;left:30px;top:30px;width:604px}
+.back .blurb h3{margin:0;font-size:40px;line-height:42px;font-weight:700;letter-spacing:-.02em;text-box:trim-both cap alphabetic}
+.back .blurb p{margin:24px 0 0;font-size:20px;line-height:27px;width:492px}
+.back .toc{position:absolute;left:30px;top:310px;width:660px}
+.back .toc .h{font-size:13.5px;font-weight:700;padding-bottom:10px;border-bottom:4px solid var(--k)}
+.back .toc .li{display:grid;grid-template-columns:56px 1fr 112px;font-size:18px;line-height:22px;padding:11px 0 11px;border-bottom:2px solid var(--k)}
+.back .toc .li span:last-child{text-align:left}
+.back .about{position:absolute;left:30px;top:646px;width:436px;font-size:13.5px;line-height:18px}
+.back .about b{display:block}
+.back .code{position:absolute;left:534px;top:646px;width:156px;height:156px;background:var(--paper);display:flex;align-items:flex-end;padding:8px;font-size:11px;line-height:13px;color:var(--ink)}
+.spine .sp-title{position:absolute;left:50%;top:170px;transform:translateX(-50%) rotate(90deg);transform-origin:0 0;white-space:nowrap;font-size:21px;font-weight:700;letter-spacing:-.01em;margin-left:10px}
+.spine .sp-imp{position:absolute;left:50%;bottom:30px;transform:translateX(-50%) rotate(90deg) translateX(-100%);transform-origin:0 0;white-space:nowrap;font-size:13.5px;font-weight:700;margin-left:9px}
+.spine .ribbon{position:absolute;left:6px;top:0;width:44px}
+.foot{margin-top:112px;font-size:14px;line-height:20px;display:grid;grid-template-columns:repeat(4,1fr);gap:40px;border-top:4px solid var(--ink);padding-top:14px}
+.foot b{display:block}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="bar"></div>
+  <header class="mast">
+    <div class="meta">
+      <div><b>Vizuara Books</b>A cover system for the library</div>
+      <div><b>Proposal 01</b>Swiss / International Typographic Style</div>
+      <div><b>Trim</b>7.5 × 9.25 in · 720 × 888 px</div>
+      <div><b>Inks</b>Paper, Ink, Signal Red</div>
+    </div>
+    <h1 class="name">Figure<i>/</i>Ground</h1>
+    <p class="tag">One grid, one typeface, three inks — and on every cover a single figure, constructed from the idea the book teaches.</p>
+  </header>
+
+  <section>
+    <h2>01 <span>Rationale</span></h2>
+    <div class="row">
+      <div class="lede" style="grid-column:span 7">
+        <p>Every cover is set on the same 12 × 15 module grid, in one typeface, like a Müller-Brockmann concert series or a Gerstner programme: the system is the brand, so the Vizuara name can afford to be quiet.</p>
+        <p>The <b>ground</b> carries the level — paper for beginner, signal red for intermediate, ink black for advanced — so fifty spines read as a gradient of difficulty, even photocopied in grey. On that ground stands exactly one <b>figure</b>, drawn from the book’s own mechanism: the causal mask of a GPT, the device mesh of 5D parallelism, the direction field of an ODE. Whatever is set in the third ink is the one thing the book teaches you to see.</p>
+      </div>
+      <div style="grid-column:span 5" class="lede"><p style="font-size:17px;line-height:25px">What it is not: no illustration, no mascots, no gradients, no “AI” clip-art. Every mark is a square, a circle or a bar placed on the grid in SVG, so the covers are vector from thumbnail to billboard, and every figure can be explained in one sentence on the back cover.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>02 <span>The programme — six rules</span></h2>
+    <ol class="rules">
+      <li><b><em>1</em>Grid</b>12 × 15 square modules of 44 px with 12 px gutters and 30 px margins. 720 × 888 divides exactly. Every element — type, figure, mark, rule — sits on it.</li>
+      <li><b><em>2</em>Type</b>Archivo, nothing else. Bold for the title, flush left from the top-left corner, as large as the longest line allows: 68, 60, 50 or 46 px. Regular for data. Lines are broken by hand; no widows.</li>
+      <li><b><em>3</em>Inks</b>Paper, Ink and Signal Red. The level decides which ink plays ground, which plays figure, and which is the signal.</li>
+      <li><b><em>4</em>Figure</b>One per book, built from squares, circles and bars on the module grid, standing on the colophon rule or bleeding off the edge. It is the mechanism of the book, not a picture of its topic.</li>
+      <li><b><em>5</em>Mark</b>The ribbon: a bookmark hanging from the top edge in column 12, its tail notched into a V. Its length is the level — one, two or three modules. On the spine it hangs the same way.</li>
+      <li><b><em>6</em>Colophon</b>Below a 4 px rule, three cells: imprint, level, length. Series books add a fourth. Nothing else is printed on the front.</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>03 <span>Three inks, three levels</span></h2>
+    <div class="inks">
+      <div class="ink" style="background:var(--paper)"><b>Paper</b><div>#F3F2EE · uncoated white<br>Ground for Level 1 · signal on Level 2 · figure on Level 3</div></div>
+      <div class="ink" style="background:var(--red)"><b>Signal Red</b><div>#DC2A1E · a red, not an orange<br>Signal on Levels 1 and 3 · ground for Level 2</div></div>
+      <div class="ink" style="background:var(--ink);color:var(--paper)"><b>Ink</b><div>#141414 · rich black<br>Figure on Levels 1 and 2 · ground for Level 3</div></div>
+    </div>
+    <div class="levels" id="levels"></div>
+  </section>
+
+  <section>
+    <h2>04 <span>Typeface</span></h2>
+    <div class="type">
+      <div class="spec-a">Archivo<br>Bold 700</div>
+      <div class="spec-b">
+        <p><b>Archivo</b> (Omnibus-Type, Google Fonts) is a grotesque cut from the nineteenth-century Akzidenz tradition the Swiss worked in — sturdy, slightly condensed capitals, a closed <i>a</i> and <i>g</i> — with a variable width axis in reserve for a longer catalogue.</p>
+        <p><b>Title</b> Bold 68/64, 60/57, 50/48 or 46/45 px, tracking −2.4 %, trimmed to cap height so the first line sits exactly on the top margin.<br><b>Subtitle</b> Regular 21/26.<br><b>Colophon</b> Bold + Regular 13.5/17.<br><b>Figure labels</b> Semibold 13.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>05 <span>The grid, the mark</span></h2>
+    <div class="twocol">
+      <div id="gridplate"></div>
+      <div class="gridnotes">
+        <dl>
+          <dt><i style="background:var(--ink)"></i>Title</dt><dd>Rows 1–4, columns 1–11. Cap height of the first line on the top margin. Title sizes step down until the longest hand-broken line fits eleven columns.</dd>
+          <dt><i style="background:#8C8B86"></i>Figure field</dt><dd>Rows 5–14, all twelve columns, bleeding off the left, right or top edge when the idea continues beyond the page (a history, an eigenvector, a corridor). Figures stand on the colophon rule.</dd>
+          <dt><i style="background:var(--red)"></i>Ribbon</dt><dd>Column 12, hanging from the trim. Level 1 = one module, Level 2 = two, Level 3 = three. The swallowtail notch cuts a V.</dd>
+          <dt><i style="background:var(--ink)"></i>Colophon</dt><dd>Row 15, below a 4 px rule. Cells start on columns 1, 4, 7 and 10.</dd>
+        </dl>
+        <div id="ribbons" style="display:flex;gap:28px;margin-top:48px"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>06 <span>The core set</span></h2>
+    <div class="shelf2" id="core"></div>
+  </section>
+
+  <section>
+    <h2>07 <span>Range — beginner to forthcoming</span></h2>
+    <div class="shelf2" id="range"></div>
+  </section>
+
+  <section>
+    <h2>08 <span>Sub-series — Charlie and the Intelligence Factory</span></h2>
+    <p class="note">Each book is one room of the same factory plan, drawn with walls in the gutters of the grid. The doors and the corridor sit at the same height on all four covers, so the set, shelved face-out, becomes one continuous floor: I opens right, II and III open both ways, IV closes the corridor.</p>
+    <div class="shelf2" id="series" style="margin-top:40px"></div>
+    <div class="corridor" id="corridor"></div>
+  </section>
+
+  <section>
+    <h2>09 <span>At library size — 180 px</span></h2>
+    <div class="library" id="library"></div>
+  </section>
+
+  <section>
+    <h2>10 <span>Print wrap — back, spine, front</span></h2>
+    <p class="note" style="margin-bottom:32px">Build Large Language Models (LLMs) from Scratch, 56 px spine (one module pitch). The ribbon hangs from the top of the spine too, so level is legible on a shelf of spines. The back cover explains its own figure.</p>
+    <div class="wrapbox" id="wrapbox"></div>
+  </section>
+
+  <footer class="foot">
+    <div><b>Figure/Ground</b>Proposal 01 for Vizuara Books.</div>
+    <div><b>Built in</b>HTML, CSS and inline SVG. No raster images anywhere.</div>
+    <div><b>Type</b>Archivo, via Google Fonts.</div>
+    <div><b>Renders</b>renders/*.png (2×), *.jpg (1×), pdf/*.pdf (vector, exact trim).</div>
+  </footer>
+</div>
+
+<script>
+/* ============================================================
+   FIGURE / GROUND — one grid, one typeface, three inks.
+   Grid: 12 x 15 modules, field 44, gutter 12, margin 30.
+   ============================================================ */
+const M=30,P=56,F=44,G=12;
+const X=c=>M+P*c, Y=r=>M+P*r;          // left/top edge of module c/r (0-based)
+const CX=c=>X(c)+F/2, CY=r=>Y(r)+F/2;  // module centre
+const RAD=Math.PI/180;
+
+function rng(seed){let a=seed>>>0;return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const f2=n=>Math.round(n*100)/100;
+const R=(x,y,w,h,c,extra='')=>`<rect x="${f2(x)}" y="${f2(y)}" width="${f2(w)}" height="${f2(h)}" class="${c}" ${extra}/>`;
+const C=(x,y,r,c,extra='')=>`<circle cx="${f2(x)}" cy="${f2(y)}" r="${f2(r)}" class="${c}" ${extra}/>`;
+const L=(x1,y1,x2,y2,w,c,extra='')=>`<line x1="${f2(x1)}" y1="${f2(y1)}" x2="${f2(x2)}" y2="${f2(y2)}" stroke-width="${w}" class="${c}" ${extra}/>`;
+const PL=(pts,w,c,extra='')=>`<polyline points="${pts.map(p=>p.map(f2).join(',')).join(' ')}" stroke-width="${w}" class="${c}" fill="none" ${extra}/>`;
+const PG=(pts,c,extra='')=>`<polygon points="${pts.map(p=>p.map(f2).join(',')).join(' ')}" class="${c}" ${extra}/>`;
+const T=(x,y,s,c='lab',extra='')=>`<text x="${f2(x)}" y="${f2(y)}" class="${c}" ${extra}>${s}</text>`;
+// a bar of width w from p to q, as a polygon (so it can be filled or outlined)
+const BAR=(p,q,w,c,extra='')=>{const dx=q[0]-p[0],dy=q[1]-p[1],l=Math.hypot(dx,dy),nx=-dy/l*w/2,ny=dx/l*w/2;
+  return PG([[p[0]+nx,p[1]+ny],[q[0]+nx,q[1]+ny],[q[0]-nx,q[1]-ny],[p[0]-nx,p[1]-ny]],c,extra);};
+
+/* ---------------- FIGURES ---------------- */
+const FIG = {};
+
+// A neuron, from scratch: weighted inputs (stroke = |w|) summed in one unit, bent by ReLU on the way out.
+FIG.neuron = () => {
+  let s='';
+  const cx=CX(6), cy=CY(9), rad=54;
+  const ws=[0.85,0.2,0.6,1,0.1,0.7,0.35,0.95,0.25];
+  [5,6,7,8,9,10,11,12,13].forEach((row,i)=>{ s+=L(0,CY(row),cx,cy,f2(3+ws[i]*13),'sk'); });
+  const kx=X(9)+F/2;
+  s+=PL([[cx,cy],[kx,cy],[kx+(cy-Y(4)),Y(4)]],16,'ss','stroke-linejoin="miter" stroke-miterlimit="10"');
+  s+=C(cx,cy,rad,'fk');
+  return s;
+};
+
+// Causal self-attention: the lower-triangular weight matrix of a GPT. Last row = the token being predicted.
+FIG.attention = () => {
+  const N=8, r=rng(7); let s='';
+  const c0=4, r0=6;
+  for(let i=0;i<N;i++){
+    const sc=[]; for(let j=0;j<=i;j++){ sc.push(j===i?2.2:(j===0?1.6:r()*2.2-0.4)); }
+    const ex=sc.map(v=>Math.exp(v)), mx=Math.max(...ex);
+    for(let j=0;j<N;j++){
+      const x=X(c0+j), y=Y(r0+i);
+      if(j<=i){ const w=Math.max(8,F*Math.sqrt(ex[j]/mx)); s+=R(x+(F-w)/2,y+(F-w)/2,w,w,i===N-1?'fs':'fk'); }
+      else s+=R(x+F/2-3,y+F/2-3,6,6,'fk');
+    }
+  }
+  return s;
+};
+
+// 5D parallelism: 64 GPUs in a device mesh. Every gap width is one axis of parallelism.
+FIG.mesh = () => {
+  let s=''; const gap=i=>i===3?44:(i%2===1?12:4);
+  const c=(492-84)/8, x0=X(3), y0=Y(5); const xs=[],ys=[]; let x=x0,y=y0;
+  for(let i=0;i<8;i++){xs.push(x);ys.push(y);x+=c+(i<7?gap(i):0);y+=c+(i<7?gap(i):0);}
+  for(let j=0;j<8;j++)for(let i=0;i<8;i++) s+=R(xs[i],ys[j],c,c,(i===5&&j===2)?'fs':'fk');
+  const mid=(a,i)=>a[i]+c+gap(i)/2;
+  const t=y0-20, l=x0-22;
+  [0,1,3].forEach(i=>{ s+=L(mid(xs,i),y0-12,mid(xs,i),y0-2,3,'sk'); s+=L(x0-12,mid(ys,i),x0-2,mid(ys,i),3,'sk'); });
+  s+=T(mid(xs,0),t,'TP','lab','text-anchor="middle"')+T(mid(xs,1),t,'CP','lab','text-anchor="middle"')+T(mid(xs,3),t,'DP','lab','text-anchor="middle"');
+  s+=T(l,mid(ys,0)+5,'TP','lab','text-anchor="end"')+T(l,mid(ys,1)+5,'EP','lab','text-anchor="end"')+T(l,mid(ys,3)+5,'PP','lab','text-anchor="end"');
+  return s;
+};
+
+// Linear algebra: a matrix maps the unit circle to an ellipse; its eigenvectors are the axes that do not turn.
+FIG.eigen = () => {
+  const cx=X(7)+6, cy=CY(9), u=P*2.1, th=-30, l1=1.95, l2=0.52;
+  const dx=Math.cos(th*RAD), dy=Math.sin(th*RAD);
+  let s=`<g clip-path="url(#clipFig)">`;
+  s+=`<ellipse cx="${cx}" cy="${cy}" rx="${f2(u*l1)}" ry="${f2(u*l2)}" transform="rotate(${th} ${cx} ${cy})" class="fk"/>`;
+  s+=C(cx,cy,u,'sk','stroke-width="7"');
+  s+=L(cx-dx*900,cy-dy*900,cx+dx*900,cy+dy*900,9,'ss');
+  s+=L(cx+dy*900,cy-dx*900,cx-dy*900,cy+dx*900,9,'ss');
+  return s+`</g>`;
+};
+
+// Context engineering: outside, an undifferentiated field of information. Inside the window it is selected,
+// sized and ordered: instructions, tools, retrieved knowledge, compressed memory — and the one query (signal).
+FIG.window = () => {
+  let s=''; const h=P/2;
+  const c0=4, r0=6, n=6, wx0=X(c0)-G, wy0=Y(r0)-G, ws=n*P+G;
+  for(let yy=Y(5)+h/2; yy<Y(14)-G; yy+=h) for(let xx=h/2+2; xx<720; xx+=h){
+    if(xx>wx0-24 && xx<wx0+ws+24 && yy>wy0-24 && yy<wy0+ws+24) continue;
+    s+=C(xx,yy,3.5,'fk');
+  }
+  for(let j=0;j<n;j++)for(let i=0;i<n;i++){
+    const x=X(c0+i), y=Y(r0+j), cx=x+F/2, cy=y+F/2;
+    if(j===n-1&&i===n-1){ s+=C(cx,cy,F/2,'fs'); continue; }
+    if(j===0) s+=R(x,y,F,F,'fk');                                   // instructions
+    else if(j===1) s+=C(cx,cy,F/2-4,'sk','stroke-width="8"');       // tools
+    else if(j<5) s+=C(cx,cy,F/2,'fk');                               // retrieved knowledge
+    else s+=C(cx,cy,10,'fk');                                        // memory, compressed
+  }
+  s+=R(wx0-8,wy0-8,ws+16,ws+16,'sk','stroke-width="8"');
+  return s;
+};
+
+// Compaction: one full context, then the shape each harness leaves behind. Signal = the summary.
+FIG.compaction = () => {
+  let s=''; const n=12;
+  const rows=[['Full context','kkkkkkkkkkkk'],['Pi','skkkk.......'],['Hermes','kkskkk......'],['Codex','s...........']];
+  rows.forEach(([lab,pat],ri)=>{
+    const y=Y(6+ri*2);
+    s+=T(X(0),y-12,lab);
+    for(let i=0;i<n;i++){
+      const x=X(i), ch=pat[i];
+      if(ch==='k') s+=R(x,y,F,F,'fk');
+      else if(ch==='s') s+=R(x,y,F,F,'fs');
+      else s+=R(x+1.5,y+1.5,F-3,F-3,'sk','stroke-width="3"');
+    }
+  });
+  return s;
+};
+
+// Git: history is a line. A feature branch leaves it and is merged back (signal);
+// another branch has just left and is still open, running off the edge of the cover.
+FIG.branch = () => {
+  let s=''; const yM=CY(10), yA=CY(7), yB=CY(12), dA=yM-yA, dB=yB-yM, w=16;
+  const J='stroke-linejoin="round"';
+  s+=L(0,yM,720,yM,w,'sk');
+  s+=PL([[CX(6),yM],[CX(6)+dB,yB],[760,yB]],w,'sk',J);
+  s+=PL([[CX(0),yM],[CX(0)+dA,yA],[CX(10)-dA,yA],[CX(10),yM]],w,'ss',J);
+  const ring=(x,y,cls)=>C(x,y,19,cls,'stroke-width="10"');
+  s+=ring(CX(0),yM,'fg sk')+ring(CX(6),yM,'fg sk')+ring(CX(10),yM,'fk sk');
+  s+=ring(CX(4),yA,'fg ss')+ring(CX(6),yA,'fg ss');
+  s+=ring(CX(9),yB,'fg sk')+ring(CX(11),yB,'fg sk');
+  return s;
+};
+
+// ML fundamentals: every point of feature space gets a predicted class; learning is placing the boundary (signal).
+FIG.boundary = () => {
+  let s=''; const a=-0.62, b=CY(9)+40, xm=360; // boundary: y = a*(x-xm) + b
+  const side=(x,y)=> y < a*(x-xm)+b;
+  const flip=new Set(['6,8','9,11','3,10']);
+  for(let r=5;r<=13;r++)for(let c=0;c<=11;c++){
+    let up=side(CX(c),CY(r)); if(flip.has(c+','+r)) up=!up;
+    s+= up ? C(CX(c),CY(r),13,'fk') : C(CX(c),CY(r),11,'sk','stroke-width="5"');
+  }
+  s+=`<g clip-path="url(#clipFig)">`+L(0,a*(0-xm)+b,720,a*(720-xm)+b,12,'ss')+`</g>`;
+  return s;
+};
+
+// RAG: every chunk is a unit vector; retrieval ranks them by angle to the query (cosine similarity).
+// The query in signal; the top-4 retrieved chunks at full weight; the rest of the corpus thin.
+FIG.cosine = () => {
+  let s=''; const ox=X(0)+6, oy=Y(13)+F, R0=9.4*P, r=rng(4); const q=38;
+  const angs=[]; for(let i=0;i<30;i++) angs.push(3+r()*84);
+  const near=[...angs].sort((u,v)=>Math.abs(u-q)-Math.abs(v-q)).slice(0,4);
+  const ray=(ang,w,cls,len=R0)=>L(ox,oy,ox+len*Math.cos(-ang*RAD),oy+len*Math.sin(-ang*RAD),w,cls,'stroke-linecap="butt"');
+  s+=`<path d="M ${ox+R0} ${oy} A ${R0} ${R0} 0 0 0 ${ox} ${oy-R0}" class="sk" stroke-width="3"/>`;
+  angs.forEach(a=>{ if(!near.includes(a)) s+=ray(a,3,'sk'); });
+  near.forEach(a=>s+=ray(a,13,'sk'));
+  s+=ray(q,13,'ss',R0+40);
+  s+=C(ox,oy,16,'fk');
+  return s;
+};
+
+// Decision tree: greedy binary splits; one example's route from root to leaf in signal.
+FIG.tree = () => {
+  let s='', hot=''; const w=14;
+  const N={root:[5,0,['A','B']],A:[2,1,['a1','C']],C:[3,2,['c1','c2']],B:[9,1,['D','b2']],D:[7,2,['d1','E']],E:[9,3,['e1','e2']],
+           a1:[1,2],c1:[2,3],c2:[4,3],b2:[11,2],d1:[5,3],e1:[8,4],e2:[10,4]};
+  const path=new Set(['root','B','D','E','e2']);
+  const pos=k=>[CX(N[k][0]),CY(5+2*N[k][1])];
+  const J='stroke-linejoin="miter"';
+  for(const k in N){ const ch=N[k][2]; if(!ch) continue;
+    const [px,py]=pos(k), [ax,ay]=pos(ch[0]), [bx,by]=pos(ch[1]), my=py+P;
+    s+=PL([[px,py],[px,my]],w,'sk'); s+=PL([[ax,ay],[ax,my],[bx,my],[bx,by]],w,'sk',J);
+    ch.forEach(c=>{ if(path.has(k)&&path.has(c)){ const [cx,cy]=pos(c); hot+=PL([[px,py-w/2],[px,my],[cx,my],[cx,cy]],w,'ss',J); }});
+  }
+  s+=hot;
+  for(const k in N){ const [x,y]=pos(k); if(!N[k][2]) s+=C(x,y,22,path.has(k)?'fs':'fk'); }
+  s+=R(pos('root')[0]-18,pos('root')[1]-18,36,36,'fs');
+  return s;
+};
+
+// Kernel engineering: a tiled matrix multiply. One output tile of C = a row-strip of A times a column-strip of B.
+FIG.gemm = () => {
+  let s=''; const sw=3;
+  const tile=(c,r,cls)=> cls==='o' ? R(X(c)+sw/2,Y(r)+sw/2,F-sw,F-sw,'sk',`stroke-width="${sw}"`) : R(X(c),Y(r),F,F,cls);
+  const hr=11, hc=8;
+  for(let r=9;r<=13;r++)for(let c=1;c<=3;c++) s+=tile(c,r,r===hr?'fk':'o');
+  for(let r=5;r<=7;r++)for(let c=5;c<=11;c++) s+=tile(c,r,c===hc?'fk':'o');
+  for(let r=9;r<=13;r++)for(let c=5;c<=11;c++) s+=tile(c,r,(r===hr&&c===hc)?'fs':'o');
+  s+=T(X(1),Y(9)-12,'A')+T(X(5),Y(5)-12,'B')+T(X(5),Y(9)-12,'C');
+  return s;
+};
+
+// VLA & world models: the arm acts now (solid); the world model imagines the pose that reaches the target (outline),
+// and the path the gripper will take to get there (dots).
+FIG.arm = () => {
+  let s='';
+  const base=[CX(2),Y(13)];
+  const L1=4.1*P, L2=3.7*P, L3=1.15*P;
+  const pose=(a1,a2,a3)=>{const j1=[base[0]+L1*Math.cos(a1*RAD),base[1]+L1*Math.sin(a1*RAD)];
+    const j2=[j1[0]+L2*Math.cos(a2*RAD),j1[1]+L2*Math.sin(a2*RAD)]; const j3=[j2[0]+L3*Math.cos(a3*RAD),j2[1]+L3*Math.sin(a3*RAD)]; return [base,j1,j2,j3];};
+  const draw=(p,solid)=>{ let o=''; const cls=solid?'fk':'sk', ex=solid?'':'stroke-width="4" stroke-linejoin="miter"';
+    o+=BAR(p[0],p[1],34,cls,ex)+BAR(p[1],p[2],26,cls,ex)+BAR(p[2],p[3],18,cls,ex);
+    const tip=p[3], d=[(p[3][0]-p[2][0])/L3,(p[3][1]-p[2][1])/L3], n=[-d[1],d[0]];
+    const g1=[tip[0]+n[0]*16,tip[1]+n[1]*16], g2=[tip[0]-n[0]*16,tip[1]-n[1]*16];
+    o+=BAR(g1,g2,8,cls,ex)+BAR(g1,[g1[0]+d[0]*22,g1[1]+d[1]*22],8,cls,ex)+BAR(g2,[g2[0]+d[0]*22,g2[1]+d[1]*22],8,cls,ex);
+    p.slice(1,3).forEach(q=>o+=C(q[0],q[1],solid?17:15,'fg sk',solid?'stroke-width="9"':'stroke-width="4"'));
+    return o;};
+  const A=pose(-86,-14,38), B=pose(-47,16,82);
+  const tipA=[A[3][0]+(A[3][0]-A[2][0])/L3*30, A[3][1]+(A[3][1]-A[2][1])/L3*30];
+  const tipB=[B[3][0]+(B[3][0]-B[2][0])/L3*30, B[3][1]+(B[3][1]-B[2][1])/L3*30];
+  // imagined trajectory of the gripper: a quadratic arc
+  const ctl=[tipB[0]+10,tipA[1]-40];
+  for(let t=0.12;t<0.93;t+=0.1){ const x=(1-t)*(1-t)*tipA[0]+2*(1-t)*t*ctl[0]+t*t*tipB[0], y=(1-t)*(1-t)*tipA[1]+2*(1-t)*t*ctl[1]+t*t*tipB[1]; s+=C(x,y,5,'fk'); }
+  s+=draw(B,false)+draw(A,true);
+  s+=R(X(1),Y(13),X(3)+F-X(1),F,'fk');
+  s+=R(tipB[0]-F/2,tipB[1]+2,F,F,'fs');
+  return s;
+};
+
+// SciML: the direction field of an ODE (a damped oscillator in phase space) and one solution curve through it.
+FIG.odefield = () => {
+  let s=''; const ox=360, oy=CY(9), u=3*P, gam=0.32;
+  const f=(x,y)=>[y,-x-gam*y];
+  for(let r=5;r<=13;r++)for(let c=0;c<=11;c++){
+    const x=(CX(c)-ox)/u, y=-(CY(r)-oy)/u; const [vx,vy]=f(x,y); const m=Math.hypot(vx,vy)||1;
+    const dx=vx/m*15, dy=-vy/m*15; s+=L(CX(c)-dx,CY(r)-dy,CX(c)+dx,CY(r)+dy,6,'sk');
+  }
+  let x=1.62,y=0.0, pts=[]; const h=0.01;
+  for(let i=0;i<2200;i++){ const k1=f(x,y), k2=f(x+h/2*k1[0],y+h/2*k1[1]), k3=f(x+h/2*k2[0],y+h/2*k2[1]), k4=f(x+h*k3[0],y+h*k3[1]);
+    x+=h/6*(k1[0]+2*k2[0]+2*k3[0]+k4[0]); y+=h/6*(k1[1]+2*k2[1]+2*k3[1]+k4[1]); if(i%4===0) pts.push([ox+x*u, oy-y*u]); }
+  s+=`<g clip-path="url(#clipFig)">`+PL(pts,11,'ss','stroke-linecap="round" stroke-linejoin="round"')+`</g>`;
+  s+=C(ox+1.62*u,oy,12,'fs');
+  return s;
+};
+
+// Diffusion LM: a sentence is not written left to right — it emerges from masks, all positions at once.
+// Rows are denoising steps: masked positions hollow, tokens unmasked at that step in signal.
+FIG.unmask = () => {
+  let s=''; const n=12, T=8, r=rng(21), sw=3;
+  const t=[]; for(let i=0;i<n;i++) t.push(1+Math.floor(r()*(T-1)*0.999)); t[3]=1; t[9]=T-1; t[6]=T-1;
+  for(let row=0;row<T;row++) for(let i=0;i<n;i++){
+    const x=X(i), y=Y(6+row);
+    if(t[i]<row) s+=R(x,y,F,F,'fk');
+    else if(t[i]===row) s+=R(x,y,F,F,'fs');
+    else s+=R(x+sw/2,y+sw/2,F-sw,F-sw,'sk',`stroke-width="${sw}"`);
+  }
+  return s;
+};
+
+/* Charlie and the Intelligence Factory — every book is one room of the same floor plan.
+   The corridor runs at the same height through every cover; set the four side by side and it is continuous. */
+const ROOM = (doors, inner) => () => {
+  let s=''; const x0=X(2)-G, x1=X(11), y0=Y(5)-G, y1=Y(14), cy=CY(9), dt=Y(9), db=Y(9)+F;
+  s+=R(x0,y0,x1-x0,G,'fk'); s+=R(x0,y1-G,x1-x0,G,'fk');
+  const wall=(x,door)=>{ if(door){ s+=R(x,y0,G,dt-y0,'fk'); s+=R(x,db,G,y1-db,'fk'); } else s+=R(x,y0,G,y1-y0,'fk'); };
+  wall(x0,doors.includes('L')); wall(x1-G,doors.includes('R'));
+  if(doors.includes('L')) s+=R(0,cy-G/2,x0+G,G,'fk');
+  if(doors.includes('R')) s+=R(x1-G,cy-G/2,720-(x1-G),G,'fk');
+  return s+inner();
+};
+const vwall=(c,r0,r1)=>R(X(c)-G,Y(r0)-G,G,Y(r1+1)-Y(r0)+G,'fk');
+const hwall=(r,c0,c1)=>R(X(c0)-G,Y(r)-G,X(c1+1)-X(c0)+G,G,'fk');
+// I · Language: the prompt is prefilled in one pass; the answer is decoded one token at a time, out through the door.
+FIG.roomLanguage = ROOM('R', () => { let s='';
+  s+=R(X(3),Y(7),3*P-G,3*P-G,'fk');
+  [6,7,8,9,10].forEach((c,i)=>s+=R(X(c),Y(9),F,F,i===4?'fs':'fk'));
+  return s; });
+// II · Vision: the picture is cut into patches, the patches become tokens, and in the end pixels generate themselves.
+FIG.roomVision = ROOM('LR', () => { let s=''; const hot=[1,2], sw=3;
+  for(let r=0;r<4;r++)for(let c=0;c<4;c++) s+=R(X(3+c),Y(5)+r*P,F,F,(r===hot[0]&&c===hot[1])?'fs':'fk');
+  const h=P/2, x0=X(2)+ (9*P-G-16*h)/2 + (h-22)/2;
+  for(let i=0;i<16;i++) s+=R(x0+i*h,CY(9)-11,22,22,i===hot[0]*4+hot[1]?'fs':'fk');
+  for(let r=0;r<4;r++)for(let c=0;c<4;c++){ const x=X(6+c), y=Y(10)+r*P;
+    s+= (r===hot[0]&&c===hot[1]) ? R(x,y,F,F,'fs') : R(x+sw/2,y+sw/2,F-sw,F-sw,'sk',`stroke-width="${sw}"`); }
+  return s; });
+// III · Sound: speech as samples; loud in the room, silent in the corridor.
+FIG.roomSound = ROOM('LR', () => { let s=''; const cy=CY(9), h=14, r=rng(3); let k=0;
+  for(let x=X(2)+h/2; x<X(11)-G; x+=h,k++){
+    const t=(x-X(2))/(X(11)-G-X(2)); const env=Math.pow(Math.sin(Math.PI*t),1.3)*(0.55+0.45*Math.sin(t*19));
+    const a=Math.max(6,Math.abs(env)*(r()*0.5+0.5)*210);
+    s+=R(x-4,cy-a,8,2*a,k===22?'fs':'fk');
+  }
+  return s; });
+// IV · Reasoning: an agent in a grid world, never shown the answer, finds its own way to the reward.
+FIG.roomReason = ROOM('L', () => { let s='';
+  s+=vwall(5,7,13)+vwall(7,5,10)+vwall(9,8,13)+hwall(7,8,9);
+  const pts=[[X(2)-G,CY(9)],[CX(4),CY(9)],[CX(4),CY(6)],[CX(6),CY(6)],[CX(6),CY(11)],[CX(8),CY(11)],[CX(8),CY(7)],[CX(10),CY(7)],[CX(10),CY(5)+26]];
+  let d=0; const step=P/2;
+  for(let i=0;i<pts.length-1;i++){ const [a,b]=[pts[i],pts[i+1]]; const len=Math.hypot(b[0]-a[0],b[1]-a[1]);
+    for(; d<=len; d+=step){ const t=d/len; s+=C(a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,6,'fk'); } d-=len; }
+  s+=R(X(10),Y(5),F,F,'fs');
+  return s; });
+
+/* ---------------- BOOKS ---------------- */
+const BOOKS=[];
+const book=o=>BOOKS.push(o);
+// core set
+book({g:'core', slug:'ai-context-engineering', level:'intermediate', capsules:43, hours:10, title:['AI Context','Engineering'], fig:'window',
+  note:'Outside, an undifferentiated field of information. Inside the window it is selected and ordered — instructions, tools, retrieved knowledge, compressed memory — around one query.'});
+book({g:'core', slug:'mathematical-foundations-for-ml', level:'beginner', capsules:43, hours:10, title:['Mathematical','Foundations for','Machine Learning'], size:'m', fig:'eigen',
+  note:'A matrix maps the unit circle to an ellipse. Its eigenvectors — the directions that do not turn — run off the page.'});
+book({g:'core', slug:'neural-networks-from-scratch', level:'beginner', capsules:33, hours:7, title:['Neural Networks','from Scratch'], fig:'neuron',
+  note:'One neuron, the unit everything else is built from: nine inputs whose line weight is |w|, summed in one cell, bent by ReLU on the way out.'});
+book({g:'core', slug:'build-llms-from-scratch', level:'intermediate', capsules:20, hours:6, title:['Build Large Language','Models (LLMs)','from Scratch'], size:'m', fig:'attention',
+  note:'The causal self-attention matrix of a GPT. Square area is attention weight; the upper triangle is masked; the last row is the token being predicted.'});
+book({g:'core', slug:'5d-parallelism', level:'advanced', capsules:40, hours:9, title:['5D Parallelism','for Large Model','Training'], size:'m', fig:'mesh',
+  note:'Sixty-four GPUs in a device mesh. Each gap width is one axis of parallelism — TP, CP, EP, PP, DP — nested like the book composes them. One rank in red.'});
+book({g:'core', slug:'pi-vs-hermes-vs-codex', level:'advanced', capsules:9, hours:1, title:['Pi vs Hermes vs Codex:','Context Compaction','and Memory'], size:'m', fig:'compaction',
+  note:'A full context window, then the shape each harness leaves behind: Pi a summary and the recent turns, Hermes head and tail around a summarised middle, Codex a handoff summary.'});
+// range
+book({g:'range', slug:'machine-learning-fundamentals', level:'beginner', capsules:37, hours:9, title:['Machine Learning','Fundamentals'], fig:'boundary',
+  note:'Every point of feature space gets a predicted class; learning is placing the boundary. Three points sit on the wrong side of it.'});
+book({g:'range', slug:'git-github-masterclass', level:'beginner', capsules:40, hours:9, title:['Git & GitHub','Masterclass'], fig:'branch',
+  note:'History is a line. A feature branch leaves it and is merged back; another has just left and is still open, running off the page.'});
+book({g:'range', slug:'decision-trees-from-scratch', level:'beginner', capsules:23, hours:5, title:['Build Decision Trees','from Scratch'], size:'m', fig:'tree',
+  note:'Greedy binary splits, drawn orthogonally. One example’s route from the root question to its leaf.'});
+book({g:'range', slug:'rag-in-production', level:'intermediate', capsules:42, hours:10, title:['RAG in','Production'], fig:'cosine',
+  note:'Thirty chunks as unit vectors. Retrieval ranks them by angle to the query (cosine similarity); the top four are drawn at full weight.'});
+book({g:'range', slug:'sciml', level:'advanced', capsules:39, hours:9, title:['Scientific Machine','Learning (SciML)'], fig:'odefield',
+  note:'The direction field of a damped oscillator, one stroke per module, and a single solution curve spiralling into equilibrium.'});
+book({g:'range', slug:'diffusion-lm-from-scratch', level:'advanced', capsules:35, hours:8, title:['Build a Diffusion','Language Model','from Scratch'], size:'m', fig:'unmask',
+  note:'Rows are denoising steps. Masked positions are hollow; tokens unmasked at each step are red — everywhere at once, not left to right.'});
+book({g:'range', slug:'vla-world-models', level:'advanced', capsules:42, hours:10, title:['Vision-Language-Action','& World Models','for Robotics'], size:'m', fig:'arm',
+  note:'The arm acts now (solid). The world model imagines the pose that reaches the target (outline) and the path the gripper will take (dots).'});
+book({g:'range', slug:'kernel-engineering', level:'advanced', soon:true, title:['Kernel','Engineering'], sub:['From silicon to speculative decoding —','GPU kernels for modern LLMs.'], fig:'gemm',
+  note:'Forthcoming. A tiled matrix multiply: one output tile of C accumulates a row-strip of A against a column-strip of B, tile by tile.'});
+// sub-series
+book({g:'series', slug:'charlie-language-room', level:'advanced', capsules:22, hours:5, series:'I', title:['Charlie and the','Language Room'], sub:['Book I — Language: Inference Engineering'], fig:'roomLanguage',
+  note:'The prompt is prefilled in one pass; the answer is decoded one token at a time and leaves through the door.'});
+book({g:'series', slug:'charlie-vision-room', level:'intermediate', capsules:20, hours:6, series:'II', title:['Charlie and the','Vision Room'], sub:['Book II — Vision: Vision Transformers'], fig:'roomVision',
+  note:'The picture is cut into patches, the patches become tokens, and at the end pixels generate themselves. One patch is traced through.'});
+book({g:'series', slug:'charlie-sound-room', level:'intermediate', capsules:20, hours:6, series:'III', title:['Charlie and the','Sound Room'], sub:['Book III — Audio: Voice Agents'], fig:'roomSound',
+  note:'Speech as samples: loud in the room, silent in the corridor. The white sample is now.'});
+book({g:'series', slug:'charlie-reasoning-room', level:'advanced', capsules:21, hours:6, series:'IV', title:['Charlie and the','Reasoning Room'], sub:['Book IV — Reason: Reinforcement Learning,','from bandits to reasoning models'], fig:'roomReason',
+  note:'A grid world. The agent is never shown the answer; step by step it finds its own way to the reward.'});
+
+const LV={beginner:1,intermediate:2,advanced:3};
+const esc=t=>t.replace(/&/g,'&amp;');
+function ribbon(lv,cls='fs'){ const h=Y(lv-1)+F, n=F/2; return `<div class="ribbon"><svg width="44" height="${h}" viewBox="0 0 44 ${h}">${PG([[0,0],[44,0],[44,h],[22,h-n],[0,h]],cls)}</svg></div>`; }
+function coverInner(b){
+  const lv=LV[b.level];
+  const svg=`<svg class="fig" viewBox="0 0 720 888" xmlns="http://www.w3.org/2000/svg">
+    <defs><clipPath id="clipFig"><rect x="0" y="${Y(4)}" width="720" height="${Y(14)-G-Y(4)}"/></clipPath></defs>
+    ${FIG[b.fig]()}</svg>`;
+  const lvName=b.level[0].toUpperCase()+b.level.slice(1);
+  const third = b.soon ? `<b>Forthcoming</b>In preparation` : `<b>${b.capsules} capsules</b>${b.hours} hours`;
+  const fourth = b.series ? `<b>Intelligence Factory</b>Charlie, Book ${b.series}` : '';
+  const colo=`<div class="colo">${b.series?'':'<div class="rule"></div>'}
+    <div class="cell" style="left:${X(0)}px"><b>Vizuara</b>Books</div>
+    <div class="cell" style="left:${X(3)}px"><b>Level ${lv}</b>${lvName}</div>
+    <div class="cell" style="left:${X(6)}px">${third}</div>
+    ${fourth?`<div class="cell" style="left:${X(9)}px">${fourth}</div>`:''}
+  </div>`;
+  const head=`<div class="head"><h2 class="title ${b.size||''}" data-size="${b.size||''}">${b.title.map(t=>`<span>${esc(t)}</span>`).join('')}</h2>${b.sub?`<div class="sub">${b.sub.map(t=>`<span>${esc(t)}</span>`).join('')}</div>`:''}</div>`;
+  return svg+ribbon(lv)+head+colo;
+}
+const cover=b=>`<figure><div class="cover cv lv${LV[b.level]}" data-slug="${b.slug}">${coverInner(b)}</div><figcaption><b>${b.slug}</b><span>${esc(b.note)}</span></figcaption></figure>`;
+['core','range','series'].forEach(g=>document.getElementById(g).innerHTML=BOOKS.filter(b=>b.g===g).map(cover).join(''));
+
+/* ---------------- PRESENTATION PLATES (not covers) ---------------- */
+// level cards
+document.getElementById('levels').innerHTML=[1,2,3].map(lv=>{
+  const nm=['Beginner','Intermediate','Advanced'][lv-1];
+  return `<div class="lvcard lv${lv}" style="background:var(--g);color:var(--k)"><div class="rb">${ribbon(lv).replace('class="ribbon"','')}</div>
+    <b>Level ${lv}</b>${nm}
+    <div class="roles"><span><i style="background:var(--g);outline:2px solid var(--k);outline-offset:-2px"></i>ground</span><span><i style="background:var(--k)"></i>figure</span><span><i style="background:var(--s)"></i>signal</span></div></div>`;}).join('');
+// grid plate
+(()=>{ let s=`<svg width="720" height="888" viewBox="0 0 720 888" style="display:block;background:var(--paper)">`;
+  for(let r=0;r<15;r++)for(let c=0;c<12;c++){
+    const zone = r===14?'#CFCDC7': r<=4 && c<=10 ? '#D9D8D2' : c===11 && r<=2 ? '#F0B7B1' : '#E7E6E1';
+    s+=`<rect x="${X(c)}" y="${Y(r)}" width="44" height="44" fill="${zone}"/>`; }
+  s+=`<rect x="30" y="30" width="660" height="828" fill="none" stroke="#141414" stroke-width="1" stroke-dasharray="3 3"/>`;
+  s+=`<text x="30" y="${Y(1)+30}" font-family="Archivo" font-weight="700" font-size="60" letter-spacing="-1.4" fill="#141414">Title, rows 1–4</text>`;
+  s+=`<text x="30" y="${Y(9)+30}" font-family="Archivo" font-weight="700" font-size="34" fill="#8C8B86">Figure field, rows 5–14</text>`;
+  s+=`<rect x="30" y="814" width="660" height="4" fill="#141414"/>`;
+  s+=`<text x="30" y="846" font-family="Archivo" font-weight="700" font-size="13.5" fill="#141414">Colophon</text>`;
+  s+=PG([[646,0],[690,0],[690,186],[668,164],[646,186]],'','fill="#DC2A1E" opacity=".9"');
+  [0,3,6,9].forEach(c=>s+=`<rect x="${X(c)}" y="866" width="2" height="16" fill="#DC2A1E"/>`);
+  s+=`</svg>`; document.getElementById('gridplate').innerHTML=s; })();
+// ribbons
+document.getElementById('ribbons').innerHTML=[1,2,3].map(lv=>`<div style="text-align:left;font-size:14px;line-height:18px"><svg width="44" height="186" viewBox="0 0 44 186" style="display:block;margin-bottom:10px">${PG([[0,0],[44,0],[44,Y(lv-1)+F],[22,Y(lv-1)+F-22],[0,Y(lv-1)+F]],'','fill="#DC2A1E"')}</svg><b>Level ${lv}</b><br>${['Beginner','Intermediate','Advanced'][lv-1]}</div>`).join('');
+
+// Title sizes step down (68 → 60 → 50 → 46) until every hand-broken line fits the 11-column measure.
+function fit(root=document){ const order=['','m','s','xs'];
+  root.querySelectorAll('.cv .title').forEach(t=>{ let k=order.indexOf(t.dataset.size||'');
+    const too=()=>[...t.children].some(sp=>sp.getBoundingClientRect().width>604.5);
+    while(too()&&k<order.length-1){ if(order[k]) t.classList.remove(order[k]); k++; t.classList.add(order[k]); } });
+}
+// a scaled copy for the presentation only: class .cv, never .cover, so the renderer ignores it
+function mini(slug, scale){
+  const src=document.querySelector(`.cover[data-slug="${slug}"]`), c=src.cloneNode(true);
+  c.classList.remove('cover'); c.removeAttribute('data-slug'); c.style.transform=`scale(${scale})`;
+  const w=document.createElement('div'); w.className='mini'; w.style.width=720*scale+'px'; w.style.height=888*scale+'px'; w.appendChild(c); return w;
+}
+function wrap(){
+  const b=BOOKS.find(x=>x.slug==='build-llms-from-scratch');
+  const toc=[['00','LLM Basics',6],['01','LLM Attention Mechanism',6],['02','LLM Data Pre-processing',2],['03','LLM Architecture',3],['04','LLM Pretraining',2],['05','LLM Finetuning',1]];
+  const back=`<div class="back cv lv2">
+    <div class="blurb"><h3>Build a GPT-style LLM<br>from an empty file.</h3>
+      <p>From tokenizer to trained transformer: attention, GPT blocks, pretraining, and fine-tuning, built by hand and illustrated.</p></div>
+    <div class="toc"><div class="h">Contents — 6 parts, 20 capsules, about 6 hours</div>
+      ${toc.map(([n,t,c])=>`<div class="li"><span>${n}</span><span>${t}</span><span>${c} capsule${c>1?'s':''}</span></div>`).join('')}</div>
+    <div class="about"><b>The cover</b>The causal self-attention matrix of a GPT. Each row is a token; each square is the weight it gives an earlier token. Nothing may attend to the future, so the upper triangle stays empty. The last row — the token about to be predicted — is set in the signal ink.</div>
+    <div class="code">Barcode / ISBN<br>area</div>
+    <div class="colo"><div class="rule"></div>
+      <div class="cell" style="left:${X(0)}px"><b>Vizuara Books</b>books.vizuara.ai</div>
+      <div class="cell" style="left:${X(3)}px"><b>Level 2</b>Intermediate</div>
+      <div class="cell" style="left:${X(6)}px"><b>20 capsules</b>6 hours</div></div>
+  </div>`;
+  const spine=`<div class="spine lv2">${ribbon(2)}<div class="sp-title">Build Large Language Models (LLMs) from Scratch</div><div class="sp-imp">Vizuara</div></div>`;
+  const front=document.querySelector('.cover[data-slug="build-llms-from-scratch"]').cloneNode(true);
+  front.classList.remove('cover'); front.removeAttribute('data-slug');
+  const w=document.createElement('div'); w.className='wrap'; w.innerHTML=back+spine; w.appendChild(front);
+  document.getElementById('wrapbox').appendChild(w);
+}
+document.fonts.ready.then(()=>{
+  fit();
+  const cor=document.getElementById('corridor');
+  ['charlie-language-room','charlie-vision-room','charlie-sound-room','charlie-reasoning-room'].forEach(s=>cor.appendChild(mini(s,0.5)));
+  const lib=document.getElementById('library');
+  const order=['neural-networks-from-scratch','mathematical-foundations-for-ml','machine-learning-fundamentals','decision-trees-from-scratch','git-github-masterclass',
+    'ai-context-engineering','build-llms-from-scratch','rag-in-production','charlie-vision-room','charlie-sound-room',
+    '5d-parallelism','pi-vs-hermes-vs-codex','sciml','diffusion-lm-from-scratch','vla-world-models','kernel-engineering','charlie-language-room','charlie-reasoning-room'];
+  order.forEach(s=>{ const f=document.createElement('figure'); f.appendChild(mini(s,0.25)); lib.appendChild(f); });
+  wrap();
+});
+</script>
+</body>
+</html>

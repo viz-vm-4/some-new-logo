@@ -1,0 +1,613 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Interchange — a cover system for Vizuara Books</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Overpass:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&family=Newsreader:ital,opsz,wght@0,6..72,400;1,6..72,400;1,6..72,500&display=block">
+<style>
+:root{ --paper:#F3EFE6; --ink:#16181B; --ink2:#4B4D51; --tint:#E3DDCF; --tint2:#D6CEBC; --water:#D0DEE3; --grey:#C4BCAC; }
+*{box-sizing:border-box}
+html,body{margin:0;background:#DEDAD0;color:#16181B}
+body{font-family:Overpass, system-ui, sans-serif;-webkit-font-smoothing:antialiased}
+
+/* ───────── COVER ───────── */
+.cover{position:relative;width:720px;height:888px;overflow:hidden;background:var(--paper);color:var(--ink);flex:0 0 720px}
+.cover.night{--paper:#15181D;--ink:#EEEAE0;--ink2:#A6A8AB;--tint:#21262D;--tint2:#2A3038;--water:#1C2B34;--grey:#3A4049}
+.cover .map{position:absolute;left:0;top:0;width:720px;height:888px;overflow:visible}
+.cover .hdr{position:absolute;left:40px;right:40px;top:33px;height:20px;display:flex;justify-content:space-between;align-items:center;
+  font:700 10.5px/1 Overpass;letter-spacing:.13em;text-transform:uppercase}
+.cover .hdr .lvl{display:flex;align-items:center;gap:8px}
+.cover .hdr .lvl svg{display:block;margin-top:-2px}
+.cover .hrule{position:absolute;left:40px;right:40px;top:58px;height:3px;background:var(--ink)}
+.cover .title{position:absolute;left:37px;right:36px;top:84px;font-weight:800;letter-spacing:-.024em;line-height:.955;
+  font-size:var(--ts,60px);font-kerning:normal}
+.cover .tag{font-family:Newsreader, Georgia, serif;font-style:italic;font-weight:400;font-size:19.5px;line-height:1.28;letter-spacing:0;
+  margin:15px 0 0 3px;max-width:540px}
+.cover .foot{position:absolute;left:40px;right:40px;bottom:30px}
+.cover .frule{height:1.5px;background:var(--ink);margin-bottom:11px}
+.cover .key{display:grid;grid-template-columns:1fr 1fr;column-gap:30px;row-gap:5px;
+  font:700 8.8px/1.1 Overpass;letter-spacing:.05em;text-transform:uppercase}
+.cover .key .k{display:flex;align-items:center;gap:7px;min-width:0}
+.cover .key .k b{flex:0 0 15px;height:15px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;
+  font:800 9px/1 Overpass;letter-spacing:0;padding-top:1.5px}
+.cover .key .k span{white-space:nowrap;overflow:hidden}
+.cover .key .k i{font-style:normal;font-weight:600;margin-left:auto;padding-left:6px;color:var(--ink2);letter-spacing:.04em}
+.cover .imprint{display:flex;justify-content:space-between;align-items:center;margin-top:13px}
+.cover .stats{font:700 10px/1 Overpass;letter-spacing:.12em;text-transform:uppercase}
+.cover .brand{display:flex;align-items:center;gap:9px;font:800 12px/1 Overpass;letter-spacing:.17em;text-transform:uppercase}
+.cover .brand svg{display:block}
+
+/* map text */
+.sn{font:700 8.4px Overpass;fill:var(--ink)}
+.bl{font:800 10px Overpass;fill:#fff}
+.tl{font:italic 400 14px Newsreader;fill:var(--ink2);letter-spacing:.06em}
+.lb{font:800 9.5px Overpass;fill:var(--ink);letter-spacing:.08em}
+.trk{font:800 10.5px Overpass;fill:var(--ink);letter-spacing:.14em}
+.dest{font:800 9px Overpass;fill:var(--ink);letter-spacing:.1em}
+.mt{font:italic 400 22px Newsreader;fill:var(--ink)}
+.stn{font:800 9.5px Overpass;fill:var(--ink);letter-spacing:.1em}
+.cell{opacity:.75}
+.cover .sbul{position:absolute;right:40px;top:86px;width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  color:#fff;font:800 23px/1 Overpass;letter-spacing:.02em;padding-top:3px}
+.cover .key .k b.hollow{background:transparent !important;border:2.6px solid var(--kc);}
+
+/* ───────── PAGE ───────── */
+.page{width:1560px;margin:0 auto;padding:70px 60px 120px}
+.covers{display:grid;grid-template-columns:720px 720px;gap:80px 0;justify-content:space-between}
+.cap{font:400 13px/1.45 Newsreader, Georgia, serif;margin-top:14px;color:#2a2c30;max-width:700px}
+.cap b{font:800 10.5px/1 Overpass;letter-spacing:.12em;text-transform:uppercase;margin-right:8px}
+</style>
+</head>
+<body>
+<div class="page"><div class="covers" id="covers"></div>
+</div>
+<script>
+const DATA = {"ai-context-engineering": {"level": "intermediate","capsules": 43,"hours": 10,"name": "AI Context Engineering","stage": "Stage 5 · Ship something","tagline": "Engineer the context window like a system.","parts": [[0,"Context Foundations",6],[1,"The Instructional Layer",5],[2,"Write and Select: RAG",7],[3,"Tools and MCP",6],[4,"Compress and Isolate",5],[5,"Memory Architectures",5],[6,"Setting Up the Build Workflow",4],[7,"Capstone Builds",5]],"caps": ["Why Context Engineering, Not Prompt Engineering","Software 1.0, 2.0, and 3.0","Anatomy of the Context Window","The Four Strategies: Write, Select, Compress, Isolate","Context Failure Modes: Poisoning, Distraction, Confusion, Clash","Your First Context Lab: Measuring Tokens and Effects","System Prompts as Programs","Instructions, Examples, and Guardrails","Designing Roles and Personas","Structured Output and Formatting Contracts","Instructional Layer Lab","Write vs Select: Two Halves of Knowledge Injection","Why RAG Exists: Grounding, Freshness, and Cost","Chunking and Embeddings","Vector Search and Retrieval","Reranking and Hybrid Search","Building a RAG Pipeline End-to-End","RAG Lab and Interactive Quiz","Tools as Context: Giving the Model Hands","Tool-Calling Mechanics","What Is MCP? The Model Context Protocol","MCP Servers and Clients","Building a Useful MCP Server and Client","Tool-Context Hygiene","Why Compress: The Token Budget Is Finite","Summarization and Pruning Strategies","Isolation: Quarantining Context Across Sub-Agents","Multi-Agent Context Boundaries","Compress and Isolate Lab","The Stateless LLM Problem","Short-Term vs Long-Term Memory","Episodic, Semantic, and Procedural Memory","Building Memory with Retrieval","Memory Architectures Lab","A Coding-Agent Build Workflow","Claude Code and OpenClaw","Context Files and Repo Hygiene","Workflow Setup Lab","Capstone: Building an Email Agent","Mega Build: Driving Claude Code End-to-End","OpenClaw and RL Agents","Building Conversational Voice Agents for Bharat","Putting It All Together: A Context-Engineering Playbook"]},"mathematical-foundations-for-ml": {"level": "beginner","capsules": 43,"hours": 10,"name": "Mathematical Foundations for Machine Learning","stage": "Stage 1 · The ground floor","tagline": "The linear algebra, probability, and calculus that make ML work.","parts": [[0,"Why Math for Machine Learning",3],[1,"Linear Algebra as Transformations",7],[2,"Determinants and the Shape of Space",5],[3,"Probability and Statistics Foundations",5],[4,"Probability Distributions",5],[5,"Python and Numerical Computing",7],[6,"Calculus and the Engine of Learning",7],[7,"Putting It Together",4]],"caps": ["The Math Under the Model","How to Read This Book","Vectors as Arrows and as Lists","Linear Combinations and Span","The Dot Product, Two Ways","The Dot Product as a Linear Transformation","A Matrix Is a Transformation","Matrix Multiplication as Composition","The Identity and the Inverse","Transformations in 3D","What the Determinant Measures","Computing 2x2 and 3x3 Determinants","Zero Determinant and Collapse","Eigenvalues and Eigenvectors","Eigen-Intuition and Why It Matters for ML","Reasoning Under Uncertainty","Conditional Probability and Bayes' Rule","Random Variables and Expectation","Variance, Standard Deviation, and Spread","Covariance and Correlation","Distributions as Shapes of Chance","Bernoulli and Binomial Distributions","The Normal Distribution","Likelihood and Maximum Likelihood","From Likelihood to Loss Functions","Python for Math: A Fast Start","Objects, Classes, and Building Blocks","NumPy Arrays and Vectorization","Linear Algebra in NumPy","Pandas for Data","Visualizing Data and Distributions","Python for Machine Learning","Derivatives as Rates of Change","Integrals and the Area Under a Curve","Partial Derivatives and the Gradient","The Chain Rule and Backpropagation","Gradient Descent","Momentum and RMSProp","The Adam Optimizer","Deep Learning Libraries in Python","A Neuron from Scratch","A Neural Network from Scratch","The Math You Now Own"]},"neural-networks-from-scratch": {"level": "beginner","capsules": 33,"hours": 7,"name": "Neural Networks from Scratch","stage": "Stage 3 · Neural networks","tagline": "Build a working neural network from an empty file.","parts": [[0,"The Ten Questions",4],[1,"Turning Scores into Probabilities",3],[2,"Weights and Wiring",4],[3,"How a Network Learns",6],[4,"Context and Review",3],[5,"Coding the Layers",7],[6,"Loss, Optimizer, and Training",6]],"caps": ["Introduction and the Ten Questions","What a Neural Network Must Actually Do","A Mathematical Function to Switch a Neuron On or Off","Matrix Multiplication as a Classifier","From Raw Scores to a Probability Distribution","The Softmax Function","Tensors: The Data Containers","The Logic for Calculating Weight Values","Setting Up the Neural Network","Activation Functions","The Network as One Big Function","Teaching, or Training, a Neural Network","The Forward Pass and Cross-Entropy Loss","The Backward Pass: The Intuition","The Backward Pass: Gradients by Hand","Weight Updation with Gradient Descent","Hyperparameter Tuning","A Glimpse of Convolutional Neural Networks","Relooking at the Ten Questions","Masterclass: Building the Whole Thing in Code","The Problem: A Spiral Dataset","Designing the Dense Layer Class","Coding the Layer Forward Pass","Coding the Layer Backward Pass","Adding Activation Functions","ReLU: Forward and Backward Pass","Softmax: The Forward Pass in Code","Cross-Entropy Loss: The Forward Pass","The Combined Softmax + Loss Backward Pass","Optimizers: Beyond Plain Gradient Descent","Coding the Optimizer","Training the Entire Network","Visualizing the Results"]},"build-llms-from-scratch": {"level": "intermediate","capsules": 20,"hours": 6,"name": "Build Large Language Models (LLMs) from Scratch","stage": "Stage 4 · Attention, and your own LLM","tagline": "Build a GPT-style LLM from an empty file.","parts": [[0,"LLM Basics",6],[1,"LLM Attention Mechanism",6],[2,"LLM Data Pre-processing",2],[3,"LLM Architecture",3],[4,"LLM Pretraining",2],[5,"LLM Finetuning",1]],"caps": ["Course Introduction","What are LLMs?","Pretraining vs Finetuning LLMs","What are transformers?","How does GPT-3 really work?","Stages of building an LLM from scratch","Introduction to the Attention Mechanism","Simplified Attention Mechanism - Code from Scratch","The self attention mechanism with keys, query and values: coded form scratch","Causal Self Attention - Coded from scratch","Multi-head Attention - Part 1","Multi-head Attention - Part 2","The GPT Tokenizer: Byte Pair Encoding and Input-Target Pairs","Token and Positional Embeddings","Bird's-eye View of the LLM Architecture","Layer Norm, GELU, and Shortcut Connections","Coding the Transformer Block and the 124M GPT-2","Measuring Loss and Coding the Pretraining Loop","Temperature, Top-k Sampling, and Loading OpenAI's Weights","Finetuning: From Spam Classifier to Instruction Following"]},"5d-parallelism": {"level": "advanced","capsules": 40,"hours": 9,"name": "5D Parallelism for Large Model Training","stage": "Systems and scale","tagline": "Scale a model across a cluster of GPUs.","parts": [[0,"GPU Foundations",6],[1,"Data Parallelism",7],[2,"ZeRO and Sharded Data Parallelism",4],[3,"Tensor Parallelism",5],[4,"Sequence and Context Parallelism",5],[5,"Pipeline Parallelism",5],[6,"Expert Parallelism and MoE",4],[7,"Putting It All Together",4]],"caps": ["Why One GPU Is Not Enough","GPU Primer: Anatomy of an Accelerator","The Five Axes of Parallelism","The Four Buckets of GPU Memory","Floating Point and Mixed Precision","Memory Math for a 1B Llama","Activation Recomputation","Gradient Accumulation","Data Parallelism from Scratch","The Ring-All-Reduce Algorithm","Choosing the Batch Size","Profiling with TensorBoard","Overlapping Communication and Compute","The Redundancy Problem in Data Parallelism","ZeRO-1: Sharding Optimizer States","ZeRO-2 and ZeRO-3","Implementing ZeRO from Scratch","Why Split a Single Layer","Column- and Row-Parallel Linear Layers","Tensor Parallelism for the Transformer Block","Tensor Parallelism from Scratch","TP vs ZeRO for Inference","The Long-Sequence Memory Wall","Sequence Parallelism Explained","Sequence Parallelism from Scratch","Context Parallelism and Ring Attention","Naive Context Parallelism from Scratch","Why Pipeline Parallelism","The Pipeline Bubble","Advanced Pipeline Schedules","Pipeline Parallelism from Scratch","Megatron 3D Parallelism","Mixture-of-Experts Basics","Expert Parallelism Explained","Load Balancing and Token Routing","Build an MoE SLM from Scratch","Composing 5D Parallelism","Distributing GPT-2 Across a Cluster","Build an SLM with 5D Parallelism","Capstone Projects and Next Steps"]},"pi-vs-hermes-vs-codex": {"level": "advanced","capsules": 9,"hours": 1,"name": "Pi vs Hermes vs Codex: Context Compaction and Memory","stage": "Stage 5 · Ship something","tagline": "Three open-source coding harnesses, read out of their source: where each one cuts the conversation, what it writes down, and what it remembers tomorrow.","parts": [[1,"Compaction",4],[2,"A session, traced",1],[3,"Memory",4]],"caps": ["How Pi compacts","How Hermes compacts","How Codex compacts","Compaction, side by side","Pi compaction, walked through one session","Pi: memory is a file you write","Hermes: the agent writes its own memory","Codex: memory the agent writes when asked","Memory, side by side"]},"dsa-in-python": {"level": "intermediate","capsules": 69,"hours": 15,"name": "Data Structures & Algorithms in Python","stage": "Stage 1 · The ground floor","tagline": "The interview-grade DSA toolkit, coded from scratch in Python.","parts": [[0,"Foundations & Python Refresher",7],[1,"Arrays & Matrices",9],[2,"Strings, Sets & Dictionaries",8],[3,"Two Pointers & Sliding Window",6],[4,"Searching, Sorting & Bit Manipulation",8],[5,"Stacks & Queues",10],[6,"Linked Lists",7],[7,"Recursion & Backtracking",6],[8,"Greedy Algorithms & Capstone",8]],"caps": ["Why Data Structures & Algorithms?","Setting Up Python: Interpreter & REPL","A Fast Tour of the Python Language","Variables, Data Types, Casting & Operators","Control Flow: Conditionals, Loops & Functions","Object-Oriented Python for Data Structures","Big-O: Time & Space Complexity","Introduction to Python Arrays","Reverse an Array & Rotate by D Places","Generate All Subarrays & Search Unsorted","Max, Min & K-th Smallest/Largest","Two Sum & Contains Duplicate","Introduction to 2D Arrays","Transpose & Rotate a Matrix","Print a Matrix in Snake Pattern","Spiral Traversal of a Matrix","Introduction to Strings","All Substrings & Reverse a String","Palindrome String & Palindromic Substrings","Remove Occurrences & Camel-Case a Sentence","Introduction to Sets","Unique Characters & Pangram with Sets","Introduction to Python Dictionaries","Frequency Counting: Vowels, Uniques & Pangram","The Two-Pointers Technique","Remove Duplicates from a Sorted Array","Boats to Save People (Leetcode 881)","The Sliding-Window Technique","Contains Duplicate II (Leetcode 219)","Longest Substring Without Repeating Characters","Linear Search","Binary Search on a Sorted Array","Bubble Sort","Selection Sort","Introduction to Bit Manipulation","Single Element Among Doubles","Counting Bits","Power of Two","Introduction to the Stack","Previous Smaller & Greater Element","Valid Parentheses","Daily Temperatures","Use Side Lane","Introduction to the Queue","Implement a Stack Using Queues","Implement a Queue Using Stacks","Reverse First K Elements of a Queue","Sliding Window Maximum","Introduction to the Linked List","Remove the N-th Node from the End","Rotate a Linked List","Reverse a Linked List","Find the Middle of a Linked List","Detect a Cycle (Floyd's Algorithm)","Merge Two Sorted Linked Lists","Introduction to Recursion","Recursive Traversal, Fibonacci & Factorial","Climbing Stairs","Generate All Subsequences","Follow the Knight: The Knight's Tour","Find All Permutations","Introduction to Greedy: Chocolate Distribution","Minimum Platforms","N Meetings in One Room","Maximum Units on a Truck","Minimum Arrows to Burst Balloons","Gas Station","Choosing the Right Pattern","Capstone: The Interview Playbook"]},"decision-trees-from-scratch": {"level": "beginner","capsules": 23,"hours": 5,"name": "Build Decision Trees from Scratch","stage": "Stage 2 · Learning from data","tagline": "Grow classification and regression trees by hand.","parts": [[0,"Foundations",4],[1,"Classification Trees",9],[2,"Regression Trees",7],[3,"Wrap-Up and Interview Prep",3]],"caps": ["Why Decision Trees?","The Anatomy of a Decision Tree","Classification vs Regression Trees","The Toy Dataset We Will Split by Hand","Starting to Build a Classification Tree","What is Gini Impurity?","Gini Impurity: A Worked Example","Gini Impurity for Numerical Features","Choosing the Best Split","Recursion and Stopping Rules","Finishing the Classification Tree","Pruning to Fight Overfitting","Code an Entire Classification Tree in Python","What are Regression Trees?","Variance and SSR as the Split Criterion","Building the First Regression Split","Finishing the Regression Tree","Regression Trees with Multiple Features","Code an Entire Regression Tree in Python","Capstone: Fit and Read a Regression Tree","Recap: Two Trees, One Algorithm","Interview Prep: Decision Trees","From One Tree to Forests and Boosting"]},"charlie-language-room": {"level": "advanced","capsules": 22,"hours": 5,"series": "Charlie and the Intelligence Factory","series_no": "I","subtitle": "Language — Inference Engineering","name": "Charlie and the Language Room","parts": [[0,"The Golden Ticket",3],[1,"The Cache Room",4],[2,"The Attention Wing",2],[3,"The Engine Room",3],[4,"The Squeezing Room",4],[5,"The Scaling Room",3],[6,"Out of the Factory",3]],"caps": ["The Golden Ticket","Prefill and decode","The memory wall","The good and evil of the KV cache","Paged attention","MQA, GQA and latent attention","Sparse and sliding-window attention","State-space models and Mamba","FlashAttention 1, 2 and 3","The anatomy of a vLLM step","Continuous batching","Radix attention and prefix caching","Quantization, from FP16 to FP4","GPTQ, AWQ and the outlier problem","Speculative decoding","Multi-token prediction","Parallelism for inference","Disaggregated serving","Distillation and finetuning for inference","Guardrails, guided decoding and evals","The million-user system","Inference at the edge"]},"charlie-vision-room": {"level": "intermediate","capsules": 20,"hours": 6,"series": "Charlie and the Intelligence Factory","series_no": "II","subtitle": "Vision — Vision Transformers","name": "Charlie and the Vision Room","parts": [[0,"Into the Vision Room",3],[1,"The Attention Bench",4],[2,"Building the Vision Transformer",3],[3,"The Hierarchy Room",2],[4,"Finding Things",3],[5,"Time and Language",3],[6,"Generating Pictures",2]],"caps": ["The Vision Room","Why convolution hits a wall","The journey of a token","Simplified self-attention","Self-attention with trainable weights","Masked and multi-head attention","Counting the parameters","Patches are tokens","Coding ViT from scratch","DeiT and the distillation token","Swin: windows that shift","Coding Swin from scratch","DETR: detection as set prediction","Coding DETR, and running it","Segment Anything","TimeSformer and video","NanoVLM from scratch","Flamingo and LLaVA","Autoencoders and VAEs","Diffusion models"]},"charlie-sound-room": {"level": "intermediate","capsules": 20,"hours": 6,"series": "Charlie and the Intelligence Factory","series_no": "III","subtitle": "Audio — Voice Agents","name": "Charlie and the Sound Room","parts": [[0,"Into the Sound Room",3],[1,"Listening",4],[2,"Speaking",3],[3,"The Brain",4],[4,"The Wire",3],[5,"Shipping",3]],"caps": ["The Sound Room","The cascaded pipeline","What sound actually is","Voice activity detection","How Whisper works","Streaming ASR and faster-whisper","Measuring transcription quality","How text-to-speech works","Piper, Coqui and neural vocoders","Prosody and streaming TTS","The LLM as an interlocutor","Prompting for speech","Tool calling for voice agents","Memory for voice agents","Streaming, buffers and chunking","Barge-in and turn-taking","WebSockets and real-time transport","Building Nimbus, end to end","The latency budget","Speech-to-speech, telephony and frameworks"]},"charlie-reasoning-room": {"level": "advanced","capsules": 21,"hours": 6,"series": "Charlie and the Intelligence Factory","series_no": "IV","subtitle": "Reason — Reinforcement Learning, from bandits to reasoning models","name": "Charlie and the Reasoning Room","parts": [[0,"Into the Reasoning Room",3],[1,"The Three Horsemen",3],[2,"Value Machines",3],[3,"Policy Machines",3],[4,"Aligning Language Models",4],[5,"Production RL",5]],"caps": ["The Reasoning Room","The agent-environment loop","A short history of RL","Dynamic programming","Monte Carlo methods","Temporal-difference learning","SARSA and Q-learning","Deep Q-networks","Replay buffers and target networks","Policy gradients and REINFORCE","Baselines, advantage and actor-critic","TRPO and PPO","RLHF from scratch","Reward models and their failure modes","GRPO and reasoning models","DPO and the direct methods","Agentic RL","The Socratic tutor","World models and dreaming","RL for robotics and driving","RL for software, and RL infrastructure"]},"inference-engineering": {"level": "advanced","subtitle": "Serve LLMs fast — batching, KV-cache, paged attention, speculative decoding.","coming_soon": true,"name": "Inference Engineering"},"git-github-masterclass": {"level": "beginner","capsules": 40,"hours": 9,"name": "Git & GitHub Masterclass","stage": "Stage 1 · The ground floor","tagline": "Version control, from an empty folder to a merged pull request.","parts": [[0,"Getting Oriented",6],[1,"Version Control Foundations",5],[2,"Meet the Team & the Plan",2],[3,"All About Git",10],[4,"All About GitHub",3],[5,"GitHub Desktop, Step by Step",5],[6,"For Students, Researchers & Pros",3],[7,"The Real World & Open Source",6]],"caps": ["Why this masterclass?","Why should you care about Git & GitHub?","How this book is structured","Git vs GitHub — the crucial distinction","Is Git/GitHub only for code?","What is a terminal, and do I need it?","What do we mean by version control?","How long can you go without learning Git?","Common rookie mistakes to avoid","Git/GitHub alternatives","GitHub Desktop — the easy way in","About Team Vizuara","What we'll cover in the rest of the course","What is Git?","How Git version control works","The repository — where history lives","Installing Git","Git basic commands: init, add, commit, status","Pushing a local repo to GitHub","What are Git branches?","Merging branches","Git pull — staying in sync","Git fork — your own copy of someone's repo","What is GitHub?","Anatomy of a GitHub repository page","Pull requests — how change gets reviewed","GitHub Desktop — install and sign in","Committing changes in GitHub Desktop","Pushing and pulling with GitHub Desktop","Branching and merging in GitHub Desktop","Resolving conflicts in GitHub Desktop","GitHub for students","CI/CD with GitHub Actions — Part 1","CI/CD with GitHub Actions — Part 2","GitLab and the wider ecosystem","Cool GitHub repos worth exploring","Do all companies use GitHub?","Do all professionals use GitHub?","Making your first open-source contribution","Capstone: putting it all together"]},"reinforcement-learning": {"level": "intermediate","capsules": 38,"hours": 8,"name": "Reinforcement Learning","stage": "Reinforcement learning and robotics","tagline": "Build every RL algorithm by hand.","parts": [[0,"Foundations of Reinforcement Learning",5],[1,"The Three Pillars of Classical RL",6],[2,"Deep Q-Networks",5],[3,"Policy Gradient Methods from Scratch",6],[4,"RLHF from Scratch",7],[5,"Build a Reasoning Model with GRPO",4],[6,"Agentic Reinforcement Learning",3],[7,"From Learner to Researcher",2]],"caps": ["What Is Reinforcement Learning?","The Agent-Environment Interface","The Markov Property and MDPs","Rewards, Returns and Discounting","OpenAI Gymnasium: Your First Environment","Value Functions and the Bellman Equations","Dynamic Programming: Policy and Value Iteration","Monte Carlo Methods: Learning from Episodes","Temporal Difference Learning","Q-Learning and SARSA","Project: Landing a Lunar Lander","The Birth of Deep RL: From Pong to Atari","From Q-Tables to Q-Networks","Experience Replay and Target Networks","The DQN Training Loop","Project: Build a DQN from Scratch","Why Optimize the Policy Directly?","The Policy Gradient Theorem","The REINFORCE Algorithm","REINFORCE with a Baseline","Advantage Functions and Actor-Critic","Generalized Advantage Estimation","Why Language Models Need Alignment","The Three-Stage RLHF Pipeline","Training a Reward Model from Preferences","Project: An SLM That Writes Positive Stories","The PPO Algorithm Explained","The PPO Training Loop for Language Models","Project: A Reddit Post Summarizer","From PPO to GRPO","How GRPO Works","GRPO and the DeepSeek-R1 Revolution","Project: Turn an SLM into a Reasoning Model","What Is Agentic RL?","The Agentic RL Landscape","Project: An Agentic RAG App Trained with RL","Putting It All Together","Doing Impactful RL Research"]},"rag-in-production": {"level": "intermediate","capsules": 42,"hours": 10,"name": "RAG in Production","stage": "Stage 5 · Ship something","tagline": "Build RAG systems that survive real users.","parts": [[0,"RAG Foundations",5],[1,"Data Ingestion",4],[2,"Chunking",5],[3,"Embeddings & Indexing",6],[4,"Retrieval & Generation",5],[5,"Advanced RAG",6],[6,"Evaluating RAG",6],[7,"Agentic & Graph RAG",5]],"caps": ["Why RAG Exists","What Is Retrieval-Augmented Generation?","The RAG Pipeline End to End","Your First Minimal RAG","RAG vs Fine-tuning vs Long Context","Ingestion Is the Hard Part","Loading Documents: PDF, HTML, and Beyond","Cleaning, Normalizing, and Metadata","Building a Robust Ingestion Pipeline","Why Chunking Decides Retrieval Quality","Fixed-Size and Overlap Chunking","Recursive and Structure-Aware Chunking","Semantic Chunking","Choosing Chunk Size and Overlap","What Embeddings Actually Encode","Choosing an Embedding Model","Similarity Metrics: Cosine, Dot, Euclidean","Vector Indexes and ANN Search","Vector Databases in Practice","Building the Index","The Retrieval Step","Prompt Augmentation and Context Assembly","Generation, Grounding, and Citations","Building a Naive RAG Chatbot","Where Naive RAG Breaks","The Advanced RAG Playbook","Query Transformation and Expansion","Hybrid Search: Dense plus Sparse","Re-ranking with Cross-Encoders","Context Compression and Filtering","Building an Advanced RAG Pipeline","You Cannot Improve What You Cannot Measure","Retrieval Metrics: Recall, Precision, MRR","Generation Metrics: Faithfulness and Relevance","RAGAS and LLM-as-Judge","Building an Evaluation Dataset","Closing the Evaluation Loop","Beyond Single-Shot Retrieval","Agentic RAG with Tools and Routing","Graph RAG: Knowledge as a Graph","Building Agentic and Graph RAG","Shipping RAG to Production"]},"kernel-engineering": {"level": "advanced","subtitle": "From silicon to speculative decoding — GPU kernels for modern LLMs.","coming_soon": true,"name": "Kernel Engineering"},"transformers-from-scratch": {"level": "intermediate","capsules": 20,"hours": 5,"name": "Transformers: Theory, Intuition, and Building from Scratch","stage": "Stage 4 · Attention, and your own LLM","tagline": "The transformer, from intuition to code.","parts": [[0,"Introduction and Motivation",2],[1,"Foundations of Attention",2],[2,"Challenges with Traditional Models",1],[3,"Introduction to Transformers",2],[4,"Positional Encoding",4],[5,"Attention Mechanisms in Transformers",3],[6,"Piecing It All Together",2],[7,"Implementation & Code Walkthrough",3],[8,"Extensions and Advanced Topics",1]],"caps": ["Example/Motivation","Course Introduction","Understanding Attention","Attention Example","Shortcomings of Sequence-to-Sequence Models","Word Embeddings","Transformer Model Intro","Why Do We Need Positional Encoding?","Approaching Positional Encoding","Sinusoidal Encoding","Other Positional Encodings","Intro to Attention in Transformers","Scaled Dot-Product Attention","Multi-Head Attention","The Encoder Block","The Decoder and Final Output","Tokenization and the Dataset","Coding the Input and Attention Layers","Assembling and Training the Transformer","Other Transformer-Based Architectures"]}};
+/* ============================================================
+   INTERCHANGE — map engine
+   Vocabulary (fixed across the library):
+     line   = a part of the book (colour = part order)
+     tick   = one capsule (a station)
+     ring   = a capsule where lines meet (interchange)
+     pill   = an interchange complex spanning parallel lines
+     bullet = route bullet with the part number, at a terminus
+     tint / water = the territory: the subject's own geography
+   ============================================================ */
+const LINES = ['#D8432E','#1F4E9C','#12875A','#E9A31B','#6C3F99','#8C5A2E','#0D7F89','#8DAA2A','#C2577A','#6F767D'];
+const LINES_NIGHT = ['#E8563F','#4A7DD6','#23A676','#F0B232','#9467CE','#BC8552','#1AA3AE','#A8C63D','#DC7096','#9CA3AA'];
+const W = 8, TICK = 5.5, R = 18, NS = 'http://www.w3.org/2000/svg';
+
+const sub=(a,b)=>[a[0]-b[0],a[1]-b[1]], add=(a,b)=>[a[0]+b[0],a[1]+b[1]], mul=(a,k)=>[a[0]*k,a[1]*k];
+const len=a=>Math.hypot(a[0],a[1]), norm=a=>{const l=len(a)||1;return [a[0]/l,a[1]/l]};
+const leftN=d=>[d[1],-d[0]];
+const f=x=>Math.round(x*100)/100;
+
+function offsetPts(pts,d){
+  if(!d) return pts.map(p=>p.slice());
+  const out=[];
+  for(let i=0;i<pts.length;i++){
+    const nPrev = i>0 ? leftN(norm(sub(pts[i],pts[i-1]))) : null;
+    const nNext = i<pts.length-1 ? leftN(norm(sub(pts[i+1],pts[i]))) : null;
+    if(!nPrev) out.push(add(pts[i],mul(nNext,d)));
+    else if(!nNext) out.push(add(pts[i],mul(nPrev,d)));
+    else { const s=[nPrev[0]+nNext[0],nPrev[1]+nNext[1]]; const k=d/(1+nPrev[0]*nNext[0]+nPrev[1]*nNext[1]); out.push(add(pts[i],mul(s,k))); }
+  }
+  return out;
+}
+function roundPath(pts, r, off=0){
+  const segs=[]; let cur=pts[0]; let dstr=`M${f(cur[0])},${f(cur[1])}`;
+  const radii = Array.isArray(r) ? r : null;
+  for(let i=1;i<pts.length;i++){
+    const P=pts[i];
+    if(i<pts.length-1){
+      const u=norm(sub(P,pts[i-1])), v=norm(sub(pts[i+1],P));
+      const cross=u[0]*v[1]-u[1]*v[0], dot=u[0]*v[0]+u[1]*v[1];
+      const th=Math.acos(Math.max(-1,Math.min(1,dot)));
+      if(th<1e-3){ pushL(P); continue; }
+      let rr = (radii? radii[i] : r) + (cross>0 ? off : -off);
+      rr=Math.max(2,rr);
+      let t=rr*Math.tan(th/2);
+      const lim=Math.min(len(sub(P,cur)), len(sub(pts[i+1],P))*0.5);
+      if(t>lim){ t=lim; rr=t/Math.tan(th/2); }
+      const A=sub(P,mul(u,t)), B=add(P,mul(v,t));
+      pushL(A);
+      const n = cross>0 ? [-u[1],u[0]] : [u[1],-u[0]];
+      const C=add(A,mul(n,rr));
+      const a0=Math.atan2(A[1]-C[1],A[0]-C[0]);
+      const sgn= cross>0?1:-1;
+      segs.push({t:'A',C,r:rr,a0,th,sgn,len:rr*th,from:A,to:B});
+      dstr+=` A${f(rr)},${f(rr)} 0 0 ${cross>0?1:0} ${f(B[0])},${f(B[1])}`;
+      cur=B;
+    } else pushL(P);
+  }
+  function pushL(P){ const l=len(sub(P,cur)); if(l>1e-6){ segs.push({t:'L',a:cur,b:P,len:l,dir:norm(sub(P,cur))}); dstr+=` L${f(P[0])},${f(P[1])}`; } cur=P; }
+  const total=segs.reduce((s,g)=>s+g.len,0);
+  return {d:dstr,segs,total,pts};
+}
+function pointAt(path,s){
+  if(!path.segs.length) return {p:path.pts[0],d:[1,0],seg:null};
+  s=Math.max(0,Math.min(path.total,s));
+  for(const g of path.segs){
+    if(s<=g.len+1e-6){
+      if(g.t==='L'){ return {p:add(g.a,mul(g.dir,s)),d:g.dir,seg:g}; }
+      const a=g.a0+g.sgn*(s/g.r); const p=[g.C[0]+g.r*Math.cos(a),g.C[1]+g.r*Math.sin(a)];
+      const d = g.sgn>0 ? [-Math.sin(a),Math.cos(a)] : [Math.sin(a),-Math.cos(a)];
+      return {p,d,seg:g};
+    }
+    s-=g.len;
+  }
+  const g=path.segs[path.segs.length-1];
+  return g.t==='L'?{p:g.b,d:g.dir,seg:g}:{p:g.to,d:[0,0],seg:g};
+}
+function orient(d){ const ax=Math.abs(d[0]), ay=Math.abs(d[1]); if(ay<0.05) return 'h'; if(ax<0.05) return 'v'; return 'd'; }
+
+function el(tag,attrs,parent){const e=document.createElementNS(NS,tag);for(const k in attrs){if(attrs[k]!==''&&attrs[k]!=null)e.setAttribute(k,attrs[k]);}if(parent)parent.appendChild(e);return e;}
+
+/* ------------------------------------------------------------ */
+function makeMap(svg, book, slug){
+  const defs=el('defs',{},svg);
+  const pat=el('pattern',{id:'hatch-'+slug,width:9,height:9,patternUnits:'userSpaceOnUse',patternTransform:'rotate(45)'},defs);
+  el('rect',{x:0,y:0,width:9,height:9,fill:'var(--tint)'},pat);
+  el('line',{x1:0,y1:0,x2:0,y2:9,stroke:'var(--tint2)','stroke-width':3.2},pat);
+  const frame=el('g',{class:'frame'},svg);
+  const L={terr:el('g',{},frame), ctx:el('g',{},frame), lines:el('g',{},frame), ticks:el('g',{},frame), rings:el('g',{},frame), labels:el('g',{},frame)};
+  const parts=book.parts||[];
+  const first=[]; let acc=1; parts.forEach(p=>{first.push(acc);acc+=p[2];});
+  const used=parts.map(()=>0);
+  const col = i => (book.colors ? book.colors[i%book.colors.length] : LINES[i%LINES.length]);
+  const stations=[]; // for audit
+  const M = {
+    frame, L, col, stations, hatch:`url(#hatch-${slug})`,
+    /* one run of a line */
+    line(part, pts, o={}){
+      const P=offsetPts(pts,o.off||0), path=roundPath(P,o.r??R,o.off||0);
+      const color=o.color||col(part), w=o.w||W;
+      if(o.hollow){
+        el('path',{d:path.d,fill:'none',stroke:color,'stroke-width':w,'stroke-linecap':'butt','stroke-linejoin':'round'},L.lines);
+        el('path',{d:path.d,fill:'none',stroke:'var(--paper)','stroke-width':w-4.2,'stroke-linecap':'butt','stroke-linejoin':'round'},L.lines);
+      } else el('path',{d:path.d,fill:'none',stroke:color,'stroke-width':w,'stroke-linecap':'butt','stroke-linejoin':'round','stroke-dasharray':o.dash||''},o.layer?L[o.layer]:L.lines);
+      if(o.ctx) return path;                       // context line (no stations)
+      const total=parts[part][2];
+      const n = o.n ?? (total-used[part]);
+      const ends=o.ends||'none';
+      // allowed arc-length intervals
+      const step=1, allowed=[]; let open=null;
+      for(let s=0;s<=path.total+1e-6;s+=step){
+        const {p,d,seg}=pointAt(path,s);
+        let ok = true;
+        if(o.where){ ok = seg && seg.t==='L' && o.where.includes(orient(d)); }
+        if(ok && o.avoid){ for(const r of o.avoid){ if(p[0]>=r[0]&&p[0]<=r[2]&&p[1]>=r[1]&&p[1]<=r[3]){ok=false;break;} } }
+        if(ok && o.span){ ok = s>=o.span[0] && s<=path.total-o.span[1]; }
+        if(ok){ if(!open) open=[s,s]; else open[1]=s; } else if(open){ allowed.push(open); open=null; }
+      }
+      if(open) allowed.push(open);
+      const A=allowed.reduce((t,iv)=>t+(iv[1]-iv[0]),0);
+      const map=u=>{ for(const iv of allowed){ const l=iv[1]-iv[0]; if(u<=l+1e-6) return iv[0]+u; u-=l; } return allowed.length?allowed[allowed.length-1][1]:0; };
+      const us=[];
+      for(let i=0;i<n;i++){
+        let t;
+        if(o.at) t=o.at[i];
+        else if(n===1) t = ends==='start'?0: ends==='end'?1:0.5;
+        else if(ends==='both') t=i/(n-1);
+        else if(ends==='end') t=(i+1)/n;
+        else if(ends==='start') t=i/n;
+        else t=(i+0.5)/n;
+        us.push(map(A*t));
+      }
+      const side=o.side??1;
+      us.forEach((s,i)=>{
+        const num=first[part]+used[part]+i;
+        const {p,d}=pointAt(path,s); const nrm=mul(leftN(d),side);
+        const isRing = o.ring==='all' || (o.ring==='end'&&i===n-1) || (o.ring==='start'&&i===0) || (Array.isArray(o.ring)&&o.ring.includes(i));
+        const tip = book.caps ? `${String(num).padStart(2,'0')} · ${book.caps[num-1]||''}` : '';
+        let e;
+        if(isRing) e=M.ring(p[0],p[1],o.ringR);
+        else if(o.hollow){ e=el('circle',{cx:f(p[0]),cy:f(p[1]),r:5.2,fill:'var(--paper)',stroke:color,'stroke-width':2.6},L.rings); }
+        else { const b=add(p,mul(nrm,w/2+TICK)); e=el('line',{x1:f(p[0]),y1:f(p[1]),x2:f(b[0]),y2:f(b[1]),stroke:color,'stroke-width':3.6},L.ticks); }
+        if(tip){ const t=el('title',{},e); t.textContent=tip; }
+        stations.push({part,num,p});
+      });
+      used[part]+=n;
+      // termini
+      const T=(where)=>{ const s=where==='start'?0:path.total; const {p,d}=pointAt(path,s); const nn=leftN(d);
+        const a=add(p,mul(nn,w/2+TICK)), b=sub(p,mul(nn,w/2+TICK));
+        el('line',{x1:f(a[0]),y1:f(a[1]),x2:f(b[0]),y2:f(b[1]),stroke:color,'stroke-width':3.6},L.ticks); };
+      if(o.term==='start'||o.term==='both') T('start');
+      if(o.term==='end'||o.term==='both') T('end');
+      const Arrow=(where)=>{ const s=where==='start'?0:path.total; const {p,d}=pointAt(path,s); const dd=where==='start'?mul(d,-1):d; const nn=leftN(dd);
+        const tip=add(p,mul(dd,13)), a=add(p,mul(nn,9)), b=sub(p,mul(nn,9));
+        el('path',{d:`M${f(a[0])},${f(a[1])} L${f(tip[0])},${f(tip[1])} L${f(b[0])},${f(b[1])}Z`,fill:color},L.lines); };
+      if(o.arrow==='end'||o.arrow==='both') Arrow('end');
+      if(o.arrow==='start'||o.arrow==='both') Arrow('start');
+      if(o.bullet){
+        const bs = o.bullet==='start'?0: o.bullet==='end'?path.total : o.bullet;
+        const where = typeof o.bullet==='number' ? 'mid' : o.bullet;
+        const {p,d}=pointAt(path,bs); const dd = where==='start'?mul(d,-1):d;
+        const q = where==='mid' ? p : add(p,mul(dd,o.bulletGap??15));
+        M.bullet(part,q[0],q[1],o.bulletColor);
+      }
+      return path;
+    },
+    ring(x,y,rad=6.6){ return el('circle',{cx:f(x),cy:f(y),r:rad,fill:'var(--paper)',stroke:'var(--ink)','stroke-width':2.7},L.rings); },
+    pill(x1,y1,x2,y2,rad=7.5){
+      const g=el('g',{},L.rings);
+      el('line',{x1,y1,x2,y2,stroke:'var(--ink)','stroke-width':rad*2+2.7,'stroke-linecap':'round'},g);
+      el('line',{x1,y1,x2,y2,stroke:'var(--paper)','stroke-width':rad*2-2.7,'stroke-linecap':'round'},g);
+      return g;
+    },
+    bullet(part,x,y,color){
+      el('circle',{cx:f(x),cy:f(y),r:9.2,fill:color||col(part)},L.labels);
+      const t=el('text',{x:f(x), y:f(y+3.7),'text-anchor':'middle',class:'bl'},L.labels); t.textContent=parts[part][0];
+    },
+    zone(d,o={}){ return el('path',{d,fill:o.fill||'var(--tint)',stroke:o.stroke||'none','stroke-width':o.sw||0,opacity:o.op??''},L.terr); },
+    rect(x,y,w,h,rx=0,o={}){ return el('rect',{x:f(x),y:f(y),width:f(w),height:f(h),rx,fill:o.fill||'var(--tint)',stroke:o.stroke||'',"stroke-width":o.sw||'',class:o.cls||''},L.terr); },
+    bulletText(txt,x,y,fill,tcol,rad=10.5){
+      el('circle',{cx:f(x),cy:f(y),r:rad,fill},L.labels);
+      const t=el('text',{x:f(x), y:f(y+3.9),'text-anchor':'middle',class:'bl'},L.labels); t.textContent=txt; t.style.fill=tcol; t.style.fontSize=(txt.length>2?8.5:10)+'px';
+    },
+    band(pts,wid,o={}){ const p=roundPath(pts,o.r??40); return el('path',{d:p.d,fill:'none',stroke:o.color||'var(--water)','stroke-width':wid,'stroke-linecap':o.cap||'butt','stroke-linejoin':'round'},L.terr); },
+    tlabel(txt,x,y,o={}){
+      const t=el('text',{x,y,'text-anchor':o.anchor||'middle',class:'tl',transform:o.rot?`rotate(${o.rot} ${x} ${y})`:''},o.top?L.labels:L.terr);
+      t.textContent=txt; if(o.size) t.style.fontSize=o.size+'px'; if(o.ls!=null) t.style.letterSpacing=o.ls; if(o.fill) t.style.fill=o.fill; return t;
+    },
+    label(txt,x,y,o={}){ const t=el('text',{x,y,'text-anchor':o.anchor||'start',class:o.cls||'lb',transform:o.rot?`rotate(${o.rot} ${x} ${y})`:''},L.labels); t.textContent=txt; if(o.fill) t.style.fill=o.fill; return t; },
+    math(txt,x,y,o={}){ const t=el('text',{x,y,'text-anchor':o.anchor||'middle',class:'mt'},L.labels); t.textContent=txt; if(o.fill) t.style.fill=o.fill; return t; },
+    claim(part,n,kind){ for(let i=0;i<n;i++) stations.push({part,num:first[part]+used[part]+i,kind}); used[part]+=n; },
+    parts(){ return parts; },
+    audit(){ return parts.map((p,i)=>[p[2],used[i]]); }
+  };
+  return M;
+}
+/* ============================================================
+   MAPS — one per book. Local frame: x 0–640 (cover x 40–680),
+   y 0–h. Lines may bleed past x<0 / x>640 to the trim.
+   ============================================================ */
+const MAPS = {};
+const OUT = [-80,-1e4,24,1e4];            // keep stations out of the left bleed / bullet zone
+const OUTR = [624,-1e4,1e4,1e4];          // and the right bleed
+
+/* polyline helpers: cut a route into parts by arc length, keeping cuts off corners */
+function polyCum(pts){ const c=[0]; for(let i=1;i<pts.length;i++) c.push(c[i-1]+len(sub(pts[i],pts[i-1]))); return c; }
+function polyAt(pts,cum,s){ for(let i=1;i<pts.length;i++) if(s<=cum[i]+1e-9){ const t=(s-cum[i-1])/((cum[i]-cum[i-1])||1); return {p:add(pts[i-1],mul(sub(pts[i],pts[i-1]),t)),i}; } return {p:pts[pts.length-1],i:pts.length-1}; }
+function cutPoly(pts,cuts,m=28){
+  const cum=polyCum(pts), out=[]; let sp=pts[0], si=1;
+  for(let c of cuts){
+    for(let k=0;k<30;k++){ const {i}=polyAt(pts,cum,c); const a=c-cum[i-1], b=cum[i]-c, L=cum[i]-cum[i-1];
+      if(L<2*m){ c=(cum[i-1]+cum[i])/2; break; } if(a>=m&&b>=m) break; c += a<m ? (m-a+0.5) : -(m-b+0.5); }
+    const q=polyAt(pts,cum,c); const pc=[sp]; for(let i=si;i<q.i;i++) pc.push(pts[i]); pc.push(q.p); out.push(pc); sp=q.p; si=q.i;
+  }
+  const pc=[sp]; for(let i=si;i<pts.length;i++) pc.push(pts[i]); out.push(pc);
+  return out;
+}
+
+/* ---------- Neural Networks from Scratch ----------
+   Three interchange bars are the input, hidden and output layers; the seven parts
+   are lines that re-order between layers, so their crossings draw the weights. */
+MAPS['neural-networks-from-scratch'] = { h:330, draw(M){
+  const cx=[80,320,560], cy=165, sp=[25,40,25];
+  const b=[3,0,5,1,6,2,4], c=[4,2,6,0,5,1,3];
+  const y=(j,lane)=>cy+(lane-3)*sp[j];
+  cx.forEach((x,j)=>M.rect(x-30,y(j,0)-28,60,y(j,6)-y(j,0)+56,30));
+  const mid=[(cx[0]+cx[1])/2,(cx[1]+cx[2])/2];
+  for(let k=0;k<7;k++){
+    const y0=y(0,k), y1=y(1,b[k]), y2=y(2,c[k]);
+    const d1=Math.abs(y1-y0), d2=Math.abs(y2-y1);
+    const m1=mid[0]+(k-3)*5, m2=mid[1]-(k-3)*5;
+    const pts=[[-60,y0],[m1-d1/2,y0],[m1+d1/2,y1],[m2-d2/2,y1],[m2+d2/2,y2],[700,y2]];
+    const avoid=[OUT,OUTR,...cx.map(x=>[x-24,-1e4,x+24,1e4])];
+    M.line(k,pts,{where:'h',avoid,side:1,bullet:66,r:18});
+  }
+  cx.forEach((x,j)=>M.pill(x,y(j,0),x,y(j,6),8.5));
+  M.tlabel('input',cx[0],y(0,6)+50); M.tlabel('hidden',cx[1],y(1,6)+50); M.tlabel('output',cx[2],y(2,6)+50);
+}};
+
+/* ---------- 5D Parallelism ----------
+   Foundations arrive from the west; five axes fan out from the hub; the circle line
+   (Putting It All Together) composes them. The ground is a grid of GPU blocks. */
+MAPS['5d-parallelism'] = { h:362, draw(M){
+  const C=[300,165];
+  const oct=[[300,10],[480,10],[560,90],[560,240],[480,320],[120,320],[40,240],[40,90],[120,10],[300,10]];
+  for(let i=-6;i<=6;i++) for(let j=-4;j<=4;j++){
+    const dx=i*36, dy=j*33; if(Math.abs(dx)>232||Math.abs(dy)>135||Math.abs(dx)+Math.abs(dy)>300) continue;
+    M.rect(C[0]+dx-13,C[1]+dy-12,26,24,2,{cls:'gpu'});
+  }
+  M.tlabel('the cluster',40,356,{anchor:'start'});
+  // circle line: its four stations sit on the western half
+  M.line(7,oct,{r:36,side:1,avoid:[[288,-1e4,1e4,1e4],[20,140,60,190]]});
+  M.line(0,[[-60,C[1]],C],{avoid:[OUT,[22,140,58,190],[C[0]-18,0,1e4,1e3]],ends:'none',side:1,n:5,bullet:66});
+  M.claim(0,1); M.ring(C[0],C[1],11);
+  M.line(1,[C,[560,C[1]]],{off:6.5,side:1,avoid:[[0,0,C[0]+24,400],[536,0,700,400]]});
+  M.line(2,[C,[560,C[1]]],{off:-6.5,side:-1,avoid:[[0,0,C[0]+24,400],[536,0,700,400]],n:3});
+  M.claim(2,1); M.pill(560,C[1]-6.5,560,C[1]+6.5,7.5);
+  M.line(3,[C,[300,10]],{side:-1,ends:'end',ring:'end',avoid:[[0,C[1]-24,700,C[1]+24]]});
+  M.line(6,[C,[455,10]],{side:-1,ends:'end',ring:'end',avoid:[[0,C[1]-26,700,C[1]+26]]});
+  M.line(4,[C,[455,320]],{side:1,ends:'end',ring:'end',avoid:[[0,C[1]-26,700,C[1]+26]]});
+  M.line(5,[C,[300,320]],{side:1,ends:'end',ring:'end',avoid:[[0,C[1]-24,700,C[1]+24]]});
+  M.bullet(3,300,-15); M.bullet(6,470,-9); M.bullet(1,590,C[1]-19); M.bullet(2,590,C[1]+19);
+  M.bullet(4,470,339); M.bullet(5,300,345); M.bullet(7,60,30);
+}};
+
+/* ---------- Pi vs Hermes vs Codex ----------
+   Three harness tracks funnel into one (compaction); one traced session; three memories. */
+MAPS['pi-vs-hermes-vs-codex'] = { h:284, draw(M){
+  const T=[22,142,262], J1=[300,142], J2=[392,142], J3=[626,142];
+  M.zone(`M-60,-8 H176 L310,126 V158 L176,292 H-60Z`);
+  M.zone(`M392,142 L500,34 H518 L626,142 L518,250 H500Z`);
+  M.tlabel('context window',100,90); M.tlabel('memory',509,196);
+  const names=['PI','HERMES','CODEX'];
+  T.forEach((ty,i)=>{
+    const pts = i===1 ? [[-60,ty],J1] : [[-60,ty],[180,ty],J1];
+    M.line(0,pts,{n:1,where:'h',avoid:[OUT,[180,-1e4,1e4,1e4]],side:i===2?-1:1,bullet:66,r:24});
+    M.label(names[i],44,ty+(i===2?26:-14),{cls:'trk'});
+  });
+  M.line(0,[J1,J1],{n:1,ring:'all'});
+  M.line(1,[J1,J2],{n:1,side:1});
+  T.forEach((ty,i)=>{
+    const pts = i===1 ? [J2,J3] : [J2,[500,ty+(i===0?12:-12)],[518,ty+(i===0?12:-12)],J3];
+    M.line(2,pts,{n:1,avoid:[[0,-1e4,488,1e4],[530,-1e4,1e4,1e4]],side:i===2?-1:1,r:18});
+  });
+  M.line(2,[J3,J3],{n:1,ring:'all'});
+  M.bullet(1,346,112);
+}};
+
+/* ---------- AI Context Engineering ----------
+   Eight sources fan into the context window and run as one bundle to the capstone
+   interchange: what the model sees is assembled, compressed, and fed forward. */
+MAPS['ai-context-engineering'] = { h:336, draw(M){
+  const lane=k=>126+12*k;
+  M.zone(`M324,90 H720 V246 H324 a20,20 0 0 1 -20,-20 V110 a20,20 0 0 1 20,-20Z`);
+  M.tlabel('context window',604,111,{anchor:'end'});
+  for(let k=0;k<8;k++){
+    const top=k<4, j=top?k:7-k;
+    const yA= top? 14+27*k : 322-27*(7-k);
+    const xB= 192-10*j;
+    const D=Math.abs(lane(k)-yA);
+    const pts=[[-60,yA],[xB,yA],[xB+D,lane(k)],[590,lane(k)]];
+    M.line(k,pts,{avoid:[OUT,[274,-1e4,1e4,1e4]],side:top?1:-1,bullet:66,n:k===7?4:undefined,r:24});
+  }
+  M.claim(7,1); M.pill(590,lane(0),590,lane(7),8.5);
+}};
+
+/* ---------- Mathematical Foundations for ML ----------
+   Coordinate axes: linear algebra runs along x, probability up y, calculus down z;
+   Python is the unit circle round the origin; Putting It Together is the resultant vector. */
+MAPS['mathematical-foundations-for-ml'] = { h:392, draw(M){
+  const O=[246,246], rc=70, zL=138, vL=138;
+  M.zone(`M${O[0]},${O[1]} H606 L${606-zL},${O[1]+zL} H${O[0]-zL}Z`);
+  M.tlabel('the ground floor',470,O[1]+zL-18,{anchor:'middle'});
+  const q=rc*Math.SQRT1_2;
+  M.line(0,[[-60,O[1]],O],{avoid:[OUT,[O[0]-rc-14,0,O[0]-rc+14,1e3]],ends:'end',ring:'end',side:1,bullet:66});
+  M.line(1,[O,[440,O[1]]],{avoid:[[0,0,O[0]+18,1e3],[O[0]+rc-14,0,O[0]+rc+14,1e3]],ends:'end',ring:'end',side:1});
+  M.line(2,[[440,O[1]],[600,O[1]]],{avoid:[[0,0,454,1e3],[586,0,1e3,1e3]],side:1,arrow:'end'});
+  M.line(3,[O,[O[0],120]],{avoid:[[0,O[1]-18,1e3,1e3],[0,O[1]-rc-14,1e3,O[1]-rc+14]],ends:'end',ring:'end',side:-1});
+  M.line(4,[[O[0],120],[O[0],8]],{avoid:[[0,106,1e3,1e3],[0,-100,1e3,20]],side:-1,arrow:'end'});
+  M.line(6,[O,[O[0]-zL,O[1]+zL]],{avoid:[[O[0]-20,0,1e3,1e3],[O[0]-q-14,O[1]+q-14,O[0]-q+14,O[1]+q+14],[-100,O[1]+zL-16,1e3,1e3]],side:-1,arrow:'end'});
+  M.line(7,[O,[O[0]+vL,O[1]-vL]],{avoid:[[0,O[1]-20,O[0]+20,1e3],[O[0]+q-14,O[1]-q-14,O[0]+q+14,O[1]-q+14],[O[0]+vL-16,-100,1e3,1e3]],side:1,arrow:'end'});
+  const Rc=rc/Math.cos(Math.PI/8), oc=[];
+  for(let i=0;i<=8;i++){ const a=-Math.PI/2+Math.PI/8+i*Math.PI/4; oc.push([O[0]+Rc*Math.cos(a),O[1]+Rc*Math.sin(a)]); }
+  const start=[O[0],O[1]-rc], circ=[start,...oc.slice(0,8),start];
+  const cross=[[O[0]+rc,O[1]],[O[0],O[1]-rc],[O[0]-rc,O[1]],[O[0]-q,O[1]+q],[O[0]+q,O[1]-q]];
+  M.line(5,circ,{r:34,side:1,avoid:cross.map(p=>[p[0]-15,p[1]-15,p[0]+15,p[1]+15])});
+  M.math('x',622,O[1]+7,{anchor:'start'}); M.math('y',O[0]+18,12,{anchor:'start'}); M.math('z',O[0]-zL-16,O[1]+zL+6,{anchor:'end'});
+  M.bullet(1,O[0]+rc+46,O[1]+22); M.bullet(2,470,O[1]+22); M.bullet(3,O[0]+22,O[1]-rc-30); M.bullet(4,O[0]+22,70);
+  M.bullet(5,O[0]-rc-22,O[1]-rc+4); M.bullet(6,O[0]-106,O[1]+76); M.bullet(7,O[0]+vL+8,O[1]-vL+30);
+}};
+
+/* ---------- Build LLMs from Scratch ----------
+   The GPT diagram as a network: tokens enter bottom-left, climb the residual stream,
+   loop out through attention inside the repeated block (×12), and leave at the top. */
+MAPS['build-llms-from-scratch'] = { h:356, draw(M){
+  const X=300, top=34, base=318, b0=82, b1=262;
+  M.rect(X-86,b0,236,b1-b0,20);
+  M.tlabel('transformer block',X-72,b0+22,{anchor:'start'});
+  M.tlabel('residual stream',X-18,b1-16,{anchor:'end',rot:0});
+  // ×12 bracket
+  const bx=X+168; M.zone(`M${bx},${b0} h8 v${b1-b0} h-8`,{fill:'none',stroke:'var(--ink)',sw:2});
+  M.math('× 12',bx+18,(b0+b1)/2+8,{anchor:'start'});
+  M.line(0,[[-60,base],[150,base]],{avoid:[OUT],ends:'end',ring:'end',side:1,bullet:66});
+  M.line(2,[[150,base],[X,base]],{avoid:[[0,0,166,1e3]],ends:'end',ring:'end',side:1});
+  M.line(1,[[X,b1-4],[X,b1-14],[X+66,b1-80],[X+66,b0+80],[X,b0+14],[X,b0+4]],{side:-1,span:[26,26],r:20});
+  M.line(3,[[X,base],[X,top]],{avoid:[[0,base-16,1e3,1e3],[0,b1-22,1e3,b1+8],[0,b0-8,1e3,b0+22]],side:1,ends:'end',ring:'end',at:[0.14,0.5,1]});
+  M.line(4,[[X,top],[560,top]],{avoid:[[0,0,X+20,1e3]],side:1,term:'end'});
+  M.line(5,[[X,top],[150,top]],{avoid:[[X-20,0,1e3,1e3]],side:1,term:'end',at:[0.6]});
+  M.bullet(1,X+96,b0+90); M.bullet(2,226,base+24); M.bullet(3,X-24,base-40); M.bullet(4,584,top); M.bullet(5,126,top);
+  M.label('TOKENS IN',24,base-16,{cls:'dest'}); M.label('NEXT TOKEN',560,top-16,{cls:'dest',anchor:'end'});
+}};
+
+/* ---------- Data Structures & Algorithms in Python ----------
+   The library's longest line (69 stations) coils through a matrix: spiral traversal. */
+MAPS['dsa-in-python'] = { h:372, draw(M){
+  const g=48, x0=14, x1=14+12*g, y0=10, y1=10+7*g;
+  for(let i=0;i<=12;i++) for(let j=0;j<=7;j++) M.rect(x0+i*g-18,y0+j*g-18,36,36,3,{cls:'cell'});
+  const pts=[[-60,y0],[x1,y0]]; let L=x0, T=y0, Rr=x1, B=y1, k=0;
+  while(true){
+    if(k%4===0){ pts.push([Rr,B]); T+=g; }
+    else if(k%4===1){ pts.push([L,B]); Rr-=g; }
+    else if(k%4===2){ pts.push([L,T]); B-=g; }
+    else { pts.push([Rr,T]); L+=g; }
+    k++; if(Rr-L<=g*2 && B-T<=g) break; if(k>20) break;
+  }
+  const counts=M.parts().map(p=>p[2]), tot=counts.reduce((a,b)=>a+b,0);
+  const cum=polyCum(pts), s0=84, S=cum[cum.length-1]-s0;
+  let acc=0; const cuts=counts.slice(0,-1).map(c=>{ acc+=c; return s0+S*acc/tot; });
+  const pieces=cutPoly(pts,cuts,26);
+  pieces.forEach((pc,i)=>{
+    M.line(i,pc,{ends:'end',ring:'end',avoid:i===0?[[-100,-1e4,s0-60,1e4]]:[],side:-1,r:20,bullet:i===0?66:undefined});
+  });
+  M.tlabel('spiral traversal of a matrix',x1+18,y1+44,{anchor:'end'});
+}};
+
+/* ---------- Build Decision Trees from Scratch ----------
+   A binary tree, root at the top; split nodes are interchanges. The wrap-up line
+   bridges the two trees (one algorithm) and runs on to forests and boosting. */
+MAPS['decision-trees-from-scratch'] = { h:372, draw(M){
+  const r=[300,100], A=[170,230], B=[430,230], yl=350;
+  [[82,yl],[258,yl],[342,yl],[518,yl]].forEach(p=>M.rect(p[0]-40,p[1]-26,80,44,6));
+  M.tlabel('leaves',600,yl+6,{anchor:'start'});
+  M.line(0,[[300,-14],r],{ends:'end',ring:'end',side:1,avoid:[[0,-100,1e3,8]],bullet:'start',bulletGap:12});
+  M.line(1,[r,A],{n:3,ends:'end',ring:'end',side:1,span:[18,0]});
+  M.line(1,[A,[82,318],[82,yl]],{n:3,side:1,span:[18,0],term:'end',r:24});
+  M.line(1,[A,[258,318],[258,yl]],{n:3,side:-1,span:[18,0],term:'end',r:24});
+  M.line(2,[r,B],{n:3,ends:'end',ring:'end',side:-1,span:[18,0]});
+  M.line(2,[B,[342,318],[342,yl]],{n:2,side:1,span:[18,0],term:'end',r:24});
+  M.line(2,[B,[518,318],[518,yl]],{n:2,side:-1,span:[18,0],term:'end',r:24});
+  M.line(3,[A,B],{n:1,side:-1,span:[20,20],layer:'ctx'});
+  M.line(3,[B,[700,230]],{n:2,side:-1,avoid:[[0,-1e4,B[0]+18,1e4],OUTR]});
+  M.label('TO FORESTS & BOOSTING',632,214,{anchor:'end',cls:'dest'});
+  M.tlabel('root',332,104,{anchor:'start'});
+  M.tlabel('classification',118,196,{anchor:'end'}); M.tlabel('regression',482,196,{anchor:'start'});
+  M.bullet(1,56,318); M.bullet(2,544,318); M.bullet(3,300,254);
+}};
+
+/* ---------- Charlie and the Intelligence Factory (sub-series) ----------
+   One factory, four lines from one gate. Each volume lights its own line; the parts
+   are rooms along it. */
+const CHARLIE = [
+  {slug:'charlie-language-room', lane:308, wing:'NW'},
+  {slug:'charlie-vision-room',   lane:320, wing:'NE'},
+  {slug:'charlie-sound-room',    lane:296, wing:'W'},
+  {slug:'charlie-reasoning-room',lane:332, wing:'E'},
+];
+const CH_COL = ['#D8432E','#1F4E9C','#12875A','#6C3F99'];
+const CH_COL_N = ['#E8563F','#4A7DD6','#23A676','#9467CE'];
+function charlieRoute(i){
+  const G=358;
+  if(i===0) return [[308,G],[308,196],[218,106],[76,106],[34,64],[34,18]];
+  if(i===1) return [[320,G],[320,196],[410,106],[552,106],[594,64],[594,18]];
+  if(i===2) return [[296,G],[296,286],[252,242],[76,242],[34,200],[34,150]];
+  return          [[332,G],[332,286],[376,242],[552,242],[594,200],[594,150]];
+}
+function drawCharlie(M,idx){
+  const wall=330;
+  M.zone(`M282,${wall} H-14 V-10 H642 V${wall} H346`,{fill:'none',stroke:'var(--ink)',sw:2.2});
+  M.tlabel('the intelligence factory',314,40);
+  // the other three volumes, in grey
+  for(let i=0;i<4;i++) if(i!==idx) M.line(0,charlieRoute(i),{ctx:true,color:'var(--grey)',w:5,layer:'ctx',r:22});
+  const pts=charlieRoute(idx);
+  const counts=M.parts().map(p=>p[2]); counts[0]-=1;          // the gate pill is capsule 01
+  const tot=counts.reduce((a,b)=>a+b,0), cum=polyCum(pts), s0=46, S=cum[cum.length-1]-s0-4;
+  let acc=0; const cuts=counts.slice(0,-1).map(c=>{ acc+=c; return s0+S*acc/tot; });
+  const route=[...pts]; const pieces=cutPoly(route,[s0,...cuts],22).slice(1);
+  // rooms: alternate tints behind the line
+  pieces.forEach((pc,i)=>M.band(pc,34,{color:i%2?'var(--tint2)':'var(--tint)',r:22}));
+  M.line(0,[pts[0],cutPoly(route,[s0],10)[0].slice(-1)[0]],{ctx:true,r:22});
+  M.claim(0,1);
+  pieces.forEach((pc,i)=>M.line(i,pc,{n:counts[i],side:(idx===1||idx===3)?-1:1,span:[6,6],r:22}));
+  M.pill(296,wall,332,wall,8);
+  // wing-end bullets with roman numerals
+  const R=['I','II','III','IV'];
+  for(let i=0;i<4;i++){ const e=charlieRoute(i).slice(-1)[0]; const y=e[1]-17;
+    M.bulletText(R[i],e[0],y,i===idx?M.col(0):'var(--grey)',i===idx?'#fff':'var(--paper)'); }
+}
+CHARLIE.forEach((c,i)=>{ MAPS[c.slug]={h:372,draw(M){drawCharlie(M,i);}}; });
+
+/* ---------- Inference Engineering (coming soon) ----------
+   A line under construction: hollow, with its announced stops. */
+MAPS['inference-engineering'] = { h:250, draw(M){
+  const pts=[[-60,190],[150,190],[270,70],[560,70]];
+  M.zone(`M150,${-10} H640 V250 H150Z`,{fill:M.hatch});
+  M.line(0,pts,{hollow:true,at:[0.18,0.52,0.72,0.93],avoid:[OUT],r:26});
+  M.line(0,[[560,70],[700,70]],{ctx:true,dash:'10 7',w:4,color:M.col(0)});
+  const names=['BATCHING','KV-CACHE','PAGED ATTENTION','SPECULATIVE DECODING'];
+  M.stations.forEach((s,i)=>{ const [x,y]=s.p; const below = i===0;
+    M.label(names[i], x+(i===0?0:0), below? y+30 : y-18, {cls:'stn',anchor: i===0?'middle':'middle'}); });
+  M.tlabel('line under construction',400,152,{anchor:'middle'});
+}};
+
+/* ============================================================
+   COVER META — typesetting per title (hand-broken lines)
+   ============================================================ */
+const META = {
+ 'ai-context-engineering':        {title:'AI Context<br>Engineering', ts:76},
+ 'mathematical-foundations-for-ml':{title:'Mathematical<br>Foundations for<br>Machine Learning', ts:56},
+ 'neural-networks-from-scratch':  {title:'Neural Networks<br>from Scratch', ts:68},
+ 'build-llms-from-scratch':       {title:'Build Large<br>Language Models<br>(LLMs) from Scratch', ts:56},
+ '5d-parallelism':                {title:'5D Parallelism<br>for Large Model<br>Training', ts:60},
+ 'pi-vs-hermes-vs-codex':         {title:'Pi vs Hermes vs Codex:<br>Context Compaction<br>and Memory', ts:53, tag:'Three open-source coding harnesses, read out of their source.'},
+ 'dsa-in-python':                 {title:'Data Structures<br>&amp; Algorithms<br>in Python', ts:60},
+ 'decision-trees-from-scratch':   {title:'Build Decision<br>Trees from Scratch', ts:64},
+ 'charlie-language-room':  {title:'Charlie and the<br>Language Room', ts:64, series:0, hdr:'Charlie and the Intelligence Factory&ensp;·&ensp;Book I'},
+ 'charlie-vision-room':    {title:'Charlie and the<br>Vision Room', ts:64, series:1, hdr:'Charlie and the Intelligence Factory&ensp;·&ensp;Book II'},
+ 'charlie-sound-room':     {title:'Charlie and the<br>Sound Room', ts:64, series:2, hdr:'Charlie and the Intelligence Factory&ensp;·&ensp;Book III'},
+ 'charlie-reasoning-room': {title:'Charlie and the<br>Reasoning Room', ts:64, series:3, hdr:'Charlie and the Intelligence Factory&ensp;·&ensp;Book IV'},
+ 'inference-engineering':  {title:'Inference<br>Engineering', ts:76, hdr:'Opening soon'},
+};
+const ORDER = Object.keys(META);
+
+const LEVELS = {beginner:'Beginner', intermediate:'Intermediate', advanced:'Advanced'};
+function levelMark(level){
+  if(level==='beginner') return `<svg width="13" height="13" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6.3" fill="var(--ink)"/></svg>`;
+  if(level==='intermediate') return `<svg width="12" height="12" viewBox="0 0 12 12"><rect x="0.5" y="0.5" width="11" height="11" fill="var(--ink)"/></svg>`;
+  return `<svg width="15" height="15" viewBox="0 0 16 16"><path d="M8 0.4 L15.6 8 L8 15.6 L0.4 8Z" fill="var(--ink)"/></svg>`;
+}
+function vmark(night){ // the Vizuara mark: two lines meeting at an interchange
+  const P = night?LINES_NIGHT:LINES;
+  return `<svg width="28" height="19" viewBox="0 0 28 19"><path d="M2.5 1.5 L14 13" stroke="${P[0]}" stroke-width="4.4" fill="none"/><path d="M25.5 1.5 L14 13" stroke="${P[1]}" stroke-width="4.4" fill="none"/><circle cx="14" cy="13" r="4.5" fill="var(--paper)" stroke="var(--ink)" stroke-width="2.3"/></svg>`;
+}
+const pad=n=>String(n).padStart(2,'0');
+const ROMAN=['I','II','III','IV'];
+
+function buildCover(slug, host){
+  const m=META[slug]||{};
+  const d=JSON.parse(JSON.stringify(DATA[slug]));
+  const night = d.level==='advanced';
+  if(d.coming_soon){
+    const stops=['Batching','KV-cache','Paged attention','Speculative decoding'];
+    d.parts=[[1,'Planned stops',4]]; d.caps=stops; d.stops=stops;
+  }
+  if(m.series!=null){ const c=(night?CH_COL_N:CH_COL)[m.series]; d.colors=d.parts.map(()=>c); }
+  else if(night) d.colors=LINES_NIGHT;
+  const colors = d.colors || LINES;
+  const c=document.createElement('div');
+  c.className='cover'+(night?' night':''); c.dataset.slug=slug;
+  host.appendChild(c);
+  const parts=d.parts||[]; let acc=1;
+  let keyHTML;
+  if(d.coming_soon){
+    keyHTML = d.stops.map((s,i)=>`<div class="k"><b class="hollow" style="--kc:${colors[0]}"></b><span>${s}</span><i>planned</i></div>`).join('');
+  } else keyHTML = parts.map((p,i)=>{ const r=`${pad(acc)}${p[2]>1?'–'+pad(acc+p[2]-1):''}`; acc+=p[2];
+     return `<div class="k"><b style="background:${colors[i%colors.length]}">${p[0]}</b><span>${p[1]}</span><i>${r}</i></div>`; }).join('');
+  const stats = d.coming_soon ? `Line under construction&ensp;·&ensp;opening soon`
+     : `${d.capsules} stations&ensp;·&ensp;${parts.length} ${m.series!=null?'rooms':'lines'}&ensp;·&ensp;${d.hours} ${d.hours===1?'hour':'hours'}`;
+  const hdr = m.hdr || (d.stage||'').replace(' · ','&ensp;·&ensp;');
+  c.innerHTML = `
+    <svg class="map" viewBox="0 0 720 888" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div class="hdr"><span>${hdr}</span><span class="lvl">${levelMark(d.level)}${LEVELS[d.level]}</span></div>
+    <div class="hrule"></div>
+    <div class="title" style="--ts:${m.ts||60}px">${m.title||d.name}<div class="tag">${m.tag||d.tagline||d.subtitle||''}</div></div>
+    ${m.series!=null?`<div class="sbul" style="background:${colors[0]}">${ROMAN[m.series]}</div>`:''}
+    <div class="foot">
+      <div class="frule"></div>
+      <div class="key">${keyHTML}</div>
+      <div class="imprint"><div class="stats">${stats}</div><div class="brand">${vmark(night)}Vizuara Books</div></div>
+    </div>`;
+  const svg=c.querySelector('svg.map');
+  const M=makeMap(svg,d,slug);
+  if(MAPS[slug]) MAPS[slug].draw(M);
+  const au=M.audit(); const bad=au.filter(([a,b])=>a!==b);
+  if(bad.length && !d.coming_soon) console.log('STATION AUDIT', slug, JSON.stringify(au));
+  return {c,M,map:MAPS[slug]};
+}
+function placeMap(o){
+  const {c,M,map}=o; if(!map) return;
+  const cb=c.getBoundingClientRect();
+  const t=c.querySelector('.title').getBoundingClientRect(), k=c.querySelector('.foot').getBoundingClientRect();
+  const top=t.bottom-cb.top, bot=k.top-cb.top;
+  const ty=Math.round(top+(bot-top-map.h)/2 + (map.dy||0));
+  M.frame.setAttribute('transform',`translate(40 ${ty})`);
+}
+
+const built=[];
+const host=document.getElementById('covers');
+ORDER.forEach(slug=>{
+  const cell=document.createElement('div'); host.appendChild(cell);
+  built.push(buildCover(slug,cell));
+});
+built.forEach(placeMap);
+document.fonts.ready.then(()=>built.forEach(placeMap));
+</script>
+</body>
+</html>
