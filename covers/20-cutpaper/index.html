@@ -62,6 +62,7 @@ body{
 .shelves{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;font-size:13px;margin-top:6px}
 .shelves div{display:flex;align-items:center;gap:8px}
 .shelves i{width:16px;height:16px;flex:none;box-shadow:0 1px 2px rgba(0,0,0,.3)}
+.shelves i.p{width:8px;margin-left:-5px}
 h2.section{font-size:15px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;margin:0 0 26px;display:flex;gap:16px;align-items:center}
 h2.section::after{content:"";flex:1;border-top:1.5px dashed rgba(244,237,223,.45)}
 .shelf{display:flex;flex-wrap:wrap;gap:64px 48px;margin-bottom:80px}
@@ -251,13 +252,23 @@ function grainSVG(seed, light=true){
 
 /* ---------- system constants ---------- */
 const SX=36, SY=548, SW=648, SH=304;   // the ivory title slip
+const PEEK = 20;                       // each extra ply shows 20px above the slip
+// Ply colours are fixed per shelf, never per book: [sheet 2 (under the slip), sheet 3 (on top)].
+// Ink and lemon everywhere, except where the board would swallow them.
+const PLY = {
+  found:[C.ink, C.lemon], neural:[C.ink, C.lemon], lang:[C.ink, C.lemon], world:[C.ink, C.lemon],
+  agents:[C.verm, C.ink], systems:[C.lemon, C.verm], factory:[C.ink, C.verm]
+};
+const topSheet = b => SY - PEEK*(LEVEL[b.level]-1);
+// Floor rule: the lowest piece of a construction either tucks under the slip or stops 24px above the top sheet.
+// And no piece in a ply colour may touch the ply sheets.
+let FLOOR = SY - 24;
 function slipAndPly(book){
   const n = LEVEL[book.level];
   let s = '';
-  const ply = book.ply || [C.ink, C.ivory];
-  // under-sheets peek out above the slip: one per extra level
+  const ply = PLY[book.shelf];
   for (let k=n-1; k>=1; k--){
-    s += R(SX, SY-13*k, SW, SH+13*k, ply[k-1], 2+ (n-k));
+    s += R(SX, SY-PEEK*k, SW, SH+PEEK*k, ply[k-1], 2+ (n-k));
   }
   s += R(SX, SY, SW, SH, C.ivory, 4+n);
   return s;
@@ -286,7 +297,7 @@ ART['ai-context-engineering'] = () => {
     while (x < end - 24){
       const w = Math.min([28,40,52,66,84,100,46,58][Math.floor(rnd()*8)], end - x);
       const a = rnd();
-      const col = a < .07 ? C.verm : a < .12 ? C.lemon : a < .17 ? C.blush : C.ivory;
+      const col = a < .07 ? (y > 440 ? C.blush : C.verm) : a < .12 ? C.lemon : a < .17 ? C.blush : C.ivory;
       if (plan[row] === t){ holes += rectD(x-4, y-4, w+8, th+8); cut.push({x, y, w}); }
       else text += `<rect x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${th}" rx="1.5" fill="${col}"/>`;
       x += w + 9; t++;
@@ -307,14 +318,15 @@ ART['ai-context-engineering'] = () => {
 ART['mathematical-foundations-for-ml'] = () => {
   let s = '';
   // graph paper sheet
-  let gp = rect(70, 58, 580, 470, jit(C.ivory));
-  for (let x=70+20; x<650; x+=20) gp += `<rect x="${x}" y="58" width="${x%100===70%100+0? 1.4:1}" height="470" fill="#9DB0D8"/>`;
-  for (let y=58+20; y<528; y+=20) gp += `<rect x="70" y="${y}" width="580" height="1" fill="#9DB0D8"/>`;
+  let gp = rect(70, 58, 580, 530, jit(C.ivory));
+  for (let x=70+20; x<650; x+=20) gp += `<rect x="${x}" y="58" width="1" height="530" fill="#9DB0D8"/>`;
+  for (let y=58+20; y<588; y+=20) gp += `<rect x="70" y="${y}" width="580" height="1" fill="#9DB0D8"/>`;
   s += lift(2, `<g transform="rotate(-2.2 360 293)">${gp}</g>`);
   const base = 468;
   const gauss = (mu,sig,A) => { const x0 = Math.max(60, mu-3.4*sig), x1 = Math.min(660, mu+3.4*sig); let d=`M${f(x0)} ${base+3}`; for(let x=x0;x<=x1;x+=3) d+=`L${f(x)} ${f(base - A*Math.exp(-((x-mu)**2)/(2*sig*sig)))}`; return d+`L${f(x1)} ${base+3}Z`; };
-  s += lift(3, path(gauss(252,72,232), jit(C.lemon)));
-  s += lift(4, path(gauss(488,58,184), jit(C.leaf)));
+  // three values, not just three hues: mustard (light), vermilion (mid), plum (dark)
+  s += lift(3, path(gauss(252,72,232), jit(C.saff)));
+  s += lift(4, path(gauss(488,58,184), jit(C.plum)));
   s += lift(5, path(gauss(352,42,318), jit(C.verm)));
   // baseline strip
   s += R(52, base-2, 616, 9, C.ink, 6);
@@ -331,9 +343,9 @@ ART['mathematical-foundations-for-ml'] = () => {
 ART['neural-networks-from-scratch'] = () => {
   let s = '';
   const L = [
-    {x:148, ys:[150,280,410]},
-    {x:360, ys:[96,226,356,486]},
-    {x:572, ys:[214,346]}
+    {x:148, ys:[146,276,406]},
+    {x:360, ys:[92,222,352,482]},
+    {x:572, ys:[210,342]}
   ];
   let strips = [];
   for (let l=0; l<2; l++) for (const y1 of L[l].ys) for (const y2 of L[l+1].ys){
@@ -352,7 +364,7 @@ ART['neural-networks-from-scratch'] = () => {
    (width = weight) all land on the next token, which is being lifted into place. */
 ART['build-llms-from-scratch'] = () => {
   let s = '';
-  const base = 446, th = 60;
+  const base = FLOOR - 62, th = 60;
   const ws = [70, 96, 58, 88, 76, 64];
   let x = 44; const tiles = [];
   ws.forEach(w => { tiles.push({x, w}); x += w + 14; });
@@ -374,53 +386,67 @@ ART['build-llms-from-scratch'] = () => {
   return s;
 };
 
-/* 5D Parallelism: five parallel planes of one model, fanned out in depth, each cut a different way.
-   Far to near: experts (sparse tiles, the active ones red), sequence (chunks of tokens),
-   data (replica blocks), pipeline (stages), tensor (columns). */
+/* 5D Parallelism: five parallel planes of one model, fanned in depth, each in its own stock.
+   Four of them are CUT, because four dimensions partition the model or its work:
+   tensor (columns), pipeline (stages), sequence (chunks of the token axis), experts (tiles, active ones red).
+   Data parallelism does not cut anything: it is three identical, uncut replicas stacked together. */
 ART['5d-parallelism'] = () => {
   let s = '';
-  const W=206, H=236, gap=10;
-  const cuts = ['experts','sequence','data','pipeline','tensor'];
-  cuts.forEach((cut,i) => {           // i = 0 is the far plane (top right), i = 4 the near one
-    const L = 48 + (4-i)*100, T = 12 + i*66;
-    const c = i===4 ? C.lemon : mix(C.ivory, C.mist, (3-i)*.3);
+  const W=180, H=210, gap=10, dx=90, dy=66;
+  const L0 = (720 - (W + 4*dx))/2;
+  const planes = [ {cut:'tensor', c:C.lemon}, {cut:'pipeline', c:C.cobalt}, {cut:'data', c:C.ivory}, {cut:'sequence', c:C.rose}, {cut:'experts', c:C.mist} ];
+  for (let k=4; k>=0; k--){               // k = 0 is the near plane (bottom left)
+    const {cut, c} = planes[k], L = L0 + k*dx, T = FLOOR - H - k*dy, z = 2 + (4-k)*2;
     let g = '';
     if (cut==='tensor'){ const w=(W-3*gap)/4; for(let j=0;j<4;j++) g += rect(L+j*(w+gap), T, w, H, jit(c)); }
     if (cut==='pipeline'){ const h=(H-3*gap)/4; for(let j=0;j<4;j++) g += rect(L, T+j*(h+gap), W, h, jit(c)); }
-    if (cut==='data'){ const w=(W-gap)/2, h=(H-gap)/2; for(let a=0;a<2;a++)for(let b=0;b<2;b++) g += rect(L+a*(w+gap), T+b*(h+gap), w, h, jit(c)); }
-    if (cut==='sequence'){ const n=6, h=(H-(n-1)*gap)/n; const sp=[[.34,.7],[.55],[.26,.62],[.44,.8],[.3],[.5,.76]];
+    if (cut==='sequence'){ const n=5, h=(H-(n-1)*gap)/n, sp=[[.38,.72],[.5],[.3,.64],[.46,.8],[.56]];
       for(let j=0;j<n;j++){ const cs=[0,...sp[j],1]; for(let q=0;q<cs.length-1;q++){ const x0=L+cs[q]*W+(q?gap/2:0), x1=L+cs[q+1]*W-(q<cs.length-2?gap/2:0); g += rect(x0, T+j*(h+gap), x1-x0, h, jit(c)); } } }
-    if (cut==='experts'){ const n=4, w=(W-(n-1)*gap)/n, h=(H-(n-1)*gap)/n; const act = new Set(['0,0','2,1','1,3','3,2']);
+    if (cut==='experts'){ const n=3, w=(W-(n-1)*gap)/n, h=(H-(n-1)*gap)/n, act = new Set(['1,0','2,2']);   // active experts only where nothing in front can show them through a gap
       for(let a=0;a<n;a++)for(let b=0;b<n;b++) g += rect(L+a*(w+gap), T+b*(h+gap), w, h, jit(act.has(a+','+b) ? C.verm : c)); }
-    s += lift(2 + i*2, g);
-  });
+    if (cut==='data'){      // replicas: three whole copies
+      s += lift(z-2, rect(L+14, T-14, W, H, jit(c))) + lift(z-1, rect(L+7, T-7, W, H, jit(c)));
+      g = rect(L, T, W, H, jit(c));
+    }
+    s += lift(z, g);
+  }
   return s;
 };
 
-/* Pi vs Hermes vs Codex: the same long context, compacted three ways.
-   Recent turns stay flat and legible; older history is pleated into a concertina. */
+/* Pi vs Hermes vs Codex: the same conversation, compacted three ways (no strategy is attributed to any product).
+   Each strip hangs from the top edge and reads top to bottom, oldest first: the old history is pleated
+   into a concertina at the top, the recent turns hang flat and legible below, and each strip is torn off
+   like a receipt at a different length. */
 ART['pi-vs-hermes-vs-codex'] = () => {
   let s = '';
-  const floor = 494;
+  const w = 140, top = -16;
   const strips = [
-    {x:84,  c:C.ultra, top:56,  pleats:7,  p:26},
-    {x:290, c:C.verm,  top:150, pleats:11, p:16},
-    {x:496, c:C.night, top:244, pleats:17, p:9}
+    {x:84,  c:C.ultra, pleats:4,  p:24, end:FLOOR},
+    {x:290, c:C.verm,  pleats:8,  p:15, end:FLOOR-86},
+    {x:496, c:C.night, pleats:16, p:9,  end:FLOOR-172}
   ];
-  strips.forEach((st,i) => {
-    const w = 140;
-    const pl = st.pleats*st.p;
-    const flatEnd = floor - pl;
-    let g = rect(st.x, st.top, w, flatEnd - st.top + 1, jit(st.c));
-    // lines of the conversation printed on the flat part
-    for (let y = st.top + 18; y < flatEnd - 14; y += 17){
-      let x = st.x + 16; const end = st.x + w - 16 - (rnd() < .35 ? rr(20,60) : 0);
-      while (x < end - 10){ const ww = Math.min(rr(10,38), end - x); g += rect(x, y, ww, 6, tint(st.c, st.c===C.night ? .3 : .38), {rx:1}); x += ww + 5; }
+  strips.forEach(st => {
+    const pEnd = top + st.pleats*st.p;
+    let g = '';
+    // flat part with a torn, receipt-like bottom edge
+    let d = `M${st.x} ${pEnd-1}H${st.x+w}V${st.end}`;
+    const teeth = 14, tw = w/teeth;
+    for (let t=teeth-1; t>=0; t--) d += `L${f(st.x + t*tw + tw/2)} ${st.end + 6}L${f(st.x + t*tw)} ${st.end}`;
+    g += path(d + 'Z', jit(st.c));
+    // recent turns printed on it: two speakers, alternately indented
+    let y = pEnd + 18, turn = 0;
+    while (y < st.end - 22){
+      const lines = 1 + Math.floor(rnd()*3), ind = turn%2 ? 34 : 16;
+      for (let l=0; l<lines && y < st.end - 22; l++, y += 15){
+        let x = st.x + ind; const endX = st.x + w - 16 - (l===lines-1 ? rr(10,50) : 0);
+        while (x < endX - 10){ const ww = Math.min(rr(10,36), endX - x); g += rect(x, y, ww, 6, tint(st.c, st.c===C.night ? .3 : .38), {rx:1}); x += ww + 5; }
+      }
+      y += 10; turn++;
     }
+    // the old history, pleated
     for (let j=0;j<st.pleats;j++){
-      const y0 = flatEnd + j*st.p, y1 = y0 + st.p;
-      const up = j%2===0;
-      const e = 8;
+      const y0 = top + j*st.p, y1 = y0 + st.p;
+      const up = j%2===1, e = 8;
       const pts = up ? [[st.x,y0],[st.x+w,y0],[st.x+w+e,y1],[st.x-e,y1]] : [[st.x-e,y0],[st.x+w+e,y0],[st.x+w,y1],[st.x,y1]];
       g += poly(pts, up ? tint(st.c,.16) : shade(st.c,.32));
     }
@@ -433,7 +459,7 @@ ART['pi-vs-hermes-vs-codex'] = () => {
    factory-shaped die-cut; the back wall is the room's shelf colour. ---------- */
 function room(back, inner){
   let s = '';
-  const O = {l:56, r:664, t:66, b:524}, vp = {x:360, y:300}, k = .44;
+  const O = {l:56, r:664, t:66, b:572}, vp = {x:360, y:300}, k = .44;
   const B = {l:vp.x+(O.l-vp.x)*k, r:vp.x+(O.r-vp.x)*k, t:vp.y+(O.t-vp.y)*k, b:vp.y+(O.b-vp.y)*k};
   s += poly([[O.l,O.t],[O.r,O.t],[B.r,B.t],[B.l,B.t]], shade(C.kraft,.42));
   s += poly([[O.l,O.t],[B.l,B.t],[B.l,B.b],[O.l,O.b]], tint(C.kraft,.12));
@@ -501,31 +527,35 @@ function patchScene(x,y,a,b,P,g,X,Y){
 }
 ART['charlie-sound-room'] = () => room(C.saff, (B,O) => {
   let s = '';
-  // on the back wall, two voices in conversation: two paper waves
-  const wave = (y0, A, k, ph, x0, x1) => { let d = ''; for (let x=x0; x<=x1; x+=4) d += (d?'L':'M') + f(x) + ' ' + f(y0 + A*Math.sin((x-x0)*k+ph)*Math.sin(Math.PI*(x-x0)/(x1-x0))); return d; };
-  s += lift(2, `<path d="${wave(B.t+58, 34, .075, 0, B.l+18, B.r-18)}" fill="none" stroke="${jit(C.ivory)}" stroke-width="15"/>`);
-  s += lift(3, `<path d="${wave(B.t+58, 24, .075, 2.2, B.l+40, B.r-40)}" fill="none" stroke="${jit(C.ink)}" stroke-width="11"/>`);
-  // on the floor, the waveform: a row of standing cards
-  const n = 15, x0 = 128, span = 464;
-  for (let i=0;i<n;i++){
-    const t = i/(n-1);
-    const h = 30 + 170*Math.abs(Math.sin(t*Math.PI*2.2+.4))*(0.35+0.65*Math.sin(t*Math.PI));
-    const x = x0 + t*span - 11;
-    s += R(x, 474 - h, 22, h, i%2 ? C.ink : C.ivory, 4);
-  }
+  // voice agents are about turn-taking: the user speaks (ink), a clear pause while the agent
+  // listens for the end of the turn, then the agent answers (ivory) with its own envelope
+  const base = 474, cw = 20, cg = 8;
+  const user  = [30, 74, 128, 100, 156, 116, 62, 28];
+  const agent = [38, 72, 116, 150, 178, 148, 122, 136, 90, 42];
+  let x = 96;
+  user.forEach(h => { s += R(x, base-h, cw, h, C.ink, 4); x += cw + cg; });
+  x += 52;
+  agent.forEach(h => { s += R(x, base-h, cw, h, C.ivory, 4); x += cw + cg; });
   return s;
 });
 ART['charlie-reasoning-room'] = () => room(C.rose, (B,O) => {
   let s = '';
-  // a pop-up staircase: one step at a time
-  const steps = 6, sx = 130, sy = 482, dw = 62, dh = 44;
-  for (let i=0;i<steps;i++){
-    const x = sx + i*dw, y = sy - (i+1)*dh;
-    s += lift(3, rect(x, y, dw*(steps-i), 12, jit(tint(C.ivory,.2))) + rect(x, y+12, dw*(steps-i), dh-12, jit(shade(C.ivory,.12))));
-  }
-  // flag at the top
-  const fx = sx + steps*dw - 20, fy = sy - steps*dh;
-  s += lift(6, rect(fx, fy-86, 6, 86, jit(C.ink)) + poly([[fx+6,fy-86],[fx+60,fy-70],[fx+6,fy-52]], jit(C.verm)));
+  const fl = FLOOR - 8;
+  // where RL starts: three bandit arms on the left, each with the stack of counters it has paid out
+  [[104,3],[152,6],[200,2]].forEach(([x,n]) => {
+    s += lift(2, strip(x+20, fl-8, x+6, fl-104, 5, jit(C.ink)) + circ(x+6, fl-110, 9, jit(C.ink)));
+    for (let i=0;i<n;i++) s += lift(2, rect(x + (i%2?2:-1), fl-10-i*11, 34, 9, jit(i===n-1 ? C.lemon : C.ivory)));
+  });
+  // where it ends: a tree of reasoning traces. One is kept and reaches the reward;
+  // the others have been snipped off, and the offcuts lie on the floor.
+  const P = {r:[452,fl], a:[452,388], b:[378,318], c:[522,316], d:[486,242], e:[590,248], h:[472,170]};
+  const br = (p,q,t=1) => strip(p[0], p[1], p[0]+(q[0]-p[0])*t, p[1]+(q[1]-p[1])*t, 12, jit(C.ivory));
+  s += lift(4, br(P.r,P.a) + br(P.a,P.c) + br(P.c,P.d) + br(P.d,P.h) + br(P.a,P.b,.45) + br(P.c,P.e,.4));
+  s += lift(5, ['a','c','d'].map(k => circ(P[k][0], P[k][1], 13, jit(C.ivory)) + brad(P[k][0], P[k][1], 5)).join(''));
+  s += lift(8, circ(P.h[0], P.h[1], 26, jit(C.verm)) + circ(P.h[0], P.h[1], 11, jit(C.ivory)));
+  // offcuts: the pruned branches, lying flat
+  s += lift(1, `<g transform="rotate(-8 300 ${fl-6})">${rect(262, fl-12, 70, 12, jit(shade(C.ivory,.06)))}${circ(340, fl-6, 12, jit(shade(C.ivory,.06)))}</g>`);
+  s += lift(1, `<g transform="rotate(10 606 ${fl-4})">${rect(580, fl-10, 52, 12, jit(shade(C.ivory,.06)))}${circ(640, fl-4, 12, jit(shade(C.ivory,.06)))}</g>`);
   return s;
 });
 
@@ -533,8 +563,8 @@ ART['charlie-reasoning-room'] = () => room(C.rose, (B,O) => {
    A punch-out sheet of numbered KV-cache pages; a few are already pressed out. */
 ART['inference-engineering'] = () => {
   let s = '';
-  const X=92, Y=62, W=536, H=454;
-  const cols=4, rows=4, pw=104, ph=78, gx=(W-cols*pw)/(cols+1), gy=(H-rows*ph)/(rows+1);
+  const X=92, Y=46, W=536, H=540, HG=424;          // the sheet tucks under the slip; the pages sit in its top HG px
+  const cols=4, rows=4, pw=104, ph=78, gx=(W-cols*pw)/(cols+1), gy=(HG-rows*ph)/(rows+1);
   const out = {'1,1':C.lemon, '3,0':C.verm, '2,3':C.cobalt, '0,2':C.mint};
   let holes = '', dies = '';
   const popped = [];
@@ -548,10 +578,10 @@ ART['inference-engineering'] = () => {
   }
   // registration marks
   const reg = (x,y) => `<circle cx="${x}" cy="${y}" r="7" fill="none" stroke="${C.ink}" stroke-width="1.3"/><path d="M${x-12} ${y}h24M${x} ${y-12}v24" stroke="${C.ink}" stroke-width="1.3"/>`;
-  dies += reg(X+16,Y+16) + reg(X+W-16,Y+16) + reg(X+16,Y+H-16) + reg(X+W-16,Y+H-16);
+  dies += reg(X+16,Y+16) + reg(X+W-16,Y+16) + reg(X+16,Y+HG+8) + reg(X+W-16,Y+HG+8);
   s += lift(2, `<g transform="rotate(-2 360 289)">${path(rectD(X,Y,W,H)+holes, jit(C.ivory), 'fill-rule="evenodd"')}${dies}</g>`);
   // pressed-out pages, lying loose
-  const spots = [[468,462,14,7],[566,330,-11,9],[34,420,-17,6],[250,-8,6,5]];
+  const spots = [[462,366,14,7],[568,262,-11,9],[26,372,-17,6],[252,-10,6,5]];
   popped.forEach((p,i) => {
     const [x,y,r,z] = spots[i];
     s += lift(z, `<g transform="rotate(${r} ${x+pw/2} ${y+ph/2})">${rect(x,y,pw,ph,jit(p.c),{rx:3})}${lbl(x+10,y+ph-12,p.n, p.c===C.cobalt?C.ivory:C.ink)}</g>`);
@@ -563,7 +593,7 @@ ART['inference-engineering'] = () => {
    The nearer the goal, the higher the card stands; ink arrows are the greedy policy. */
 ART['reinforcement-learning'] = () => {
   let s = '';
-  const cols=5, rows=4, T=90, g=12, X=(720-(cols*T+(cols-1)*g))/2, Y=66;
+  const cols=5, rows=4, T=104, g=12, X=(720-(cols*T+(cols-1)*g))/2, Y=FLOOR-(rows*T+(rows-1)*g);
   const goal=[4,0], walls = new Set(['1,1','2,1','3,2']);
   // distances by breadth-first search from the goal
   const dist = {}; const q = [goal]; dist[goal.join(',')] = 0;
@@ -578,17 +608,17 @@ ART['reinforcement-learning'] = () => {
     const x = X + c.a*(T+g), y = Y + c.b*(T+g);
     const v = 1 - c.d/maxD;
     const z = 1 + Math.round(v*10);
-    if (c.d === 0){ s += lift(z, rect(x,y,T,T,jit(C.verm)) + circ(x+T/2,y+T/2,20,jit(C.ivory)) + circ(x+T/2,y+T/2,9,jit(C.verm))); return; }
+    if (c.d === 0){ s += lift(z, rect(x,y,T,T,jit(C.verm)) + circ(x+T/2,y+T/2,24,jit(C.ivory)) + circ(x+T/2,y+T/2,11,jit(C.verm))); return; }
     // greedy step toward the goal
     let best = null;
     for (const [da,db] of [[1,0],[0,-1],[-1,0],[0,1]]){ const k=(c.a+da)+','+(c.b+db); if (k in dist && dist[k] < c.d){ best=[da,db]; break; } }
     const ang = Math.atan2(best[1], best[0])*180/Math.PI;
     const cx = x+T/2, cy = y+T/2;
-    const arrow = `<polygon points="${cx-14},${cy-15} ${cx+16},${cy} ${cx-14},${cy+15} ${cx-6},${cy}" fill="${C.ink}" transform="rotate(${ang} ${cx} ${cy})"/>`;
+    const arrow = `<polygon points="${cx-16},${cy-17} ${cx+18},${cy} ${cx-16},${cy+17} ${cx-7},${cy}" fill="${C.ink}" transform="rotate(${ang} ${cx} ${cy})"/>`;
     s += lift(z, rect(x,y,T,T,jit(ramp(v))) + (c.a===0 && c.b===rows-1 ? '' : arrow));
   });
   // the agent, at the start
-  s += lift(3, circ(X + T/2, Y + (rows-1)*(T+g) + T/2, 24, jit(C.ink)) + circ(X + T/2 - 7, Y + (rows-1)*(T+g) + T/2 - 8, 6, C.ivory));
+  s += lift(3, circ(X + T/2, Y + (rows-1)*(T+g) + T/2, 28, jit(C.ink)) + circ(X + T/2 - 8, Y + (rows-1)*(T+g) + T/2 - 9, 7, C.ivory));
   return s;
 };
 
@@ -611,10 +641,10 @@ ART['rag-in-production'] = () => {
     s += lift(1, card(X, top0 + i*step, Wc, 150, tabs[i%4], i%3===0 ? shade(C.ivory,.14) : shade(C.ivory,.05), false));
   }
   // the drawer front, with its label and brass pull
-  const D = {x:108, y:370, w:504, h:162};
+  const D = {x:108, y:FLOOR-158, w:504, h:158};
   s += lift(4, rect(D.x, D.y, D.w, D.h, jit(C.ultra)) + rect(360-62, D.y+30, 124, 46, jit(C.ivory)) +
     rect(360-50, D.y+40, 100, 3.5, C.ink) + rect(360-50, D.y+50, 72, 3.5, C.ink) + rect(360-50, D.y+60, 88, 3.5, C.ink));
-  s += lift(6, `<path d="M${360-36} ${D.y+104} a36 30 0 0 0 72 0" fill="none" stroke="url(#${PFX}-brass)" stroke-width="7"/>` + brad(360-36, D.y+104, 7) + brad(360+36, D.y+104, 7));
+  s += lift(6, `<path d="M${360-36} ${D.y+100} a36 30 0 0 0 72 0" fill="none" stroke="url(#${PFX}-brass)" stroke-width="7"/>` + brad(360-36, D.y+100, 7) + brad(360+36, D.y+100, 7));
   // the top three, pulled out and fanned like a hand of cards
   const fan = [ {cx:222, cy:170, r:-10, tab:C.verm, tx:18, z:7}, {cx:498, cy:176, r:9, tab:C.leaf, tx:230, z:8}, {cx:360, cy:132, r:-1, tab:C.cobalt, tx:120, z:10} ];
   fan.forEach(c => {
@@ -628,32 +658,32 @@ ART['rag-in-production'] = () => {
    BOOK DATA
    ===================================================================== */
 const BOOKS = [
-  {slug:'ai-context-engineering', shelf:'agents', level:'intermediate', lines:['AI Context','Engineering'], capsules:43, hours:10, ply:[C.ultra], core:true,
+  {slug:'ai-context-engineering', shelf:'agents', level:'intermediate', lines:['AI Context','Engineering'], capsules:43, hours:10, core:true,
     note:'A die-cut window over lines of tokens that run on beneath the frame. Only what fits in the window is context; new pieces are being dropped in, one did not make the cut.'},
   {slug:'mathematical-foundations-for-ml', shelf:'found', level:'beginner', lines:['Mathematical','Foundations for','Machine Learning'], capsules:43, hours:10, core:true,
-    note:'Graph paper (the grid of linear algebra), three normal distributions cut in card (probability), and a tangent strip pinned at an inflection point (calculus).'},
+    note:'Graph paper (the grid of linear algebra), three normal distributions cut in card (probability), and a tangent strip pinned at an inflection point (calculus). The three curves are three values (mustard, vermilion, plum), so they stay apart in greyscale.'},
   {slug:'neural-networks-from-scratch', shelf:'neural', level:'beginner', lines:['Neural Networks','from Scratch'], capsules:33, hours:7, core:true,
     note:'A 3-4-2 network built like a jointed paper toy. Each weight is a strip as wide as its magnitude (ivory positive, ink negative), pinned at the neurons with brass fasteners.'},
-  {slug:'build-llms-from-scratch', shelf:'lang', level:'intermediate', lines:['Build Large','Language Models','(LLMs) from Scratch'], capsules:20, hours:6, ply:[C.ink], core:true,
+  {slug:'build-llms-from-scratch', shelf:'lang', level:'intermediate', lines:['Build Large','Language Models','(LLMs) from Scratch'], capsules:20, hours:6, core:true,
     note:'A line of tokens. Paper loops of attention, width by weight, all land on the empty slot, and the next token is being lifted into place above it.'},
-  {slug:'5d-parallelism', shelf:'systems', level:'advanced', lines:['5D Parallelism','for Large','Model Training'], capsules:40, hours:9, ply:[C.lemon, C.verm], core:true,
-    note:'Five parallel planes of one model fanned out in depth, each cut a different way. Near to far: tensor columns, pipeline stages, data blocks, sequence chunks, then expert tiles with the active experts in red.'},
-  {slug:'pi-vs-hermes-vs-codex', shelf:'agents', level:'advanced', lines:['Pi vs Hermes','vs Codex'], sub:'Context Compaction and Memory', capsules:9, hours:1, ply:[C.ultra, C.verm], core:true,
-    note:'The same long context compacted three ways. Recent turns stay flat; older history is pleated into a concertina, tighter each time.'},
+  {slug:'5d-parallelism', shelf:'systems', level:'advanced', lines:['5D Parallelism for','Large Model Training'], capsules:40, hours:9, core:true,
+    note:'Five parallel planes of one model, fanned in depth, one stock each. Four dimensions partition, so four planes are cut: tensor into columns, pipeline into stages, sequence into chunks, experts into tiles (the active ones red). Data parallelism partitions nothing: it is three identical uncut replicas.'},
+  {slug:'pi-vs-hermes-vs-codex', shelf:'agents', level:'advanced', lines:['Pi vs Hermes','vs Codex'], sub:'Context Compaction and Memory', capsules:9, hours:1, core:true,
+    note:'The same conversation compacted three ways, read top to bottom like any transcript: the old history is pleated at the top, the recent turns hang flat below, and each strip is torn off like a receipt at its own length. Which method is which is left to the book.'},
 
-  {slug:'charlie-language-room', shelf:'factory', level:'advanced', lines:['Charlie and the','Language Room'], sub:'Language: Inference Engineering', series:'I', capsules:22, hours:5, ply:[C.verm, C.ink],
+  {slug:'charlie-language-room', shelf:'factory', level:'advanced', lines:['Charlie and the','Language Room'], sub:'Language: Inference Engineering', series:'I', capsules:22, hours:5,
     note:'<b>Sub-series.</b> Every Intelligence Factory book is a pop-up room seen through a factory-roof die-cut in kraft board; the back wall is the colour of the shelf the subject belongs to. Here blank tokens ride a conveyor into the inference machine and come out generated.'},
-  {slug:'charlie-vision-room', shelf:'factory', level:'intermediate', lines:['Charlie and the','Vision Room'], sub:'Vision: Vision Transformers', series:'II', capsules:20, hours:6, ply:[C.leaf],
+  {slug:'charlie-vision-room', shelf:'factory', level:'intermediate', lines:['Charlie and the','Vision Room'], sub:'Vision: Vision Transformers', series:'II', capsules:20, hours:6,
     note:'A picture cut into patches, the way a vision transformer sees it. The top row has already left, in raster order, as a sequence.'},
-  {slug:'charlie-sound-room', shelf:'factory', level:'intermediate', lines:['Charlie and the','Sound Room'], sub:'Audio: Voice Agents', series:'III', capsules:20, hours:6, ply:[C.saff],
-    note:'A waveform of standing cards on the floor; on the wall, two paper waves: a voice and the agent answering it.'},
-  {slug:'charlie-reasoning-room', shelf:'factory', level:'advanced', lines:['Charlie and the','Reasoning Room'], sub:'Reason: Reinforcement Learning, from bandits to reasoning models', series:'IV', capsules:21, hours:6, ply:[C.rose, C.ink],
-    note:'A pop-up staircase, the oldest trick in paper engineering, for step-by-step reasoning toward a reward flag.'},
-  {slug:'inference-engineering', shelf:'systems', level:'advanced', lines:['Inference','Engineering'], sub:'Serve LLMs fast: batching, KV-cache, paged attention, speculative decoding.', soon:true, ply:[C.lemon, C.verm],
+  {slug:'charlie-sound-room', shelf:'factory', level:'intermediate', lines:['Charlie and the','Sound Room'], sub:'Audio: Voice Agents', series:'III', capsules:20, hours:6,
+    note:'Voice agents are about turn-taking: an ink utterance, a clear pause while the agent listens for the end of the turn, then an ivory reply with its own envelope.'},
+  {slug:'charlie-reasoning-room', shelf:'factory', level:'advanced', lines:['Charlie and the','Reasoning Room'], sub:'Reason: Reinforcement Learning', series:'IV', capsules:21, hours:6,
+    note:'From bandits to reasoning models: three bandit arms with the counters each has paid out, then a tree of reasoning traces. One trace is kept and reaches the vermilion reward; the others have been snipped off and lie on the floor.'},
+  {slug:'inference-engineering', shelf:'systems', level:'advanced', lines:['Inference','Engineering'], sub:'Batching, KV-cache, paged attention, speculative decoding', soon:true,
     note:'<b>Coming soon</b> books show the kit before assembly: a punch-out sheet with die lines and registration marks. Here the pieces are numbered KV-cache pages; a few are already pressed out and no longer in order, as in paged attention.'},
-  {slug:'rag-in-production', shelf:'agents', level:'intermediate', lines:['RAG','in Production'], capsules:42, hours:10, ply:[C.ultra],
+  {slug:'rag-in-production', shelf:'agents', level:'intermediate', lines:['RAG','in Production'], capsules:42, hours:10,
     note:'A card-catalogue drawer: retrieval the way libraries always did it. The top three cards have been pulled up out of the drawer to be read.'},
-  {slug:'reinforcement-learning', shelf:'world', level:'intermediate', lines:['Reinforcement','Learning'], capsules:38, hours:8, ply:[C.ink],
+  {slug:'reinforcement-learning', shelf:'world', level:'intermediate', lines:['Reinforcement','Learning'], capsules:38, hours:8,
     note:'A grid world where each tile is lifted by its value: the nearer the goal, the higher the card stands and the longer its shadow.'}
 ];
 
@@ -669,6 +699,7 @@ function bookInner(b, i, pfx){
   PFX = pfx;
   rnd = mulberry(1000 + i*97);
   wrnd = mulberry(55 + i*31);
+  FLOOR = topSheet(b) - 24;
   const shelf = SHELF[b.shelf];
   const art = ART[b.slug]();
   const n = LEVEL[b.level];
@@ -722,7 +753,7 @@ function wrapHTML(b, i){
   // spine: board colour, a vertical slip, and the ply stripes at the head so level shows on the shelf
   PFX = 'ws'; wrnd = mulberry(5);
   let sp = defs() + `<rect width="60" height="888" fill="${shelf.board}"/>`;
-  const plyCols = [C.ivory, ...(b.ply||[])];
+  const plyCols = [C.ivory, ...PLY[b.shelf]];
   for (let k=0;k<n;k++) sp += R(10, 36 + k*14, 40, 9, k===0 ? C.ivory : plyCols[k], 2);
   sp += R(8, 118, 44, 648, C.ivory, 3);
   const spine = `<div class="spine" style="--board:${shelf.board}">
@@ -751,18 +782,20 @@ function build(){
 }
 
 function fitTitles(){
+  // The title is set as large as its longest line allows (76px cap). The subtitle gives way first:
+  // it shrinks from 25px to 20px to stay on one line, and only then may the title shrink.
   document.querySelectorAll('.book').forEach(cv => {
-    const t = cv.querySelector('.title'), sub = cv.querySelector('.sub'), slip = cv.querySelector('.slip');
-    const foot = cv.querySelector('.foot');
-    let size = 76;
-    const fits = () => {
-      const wide = [...t.children].some(s => s.getBoundingClientRect().width > 588);
-      const bottom = (sub || t).getBoundingClientRect().bottom;
-      const tall = bottom > foot.getBoundingClientRect().top - 18;
-      return !wide && !tall;
-    };
-    t.style.fontSize = size + 'px';
-    while (size > 40 && !fits()){ size -= 1; t.style.fontSize = size + 'px'; }
+    const t = cv.querySelector('.title'), sub = cv.querySelector('.sub'), foot = cv.querySelector('.foot');
+    let size = 76, ss = 25;
+    const setT = () => { t.style.fontSize = size + 'px'; }, setS = () => { if (sub) sub.style.fontSize = ss + 'px'; };
+    setT(); setS();
+    while (size > 40 && [...t.children].some(c => c.getBoundingClientRect().width > 588)){ size--; setT(); }
+    const lines = () => sub ? Math.round(sub.getBoundingClientRect().height / (ss*1.15)) : 0;
+    while (sub && ss > 20 && lines() > 1){ ss--; setS(); }
+    const tall = () => (sub || t).getBoundingClientRect().bottom > foot.getBoundingClientRect().top - 18;
+    while (tall() && sub && ss > 20){ ss--; setS(); }
+    while (tall() && size > 40){ size--; setT(); }
+    cv.dataset.title = size; if (sub) cv.dataset.sub = ss;
   });
 }
 
@@ -794,7 +827,7 @@ function buildSystem(){
     ['Night','night','Systems & scale'],['Rose','rose','Reward & the world'],['Kraft','kraft','Intelligence Factory'],['Ivory','ivory','Title slip'],
     ['Ink','ink','Type'],['Lemon','lemon','Accent'],['Blush','blush','Accent'],['Cobalt','cobalt','Accent']
   ];
-  const plyPic = n => `<svg viewBox="0 0 160 96">${[...Array(n)].map((_,k)=>{ const kk=n-1-k; return `<rect x="8" y="${30-kk*9}" width="144" height="${58+kk*9}" fill="${[C.ivory,C.ultra,C.verm][kk]}" style="filter:drop-shadow(0 1.5px 1.5px rgba(0,0,0,.35))"/>`; }).join('')}<rect x="8" y="30" width="144" height="58" fill="${C.ivory}" style="filter:drop-shadow(0 2px 2px rgba(0,0,0,.4))"/><rect x="20" y="42" width="80" height="9" fill="${C.ink}"/><rect x="20" y="56" width="60" height="9" fill="${C.ink}"/></svg>`;
+  const plyPic = n => `<svg viewBox="0 0 160 96">${[...Array(n)].map((_,k)=>{ const kk=n-1-k; return `<rect x="8" y="${30-kk*9}" width="144" height="${58+kk*9}" fill="${[C.ivory,C.ink,C.lemon][kk]}" style="filter:drop-shadow(0 1.5px 1.5px rgba(0,0,0,.35))"/>`; }).join('')}<rect x="8" y="30" width="144" height="58" fill="${C.ivory}" style="filter:drop-shadow(0 2px 2px rgba(0,0,0,.4))"/><rect x="20" y="42" width="80" height="9" fill="${C.ink}"/><rect x="20" y="56" width="60" height="9" fill="${C.ink}"/></svg>`;
   document.getElementById('sys').innerHTML = `
     <div class="card"><h3>Paper stock</h3><div class="swatches">${sw.map(([n,k,u])=>`<div class="sw"><i style="background:var(--${k})"></i><b>${n}</b><span>${C[k].toUpperCase()}</span><br>${u}</div>`).join('')}</div></div>
     <div class="card typespec"><h3>Type</h3>
@@ -805,9 +838,9 @@ function buildSystem(){
     </div>
     <div class="card"><h3>Level = ply</h3>
       <div class="plyrow"><figure>${plyPic(1)}Beginner<br>one sheet</figure><figure>${plyPic(2)}Intermediate<br>two sheets</figure><figure>${plyPic(3)}Advanced<br>three sheets</figure></div>
-      <p class="small">The deeper the book, the more sheets of card the title is mounted on. The label also names the level beside a small ply icon.</p>
-      <h3 style="margin-top:18px">Board colour = shelf</h3>
-      <div class="shelves">${Object.values(SHELF).map(s=>`<div><i style="background:${s.board}"></i>${s.name}</div>`).join('')}</div>
+      <p class="small">The deeper the book, the more sheets of card the title is mounted on; each shows 20px. Ply colours are fixed per shelf, never chosen per book, and no emblem piece in a ply colour may touch them.</p>
+      <h3 style="margin-top:18px">Board colour = shelf · its two ply sheets</h3>
+      <div class="shelves">${Object.entries(SHELF).map(([k,s])=>`<div><i style="background:${s.board}"></i><i class="p" style="background:${PLY[k][0]}"></i><i class="p" style="background:${PLY[k][1]}"></i>${s.name}</div>`).join('')}</div>
     </div>
     <div class="card vocab"><h3>The paper vocabulary: every operation means one thing</h3><ul>
       <li><b>Cut</b>split or partition: parallelism, patches, chunks</li>
@@ -815,7 +848,7 @@ function buildSystem(){
       <li><b>Window</b>what the model can see: context, attention span</li>
       <li><b>Layer</b>depth: network layers, and the ply that marks a book's level</li>
       <li><b>Pin</b>a weighted connection: neurons, edges, graphs</li>
-      <li><b>Punch out</b>select or remove: retrieval, pruning, paged memory</li>
+      <li><b>Punch out, snip</b>select or remove: retrieval, pruning, paged memory</li>
       <li><b>Lift</b>a number made physical: height of the card is value or weight</li>
       <li><b>Loop</b>who attends to whom: attention, recurrence, feedback</li>
     </ul></div>`;

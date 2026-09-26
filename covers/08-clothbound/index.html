@@ -161,34 +161,55 @@ function hash(s){ let h = 2166136261; for (const c of s){ h ^= c.charCodeAt(0); 
 function rng(seed){ return function(){ seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 
 /* ---------- palette ---------- */
+/* Cloth is chosen by subject family, so the shelf can grow to fifty books without reading as random.
+   Within a family, neighbours on the shelf alternate cloths. */
+const FAMILY = {
+  foundations: 'Foundations & maths',
+  classical:   'Classical ML & data tools',
+  deep:        'Deep learning & vision',
+  language:    'Language & LLMs',
+  agents:      'Agents, context & memory',
+  systems:     'Systems & infrastructure',
+  reasoning:   'RL & reasoning',
+};
 const CLOTH = {
-  oxblood:  { name:'Oxblood',   hex:'#5b1a24' },
-  madder:   { name:'Madder',    hex:'#9a2f20' },
-  saffron:  { name:'Saffron',   hex:'#c68f1f' },
-  peacock:  { name:'Peacock',   hex:'#0f4e58' },
-  viridian: { name:'Viridian',  hex:'#145a47' },
-  bottle:   { name:'Bottle',    hex:'#1a3f2e' },
-  prussian: { name:'Prussian',  hex:'#18305a' },
-  cobalt:   { name:'Cobalt',    hex:'#233f86' },
-  aubergine:{ name:'Aubergine', hex:'#3f1c42' },
-  claret:   { name:'Claret',    hex:'#6a1c3c' },
-  moss:     { name:'Moss',      hex:'#515c27' },
-  tobacco:  { name:'Tobacco',   hex:'#6e4526' },
-  slate:    { name:'Slate',     hex:'#39444f' },
-  ink:      { name:'Ink',       hex:'#1a1c23' },
+  prussian: { name:'Prussian',  hex:'#18305a', fam:'foundations' },
+  cobalt:   { name:'Cobalt',    hex:'#233f86', fam:'foundations' },
+  moss:     { name:'Moss',      hex:'#434d1f', fam:'classical' },
+  tobacco:  { name:'Tobacco',   hex:'#5e3a1f', fam:'classical' },
+  bottle:   { name:'Bottle',    hex:'#1a3f2e', fam:'deep' },
+  viridian: { name:'Viridian',  hex:'#10503f', fam:'deep' },
+  oxblood:  { name:'Oxblood',   hex:'#5b1a24', fam:'language' },
+  madder:   { name:'Madder',    hex:'#8a2a1c', fam:'language' },
+  claret:   { name:'Claret',    hex:'#6a1c3c', fam:'language' },
+  peacock:  { name:'Peacock',   hex:'#0c4450', fam:'agents' },
+  saffron:  { name:'Saffron',   hex:'#c68f1f', fam:'agents', light:true },
+  ink:      { name:'Ink',       hex:'#1a1c23', fam:'systems' },
+  slate:    { name:'Slate',     hex:'#343e48', fam:'systems' },
+  aubergine:{ name:'Aubergine', hex:'#3f1c42', fam:'reasoning' },
 };
 const HOUSE = { name:'House black', hex:'#1d1c20', note:'leather-grain, spine & corners' };
 
+/* Foil: gold is the default. Every other foil means something.
+   stops = full sheen (device, ring, fillets) · type = light-only stops for lettering
+   label = flat light value for small caps and rules · print = the one flat value in the vector print file */
 const FOILS = {
-  gold:      { name:'Gold', edge:'#3a2a0a',
-               stops:['#7c5c1d','#caa24c','#f3dc93','#fff3c4','#c69c45','#8d6a25','#d7b565','#f7e5a4','#b58d3a','#7a5a1c'] },
-  copper:    { name:'Copper', edge:'#3a1a0c',
-               stops:['#6d3219','#b86b43','#eba882','#fbd6bd','#bf7650','#80401f','#cf8a62','#f4c3a3','#a65d38','#6a3017'] },
-  palladium: { name:'Palladium', edge:'#23262a',
-               stops:['#5d6267','#a8adb2','#e4e7ea','#ffffff','#b3b8bd','#72777c','#c9cdd1','#f2f4f5','#9ca1a6','#5a5f64'] },
-  black:     { name:'Black pigment', edge:'#000000', pigment:true,
-               stops:['#111112','#1b1b1c','#2a2a2b','#3a3a3a','#222223','#121213','#1f1f20','#303031','#1a1a1b','#0f0f10'] },
+  gold:      { name:'Gold', use:'default', pms:'Pantone 871 C',
+               stops:['#7c5c1d','#caa24c','#f3dc93','#fff3c4','#c69c45','#8d6a25','#d7b565','#f7e5a4','#b58d3a','#7a5a1c'],
+               type:['#d7b565','#f3dc93','#fbeab0','#e2c476','#d7b565'], label:'#f0d68a', print:'#dcbd6e' },
+  copper:    { name:'Copper', use:'agents, context & memory', pms:'Pantone 876 C',
+               stops:['#6d3219','#b86b43','#eba882','#fbd6bd','#bf7650','#80401f','#cf8a62','#f4c3a3','#a65d38','#6a3017'],
+               type:['#eba882','#fbd6bd','#fde3d0','#f4c3a3','#eba882'], label:'#f6c7aa', print:'#eeb391' },
+  palladium: { name:'Palladium', use:'systems & infrastructure', pms:'Pantone 877 C',
+               stops:['#5d6267','#a8adb2','#e4e7ea','#ffffff','#b3b8bd','#72777c','#c9cdd1','#f2f4f5','#9ca1a6','#5a5f64'],
+               type:['#c9cdd1','#e4e7ea','#f7f8f9','#d8dbde','#c9cdd1'], label:'#e4e7ea', print:'#d3d6d9' },
+  black:     { name:'Black pigment', use:'light cloths only', pms:'matt black pigment foil', pigment:true,
+               stops:['#111112','#1b1b1c','#2a2a2b','#3a3a3a','#222223','#121213','#1f1f20','#303031','#1a1a1b','#0f0f10'],
+               type:['#2a2a2b','#1b1b1c','#161617','#222223','#2a2a2b'], label:'#1b1b1c', print:'#1c1c1d' },
 };
+/* WCAG contrast, used as a build check on every book: type stops ≥ 3:1, label ≥ 4.5:1 against the cloth. */
+function lum(h){ return hex2rgb(h).map(v => { v /= 255; return v <= .03928 ? v/12.92 : Math.pow((v+.055)/1.055, 2.4); }).reduce((a,v,i) => a + v*[.2126,.7152,.0722][i], 0); }
+function contrast(a, b){ const A = lum(a), B = lum(b); return (Math.max(A,B) + .05) / (Math.min(A,B) + .05); }
 
 /* ---------- numbers ---------- */
 function words(n){
@@ -350,7 +371,7 @@ const DEVICES = {
     const layers = [3,5,5,2], xs = [-96,-32,32,96], dy = 40; let e = '', n = '';
     const ys = layers.map(k => Array.from({length:k}, (_,i) => (i - (k-1)/2) * dy));
     for (let l = 0; l < 3; l++) for (const y1 of ys[l]) for (const y2 of ys[l+1]){
-      const q = c.r(), w = q < .22 ? 3.6 : q < .55 ? 2.2 : 1.4; e += `<path d="M${xs[l]} ${f(y1)}L${xs[l+1]} ${f(y2)}" stroke="${WHT}" stroke-width="${f(w)}"/>`; }
+      const q = c.r(), w = q < .22 ? 3.6 : q < .55 ? 2.4 : 1.6; e += `<path d="M${xs[l]} ${f(y1)}L${xs[l+1]} ${f(y2)}" stroke="${WHT}" stroke-width="${f(w)}"/>`; }
     ys.forEach((col,l) => col.forEach(y => { n += `<circle cx="${xs[l]}" cy="${f(y)}" r="15" fill="${BLK}"/><circle cx="${xs[l]}" cy="${f(y)}" r="10" fill="${WHT}"/>`; }));
     let io = '';
     ys[0].forEach(y => { const a = arrow(-126, y, -112, y, 7); io += `<path d="${a.line}" stroke="${WHT}" stroke-width="2.6"/><path d="${a.head}" fill="${WHT}"/>`; });
@@ -389,34 +410,45 @@ const DEVICES = {
     return s;
   },
 
-  /* Pi vs Hermes vs Codex — a triptych: three agents, three ways to compact the same history.
-     (evenly kept + summary below · progressively compressed · summary above + recent lines) */
+  /* Pi vs Hermes vs Codex — context compaction as a triptych of three stages of ONE generic cycle:
+     a full window → older turns folded down → a summary block over the recent turns, with room freed below.
+     It deliberately makes no claim about how Pi, Hermes or Codex each compacts; the three panels are stages, not products. */
   triptych(c){
-    const xs = [-74,0,74], w = 58, top = -104, bot = 92; let s = '';
+    const xs = [-78,0,78], w = 58, top = -104, bot = 92; let s = '';
     xs.forEach((x,k) => {
-      const x0 = x - w/2, x1 = x + w/2, lx0 = x0 + 11, lx1 = x1 - 11;
+      const x0 = x - w/2, lx0 = x0 + 11, lx1 = x0 + w - 11; let L = '';
       s += `<rect x="${x0}" y="${top}" width="${w}" height="${bot-top}" rx="4" fill="none" stroke="${WHT}" stroke-width="4.5"/>`;
-      let L = '';
-      if (k === 0){ s += `<rect x="${lx0}" y="${top+11}" width="${lx1-lx0}" height="46" fill="${WHT}"/>`; for (let y = top+72; y <= bot-10; y += 11.5) L += `M${lx0} ${f(y)}H${lx1}`; s += `<path d="${L}" stroke="${WHT}" stroke-width="3.6"/>`; }
-      if (k === 1){ let y = bot - 12, g = 16; while (y > top + 8){ L += `M${lx0} ${f(y)}H${lx1}`; y -= g; g = Math.max(4.4, g*.8); } s += `<path d="${L}" stroke="${WHT}" stroke-width="2.8"/>`; }
-      if (k === 2){ let G = ''; for (let y = top+14; y <= top+50; y += 11.5) G += `M${lx0} ${f(y)}H${lx1}`; for (let y = top+72; y <= bot-10; y += 11.5) L += `M${lx0} ${f(y)}H${lx1}`;
-        s += `<path d="${G}" stroke="${WHT}" stroke-width="2.4" stroke-dasharray="3 4"/><path d="${L}" stroke="${WHT}" stroke-width="3.6"/><path d="M${lx0-3} ${top+60}H${lx1+3}" stroke="${WHT}" stroke-width="1.6"/>`; }
+      if (k === 0){ for (let y = top + 13; y <= bot - 9; y += 10) L += `M${lx0} ${y}H${lx1}`; s += `<path d="${L}" stroke="${WHT}" stroke-width="3.4"/>`; }
+      if (k === 1){ let Z = `M${lx0} ${top+13}`; for (let y = top + 13, i = 0; y < top + 92; y += 6.5, i++) Z += `L${i % 2 ? lx0 : lx1} ${f(y)}`;
+        s += `<path d="${Z}" fill="none" stroke="${WHT}" stroke-width="2.6" stroke-linejoin="miter"/>`;
+        for (let y = top + 104; y <= bot - 9; y += 10) L += `M${lx0} ${y}H${lx1}`; s += `<path d="${L}" stroke="${WHT}" stroke-width="3.4"/>`; }
+      if (k === 2){ s += `<rect x="${lx0}" y="${top+12}" width="${lx1-lx0}" height="30" fill="${WHT}"/>`;
+        for (let y = top + 54; y <= top + 104; y += 10) L += `M${lx0} ${y}H${lx1}`; s += `<path d="${L}" stroke="${WHT}" stroke-width="3.4"/>`;
+        s += `<path d="M${lx0} ${bot-12}H${lx1}" stroke="${WHT}" stroke-width="1.6" stroke-dasharray="3 4"/>`; }
     });
+    [-39, 39].forEach(x => { s += `<path d="M${x-5} -12L${x+5} -4L${x-5} 4Z" fill="${WHT}"/>`; });
     s += `<path d="M-112 ${bot+12}H112" stroke="${WHT}" stroke-width="6"/><path d="M-96 ${bot+23}H96" stroke="${WHT}" stroke-width="2.2"/>`;
     return s;
   },
 
   /* ---- The Intelligence Factory (arch devices) ---- */
-  /* I. Language — inference: the prompt is prefilled in parallel (a block),
-     then tokens are decoded one at a time, climbing out of it. */
+  /* I. Language — inference engineering as continuous batching: six request lanes; each request is a
+     wide prefill bar followed by its decode steps, and a new request slots into a lane the moment one finishes. */
   lang(c){
-    let s = ''; const cols = 7, rows = 3, q = 13, g = 4.5, bw = cols*q + (cols-1)*g, x0 = -bw/2, y0 = 52;
-    for (let i = 0; i < rows; i++) for (let j = 0; j < cols; j++) s += `<rect x="${f(x0 + j*(q+g))}" y="${f(y0 + i*(q+g))}" width="${q}" height="${q}" fill="${WHT}"/>`;
-    s += `<path d="M${f(x0-9)} ${y0-9}V${f(y0 + rows*(q+g) + 4)}H${f(-x0+9)}V${y0-9}" fill="none" stroke="${WHT}" stroke-width="3"/>`;
-    s += `<path d="M0 ${y0-9}V-92" stroke="${WHT}" stroke-width="3.4"/>`;
-    for (let k = 0; k < 6; k++){ const y = 28 - k*24, z = 19 - k*1.6;
-      s += `<rect x="${f(-z/2-4)}" y="${f(y-z/2-4)}" width="${f(z+8)}" height="${f(z+8)}" fill="${BLK}"/>`;
-      s += k < 5 ? `<rect x="${f(-z/2)}" y="${f(y-z/2)}" width="${f(z)}" height="${f(z)}" fill="${WHT}"/>` : `<rect x="${f(-z/2+1.3)}" y="${f(y-z/2+1.3)}" width="${f(z-2.6)}" height="${f(z-2.6)}" fill="none" stroke="${WHT}" stroke-width="2.6"/>`; }
+    const r = rng(1107); let s = ''; const x0 = -98, x1 = 98, lh = 15, q = 10.5, g = 3.5;
+    for (let i = 0; i < 6; i++){
+      const y = -76 + i*37; let x = x0 - r()*40, first = true;
+      while (x < x1){
+        const pw = 20 + Math.round(r()*30), nd = 2 + Math.floor(r()*5);
+        const bars = [];
+        if (!first || x >= x0) bars.push(['p', x, pw]);
+        let xx = x + pw + 3; for (let k = 0; k < nd; k++){ bars.push(['d', xx, q]); xx += q + g; }
+        for (const [t, bx, bw] of bars){
+          const a = Math.max(bx, x0), b = Math.min(bx + bw, x1); if (b - a < 3) continue;
+          s += t === 'p' ? `<rect x="${f(a)}" y="${f(y - lh/2)}" width="${f(b-a)}" height="${lh}" fill="${WHT}"/>`
+                         : `<rect x="${f(a)}" y="${f(y - q/2)}" width="${f(b-a)}" height="${q}" fill="${WHT}"/>`; }
+        x = xx + 6; first = false; } }
+    s += `<path d="M${x0-8} -98V142" stroke="${WHT}" stroke-width="2"/>`;
     return s;
   },
   /* II. Vision — an eye whose iris is cut into ViT patches. */
@@ -436,37 +468,42 @@ const DEVICES = {
     s += `<path d="M-100 -44H-96M0 -44H100M-100 44H-24M92 44H100" stroke="${WHT}" stroke-width="1.8"/>`;
     return s;
   },
-  /* IV. Reason — from bandits to reasoning models: a search tree grown from three arms,
-     one chain carried through to the reward. */
+  /* IV. Reason — the RL behind reasoning models: one prompt, a sampled group of six reasoning chains,
+     each ending in its reward (solid = correct, open = wrong); the best chain is carried in heavy foil. */
   reason(c){
-    const R0 = [0,100], L1 = [-64,0,64].map(x => [x,52]);
-    const L2 = [], L3 = []; L1.forEach(p => [-26,26].forEach(o => L2.push([p[0]+o, 4, p])));
-    L2.forEach(p => [-11,11].forEach(o => L3.push([p[0]+o, -44, p])));
-    const chosen = [R0, L1[1], L2[3], L3[6]]; const goal = [L3[6][0], -92];
-    let thin = '', dots = '', xs = '';
-    L1.forEach(p => { thin += `M${R0[0]} ${R0[1]}L${p[0]} ${p[1]}`; });
-    L2.forEach(p => { thin += `M${p[2][0]} ${p[2][1]}L${p[0]} ${p[1]}`; });
-    const pruned = new Set([0,3,8,11]);
-    L3.forEach((p,i) => { if (pruned.has(i)){ const mx = p[2][0] + (p[0]-p[2][0])*.55, my = p[2][1] + (p[1]-p[2][1])*.55; thin += `M${p[2][0]} ${p[2][1]}L${f(mx)} ${f(my)}`; xs += `M${f(mx-4)} ${f(my-4)}l8 8m0 -8l-8 8`; }
-      else { thin += `M${p[2][0]} ${p[2][1]}L${p[0]} ${p[1]}`; if (i !== 6) dots += `<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="${WHT}"/>`; } });
-    const bold = 'M' + chosen.concat([goal]).map(p => p[0] + ' ' + p[1]).join('L');
-    [R0].concat(L1, L2.map(p=>[p[0],p[1]])).forEach(p => { dots += `<circle cx="${p[0]}" cy="${p[1]}" r="4.6" fill="${WHT}"/>`; });
-    return `<path d="${thin}" stroke="${WHT}" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="${xs}" stroke="${WHT}" stroke-width="2.2" stroke-linecap="round"/>
-      <path d="${bold}" stroke="${BLK}" stroke-width="13" fill="none" stroke-linecap="round" stroke-linejoin="round"/>${dots}
-      <path d="${bold}" stroke="${WHT}" stroke-width="5.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-      ${chosen.map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="7" fill="${WHT}"/>`).join('')}
-      <circle cx="${goal[0]}" cy="${goal[1]}" r="13" fill="${BLK}"/><circle cx="${goal[0]}" cy="${goal[1]}" r="9" fill="${WHT}"/><circle cx="${goal[0]}" cy="${goal[1]}" r="16" fill="none" stroke="${WHT}" stroke-width="2.2"/>`;
+    const base = [0, 124];
+    const ends = [[-88, 12, 0], [-62, -42, 1], [-28, -16, 0], [8, -80, 2], [46, -50, 1], [86, -2, 0]];
+    let thin = '', steps = '', out = '', bold = '';
+    ends.forEach(([x, y, k]) => {
+      const L = Math.hypot(x - base[0], y - base[1]), n = Math.floor(L / 30);
+      const d = `M${base[0]} ${base[1]}L${x} ${y}`;
+      if (k === 2) bold = d; else thin += d;
+      for (let j = 1; j < n; j++){ const t = j / n; steps += `<circle cx="${f(base[0] + (x-base[0])*t)}" cy="${f(base[1] + (y-base[1])*t)}" r="${k === 2 ? 4.6 : 3.4}" fill="${WHT}"/>`; }
+      out += k === 0 ? `<circle cx="${x}" cy="${y}" r="10" fill="${BLK}"/><circle cx="${x}" cy="${y}" r="6.5" fill="none" stroke="${WHT}" stroke-width="2.6"/>`
+           : k === 1 ? `<circle cx="${x}" cy="${y}" r="10.5" fill="${BLK}"/><circle cx="${x}" cy="${y}" r="7.5" fill="${WHT}"/>`
+           : `<circle cx="${x}" cy="${y}" r="13" fill="${BLK}"/><circle cx="${x}" cy="${y}" r="9" fill="${WHT}"/><circle cx="${x}" cy="${y}" r="15.5" fill="none" stroke="${WHT}" stroke-width="2"/>`;
+    });
+    return `<path d="${thin}" stroke="${WHT}" stroke-width="2.4" stroke-linecap="round"/>${steps}
+      <path d="${bold}" stroke="${BLK}" stroke-width="13" stroke-linecap="round"/><path d="${bold}" stroke="${WHT}" stroke-width="5.5" stroke-linecap="round"/>
+      ${out}<rect x="-11" y="${base[1]-7}" width="22" height="14" fill="${WHT}"/>`;
   },
 
-  /* Kernel Engineering — the die: a grid of streaming multiprocessors inside the package. */
+  /* Kernel Engineering — tiled GEMM, the diagram every kernel engineer draws: A to the left, B above, C below-right.
+     One output tile of C (solid) is computed from the row panel of A and the column panel of B (hatched)
+     staged through shared memory. The solid tile is the accent (__A__): foiled even while the book is forthcoming. */
   kernel(c){
-    let s = `<rect x="-84" y="-84" width="168" height="168" rx="8" fill="none" stroke="${WHT}" stroke-width="5"/>`;
-    let pins = ''; for (let i = 0; i < 9; i++){ const t = -64 + i*16; pins += `M${t} -90V-106M${t} 90V106M-90 ${t}H-106M90 ${t}H106`; }
-    s += `<path d="${pins}" stroke="${WHT}" stroke-width="4"/>`;
-    for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++){ const x = -64 + j*33, y = -64 + i*33;
-      s += `<rect x="${x}" y="${y}" width="29" height="29" fill="${WHT}"/>`;
-      s += `<path d="M${x+14.5} ${y+5}V${y+24}M${x+5} ${y+14.5}H${x+24}" stroke="${BLK}" stroke-width="2.2"/>`; }
-    s += `<circle cx="-70" cy="-70" r="4" fill="${WHT}"/>`;
+    const t = 26, n = 4, cs = n*t, g = 12, kt = 2, ks = kt*t, C0 = -20, A0 = C0 - g - ks, i0 = 1, j0 = 2;
+    let s = '', grid = '';
+    for (let k = 1; k < n; k++) grid += `M${C0 + k*t} ${C0}V${C0 + cs}M${C0} ${C0 + k*t}H${C0 + cs}`;
+    grid += `M${A0 + t} ${C0}V${C0 + cs}M${C0} ${A0 + t}H${C0 + cs}`;
+    for (let k = 1; k < n; k++) grid += `M${A0} ${C0 + k*t}H${A0 + ks}M${C0 + k*t} ${A0}V${A0 + ks}`;
+    s += `<path d="${grid}" stroke="${WHT}" stroke-width="1.6"/>`;
+    const hatch = (x, y, w, h, id) => { let d = ''; for (let u = -h; u < w; u += 6) d += `M${x + u} ${y + h}L${x + u + h} ${y}`;
+      return `<clipPath id="${c.id}${id}"><rect x="${x}" y="${y}" width="${w}" height="${h}"/></clipPath><path d="${d}" stroke="${WHT}" stroke-width="2" clip-path="url(#${c.id}${id})"/>`; };
+    s += hatch(A0, C0 + i0*t, ks, t, 'ha') + hatch(C0 + j0*t, A0, t, ks, 'hb');
+    s += `<path d="M${A0} ${C0 + i0*t}h${ks}v${t}h-${ks}ZM${C0 + j0*t} ${A0}h${t}v${ks}h-${t}Z" fill="none" stroke="${WHT}" stroke-width="3"/>`;
+    s += `<path d="M${C0} ${C0}h${cs}v${cs}h-${cs}ZM${A0} ${C0}h${ks}v${cs}h-${ks}ZM${C0} ${A0}h${cs}v${ks}h-${cs}Z" fill="none" stroke="${WHT}" stroke-width="4.5"/>`;
+    s += `<rect x="${C0 + j0*t + 3}" y="${C0 + i0*t + 3}" width="${t - 6}" height="${t - 6}" fill="__A__"/>`;
     return s;
   },
 
@@ -524,27 +561,27 @@ const BOOKS = [
   { slug:'build-llms-from-scratch', title:'Build Large Language Models (LLMs) from Scratch', level:'intermediate', capsules:20, cloth:'oxblood', foil:'gold', device:'llm', pattern:'stairs',
     t:{ pre:'Build', caps:['LARGE LANGUAGE','MODELS'], post:'(LLMs) from Scratch' } },
   { slug:'5d-parallelism', title:'5D Parallelism for Large Model Training', level:'advanced', capsules:40, cloth:'ink', foil:'palladium', device:'penteract', pattern:'mesh',
-    t:{ caps:['5D','PARALLELISM'], post:'for Large Model Training' } },
+    t:{ caps:['5D','PARALLELISM'], post:'for Large Model Training', scale:[1.7,1] } },
   { slug:'pi-vs-hermes-vs-codex', title:'Pi vs Hermes vs Codex: Context Compaction and Memory', level:'advanced', capsules:9, cloth:'saffron', foil:'black', device:'triptych', pattern:'chevron',
     t:{ caps:[['PI ',{it:'vs'},' HERMES'],[{it:'vs'},' CODEX']], post:'Context Compaction and Memory' } },
 
   { slug:'charlie-language-room', title:'Charlie and the Language Room', series:'I', level:'advanced', capsules:22, cloth:'madder', foil:'gold', device:'lang', pattern:'sawtooth', arch:true,
-    t:{ pre:'Charlie and the', caps:['LANGUAGE','ROOM'], post:'Language — Inference Engineering' } },
+    t:{ pre:'Charlie and the', caps:['LANGUAGE','ROOM'], post:'Inference Engineering' } },
   { slug:'charlie-vision-room', title:'Charlie and the Vision Room', series:'II', level:'intermediate', capsules:20, cloth:'viridian', foil:'gold', device:'vision', pattern:'sawtooth', arch:true,
-    t:{ pre:'Charlie and the', caps:['VISION','ROOM'], post:'Vision — Vision Transformers' } },
-  { slug:'charlie-sound-room', title:'Charlie and the Sound Room', series:'III', level:'intermediate', capsules:20, cloth:'cobalt', foil:'gold', device:'sound', pattern:'sawtooth', arch:true,
-    t:{ pre:'Charlie and the', caps:['SOUND','ROOM'], post:'Audio — Voice Agents' } },
+    t:{ pre:'Charlie and the', caps:['VISION','ROOM'], post:'Vision Transformers' } },
+  { slug:'charlie-sound-room', title:'Charlie and the Sound Room', series:'III', level:'intermediate', capsules:20, cloth:'peacock', foil:'gold', device:'sound', pattern:'sawtooth', arch:true,
+    t:{ pre:'Charlie and the', caps:['SOUND','ROOM'], post:'Voice Agents' } },
   { slug:'charlie-reasoning-room', title:'Charlie and the Reasoning Room', series:'IV', level:'advanced', capsules:21, cloth:'aubergine', foil:'gold', device:'reason', pattern:'sawtooth', arch:true,
-    t:{ pre:'Charlie and the', caps:['REASONING','ROOM'], post:'Reason — Reinforcement Learning, from bandits to reasoning models' } },
+    t:{ pre:'Charlie and the', caps:['REASONING','ROOM'], post:'Reinforcement Learning, from bandits to reasoning models' } },
 
   { slug:'decision-trees-from-scratch', title:'Build Decision Trees from Scratch', level:'beginner', capsules:23, cloth:'moss', foil:'gold', device:'dtree', pattern:'kd',
     t:{ pre:'Build', caps:['DECISION','TREES'], post:'from Scratch' } },
   { slug:'sql-masterclass', title:'SQL Masterclass', level:'beginner', capsules:36, cloth:'tobacco', foil:'gold', device:'sql', pattern:'ledger',
     t:{ caps:['SQL','MASTERCLASS'], scale:[1.9,1] } },
-  { slug:'deit-from-scratch', title:'Build a Data-Efficient Image Transformer (DeiT) from Scratch', level:'advanced', capsules:42, cloth:'claret', foil:'palladium', device:'deit', pattern:'patches',
+  { slug:'deit-from-scratch', title:'Build a Data-Efficient Image Transformer (DeiT) from Scratch', level:'advanced', capsules:42, cloth:'viridian', foil:'gold', device:'deit', pattern:'patches',
     t:{ pre:'Build a', caps:['DATA-EFFICIENT','IMAGE TRANSFORMER'], post:'(DeiT) from Scratch' } },
   { slug:'kernel-engineering', title:'Kernel Engineering', level:'advanced', forthcoming:true, cloth:'slate', foil:'palladium', device:'kernel', pattern:'traces',
-    t:{ caps:['KERNEL','ENGINEERING'], post:'From silicon to speculative decoding — GPU kernels for modern LLMs.' } },
+    t:{ caps:['KERNEL','ENGINEERING'], post:'From silicon to speculative decoding — GPU kernels for modern LLMs' } },
 ];
 
 /* ============================================================
@@ -631,14 +668,23 @@ function wrapItalic(text, size, maxW){
 
 /* ============================================================
    COVER BUILDER
-   Every cover is two stacked renderings of the same artwork:
-   .so — screen: foil and blind art used as masks, with pressed-edge filters (the material simulation)
-   .po — print:  the same art painted directly as vectors (foil gradient, flat blind tone) for the PDF
+   Art is written with tokens and painted once per output:
+     __F__ foil sheen (device, ring, fillets)   __T__ type foil (light stops, per line)
+     __L__ flat light foil (labels, rules)      __A__ accent (foiled even on a forthcoming book)
+     __K__ knock-out
+   Screen (.so): the material simulation — cloth texture, sheen, speck, lips and shadows.
+   Print  (.po): flat cloth colour, flat blind tints and ONE flat foil value — a pure-vector POD file.
    ============================================================ */
-const tok = (s, F, K) => s.split('__F__').join(F).split('__K__').join(K);
+function paint(s, m){
+  const F = m.F, K = m.K === undefined ? 'none' : m.K, T = m.T === undefined ? F : m.T, L = m.L === undefined ? F : m.L, A = m.A === undefined ? F : m.A;
+  return s.split('__F__').join(F).split('__K__').join(K).split('__T__').join(T).split('__L__').join(L).split('__A__').join(A);
+}
+const tok = (s, F, K) => paint(s, { F, K });
+const TXT = '__T__', LIN = '__L__';
 const circlePath = (x,y,r) => `M${f(x-r)} ${f(y)}a${f(r)} ${f(r)} 0 1 0 ${f(2*r)} 0a${f(r)} ${f(r)} 0 1 0 ${f(-2*r)} 0Z`;
+const LABEL_Y = 372;   // every label sits on this baseline; the title stacks upward from it
 
-function layoutTitle(b, cx, zoneTop, zoneBot, maxW){
+function layoutTitle(b, cx, zoneTop, maxW){
   const T = b.t, scale = T.scale || T.caps.map(() => 1);
   let size = T.size || 80;
   const widest = Math.max(...T.caps.map((l,i) => lineWidth(l, size*scale[i])));
@@ -654,12 +700,12 @@ function layoutTitle(b, cx, zoneTop, zoneBot, maxW){
     if (T.post){ const ps = T.post.length > 34 ? ip*.84 : ip; const L = wrapItalic(T.post, ps, maxW - 16);
       L.forEach((t,i) => items.push({ k:'it', t, size:ps, asc:ps*.72, desc:ps*.22, gap: i < L.length-1 ? ps*.28 : 20 })); }
     items.push({ k:'orn', asc:5, desc:5, gap:17 });
-    items.push({ k:'lab', t:detail, size:13.5, asc:10, desc:1, gap:0 });
+    items.push({ k:'lab', t:detail, size:13.5, asc:10, desc:0, gap:0 });
     totH = items.reduce((h,it) => h + it.asc + it.desc + it.gap, 0);
-    if (totH <= zoneBot - zoneTop) break;
+    if (LABEL_Y - totH >= zoneTop) break;
     size *= .95;
   }
-  let y = zoneTop + Math.max(0, (zoneBot - zoneTop - totH) / 2), out = '';
+  let y = LABEL_Y - totH, out = '';
   for (const it of items){
     const base = y + it.asc;
     if (it.k === 'caps'){
@@ -668,14 +714,14 @@ function layoutTitle(b, cx, zoneTop, zoneBot, maxW){
         if (s.it){ const fsz = it.size*.62; spans += `<tspan x="${f(x)}" style="font:600 italic ${f(fsz)}px ${FACE};letter-spacing:${f(fsz*IT_TRACK)}px">${s.t}</tspan>`; x += tw(s.t, `600 italic ${fsz}px ${FACE}`, fsz*IT_TRACK); }
         else { spans += `<tspan x="${f(x)}" style="font:700 ${f(it.size)}px ${FACE};letter-spacing:${f(it.size*CAP_TRACK)}px;font-variant-numeric:lining-nums">${s.t.replace(/ /g,'&#160;')}</tspan>`; x += tw(s.t, `700 ${it.size}px ${FACE}`, it.size*CAP_TRACK); }
       }
-      out += `<text y="${f(base)}" fill="${WHT}">${spans}</text>`;
+      out += `<text y="${f(base)}" fill="${TXT}">${spans}</text>`;
     } else if (it.k === 'it'){
-      out += `<text x="${cx}" y="${f(base)}" text-anchor="middle" fill="${WHT}" style="font:600 italic ${f(it.size)}px ${FACE}">${it.t}</text>`;
+      out += `<text x="${cx}" y="${f(base)}" text-anchor="middle" fill="${TXT}" style="font:600 italic ${f(it.size)}px ${FACE}">${it.t}</text>`;
     } else if (it.k === 'orn'){
-      out += `<path d="M${cx-46} ${f(base)}H${cx-13}M${cx+13} ${f(base)}H${cx+46}" stroke="${WHT}" stroke-width="1.8"/><path d="M${cx} ${f(base-6)}L${cx+6} ${f(base)}L${cx} ${f(base+6)}L${cx-6} ${f(base)}Z" fill="${WHT}"/>`;
+      out += `<path d="M${cx-46} ${f(base)}H${cx-13}M${cx+13} ${f(base)}H${cx+46}" stroke="${LIN}" stroke-width="1.8"/><path d="M${cx} ${f(base-6)}L${cx+6} ${f(base)}L${cx} ${f(base+6)}L${cx-6} ${f(base)}Z" fill="${LIN}"/>`;
     } else if (it.k === 'lab'){
       const ls = it.size*.24;
-      out += `<text x="${f(cx + ls/2)}" y="${f(base)}" text-anchor="middle" fill="${WHT}" style="font:700 ${it.size}px ${FACE};letter-spacing:${f(ls)}px">${it.t}</text>`;
+      out += `<text x="${f(cx + ls/2)}" y="${f(base)}" text-anchor="middle" fill="${LIN}" style="font:700 ${it.size}px ${FACE};letter-spacing:${f(ls)}px">${it.t}</text>`;
     }
     y = base + it.desc + it.gap;
   }
@@ -683,26 +729,26 @@ function layoutTitle(b, cx, zoneTop, zoneBot, maxW){
 }
 
 /* the Vizuara device: an open book seen end-on — which is also a V */
-function vizMark(x, y, s = 1){
+function vizMark(x, y, s = 1, ink = LIN){
   return `<g transform="translate(${f(x)} ${f(y)}) scale(${s})">
-      <circle r="17" fill="none" stroke="${WHT}" stroke-width="2"/>
-      <path d="M0 9.5Q-3.5 -1 -12 -6.5M0 9.5Q3.5 -1 12 -6.5" fill="none" stroke="${WHT}" stroke-width="2.8" stroke-linecap="round"/>
-      <path d="M0 9.5Q-2 -2 -7 -9.5M0 9.5Q2 -2 7 -9.5" fill="none" stroke="${WHT}" stroke-width="2" stroke-linecap="round"/>
-      <path d="M0 9.5Q-.6 -2.5 -2.4 -11M0 9.5Q.6 -2.5 2.4 -11" fill="none" stroke="${WHT}" stroke-width="1.6" stroke-linecap="round"/>
+      <circle r="17" fill="none" stroke="${ink}" stroke-width="2"/>
+      <path d="M0 9.5Q-3.5 -1 -12 -6.5M0 9.5Q3.5 -1 12 -6.5" fill="none" stroke="${ink}" stroke-width="2.8" stroke-linecap="round"/>
+      <path d="M0 9.5Q-2 -2 -7 -9.5M0 9.5Q2 -2 7 -9.5" fill="none" stroke="${ink}" stroke-width="2" stroke-linecap="round"/>
+      <path d="M0 9.5Q-.6 -2.5 -2.4 -11M0 9.5Q.6 -2.5 2.4 -11" fill="none" stroke="${ink}" stroke-width="1.6" stroke-linecap="round"/>
     </g>`;
 }
 function imprint(cx, iy){
   const ils = 14*.34;
   return vizMark(cx, iy-5)
-    + `<text x="${cx-32}" y="${iy}" text-anchor="end" fill="${WHT}" style="font:700 14px ${FACE};letter-spacing:${f(ils)}px">VIZUARA</text>`
-    + `<text x="${f(cx+32+ils)}" y="${iy}" text-anchor="start" fill="${WHT}" style="font:700 14px ${FACE};letter-spacing:${f(ils)}px">BOOKS</text>`;
+    + `<text x="${cx-32}" y="${iy}" text-anchor="end" fill="${LIN}" style="font:700 14px ${FACE};letter-spacing:${f(ils)}px">VIZUARA</text>`
+    + `<text x="${f(cx+32+ils)}" y="${iy}" text-anchor="start" fill="${LIN}" style="font:700 14px ${FACE};letter-spacing:${f(ils)}px">BOOKS</text>`;
 }
 
-function clothDefs(P, cloth, foil, seed, ww = W){
-  const fs = foil.stops, n = fs.length;
-  const grad = fs.map((c,i) => `<stop offset="${f(i/(n-1))}" stop-color="${c}"/>`).join('');
+function clothDefs(P, foil){
+  const stops = (arr) => arr.map((c,i) => `<stop offset="${f(i/(arr.length-1))}" stop-color="${c}"/>`).join('');
   return `
-  <linearGradient id="${P}fg" gradientUnits="userSpaceOnUse" x1="-40" y1="0" x2="760" y2="888">${grad}</linearGradient>
+  <linearGradient id="${P}fg" gradientUnits="userSpaceOnUse" x1="-40" y1="0" x2="760" y2="888">${stops(foil.stops)}</linearGradient>
+  <linearGradient id="${P}ft" x1="0" y1="0" x2="1" y2=".45">${stops(foil.type)}</linearGradient>
   <linearGradient id="${P}light" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="720" y2="888">
     <stop offset="0" stop-color="#fff" stop-opacity=".07"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".16"/></linearGradient>
   <radialGradient id="${P}vig" cx="45%" cy="40%" r="75%"><stop offset=".6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".22"/></radialGradient>
@@ -717,161 +763,170 @@ function clothDefs(P, cloth, foil, seed, ww = W){
   <pattern id="${P}speck" width="120" height="120" patternUnits="userSpaceOnUse"><image href="${TEX.speck}" width="120" height="120" preserveAspectRatio="none"/></pattern>
   <linearGradient id="${P}rim" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#000" stop-opacity=".75"/><stop offset=".42" stop-color="#000" stop-opacity=".12"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff" stop-opacity=".22"/></linearGradient>`;
 }
-
-function clothLayer(hex, seed, w = W, x = 0){
+/* flat cloth colour everywhere; the woven texture is a screen-only overlay */
+function clothLayer(hex, seed, x = 0){
   const fl = seed % 4, sx = fl & 1 ? -1 : 1, sy = fl & 2 ? -1 : 1;
-  return `<rect x="${x}" width="${w}" height="${H}" fill="${hex}"/>
-  <image href="${TEX.cloth}" width="${W}" height="${H}" preserveAspectRatio="none" transform="translate(${x + (sx < 0 ? W : 0)} ${sy < 0 ? H : 0}) scale(${sx} ${sy})"/>`;
+  return `<rect x="${x}" width="${W}" height="${H}" fill="${hex}"/>
+  <image class="so" href="${TEX.cloth}" width="${W}" height="${H}" preserveAspectRatio="none" transform="translate(${x + (sx < 0 ? W : 0)} ${sy < 0 ? H : 0}) scale(${sx} ${sy})"/>`;
 }
-
 function leather(clipD, x0, P, id){
-  return `<clipPath id="${P}${id}"><path d="${clipD}"/></clipPath><g clip-path="url(#${P}${id})"><path d="${clipD}" fill="${HOUSE.hex}"/><image href="${TEX.leather}" x="${x0}" width="180" height="${H}" preserveAspectRatio="none"/></g>`;
+  return `<path d="${clipD}" fill="${HOUSE.hex}"/><clipPath id="${P}${id}"><path d="${clipD}"/></clipPath><g class="so" clip-path="url(#${P}${id})"><image href="${TEX.leather}" x="${x0}" width="180" height="${H}" preserveAspectRatio="none"/></g>`;
 }
-/* Material effects, all as vector copies so they cost almost nothing to render and survive into the PDF.
-   blind: a light lip peeking out along the lower-right edge (the classic inset/letterpress read)
-   foil:  a soft dark drop along the lower-right, the foil itself, then the cloth grain it picks up */
+/* blind die: the pressed tone (screen and print) plus a light lip along the lower-right edge (screen) */
 function blindArt(art, tone, lip, K){
-  return `<g class="so" transform="translate(.7 .9)" opacity=".38">${tok(art, lip, 'none')}</g>${tok(art, tone, K)}`;
+  return `<g class="so" transform="translate(.7 .9)" opacity=".38">${paint(art, { F:lip, T:lip, L:lip })}</g>${paint(art, { F:tone, K })}`;
 }
-function foilArt(art, P, K, grad, speckOp){
-  return `<g class="so" transform="translate(1.1 1.5)" opacity=".42">${tok(art, '#000', 'none')}</g>${tok(art, `url(#${P}${grad})`, K)}<g class="so" opacity="${speckOp}">${tok(art, `url(#${P}speck)`, 'none')}</g>`;
+/* foil die on screen: soft shadow, the foil, then the cloth grain it picks up */
+function foilScreen(art, P, foil, sheen, K){
+  const m = { F:sheen, K, T:`url(#${P}ft)`, L:foil.label, A:sheen };
+  return `<g transform="translate(1.1 1.5)" opacity="${foil.pigment ? .12 : .42}">${paint(art, { F:'#000', T:'#000', L:'#000' })}</g>${paint(art, m)}`
+    + `<g opacity="${foil.pigment ? .3 : .75}">${paint(art, { F:`url(#${P}speck)`, T:`url(#${P}speck)`, L:'none' })}</g>`;
 }
 function sunkRim(d, P, id){
-  return `<clipPath id="${P}${id}"><path d="${d}"/></clipPath><g clip-path="url(#${P}${id})" fill="none" stroke="url(#${P}rim)">
+  return `<clipPath id="${P}${id}"><path d="${d}"/></clipPath><g class="so" clip-path="url(#${P}${id})" fill="none" stroke="url(#${P}rim)">
     <path d="${d}" stroke-width="3" opacity=".9"/><path d="${d}" stroke-width="7" opacity=".45"/><path d="${d}" stroke-width="13" opacity=".2"/></g>`;
 }
 
-function buildCover(b, P, opts = {}){
+/* Level is the binding: visible leather goes 0 → 1 → 2 as the book goes deeper. */
+const BINDING = {
+  beginner:     { S:0,  CN:0,   name:'full cloth' },
+  intermediate: { S:92, CN:0,   name:'quarter-bound' },
+  advanced:     { S:92, CN:132, name:'half-bound' },
+};
+
+function coverParts(b, P){
   const cloth = CLOTH[b.cloth].hex, foil = FOILS[b.foil], R = rng(hash(b.slug));
-  const lvl = b.level;
-  const S = lvl === 'advanced' ? 0 : 92;           // quarter-cloth on the front board
-  const CN = lvl === 'intermediate' ? 132 : 0;     // corner leg (half binding)
-  const HINGE = 30;
+  const { S, CN } = BINDING[b.level], HINGE = 30;
   const cx = Math.round(((S || HINGE) + W) / 2);   // centred on the board, not the case
   const band = { x0: S || 40, y0: 418, x1: W, y1: 792 };
-  const cy = 605, RING = 150;
-  const arch = !!b.arch, AW = 262, AH = 340;
-  const dark = shade(cloth, -.28), sunk = shade(cloth, -.10), blindDev = shade(cloth, -.34);
-  const seed = hash(b.slug) % 97;
-
-  /* --- blind band art --- */
+  const cy = 605, RING = 150, arch = !!b.arch, AW = 262, AH = 340;
   const pattern = PATTERNS[b.pattern]({ x0:band.x0, y0:band.y0, x1:band.x1, y1:band.y1, cx, cy, r:R });
   const bandLines = `<path d="M${band.x0} ${band.y0+1.5}H${band.x1}M${band.x0} ${band.y1-1.5}H${band.x1}" stroke="${WHT}" stroke-width="3"/>`;
   const clearD = arch ? archPath(AW+34, AH+34, cx, cy) : circlePath(cx, cy, RING+18);
-
-  /* --- device --- */
-  const dctx = { r:rng(hash(b.slug+'d')), id:P };
   const devY = arch ? cy + 22 : cy;
-  const devInner = DEVICES[b.device](dctx);
-  const devExtra = arch ? `<text x="${cx}" y="${cy - AH/2 + 64}" text-anchor="middle" style="font:700 30px ${FACE};letter-spacing:.08em" fill="${WHT}">${b.series}</text><path d="M${cx-40} ${cy - AH/2 + 78}H${cx+40}" stroke="${WHT}" stroke-width="1.8"/>` : '';
+  const devInner = DEVICES[b.device]({ r:rng(hash(b.slug+'d')), id:P });
+  const devG = (inner) => `<g transform="translate(${cx} ${devY})">${inner}</g>`;
+  const devExtra = arch ? `<text x="${cx}" y="${cy - AH/2 + 64}" text-anchor="middle" style="font:700 30px ${FACE};letter-spacing:.08em" fill="${TXT}">${b.series}</text><path d="M${cx-40} ${cy - AH/2 + 78}H${cx+40}" stroke="${LIN}" stroke-width="1.8"/>` : '';
   const frame = arch
     ? `<path d="${archPath(AW, AH, cx, cy)}" fill="none" stroke="${WHT}" stroke-width="4"/><path d="${archPath(AW-18, AH-18, cx, cy)}" fill="none" stroke="${WHT}" stroke-width="1.6"/>`
     : `<circle cx="${cx}" cy="${cy}" r="${RING}" fill="none" stroke="${WHT}" stroke-width="4"/><circle cx="${cx}" cy="${cy}" r="${RING-9}" fill="none" stroke="${WHT}" stroke-width="1.6"/>`;
   const sunkD = arch ? archPath(AW+12, AH+12, cx, cy) : circlePath(cx, cy, RING+7);
-
-  /* --- type --- */
-  const title = layoutTitle(b, cx, b.series ? 96 : 66, 392, lvl === 'advanced' ? 560 : 520);
+  const title = layoutTitle(b, cx, b.series ? 92 : 60, b.level === 'beginner' ? 560 : 520);
   let head = '';
   if (b.series){
     const ls = 12.5*.26, t = 'CHARLIE AND THE INTELLIGENCE FACTORY', wv = tw(t, `700 12.5px ${FACE}`, ls);
-    head = `<text x="${f(cx+ls/2)}" y="62" text-anchor="middle" fill="${WHT}" style="font:700 12.5px ${FACE};letter-spacing:${f(ls)}px">${t}</text>
-      <path d="M${f(cx - wv/2 - 40)} 57.5H${f(cx - wv/2 - 12)}M${f(cx + wv/2 + 12)} 57.5H${f(cx + wv/2 + 40)}" stroke="${WHT}" stroke-width="1.6"/>`;
+    // on a half binding the rules must stop 16px short of the corner fillet (which crosses y 57.5 at x = W-CN-12.7+57.5)
+    const limit = CN ? (W - CN - 12.7 + 57.5) - 16 : W - 24;
+    const len = Math.min(28, limit - (cx + wv/2 + 12));
+    head = `<text x="${f(cx+ls/2)}" y="62" text-anchor="middle" fill="${LIN}" style="font:700 12.5px ${FACE};letter-spacing:${f(ls)}px">${t}</text>`
+      + (len >= 14 ? `<path d="M${f(cx - wv/2 - 12 - len)} 57.5H${f(cx - wv/2 - 12)}M${f(cx + wv/2 + 12)} 57.5H${f(cx + wv/2 + 12 + len)}" stroke="${LIN}" stroke-width="1.6"/>` : '');
   }
   let fillets = '';
   if (S) fillets += `<path d="M${S-9} 0V${H}" stroke="${WHT}" stroke-width="2.2"/>`;
   if (CN) fillets += `<path d="M${W-CN-12.7} 0L${W} ${CN+12.7}M${W-CN-12.7} ${H}L${W} ${H-CN-12.7}" stroke="${WHT}" stroke-width="2.2"/>`;
+  const foilAbs = head + title + frame + devExtra + imprint(cx, 848) + fillets;
+  return { cloth, foil, S, CN, HINGE, cx, cy, band, pattern, bandLines, clearD, devY, devInner, devG, sunkD, foilAbs, arch, RING,
+    dark: shade(cloth, -.28), sunk: shade(cloth, -.10), blindDev: shade(cloth, -.34), lip: shade(cloth, .22), seed: hash(b.slug) % 97 };
+}
+
+function buildCover(b, P, opts = {}){
+  const c = coverParts(b, P), { cloth, foil, S, CN, HINGE, band, cx, devG, devInner, sunk, dark } = c;
   const foilDev = !b.forthcoming;
-  const foilAbs = head + title + frame + devExtra + imprint(cx, 848);   // absolute coordinates, no knock-outs
-  const devG = (inner) => `<g transform="translate(${cx} ${devY})">${inner}</g>`;
-
-  /* --- house cloth (quarter / half) --- */
   let house = '';
-  if (S){
-    house += leather(`M0 0H${S}V${H}H0Z`, 0, P, 'ls');
-    house += `<rect x="${S-7}" width="7" height="${H}" fill="url(#${P}lap)"/><path d="M${S+.6} 0V${H}" stroke="#fff" stroke-opacity=".14" stroke-width="1.2"/>`;
-  }
-  if (CN){
-    house += leather(`M${W-CN} 0H${W}V${CN}ZM${W-CN} ${H}H${W}V${H-CN}Z`, W-180, P, 'lc');
-    house += `<path d="M${W-CN} 0L${W} ${CN}M${W-CN} ${H}L${W} ${H-CN}" stroke="#000" stroke-opacity=".5" stroke-width="5"/><path d="M${W-CN-1.2} 0L${W} ${CN+1.2}M${W-CN-1.2} ${H}L${W} ${H-CN-1.2}" stroke="#fff" stroke-opacity=".14" stroke-width="1.2"/>`;
-  }
-
-  const M = (inner) => `<rect width="${W}" height="${H}" fill="#000"/>${tok(inner, '#fff', '#000')}`;
-  const bandClip = `<clipPath id="${P}bc"><rect x="${band.x0}" y="${band.y0+10}" width="${band.x1-band.x0}" height="${band.y1-band.y0-20}"/></clipPath>
-    <clipPath id="${P}cc"><path clip-rule="evenodd" d="M0 0H${W}V${H}H0Z ${clearD}"/></clipPath>`;
-
+  if (S) house += leather(`M0 0H${S}V${H}H0Z`, 0, P, 'ls') + `<g class="so"><rect x="${S-7}" width="7" height="${H}" fill="url(#${P}lap)"/><path d="M${S+.6} 0V${H}" stroke="#fff" stroke-opacity=".14" stroke-width="1.2"/></g>`;
+  if (CN) house += leather(`M${W-CN} 0H${W}V${CN}ZM${W-CN} ${H}H${W}V${H-CN}Z`, W-180, P, 'lc')
+    + `<g class="so"><path d="M${W-CN} 0L${W} ${CN}M${W-CN} ${H}L${W} ${H-CN}" stroke="#000" stroke-opacity=".5" stroke-width="5"/><path d="M${W-CN-1.2} 0L${W} ${CN+1.2}M${W-CN-1.2} ${H}L${W} ${H-CN-1.2}" stroke="#fff" stroke-opacity=".14" stroke-width="1.2"/></g>`;
+  const devFoil = foilDev ? devInner : paint(devInner, { F:'none', K:'none', T:'none', L:'none', A:'__A__' });
+  const size = opts.w ? `width="${opts.w}" height="${opts.h}"` : `width="${W}" height="${H}"`;
   const svgOpen = opts.x !== undefined
     ? `<svg x="${opts.x}" y="0" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`
-    : `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">`;
-  const speckOp = foil.pigment ? .35 : .8, lip = shade(cloth, .22);
+    : `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" ${size}>`;
   return `${svgOpen}
-  <defs>${clothDefs(P, cloth, foil, seed)}
-    <linearGradient id="${P}fgd" href="#${P}fg" gradientTransform="translate(${-cx} ${-devY})"/>
-    ${bandClip}
+  <defs>${clothDefs(P, foil)}
+    <linearGradient id="${P}fgd" href="#${P}fg" gradientTransform="translate(${-cx} ${-c.devY})"/>
+    <clipPath id="${P}bc"><rect x="${band.x0}" y="${band.y0+10}" width="${band.x1-band.x0}" height="${band.y1-band.y0-20}"/></clipPath>
+    <clipPath id="${P}cc"><path clip-rule="evenodd" d="M0 0H${W}V${H}H0Z ${c.clearD}"/></clipPath>
   </defs>
-  ${clothLayer(cloth, seed)}
-
-  <!-- blind die: the band, the sunk roundel (and, while forthcoming, the device) -->
-  <g clip-path="url(#${P}cc)"><g clip-path="url(#${P}bc)">${blindArt(pattern, dark, lip, dark)}</g>${blindArt(bandLines, dark, lip, dark)}</g>
-  <path d="${sunkD}" fill="${sunk}"/>${sunkRim(sunkD, P, 'sr')}
-  ${foilDev ? '' : devG(blindArt(devInner, blindDev, shade(cloth, .12), sunk))}
-
+  ${clothLayer(cloth, c.seed)}
+  <g clip-path="url(#${P}cc)"><g clip-path="url(#${P}bc)">${blindArt(c.pattern, dark, c.lip, dark)}</g>${blindArt(c.bandLines, dark, c.lip, dark)}</g>
+  <path d="${c.sunkD}" fill="${sunk}"/>${sunkRim(c.sunkD, P, 'sr')}
+  ${foilDev ? '' : devG(blindArt(devInner, c.blindDev, shade(cloth, .12), sunk))}
   ${house}
-  <rect x="${HINGE-9}" width="18" height="${H}" fill="url(#${P}hinge)"/>
-
-  <!-- foil die -->
-  ${tok(fillets, `url(#${P}fg)`, sunk)}
-  ${foilArt(foilAbs, P, 'none', 'fg', speckOp)}
-  ${foilDev ? devG(foilArt(devInner, P, sunk, 'fgd', speckOp)) : ''}
-
-  <rect class="so" width="${W}" height="${H}" fill="url(#${P}weave)"/>
-  <rect width="${W}" height="${H}" fill="url(#${P}light)"/>
-  <rect width="${W}" height="${H}" fill="url(#${P}vig)"/>
-  <path class="so" d="M0 .75H${W-.75}V${H-.75}H0" fill="none" stroke="#fff" stroke-opacity=".10" stroke-width="1.5"/>
+  <rect class="so" x="${HINGE-9}" width="18" height="${H}" fill="url(#${P}hinge)"/>
+  <g class="so">${foilScreen(c.foilAbs, P, foil, `url(#${P}fg)`, sunk)}${devG(foilScreen(devFoil, P, foil, `url(#${P}fgd)`, sunk))}</g>
+  <g class="po">${paint(c.foilAbs, { F:foil.print, K:sunk })}${devG(paint(devFoil, { F:foil.print, K:sunk }))}</g>
+  <g class="so"><rect width="${W}" height="${H}" fill="url(#${P}weave)"/><rect width="${W}" height="${H}" fill="url(#${P}light)"/><rect width="${W}" height="${H}" fill="url(#${P}vig)"/>
+  <path d="M0 .75H${W-.75}V${H-.75}H0" fill="none" stroke="#fff" stroke-opacity=".10" stroke-width="1.5"/></g>
 </svg>`;
 }
 
+/* One-colour plates for the case-bound edition: the foil die and the blind die (black = metal). */
+function buildPlate(b, P, kind){
+  const c = coverParts(b, P);
+  let art;
+  if (kind === 'foil') art = paint(c.foilAbs, { F:'#000', K:'#fff' }) + c.devG(paint(b.forthcoming ? paint(c.devInner, { F:'none', K:'none', A:'__A__' }) : c.devInner, { F:'#000', K:'#fff' }));
+  else art = `<defs><clipPath id="${P}bc"><rect x="${c.band.x0}" y="${c.band.y0+10}" width="${c.band.x1-c.band.x0}" height="${c.band.y1-c.band.y0-20}"/></clipPath>
+      <clipPath id="${P}cc"><path clip-rule="evenodd" d="M0 0H${W}V${H}H0Z ${c.clearD}"/></clipPath></defs>
+      <g clip-path="url(#${P}cc)"><g clip-path="url(#${P}bc)">${tok(c.pattern, '#000', '#000')}</g>${tok(c.bandLines, '#000', '#000')}</g>
+      <path d="${c.sunkD}" fill="#000" fill-opacity=".45"/>` + (b.forthcoming ? c.devG(paint(c.devInner, { F:'#000', K:'#fff' })) : '');
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="240" height="296"><rect width="${W}" height="${H}" fill="#fff"/>${art}
+    <rect x="1" y="1" width="${W-2}" height="${H-2}" fill="none" stroke="#000" stroke-opacity=".15" stroke-width="2"/></svg>`;
+}
+
 /* ============================================================
-   FULL CASE WRAP — back board · spine · front board (quarter-bound)
+   FULL CASE WRAP — back board · spine · front board, for any binding
    ============================================================ */
-function buildWrap(){
-  const b = BOOKS.find(x => x.slug === 'neural-networks-from-scratch');
-  const SP = 84, WW = W*2 + SP, P = 'wr-', S = 92, HINGE = 30;
+function buildWrap(b){
+  const SP = 84, WW = W*2 + SP, P = 'wr-', HINGE = 30;
+  const { S, CN } = BINDING[b.level];
   const cloth = CLOTH[b.cloth].hex, foil = FOILS[b.foil], seed = hash(b.slug) % 97;
-  const dark = shade(cloth, -.28);
+  const dark = shade(cloth, -.28), lip = shade(cloth, .22);
   // back board: the blind band runs on; a blind colophon sits where the front has its device
-  const bcx = Math.round((W - S) / 2), cy = 605;
+  const bx1 = W - (S || HINGE), bcx = Math.round(bx1 / 2), cy = 605;
   const band = { x0:0, y0:418, x1:W - S, y1:792 };
   const pattern = PATTERNS[b.pattern]({ ...band, cx:bcx, cy, r:rng(hash(b.slug)) });
   const bandLines = `<path d="M${band.x0} ${band.y0+1.5}H${band.x1}M${band.x0} ${band.y1-1.5}H${band.x1}" stroke="${WHT}" stroke-width="3"/>`;
   const clearD = circlePath(bcx, cy, 92);
-  const blindBack = vizMark(bcx, cy + 4, 3.4) + `<circle cx="${bcx}" cy="${cy}" r="76" fill="none" stroke="${WHT}" stroke-width="3"/>`;
-  const backFoot = `<text x="${bcx + 2}" y="848" text-anchor="middle" fill="${WHT}" style="font:700 12.5px ${FACE};letter-spacing:4px">VIZUARA BOOKS</text>`;
-  // spine, in the house cloth, blocked in the book's foil: head rules · title · rules · device · tail rules
+  const blindBack = vizMark(bcx, cy + 4, 3.4, WHT) + `<circle cx="${bcx}" cy="${cy}" r="76" fill="none" stroke="${WHT}" stroke-width="3"/>`;
+  const backFoot = `<text x="${bcx + 2}" y="848" text-anchor="middle" fill="${LIN}" style="font:700 12.5px ${FACE};letter-spacing:4px">VIZUARA BOOKS</text>`;
+  // spine: blocked in the book's foil — head rules · title · rules · device · tail rules
   const sx = W, scx = W + SP/2;
-  const rules = y => `<path d="M${sx+10} ${y}H${sx+SP-10}M${sx+10} ${y+6}H${sx+SP-10}" stroke="${WHT}" stroke-width="2"/>`;
-  const ls = 30*CAP_TRACK, capW = tw('NEURAL NETWORKS', `700 30px ${FACE}`, ls);
+  const rules = y => `<path d="M${sx+10} ${y}H${sx+SP-10}M${sx+10} ${y+6}H${sx+SP-10}" stroke="${LIN}" stroke-width="2"/>`;
+  const capsTxt = b.t.caps.map(l => segs(l).map(s => s.t).join('')).join(' ');
+  const post = b.t.post || '';
+  let cs = 30, is = 22; const room = 450;
+  const need = () => tw(capsTxt, `700 ${cs}px ${FACE}`, cs*CAP_TRACK) + (post ? 12 + tw(post, `600 italic ${is}px ${FACE}`, 0) : 0);
+  while (need() > room && cs > 18){ cs -= 1; is = cs * .73; }
+  const capW = tw(capsTxt, `700 ${cs}px ${FACE}`, cs*CAP_TRACK);
   const spineTitle = `<g transform="translate(${scx} 96) rotate(90)">
-      <text x="0" y="10.5" fill="${WHT}" style="font:700 30px ${FACE};letter-spacing:${f(ls)}px">NEURAL&#160;NETWORKS</text>
-      <text x="${f(capW + 12)}" y="9" fill="${WHT}" style="font:600 italic 22px ${FACE}">from Scratch</text></g>`;
-  const spineArt = rules(34) + spineTitle + rules(566) + `<path d="M${scx} 604l6 8-6 8-6-8Z" fill="${WHT}"/>` + vizMark(scx, 800, .95) + rules(846);
-  const fillet = `<path d="M${W-S+9} 0V${H}" stroke="${WHT}" stroke-width="2.2"/>`;
+      <text x="0" y="${f(cs*.35)}" fill="${TXT}" style="font:700 ${cs}px ${FACE};letter-spacing:${f(cs*CAP_TRACK)}px;font-variant-numeric:lining-nums">${capsTxt.replace(/ /g,'&#160;')}</text>
+      ${post ? `<text x="${f(capW + 12)}" y="${f(cs*.3)}" fill="${TXT}" style="font:600 italic ${f(is)}px ${FACE}">${post}</text>` : ''}</g>`;
+  const spineArt = rules(34) + spineTitle + rules(566) + `<path d="M${scx} 604l6 8-6 8-6-8Z" fill="${LIN}"/>` + vizMark(scx, 800, .95) + rules(846);
+  let backFillets = '';
+  if (S) backFillets += `<path d="M${W-S+9} 0V${H}" stroke="${WHT}" stroke-width="2.2"/>`;
+  if (CN) backFillets += `<path d="M${CN+12.7} 0L0 ${CN+12.7}M${CN+12.7} ${H}L0 ${H-CN-12.7}" stroke="${WHT}" stroke-width="2.2"/>`;
+  let house = '';
+  if (S) house += leather(`M${W-S} 0H${W+SP}V${H}H${W-S}Z`, W-S, P, 'sp') + `<g class="so"><rect x="${W-S}" width="7" height="${H}" fill="url(#${P}lapR)"/><path d="M${W-S-.6} 0V${H}" stroke="#fff" stroke-opacity=".14" stroke-width="1.2"/></g>`;
+  else house += clothLayer(cloth, seed + 2, W).replace(`<rect x="${W}" width="${W}"`, `<rect x="${W}" width="${SP}"`);
+  if (CN) house += leather(`M0 0H${CN}L0 ${CN}ZM0 ${H}H${CN}L0 ${H-CN}Z`, 0, P, 'bc2')
+    + `<g class="so"><path d="M${CN} 0L0 ${CN}M${CN} ${H}L0 ${H-CN}" stroke="#000" stroke-opacity=".5" stroke-width="5"/></g>`;
+  const foilArt = backFoot + spineArt + backFillets;
   const front = buildCover(b, 'wf-', { x: W + SP });
   document.getElementById('wrap').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${WW} ${H}" width="${WW}" height="${H}">
-    <defs>${clothDefs(P, cloth, foil, seed, WW)}
+    <defs>${clothDefs(P, foil)}
       <clipPath id="${P}bc"><rect x="${band.x0}" y="${band.y0+10}" width="${band.x1-band.x0}" height="${band.y1-band.y0-20}"/></clipPath>
       <clipPath id="${P}cc"><path clip-rule="evenodd" d="M0 0H${W}V${H}H0Z ${clearD}"/></clipPath>
+      <clipPath id="${P}spc"><rect x="${W}" width="${SP}" height="${H}"/></clipPath>
     </defs>
     ${clothLayer(cloth, seed + 1)}
-    <g clip-path="url(#${P}cc)"><g clip-path="url(#${P}bc)">${blindArt(pattern, dark, shade(cloth, .22), dark)}</g>${blindArt(bandLines, dark, shade(cloth, .22), dark)}</g>${blindArt(blindBack, dark, shade(cloth, .22), cloth)}
-    ${leather(`M${W-S} 0H${W+SP}V${H}H${W-S}Z`, W-S, P, 'sp')}
-    <rect x="${W-S}" width="7" height="${H}" fill="url(#${P}lapR)"/><path d="M${W-S-.6} 0V${H}" stroke="#fff" stroke-opacity=".14" stroke-width="1.2"/>
-    <rect x="${W-HINGE-9}" width="18" height="${H}" fill="url(#${P}hinge)" transform="rotate(180 ${W-HINGE} ${H/2})"/>
-    <rect x="${W}" width="${SP}" height="${H}" fill="url(#${P}light)" opacity=".6"/>
-    <path d="M${W+.5} 0V${H}M${W+SP-.5} 0V${H}" stroke="#000" stroke-opacity=".35" stroke-width="1"/>
-    ${tok(fillet, `url(#${P}fg)`, 'none')}
-    ${foilArt(backFoot + spineArt, P, 'none', 'fg', .8)}
-    <rect class="so" width="${W+SP}" height="${H}" fill="url(#${P}weave)"/>
-    <rect width="${W}" height="${H}" fill="url(#${P}vig)"/>
+    <g clip-path="url(#${P}cc)"><g clip-path="url(#${P}bc)">${blindArt(pattern, dark, lip, dark)}</g>${blindArt(bandLines, dark, lip, dark)}</g>${blindArt(blindBack, dark, lip, cloth)}
+    <g clip-path="url(#${P}spc)">${S ? '' : ''}</g>
+    ${house}
+    <rect class="so" x="${W-HINGE-9}" width="18" height="${H}" fill="url(#${P}hinge)" transform="rotate(180 ${W-HINGE} ${H/2})"/>
+    <g class="so"><rect x="${W}" width="${SP}" height="${H}" fill="url(#${P}light)" opacity=".6"/><path d="M${W+.5} 0V${H}M${W+SP-.5} 0V${H}" stroke="#000" stroke-opacity=".35" stroke-width="1"/></g>
+    <g class="so">${foilScreen(foilArt, P, foil, `url(#${P}fg)`, 'none')}</g>
+    <g class="po">${paint(foilArt, { F:foil.print })}</g>
+    <g class="so"><rect width="${W+SP}" height="${H}" fill="url(#${P}weave)"/><rect width="${W}" height="${H}" fill="url(#${P}vig)"/></g>
     ${front}
   </svg>`;
 }
@@ -890,11 +945,12 @@ function swatchSVG(hex, P, leather){
 }
 function foilSVG(k, P){
   const fo = FOILS[k], n = fo.stops.length;
-  return `<svg viewBox="0 0 128 64" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="${P}g" x1="0" y1="0" x2="1" y2="1">${fo.stops.map((c,i)=>`<stop offset="${f(i/(n-1))}" stop-color="${c}"/>`).join('')}</linearGradient></defs><rect width="128" height="64" fill="url(#${P}g)"/></svg>`;
+  return `<svg viewBox="0 0 128 64" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="${P}g" x1="0" y1="0" x2="1" y2="1">${fo.stops.map((c,i)=>`<stop offset="${f(i/(n-1))}" stop-color="${c}"/>`).join('')}</linearGradient></defs><rect width="128" height="44" fill="url(#${P}g)"/>
+    <rect y="44" width="64" height="20" fill="${fo.type[1]}"/><rect x="64" y="44" width="64" height="20" fill="${fo.print}"/></svg>`;
 }
 function keySVG(level){
-  const hs = HOUSE.hex, gold = '#c9a24c'; const S = level==='advanced'?0:19, C = level==='intermediate'?27:0;
-  const bg = level==='beginner' ? CLOTH.prussian.hex : level==='intermediate' ? CLOTH.oxblood.hex : CLOTH.ink.hex;
+  const hs = HOUSE.hex, gold = '#d7b565', { S:S0, CN:C0 } = BINDING[level], S = S0 ? 19 : 0, C = C0 ? 27 : 0;
+  const bg = level === 'beginner' ? CLOTH.prussian.hex : level === 'intermediate' ? CLOTH.oxblood.hex : CLOTH.ink.hex;
   const x0 = S || 6, cx = (x0 + 150)/2;
   return `<svg viewBox="0 0 150 185" xmlns="http://www.w3.org/2000/svg">
     <rect width="150" height="185" fill="${bg}"/>
@@ -908,36 +964,51 @@ function keySVG(level){
   </svg>`;
 }
 
+/* build check: every type stop ≥ 3:1 and the label ≥ 4.5:1 against the cloth, on screen and in print */
+function legibility(b){
+  const cl = CLOTH[b.cloth].hex, fo = FOILS[b.foil];
+  const title = Math.min(...fo.type.map(s => contrast(s, cl))), label = contrast(fo.label, cl), print = contrast(fo.print, cl);
+  return { title, label, print, ok: title >= 3 && label >= 4.5 && print >= 4.5 };
+}
+
 function render(){
-  document.getElementById('cloths').innerHTML = Object.entries(CLOTH).map(([k,c]) => `<div class="sw">${swatchSVG(c.hex,'s'+k)}<b>${c.name}</b><code>${c.hex.toUpperCase()}</code></div>`).join('')
-    + `<div class="sw">${swatchSVG(HOUSE.hex,'shouse',true)}<b>${HOUSE.name}</b><code>${HOUSE.hex.toUpperCase()} · spine &amp; corners</code></div>`;
-  document.getElementById('foils').innerHTML = Object.entries(FOILS).map(([k,fo]) => `<div class="sw">${foilSVG(k,'f'+k)}<b>${fo.name}</b><code>${fo.pigment ? 'matt pigment foil' : 'metallic foil'}</code></div>`).join('');
+  document.getElementById('cloths').innerHTML = Object.entries(FAMILY).map(([fk, fname]) =>
+    `<div class="fam"><div class="famname">${fname}</div><div class="famrow">` +
+    Object.entries(CLOTH).filter(([,c]) => c.fam === fk).map(([k,c]) => `<div class="sw">${swatchSVG(c.hex,'s'+k)}<b>${c.name}</b><code>${c.hex.toUpperCase()}</code></div>`).join('') + `</div></div>`).join('')
+    + `<div class="fam"><div class="famname">Spine &amp; corners</div><div class="famrow"><div class="sw">${swatchSVG(HOUSE.hex,'shouse',true)}<b>${HOUSE.name}</b><code>${HOUSE.hex.toUpperCase()}</code></div></div></div>`;
+  document.getElementById('foils').innerHTML = Object.entries(FOILS).map(([k,fo]) => `<div class="sw fw">${foilSVG(k,'f'+k)}<b>${fo.name}</b><code>${fo.use} · ${fo.pms}</code></div>`).join('');
   document.getElementById('key').innerHTML = [
-    ['beginner','Quarter-bound · Beginner','A strip of house cloth along the spine, with a gilt fillet at the join.'],
-    ['intermediate','Half-bound · Intermediate','The spine strip plus two corners, each finished with a gilt fillet.'],
-    ['advanced','Full cloth · Advanced','One cloth over the whole board, with no strip or corners.'],
+    ['beginner','Full cloth · Beginner','One cloth over the whole board. No leather.'],
+    ['intermediate','Quarter-bound · Intermediate','A strip of house leather-grain cloth along the spine, with a gilt fillet at the join.'],
+    ['advanced','Half-bound · Advanced','The spine strip plus two fore-edge corners, each finished with a gilt fillet.'],
   ].map(([l,t,d]) => `<div class="key">${keySVG(l)}<b>${t}</b>${d}</div>`).join('');
+  document.getElementById('checks').innerHTML = `<tr><th>Book</th><th>Cloth · foil</th><th>Title stops</th><th>Label</th><th>Print foil</th><th></th></tr>` + BOOKS.map(b => {
+    const r = legibility(b); if (!r.ok) console.warn('legibility check failed', b.slug, r);
+    return `<tr><td>${b.title}</td><td>${CLOTH[b.cloth].name} · ${FOILS[b.foil].name}</td><td>${r.title.toFixed(2)}</td><td>${r.label.toFixed(2)}</td><td>${r.print.toFixed(2)}</td><td>${r.ok ? 'pass' : '<b>FAIL</b>'}</td></tr>`; }).join('');
   // the web-library view: the actual 1× renders, shown at 180 px (added after load; they are just pictures of the covers above)
   const shelf = () => { document.getElementById('shelf').innerHTML = BOOKS.map(b => `<div class="t"><img src="renders/${b.slug}.jpg" width="180" height="222" alt="${b.title}"><span>${b.title}</span></div>`).join(''); };
   if (document.readyState === 'complete') shelf(); else addEventListener('load', shelf);
-
 }
 function renderCovers(){
   let html = '';
   for (const b of BOOKS){
-    const bind = b.level === 'beginner' ? 'quarter-bound' : b.level === 'intermediate' ? 'half-bound' : 'full cloth';
     html += `<figure><div class="cover" data-slug="${b.slug}">${buildCover(b, 'c' + hash(b.slug).toString(36) + '-')}</div>
-      <figcaption><span><b>${b.title}</b><br>${b.level} · ${bind}${b.forthcoming ? ' · forthcoming: device blind until publication' : ''}</span><span style="text-align:right">${CLOTH[b.cloth].name} cloth<br>${FOILS[b.foil].name} foil · ${b.series ? 'arch device (series)' : 'roundel device'}</span></figcaption></figure>`;
+      <figcaption><span><b>${b.title}</b><br>${b.level} · ${BINDING[b.level].name}${b.forthcoming ? ' · forthcoming: device blind until publication, output tile foiled' : ''}</span><span style="text-align:right">${CLOTH[b.cloth].name} cloth · ${FAMILY[CLOTH[b.cloth].fam].toLowerCase()}<br>${FOILS[b.foil].name} foil · ${b.series ? 'arch device (series)' : 'roundel device'}</span></figcaption></figure>`;
   }
   document.getElementById('covers').innerHTML = html;
-  buildWrap();
+  const wb = BOOKS.find(x => x.slug === WRAP_BOOK);
+  buildWrap(wb);
+  document.getElementById('plates').innerHTML =
+    `<div class="plate"><div class="sim">${buildCover(wb, 'pl-s-', { w:240, h:296 })}</div><b>Screen simulation</b>Cloth, sheen, deboss: the JPG/PNG renders.</div>
+     <div class="plate"><div class="printview">${buildCover(wb, 'pl-p-', { w:240, h:296 })}</div><b>Print file (PDF)</b>Flat cloth colour, flat blind tint, one flat foil value. Pure vector.</div>
+     <div class="plate">${buildPlate(wb, 'pl-f-', 'foil')}<b>Foil die</b>One brass die, blocked in ${FOILS[wb.foil].name.toLowerCase()} (${FOILS[wb.foil].pms}).</div>
+     <div class="plate">${buildPlate(wb, 'pl-b-', 'blind')}<b>Blind die</b>Pressed with no foil. Grey = the sunk panel, a second, deeper level.</div>`;
 }
+const WRAP_BOOK = '5d-parallelism';
 
-/* Build at once (so the covers always exist), then rebuild the moment the fonts have landed,
-   since every title is measured and fitted with the real Cormorant metrics. */
-const FONT_SPECS = [`700 80px ${FACE}`, `600 italic 40px ${FACE}`, `700 14px ${FACE}`, `400 18px "EB Garamond"`];
 /* Build right after the document has parsed (keeps parsing fast), then refit the titles
    if the fonts arrive later, since every title is measured with the real Cormorant metrics. */
+const FONT_SPECS = [`700 80px ${FACE}`, `600 italic 40px ${FACE}`, `700 14px ${FACE}`, `400 18px "EB Garamond"`];
 function start(){
   makeTextures(); render(); renderCovers();
   if (!FONT_SPECS.every(s => document.fonts.check(s)))

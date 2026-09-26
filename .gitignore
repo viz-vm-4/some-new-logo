@@ -5,3 +5,5 @@ covers/*/renders/*.png
 tools/.peek/
 # contact.js scratch page (created and deleted during a run)
 ._contact.html
+# Print PDFs are regenerated on every render; they are committed once, at the end, after final QA.
+covers/*/renders/pdf/

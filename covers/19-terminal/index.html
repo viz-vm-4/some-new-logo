@@ -22,8 +22,8 @@ body{font-family:'Martian Mono',monospace;font-variation-settings:'wdth' 75}
 .tl{font-variation-settings:'wdth' 75,'wght' 800;color:var(--ink);word-spacing:-.28em}
 .tl.sub{font-variation-settings:'wdth' 75,'wght' 700;word-spacing:-.2em}
 .pr{font-variation-settings:'wdth' 75,'wght' 800;color:var(--sig)}
-.cur{position:absolute;background:var(--sig)}
-.cur.soon{background:transparent;border:3px solid var(--sig)}
+.tl .cur{display:inline-block;width:25px;height:37px;background:var(--sig);margin-left:9px;vertical-align:baseline}
+.tl .cur.soon{background:transparent;border:4px solid var(--sig)}
 .cap{font-size:10px;line-height:var(--ch);font-variation-settings:'wdth' 75,'wght' 500;color:var(--ink)}
 .cap b{font-variation-settings:'wdth' 75,'wght' 800;color:var(--sig)}
 .foot{font-size:10px;line-height:var(--ch);font-variation-settings:'wdth' 100,'wght' 600;letter-spacing:.06em;color:var(--ink)}
@@ -187,7 +187,7 @@ function catmull(pts,n=12){ // smooth polyline through points
 }
 
 // ─── real data, computed offline (see NOTES.md): GPT-2 attention, MNIST, iris
-/*DATA*/const DATA={"attn":{"toks":["A"," language"," model"," reads"," the"," tokens"," that"," came"," before"," and"," predicts"," the"," one"," that"," comes"," next","."," It"," learns"," this"," from"," text",","," one"," token"," at"," a"," time",","," until"," the"," patterns"," of"," language"," are"," stored"," in"," its"," weights","."," Then"," it"," writes"," text",","," one"," token"," at"," a"," time","."],"rows":["9","90","901","9024","90247","912575","9125759","81257595","712464749","5123446479","61245474797","612454647989","5124546479887","41233343566659","412333435666696","4123334356655966","31122232345446449","311233324454475598","3123333244544644869","21122232334336447698","211222323343354476989","3112223234433644869798","21121221233234336576779","211212212232243365757798","2112222123322433547566869","11111111223223224464567798","211112112232232243545676977","1111111122322322436456769878","11111111122122223353455576569","111111111121121122323333543469","1111111111211211223233335444696","11111111112112113232334354446959","111111111121111122322333433458596","1111111111211111223223324333574859","10110111111111112132223243234648599","111111111111111121222232432357475978","1111011011111111212122223323464749789","11110110111111112121222232234647498889","100101001110011111111121221234253555559","1001010000101111112111112112242425555599","10010100101011111121111121122424244545879","000000000010010011111111211123242444458789","0000000000100100111111111111121313333355659","00000000001001001111111111111213133333656698","000000000010000010111111111112121333235455998","0000000000100000101011111111121213332355559888","00000000001000001011111111111212132323544487769","000000000000000000100111111112121222224444776698","0000000000000000001001111111121212222244446766977","00000000000000000010011111111212122222444477769769","000000000000000000100110111111121222123343555575569"]},"iris":{"X":[[1.4,0.2],[1.4,0.2],[1.3,0.2],[1.5,0.2],[1.4,0.2],[1.7,0.4],[1.4,0.3],[1.5,0.2],[1.4,0.2],[1.5,0.1],[1.5,0.2],[1.6,0.2],[1.4,0.1],[1.1,0.1],[1.2,0.2],[1.5,0.4],[1.3,0.4],[1.4,0.3],[1.7,0.3],[1.5,0.3],[1.7,0.2],[1.5,0.4],[1.0,0.2],[1.7,0.5],[1.9,0.2],[1.6,0.2],[1.6,0.4],[1.5,0.2],[1.4,0.2],[1.6,0.2],[1.6,0.2],[1.5,0.4],[1.5,0.1],[1.4,0.2],[1.5,0.2],[1.2,0.2],[1.3,0.2],[1.4,0.1],[1.3,0.2],[1.5,0.2],[1.3,0.3],[1.3,0.3],[1.3,0.2],[1.6,0.6],[1.9,0.4],[1.4,0.3],[1.6,0.2],[1.4,0.2],[1.5,0.2],[1.4,0.2],[4.7,1.4],[4.5,1.5],[4.9,1.5],[4.0,1.3],[4.6,1.5],[4.5,1.3],[4.7,1.6],[3.3,1.0],[4.6,1.3],[3.9,1.4],[3.5,1.0],[4.2,1.5],[4.0,1.0],[4.7,1.4],[3.6,1.3],[4.4,1.4],[4.5,1.5],[4.1,1.0],[4.5,1.5],[3.9,1.1],[4.8,1.8],[4.0,1.3],[4.9,1.5],[4.7,1.2],[4.3,1.3],[4.4,1.4],[4.8,1.4],[5.0,1.7],[4.5,1.5],[3.5,1.0],[3.8,1.1],[3.7,1.0],[3.9,1.2],[5.1,1.6],[4.5,1.5],[4.5,1.6],[4.7,1.5],[4.4,1.3],[4.1,1.3],[4.0,1.3],[4.4,1.2],[4.6,1.4],[4.0,1.2],[3.3,1.0],[4.2,1.3],[4.2,1.2],[4.2,1.3],[4.3,1.3],[3.0,1.1],[4.1,1.3],[6.0,2.5],[5.1,1.9],[5.9,2.1],[5.6,1.8],[5.8,2.2],[6.6,2.1],[4.5,1.7],[6.3,1.8],[5.8,1.8],[6.1,2.5],[5.1,2.0],[5.3,1.9],[5.5,2.1],[5.0,2.0],[5.1,2.4],[5.3,2.3],[5.5,1.8],[6.7,2.2],[6.9,2.3],[5.0,1.5],[5.7,2.3],[4.9,2.0],[6.7,2.0],[4.9,1.8],[5.7,2.1],[6.0,1.8],[4.8,1.8],[4.9,1.8],[5.6,2.1],[5.8,1.6],[6.1,1.9],[6.4,2.0],[5.6,2.2],[5.1,1.5],[5.6,1.4],[6.1,2.3],[5.6,2.4],[5.5,1.8],[4.8,1.8],[5.4,2.1],[5.6,2.4],[5.1,2.3],[5.1,1.9],[5.9,2.3],[5.7,2.5],[5.2,2.3],[5.0,1.9],[5.2,2.0],[5.4,2.3],[5.1,1.8]],"y":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]}};/*/DATA*/
+/*DATA*/const DATA={"attn":{"toks":["A"," language"," model"," reads"," the"," tokens"," that"," came"," before"," and"," predicts"," the"," one"," that"," comes"," next","."," It"," learns"," this"," from"," text",","," one"," token"," at"," a"," time",","," until"," the"," patterns"," of"," language"," are"," stored"," in"," its"," weights","."," Then"," it"," writes"," text",","," one"," token"," at"," a"," time","."],"rows":["9","90","901","9024","90247","912575","9125759","81257595","712464749","5123446479","61245474797","612454647989","5124546479887","41233343566659","412333435666696","4123334356655966","31122232345446449","311233324454475598","3123333244544644869","21122232334336447698","211222323343354476989","3112223234433644869798","21121221233234336576779","211212212232243365757798","2112222123322433547566869","11111111223223224464567798","211112112232232243545676977","1111111122322322436456769878","11111111122122223353455576569","111111111121121122323333543469","1111111111211211223233335444696","11111111112112113232334354446959","111111111121111122322333433458596","1111111111211111223223324333574859","10110111111111112132223243234648599","111111111111111121222232432357475978","1111011011111111212122223323464749789","11110110111111112121222232234647498889","100101001110011111111121221234253555559","1001010000101111112111112112242425555599","10010100101011111121111121122424244545879","000000000010010011111111211123242444458789","0000000000100100111111111111121313333355659","00000000001001001111111111111213133333656698","000000000010000010111111111112121333235455998","0000000000100000101011111111121213332355559888","00000000001000001011111111111212132323544487769","000000000000000000100111111112121222224444776698","0000000000000000001001111111121212222244446766977","00000000000000000010011111111212122222444477769769","000000000000000000100110111111121222123343555575569"]},"iris":{"X":[[1.4,0.2],[1.4,0.2],[1.3,0.2],[1.5,0.2],[1.4,0.2],[1.7,0.4],[1.4,0.3],[1.5,0.2],[1.4,0.2],[1.5,0.1],[1.5,0.2],[1.6,0.2],[1.4,0.1],[1.1,0.1],[1.2,0.2],[1.5,0.4],[1.3,0.4],[1.4,0.3],[1.7,0.3],[1.5,0.3],[1.7,0.2],[1.5,0.4],[1.0,0.2],[1.7,0.5],[1.9,0.2],[1.6,0.2],[1.6,0.4],[1.5,0.2],[1.4,0.2],[1.6,0.2],[1.6,0.2],[1.5,0.4],[1.5,0.1],[1.4,0.2],[1.5,0.2],[1.2,0.2],[1.3,0.2],[1.4,0.1],[1.3,0.2],[1.5,0.2],[1.3,0.3],[1.3,0.3],[1.3,0.2],[1.6,0.6],[1.9,0.4],[1.4,0.3],[1.6,0.2],[1.4,0.2],[1.5,0.2],[1.4,0.2],[4.7,1.4],[4.5,1.5],[4.9,1.5],[4.0,1.3],[4.6,1.5],[4.5,1.3],[4.7,1.6],[3.3,1.0],[4.6,1.3],[3.9,1.4],[3.5,1.0],[4.2,1.5],[4.0,1.0],[4.7,1.4],[3.6,1.3],[4.4,1.4],[4.5,1.5],[4.1,1.0],[4.5,1.5],[3.9,1.1],[4.8,1.8],[4.0,1.3],[4.9,1.5],[4.7,1.2],[4.3,1.3],[4.4,1.4],[4.8,1.4],[5.0,1.7],[4.5,1.5],[3.5,1.0],[3.8,1.1],[3.7,1.0],[3.9,1.2],[5.1,1.6],[4.5,1.5],[4.5,1.6],[4.7,1.5],[4.4,1.3],[4.1,1.3],[4.0,1.3],[4.4,1.2],[4.6,1.4],[4.0,1.2],[3.3,1.0],[4.2,1.3],[4.2,1.2],[4.2,1.3],[4.3,1.3],[3.0,1.1],[4.1,1.3],[6.0,2.5],[5.1,1.9],[5.9,2.1],[5.6,1.8],[5.8,2.2],[6.6,2.1],[4.5,1.7],[6.3,1.8],[5.8,1.8],[6.1,2.5],[5.1,2.0],[5.3,1.9],[5.5,2.1],[5.0,2.0],[5.1,2.4],[5.3,2.3],[5.5,1.8],[6.7,2.2],[6.9,2.3],[5.0,1.5],[5.7,2.3],[4.9,2.0],[6.7,2.0],[4.9,1.8],[5.7,2.1],[6.0,1.8],[4.8,1.8],[4.9,1.8],[5.6,2.1],[5.8,1.6],[6.1,1.9],[6.4,2.0],[5.6,2.2],[5.1,1.5],[5.6,1.4],[6.1,2.3],[5.6,2.4],[5.5,1.8],[4.8,1.8],[5.4,2.1],[5.6,2.4],[5.1,2.3],[5.1,1.9],[5.9,2.3],[5.7,2.5],[5.2,2.3],[5.0,1.9],[5.2,2.0],[5.4,2.3],[5.1,1.8]],"y":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]},"mnist":{"img":[[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,84,185,159,151,60,36,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,222,254,254,254,254,241,198,198,198,198,198,198,198,198,170,52,0,0,0,0,0,0],[0,0,0,0,0,0,67,114,72,114,163,227,254,225,254,254,254,250,229,254,254,140,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,17,66,14,67,67,67,59,21,236,254,106,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,83,253,209,18,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,22,233,255,83,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,129,254,238,44,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,59,249,254,62,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,133,254,187,5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,205,248,58,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,126,254,182,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,75,251,240,57,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,19,221,254,166,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,3,203,254,219,35,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,38,254,254,77,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,31,224,254,115,1,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,133,254,254,52,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,61,242,254,254,52,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,121,254,254,219,40,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,121,254,207,18,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]],"p":[1e-06,0.0,0.000328,0.001376,0.0,2e-06,0.0,0.998266,9e-06,1.9e-05],"row0":3}};/*/DATA*/
 
 // ─── emblems: each fills rows 0..FR-1 with its own data ─────────────────
 const EMBLEM={};
@@ -212,30 +212,23 @@ EMBLEM['build-llms-from-scratch']=function(g){
 
 // Hex dump of a handwritten seven, and the network's answer
 EMBLEM['neural-networks-from-scratch']=function(g){
-  const PX=40, PY=FR; // pixels: 3 cols x 1 row each
-  const W=PX*18, H=PY*CH; // physical px
-  const stroke=catmull([[150,86],[250,78],[350,70],[430,70],[415,120],[375,200],[330,290],[295,380],[270,470],[258,520]].map(([x,y])=>[x,y]),10);
-  const bar=[[215,300],[400,292]];
-  for(let y=0;y<PY;y++)for(let x=0;x<PX;x++){
-    const px=(x+.5)*18, py=(y+.5)*CH;
-    let d=1e9; for(let i=0;i<stroke.length-1;i++) d=Math.min(d,segd(px,py,...stroke[i],...stroke[i+1]));
-    const v=clamp((46-d)/26);
-    const b=Math.round(v*255), hx=b.toString(16).padStart(2,'0');
-    const t = b===0? .02 : b>=240? .95 : .30+(b/255)*.55;
-    g.text(y,x*3,hx+' ',t);
-  }
-  // softmax output
-  const P=[.004,.012,.021,.018,.009,.006,.002,.874,.031,.023];
-  const pc=86, pr=14;
-  g.fill(pr-2,pc-2,pr+21,COLS,' ',-1);
+  // MNIST test image 0 (rows 3-27), one hex byte of ink per pixel, printed double-spaced;
+  // beside it the softmax that the back-cover program returns for it after 10 epochs.
+  const {img,p}=DATA.mnist;
+  img.forEach((row,y)=>row.forEach((b,x)=>{
+    const t=b===0?.03:b>=224?.95:.3+b/255*.55, r=2*y, c=x*3;
+    g.text(r,c,b.toString(16).padStart(2,'0')+' ',t);
+    if(t>=.86) g.fill(r+1,c,r+2,c+3,' ',.95);
+  }));
+  const pc=86, pr=13;
   for(let k=0;k<10;k++){
-    const r=pr+k*2, on=k===7;
-    g.text(r,pc,String(k),on?.95:.8,on?1:0);
-    const L=Math.max(1,Math.round(P[k]*24));
-    for(let i=0;i<L;i++) g.put(r,pc+2+i,on?' ':'#',on?.95:.8,on?1:0);
-    g.text(r,pc+3+L,P[k].toFixed(3),on?.8:.55,on?1:0);
+    const r=pr+k*2, on=k===7, L=Math.round(p[k]*20);
+    if(on) g.text(r,pc-1,' '+k+' ',.95,1); else g.text(r,pc,String(k),.8);
+    for(let i=0;i<L;i++) g.put(r,pc+3+i,on?' ':'#',on?.95:.8,on?1:0);
+    g.text(r,pc+24,p[k].toFixed(3),on?.84:.55,on?1:0);
   }
-  return {cap:['p','= softmax(W2 @ relu(W1 @ (img / 255)))   # -> 7']};
+  g.text(pr+21,pc-1,'10 epochs · test acc 0.976',.5);
+  return {cap:['p','= forward(x_test[:1])[2]   # MNIST test image 0, rows 3-27 in hex; p[7] = 0.998']};
 };
 
 // Histogram of N(0,1) samples; every sample printed in its bin
@@ -260,7 +253,7 @@ EMBLEM['mathematical-foundations-for-ml']=function(g){
   });
   // axis
   for(let c=0;c<COLS;c++) g.put(base,c,c%6===0?'+':'-',.8);
-  for(let k=0;k<=B;k+=2){ const v=lo+k*bw; const s=(v>0?'+':'')+v.toFixed(1); g.text(base+1,Math.max(0,k*6-1),s,.7); }
+  for(let k=2;k<=B-2;k+=2){ const v=lo+k*bw; const s=(v>0?'+':'')+v.toFixed(1); g.text(base+1,Math.max(0,k*6-1),s,.7); }
   // pdf curve
   const pts=[];
   for(let c=0;c<COLS;c++){
@@ -269,7 +262,7 @@ EMBLEM['mathematical-foundations-for-ml']=function(g){
   }
   for(let c=0;c<COLS;c++){ const r=Math.round(pts[c])-1; if(r<0||r>=base) continue; const q=g.get(r,c);
     if(q.t<.86) g.put(r,c,'*',.95,1); }
-  return {cap:['x','= randn(420); hist(x, bins=20)   # * marks 420 · 0.25 · pdf(x)']};
+  return {cap:['x','= randn(420); hist(x, bins=20, range=(-2.5, 2.5))   # * = 420 · 0.25 · pdf(x)']};
 };
 
 
@@ -315,7 +308,7 @@ EMBLEM['5d-parallelism']=function(g){
     drawLine(g,...V[m],...V[m2],AX[k],.66,0,isNode); }
   for(let k=0;k<5;k++) drawLine(g,...V[hot],...V[hot^(1<<k)],AX[k],.84,1,isNode);
   node.forEach(([r,c],m)=>g.text(r,c,' '+String(m).padStart(2,'0')+' ',.95,m===hot?1:0));
-  return {cap:['mesh','= init_device_mesh("cuda", (2, 2, 2, 2, 2), ("dp", "pp", "tp", "cp", "ep"))']};
+  return {cap:['mesh','= init_device_mesh("cuda", (2, 2, 2, 2, 2), mesh_dim_names=("dp", "pp", "tp", "cp", "ep"))']};
 };
 
 // Context engineering: packing a finite window
@@ -357,38 +350,38 @@ EMBLEM['ai-context-engineering']=function(g){
 
 // Context compaction: three transcripts squeezed into memory
 EMBLEM['pi-vs-hermes-vs-codex']=function(g){
-  const STOP=new Set('the a an to of that so it is and for in on with can you please we i be this was are as at by from into then now just also there will would could should my our your its which when what'.split(' '));
-  const cw=(w,L)=>{ if(L>=1&&STOP.has(w.toLowerCase().replace(/[^a-z]/g,''))) return null;
-    if(L>=2&&w.length>3) w=w[0]+w.slice(1).replace(/[aeiou]/gi,'');
-    if(L>=3) w=w.slice(0,5); return w; };
   const T=[
-    'user: the build fails on the parser branch, can you take a look? assistant: running the tests first. tool: pytest -q: 3 failed, 41 passed. assistant: the lexer returns bytes where the parser expects str; patching lexer.py and running again. tool: 44 passed. user: great, now make it stream the file instead of loading all of it into memory. assistant: switching read() to an iterator over chunks, with a small carry buffer for tokens split across chunk boundaries. tool: 46 passed, peak memory 38 MB, down from 1.2 GB. user: add a test for a token split exactly at a boundary. assistant: added test_split_token with chunk sizes 1, 2 and 7. tool: 47 passed. user: commit it. assistant: committed as stream the lexer input; 3 files changed.',
-    'user: add retries to the payment webhook handler, it drops events when the ledger is slow. assistant: reading handler.py and the queue config. tool: grep retry: no matches. assistant: adding exponential backoff with jitter, at most five attempts, and an idempotency key so a retried event is never applied twice. tool: 12 passed. user: what happens after the fifth failure? assistant: the event goes to the dead letter queue with the last error attached, and an alert fires. user: and replays? assistant: a replay command reads the dead letter queue in order and reuses the same idempotency keys. tool: 15 passed. user: ship it behind a flag.',
-    'user: the nightly ingest job got slow after yesterday\'s merge, can you profile it? assistant: running it with the profiler on a one percent sample. tool: 71 percent of time in normalize_rows. assistant: the merge replaced a vectorised call with a python loop over every row. restoring the vectorised path and adding a benchmark so it cannot regress silently. tool: sample run 4.1 s, was 58 s. user: why did review miss it? assistant: the diff was large and the loop looked equivalent; the benchmark now fails the build if the sample run exceeds 8 s. user: good, ship it.',
+    ['user: the build fails on the parser branch, can you take a look?','assistant: running the tests first.','tool: pytest -q: 3 failed, 41 passed.','assistant: the lexer returns bytes where the parser expects str; patching lexer.py and running again.','tool: 44 passed.','user: great, now make it stream the file instead of loading all of it into memory.','assistant: switching read() to an iterator over chunks, with a small carry buffer for tokens split across chunk boundaries.','tool: 46 passed, peak memory 38 MB, down from 1.2 GB.','user: add a test for a token split exactly at a boundary.','assistant: added test_split_token with chunk sizes 1, 2 and 7.','tool: 47 passed.'],
+    ['user: add retries to the payment webhook handler, it drops events when the ledger is slow.','assistant: reading handler.py and the queue config.','tool: grep retry: no matches.','assistant: adding exponential backoff with jitter, at most five attempts, and an idempotency key so a retried event is never applied twice.','tool: 12 passed.','user: what happens after the fifth failure?','assistant: the event goes to the dead letter queue with the last error attached, and an alert fires.','user: and replays?','assistant: a replay command reads the dead letter queue in order and reuses the same idempotency keys.','tool: 15 passed.'],
+    ["user: the nightly ingest job got slow after yesterday's merge, can you profile it?",'assistant: running it with the profiler on a one percent sample.','tool: 71 percent of time in normalize_rows.','assistant: the merge replaced a vectorised call with a python loop over every row. restoring the vectorised path and adding a benchmark so it cannot regress silently.','tool: sample run 4.1 s, was 58 s.','user: why did review miss it?','assistant: the diff was large and the loop looked equivalent; the benchmark now fails the build if the sample run exceeds 8 s.','user: good, ship it.'],
   ];
-  const prof=[u=>1-.84*u, u=>1-.84*Math.pow(u,1.7), u=>1-.84*Math.pow(u,.62)];
-  const centers=[20,60,100], W0=38, rows=FR-4;
-  T.forEach((txt,f)=>{
-    const words=txt.split(/\s+/); let wi=0;
-    for(let r=0;r<rows;r++){
-      const u=r/(rows-1), w=Math.max(6,Math.round(W0*prof[f](u)/2)*2), L=Math.min(3,Math.floor(u*4.2));
-      const t=.26+.58*u, c0=centers[f]-w/2;
-      let line='', guard=0;
-      while(guard++<200){
-        const raw=words[wi%words.length]; const x=cw(raw,L); wi++;
-        if(x===null) continue;
-        const add=(line?(L>=3?'·':' '):'')+x;
-        if((line+add).length>w){ if(!line){ line=x.slice(0,w); } else wi--; break; }
-        line+=add;
-      }
-      const pad=w-line.length, lp=Math.floor(pad/2);
-      g.text(r,c0,' '.repeat(lp)+line+' '.repeat(pad-lp),t);
+  const S=[
+    'summary: parser tests failed because the lexer returned bytes where the parser expects str; fixed in lexer.py, 44 passed. input is now streamed through a chunk iterator with a carry buffer for split tokens: peak memory 38 MB, was 1.2 GB. test_split_token added for chunk sizes 1, 2 and 7; 47 passed. next: commit.',
+    'summary: the webhook handler dropped events when the ledger was slow. added backoff with jitter, at most five attempts, and an idempotency key so no event applies twice; 12 passed. after five failures the event goes to the dead letter queue with its error and an alert fires; replays reuse the keys; 15 passed. next: ship behind a flag.',
+    'summary: the nightly ingest slowed after a merge that swapped a vectorised call in normalize_rows for a python loop (71 percent of time). restored the vectorised path: sample run 4.1 s, was 58 s. a benchmark now fails the build above 8 s, because review missed the loop. user approved shipping.',
+  ];
+  const centers=[20,60,100], W0=36, LIM=27, MEM=FR-4;
+  T.forEach((turns,f)=>{
+    const c0=centers[f]-W0/2; let r=0;
+    for(const t of turns){ if(r>=LIM) break; r+=g.flow(r,c0,LIM,c0+W0,t,.56); }
+    // the trigger
+    const lab=' context limit ', dash='- '.repeat(W0).slice(0,W0), at=Math.floor((W0-lab.length)/2);
+    g.text(LIM,c0,dash.slice(0,at)+lab+dash.slice(at+lab.length),.84);
+    // older turns rewritten as a summary, narrowing into memory
+    const words=S[f].split(' '); let wi=0; const rows=MEM-LIM-2;
+    for(let i=0;i<rows&&wi<words.length;i++){
+      const u=i/(rows-1), w=Math.max(8,Math.round(W0*(1-.78*u)/2)*2);
+      let line='';
+      while(wi<words.length&&(line?line.length+1:0)+words[wi].length<=w){ line+=(line?' ':'')+words[wi]; wi++; }
+      if(!line){ line=words[wi].slice(0,w); wi++; }
+      const lp=Math.floor((W0-line.length)/2);
+      g.text(LIM+2+i,c0+lp,line,.72+.18*u);
     }
     const mw=8, mc=centers[f]-mw/2;
-    g.fill(rows,mc,FR,mc+mw,' ',.95,1);
-    g.text(rows+1,mc+1,'MEMORY',.95,1);
+    g.fill(MEM,mc,FR,mc+mw,' ',.95,1);
+    g.text(MEM+1,mc+1,'MEMORY',.95,1);
   });
-  return {cap:['ctx','= compact(history) if tokens(history) > limit else history']};
+  return {cap:['ctx','= [summarize(old_turns)] + recent_turns if tokens(ctx) > limit else ctx']};
 };
 
 // Decision tree on the real iris data: depth-3 CART on petal length x width.
@@ -482,11 +475,11 @@ EMBLEM['charlie-language-room']=function(g){
   }
   // axis
   for(let c=x0;c<=x1;c++) g.put(base,c,(c-x0)%Math.round((x1-x0)/12)===0?'+':'-',.8);
-  [1,4,16,64,256,1024,4096].forEach(I=>{ const s=String(I); g.text(base+1,col(I)-Math.floor(s.length/2),s,.7); });
+  [1,4,16,64,256,1024,4096].forEach(I=>{ const s=String(I); g.text(base+1,Math.min(114-s.length,Math.max(6,col(I)-Math.floor(s.length/2))),s,.7); });
   g.text(base+2,x1-24,'FLOP / byte  (log2)',.62);
-  g.text(8,x0,'TFLOP/s',.62);
+  g.text(8,6,'TFLOP/s',.62);
   // operating points
-  const pt=(I,label,s)=>{ const c=col(I), r=rowOf(Math.min(PEAK,BW*I)); g.text(r-2,Math.min(COLS-4-label.length,Math.max(4,c-Math.floor(label.length/2))),label,.95,s); g.put(r-1,c,'|',.95,s); };
+  const pt=(I,label,s)=>{ const c=col(I), r=rowOf(Math.min(PEAK,BW*I)); g.text(r-2,Math.min(114-label.length,Math.max(6,c-Math.floor(label.length/2))),label,.95,s); g.put(r-1,c,'|',.95,s); };
   pt(1,' decode b=1 ',0); pt(8,' b=8 ',0); pt(64,' b=64 ',0); pt(295,' ridge 295 ',1); pt(2048,' prefill 2k tok ',0);
   return {cap:['tflops','= min(989, 3.35 * intensity)   # H100 roofline: decode is memory-bound']};
 };
@@ -494,61 +487,69 @@ EMBLEM['charlie-language-room']=function(g){
 // II · Vision room: an eye, cut into patches
 EMBLEM['charlie-vision-room']=function(g){
   seriesBand(g,1);
-  const cx=360, cy=5*CH+282;
-  const f=(x,y)=>{
-    const dx=(x-cx)/330, u=Math.abs(dx);
-    const up=cy-165*(1-dx*dx)*(1-.12*dx), lo=cy+118*(1-dx*dx)*(1+.05*dx);
-    const brow=cy-218+ (dx*dx)*70 - 12*dx;
-    let t=.17;
-    if(Math.abs(y-brow)<16-10*u && u<.95) t=.92;
+  // a 36 x 32 px image of an eye; every byte is a pixel's luminance (00 = black, ff = white)
+  const cx=360, cy=272;
+  const lum=(x,y)=>{
+    const dx=(x-cx)/335, u=Math.abs(dx);
+    const up=cy-150*(1-dx*dx)*(1-.12*dx), lo=cy+108*(1-dx*dx)*(1+.05*dx);
+    const brow=cy-196+(dx*dx)*64-12*dx;
+    let L=.8-.08*Math.abs((y-cy)/250);
+    if(Math.abs(y-brow)<15-9*u && u<.95) L=.3;
     if(u<1 && y>up && y<lo){
-      t=.02;
-      const d=Math.hypot(x-cx,y-(cy-10));
-      if(d<138){ const th=Math.atan2(y-cy,x-cx); t=.66+.16*Math.sin(th*19)+.16*(d/138); }
-      if(d>126&&d<138) t=.95;
-      if(d<58) t=.97;
-      if(Math.hypot(x-(cx+34),y-(cy-46))<17) t=.0;
+      L=.93-.25*Math.max(0,1-(y-up)/40);
+      const d=Math.hypot(x-cx,y-(cy-8));
+      if(d<128){ const th=Math.atan2(y-cy,x-cx); L=.42+.13*Math.sin(th*19)-.14*(d/128); }
+      if(d>=116&&d<128) L=.1;
+      if(d<50) L=.02;
+      if(Math.hypot(x-(cx+30),y-(cy-40))<15) L=1;
     }
-    if(u<1.03 && y<=up && y>up-18+8*u) t=.97;
-    if(u<1 && y>=lo && y<lo+8) t=.62;
-    return t;
+    if(u<1.03 && y<=up && y>up-17+8*u) L=.04;
+    if(u<1 && y>=lo && y<lo+7) L=.5;
+    return clamp(L);
   };
-  const PW=9, PH=5, c0=2, r0=5;
-  const hot=[4,8];
-  for(let pi=0;pi<9;pi++)for(let pj=0;pj<13;pj++){
+  const PW=10, PH=5, c0=1, r0=5, hot=[3,7];
+  for(let pi=0;pi<8;pi++)for(let pj=0;pj<12;pj++){
     const isHot=pi===hot[0]&&pj===hot[1];
     for(let rr=0;rr<4;rr++)for(let v=0;v<3;v++){
       const r=r0+pi*PH+rr, c=c0+pj*PW+v*3;
-      const t=f((c+1)*CW,(r+.5)*CH), b=Math.round(clamp(t)*255).toString(16).padStart(2,'0');
-      const cell=(v<2?b+' ':b.slice(0,2)), tt=t>=.86?.95:t<.06?.03:.14+t*.7;
-      g.text(r,c,cell,isHot?Math.max(.45,tt):tt,isHot?1:0);
+      const L=lum((c+1)*CW,(r+.5)*CH), byte=Math.round(L*255), ink=1-byte/255;
+      const tt=ink>=.86?.95:ink<.08?.03:ink;
+      g.text(r,c,byte.toString(16).padStart(2,'0'),isHot?Math.max(.45,tt):tt,isHot?1:0);
     }
   }
-  return {cap:['tokens','= patchify(img, 16) @ W_embed + pos   # 13 x 9 patches -> 117 tokens']};
+  // the sequence the transformer actually reads
+  const k=hot[0]*12+hot[1];
+  const seq=['[CLS]','p0','p1','p2','p3','p4','p5','...',`p${k-2}`,`p${k-1}`,`p${k}`,`p${k+1}`,`p${k+2}`,'...','p93','p94','p95'];
+  let c=6; g.text(47,c,'x =',.62); c+=4;
+  seq.forEach(t=>{ const on=t===`p${k}`, cls=t==='[CLS]';
+    if(on||cls) g.text(47,c,' '+t+' ',.95,on?1:0); else g.text(47,c,' '+t+' ',t==='...'?.5:.8);
+    c+=t.length+3; });
+  g.text(48,6+4+7*0,'',.5);
+  return {cap:['x','= [CLS] + patches(img, 4 x 3 px) @ W_embed + pos   # 36 x 32 px -> 12 x 8 = 96 patches -> 97 tokens']};
 };
 
 // III · Sound room: a user turn and an agent turn, each column made of the letter being spoken
 EMBLEM['charlie-sound-room']=function(g){
   seriesBand(g,2);
-  const mid=28, amp=20, R=rng(8);
+  const mid=28, amp=20, R=rng(8); // 40 ms per column
   const turn=(txt,c0,c1,s)=>{
-    const dur=[...txt].map(ch=>/[aeiou]/.test(ch)?1.6:/[a-z]/.test(ch)?1:ch===' '?.7:.5);
-    const tot=dur.reduce((a,b)=>a+b,0), sc=(c1-c0)/tot; let x=c0; const cols=[];
-    [...txt].forEach((ch,i)=>{ const w=dur[i]*sc; for(let c=Math.round(x);c<Math.round(x+w);c++) cols.push([c,ch]); x+=w; });
+    const ch=[...txt], vow=ch.map(x=>/[aeiou]/.test(x)?1:0), nv=vow.reduce((a,b)=>a+b,0), extra=(c1-c0)-ch.length;
+    let k=0; const w=ch.map((x,i)=>{ if(!vow[i]) return 1; const b0=Math.round(k*extra/nv); k++; return 1+Math.round(k*extra/nv)-b0; });
+    const cols=[]; let c=c0; ch.forEach((x,i)=>{ for(let n=0;n<w[i];n++) cols.push([c++,x]); });
     let prev=0;
-    cols.forEach(([c,ch],i)=>{
-      const base=/[aeiou]/.test(ch)?.95:/[mnlrwy]/.test(ch)?.62:/[a-z]/.test(ch)?.42:/[?.,]/.test(ch)?.05:.08;
-      const a=.55*base+.45*prev; prev=base;
+    cols.forEach(([c,x],i)=>{
+      const base=/[aeiou]/.test(x)?.95:/[mnlrwy]/.test(x)?.62:/[a-z]/.test(x)?.42:0;
+      if(!base){ prev=0; g.put(mid,c,x===' '?'-':x,.5,s); return; }   // silence between words
+      const a=.6*base+.4*prev; prev=base;
       const h=Math.max(0,Math.round(amp*a*(.8+.3*R())*Math.min(1,(i+2)/5,(cols.length-i+1)/5)));
-      for(let dr=-h;dr<=h;dr++){ const t=Math.abs(dr)<=h*.45?.95:.7-.3*Math.abs(dr)/(h+1); g.put(mid+dr,c,ch,t,s); }
-      if(h===0) g.put(mid,c,'-',.4,s);
+      for(let dr=-h;dr<=h;dr++){ const t=Math.abs(dr)<=h*.45?.95:.7-.3*Math.abs(dr)/(h+1); g.put(mid+dr,c,x,t,s); }
     });
   };
   for(let c=0;c<COLS;c++) g.put(mid,c,'-',.3);
-  turn('can you move my dentist appointment to friday?',2,58,0);
-  turn('sure. friday at ten is free. shall i book it?',65,118,1);
-  g.text(49,2,' USER  0.0-2.4 s ',.95); g.text(49,58,'240 ms',.7); g.text(49,65,' AGENT  2.6-4.9 s ',.95,1);
-  return {cap:['reply','= tts(llm(asr(mic)))   # user turn · 240 ms · agent turn']};
+  turn('can you move my dentist appointment to friday?',2,61,0);
+  turn('sure. friday at ten is free. shall i book it?',67,118,1);
+  g.text(49,6,' USER  0.00-2.36 s ',.95); g.text(49,61,'240 ms',.7); g.text(49,67,' AGENT  2.60-4.64 s ',.95,1);
+  return {cap:['reply','= tts(llm(asr(mic)))   # user turn · 240 ms · agent turn · 40 ms per column']};
 };
 
 // IV · Reasoning room: sampled chains of thought, rewarded by the answer
@@ -559,7 +560,7 @@ EMBLEM['charlie-reasoning-room']=function(g){
             ['20x24 - 3x24',['480 - 72','408'],['480 - 62','418']],
             ['17x25 - 17',['425 - 17','408'],['425 - 7','418']],
             ['10x24 + 7x24',['240 + 168','408'],['240 + 148','388']]];
-  const X=[15,45,75,105], R0=7, R1=17, R2=28, R3=37, R4=43;
+  const X=[16,45,74,103], R0=7, R1=17, R2=28, R3=37, R4=43;
   const chip=(r,x,t,tone,s)=>{ const w=t.length+2; g.text(r,x-Math.floor(w/2),' '+t+' ',tone,s); };
   const vline=(c,r0,r1,s)=>{ for(let r=r0;r<=r1;r++){ g.put(r,c,' ',.95,s?1:0); g.put(r,c+1,' ',.95,s?1:0); } };
   const hline=(r,c0,c1,s)=>{ for(let c=Math.min(c0,c1);c<=Math.max(c0,c1)+1;c++) g.put(r,c,' ',.95,s?1:0); };
@@ -569,9 +570,9 @@ EMBLEM['charlie-reasoning-room']=function(g){
   X.forEach((x,i)=>vline(x,R0+6,R1-1,i===HOT[0]));
   L1.forEach((a,i)=>{
     const x=X[i], hot=i===HOT[0];
-    vline(x,R1+1,R1+4,hot); hline(R1+5,x-7,x+7,0); if(hot) hline(R1+5,x-7,x,1);
+    vline(x,R1+1,R1+4,hot); hline(R1+5,x-6,x+6,0); if(hot) hline(R1+5,x-6,x,1);
     [a[1],a[2]].forEach((ch,j)=>{
-      const cx=x+(j?7:-7), h=hot&&j===HOT[1], ok=ch[1]==='408';
+      const cx=x+(j?6:-6), h=hot&&j===HOT[1], ok=ch[1]==='408';
       vline(cx,R1+6,R2-1,h); chip(R2,cx,ch[0],.95,h?1:0);
       vline(cx,R2+1,R3-1,h); chip(R3,cx,ch[1],ok?.95:.6,h?1:0);
       vline(cx,R3+1,R4-1,h); chip(R4,cx,ok?'+1':'0',ok?.95:.6,h?1:0);
@@ -579,7 +580,7 @@ EMBLEM['charlie-reasoning-room']=function(g){
     chip(R1,x,a[0],.95,hot?1:0);
   });
   chip(R0,60,'Q: 17 x 24 = ?',.95,1);
-  g.text(47,2,'reward = 1 if answer == 408 else 0   ·   advantage = reward - mean(group)',.62);
+  g.text(47,6,'reward = 1 if answer == 408 else 0   ·   advantage = reward - mean(group)',.62);
   return {cap:['loss','= -(advantage * logprob(chain)).mean()   # sample a group, reinforce the right ones']};
 };
 
@@ -590,25 +591,25 @@ const BOOKS=[
   {slug:'neural-networks-from-scratch', desc:'A 40 × 51 hex dump of a handwritten seven — one byte of ink per pixel — and the ten-way softmax a small network returns for it.', level:'beginner', meta:'33 capsules · 7 h',
    title:[['Neural Networks','from Scratch'],6]},
   {slug:'mathematical-foundations-for-ml', desc:'420 draws from N(0, 1), every sample printed in its own bin; the selected asterisks trace the density the histogram converges to.', level:'beginner', meta:'43 capsules · 10 h',
-   title:[['Mathematical','Foundations for','Machine Learning'],5]},
+   title:[['Mathematical','Foundations','for Machine Learning'],5]},
   {slug:'5d-parallelism', desc:"The 2×2×2×2×2 device mesh drawn as what it is, a 5-cube: 32 ranks, 80 links, each link spelled with its axis (dp, pp, tp, cp, ep). Rank 00's five process groups are selected.", level:'advanced', meta:'40 capsules · 9 h',
-   title:[['5D Parallelism','for Large Model','Training'],5]},
+   title:[['5D Parallelism for','Large Model Training'],5]},
   {slug:'ai-context-engineering', desc:"A 128k-token window packed with system prompt, tool schemas, retrieved docs, memory and history; the user's question selected, 594 tokens spare, one document left outside.", level:'intermediate', meta:'43 capsules · 10 h',
    title:[['AI Context','Engineering'],6]},
   {slug:'pi-vs-hermes-vs-codex', desc:'Three agent transcripts squeezed through compaction — stop-words go, then vowels, then whole words — until each lands in memory.', level:'advanced', meta:'9 capsules · 1 h',
    title:[['Pi vs Hermes','vs Codex:'],5,['Context Compaction and Memory']]},
   {slug:'decision-trees-from-scratch', desc:'Iris, petal length × petal width, split to depth 3. Every leaf is textured with its own decision rule; the root split is selected.', level:'beginner', meta:'23 capsules · 5 h',
-   title:[['Build Decision','Trees from Scratch'],5]},
+   title:[['Build Decision Trees','from Scratch'],5]},
   {slug:'kernel-engineering', desc:'One step of a tiled GEMM in fp16: row-tile i of A and column-tile j of B stream through; the selected tiles are this k-step and the accumulator. Coming soon: the cursor is hollow.', level:'advanced', meta:'coming soon', soon:true,
    title:[['Kernel','Engineering'],6,['From silicon to speculative decoding —','GPU kernels for modern LLMs.'],2.4]},
   {slug:'charlie-language-room', desc:'The H100 roofline, min(989 TFLOP/s, 3.35 TB/s × intensity). Every row under the roof names its own throughput; decode sits on the slope, prefill on the flat.', level:'advanced', meta:'22 capsules · 5 h',
-   title:[['Charlie and the','Language Room'],5,['Inference Engineering']]},
+   title:[['Charlie and','the Language Room'],5,['Inference Engineering']]},
   {slug:'charlie-vision-room', desc:'An eye, as bytes, cut into 13 × 9 patches — the 117 tokens a Vision Transformer sees. One patch selected.', level:'intermediate', meta:'20 capsules · 6 h',
-   title:[['Charlie and the','Vision Room'],5,['Vision Transformers']]},
+   title:[['Charlie and','the Vision Room'],5,['Vision Transformers']]},
   {slug:'charlie-sound-room', desc:'A user turn and an agent turn as waveforms. Each column is built from the letter being spoken, so the centre line reads the transcript.', level:'intermediate', meta:'20 capsules · 6 h',
-   title:[['Charlie and the','Sound Room'],5,['Voice Agents']]},
+   title:[['Charlie and','the Sound Room'],5,['Voice Agents']]},
   {slug:'charlie-reasoning-room', desc:'A group of eight sampled chains for 17 × 24; the ones that reach 408 score +1. The chain being reinforced is selected.', level:'advanced', meta:'21 capsules · 6 h',
-   title:[['Charlie and the','Reasoning Room'],5,['Reinforcement Learning,','from bandits to reasoning models']]},
+   title:[['Charlie and','the Reasoning Room'],5,['Reinforcement Learning,','from bandits to reasoning models']]},
 ];
 const PROMPT={beginner:'>',intermediate:'$',advanced:'#'};
 
@@ -620,12 +621,10 @@ function build(b){
   const M=6, T0=56;
   const [lines,k,sub,sk=3]=b.title, TX=15;
   let r=T0;
-  const line=(txt,kk,cls)=>{ parts.push(`<div class="tl ${cls||''}" data-k="${kk}" style="left:${TX*CW}px;top:${(r*CH).toFixed(1)}px;font-size:${kk*10}px;line-height:${(kk*CH).toFixed(1)}px">${esc(txt)}</div>`); r+=kk; };
-  lines.forEach(ln=>line(ln,k));
-  if(sub){ r+=1; sub.forEach(ln=>line(ln,sk,'sub')); }
+  const line=(txt,kk,cls,cur)=>{ parts.push(`<div class="tl ${cls||''}" style="left:${TX*CW}px;top:${(r*CH).toFixed(1)}px;font-size:${kk*10}px;line-height:${(kk*CH).toFixed(1)}px">${esc(txt)}${cur?`<i class="cur${b.soon?' soon':''}"></i>`:''}</div>`); r+=kk; };
+  lines.forEach((ln,i)=>line(ln,k,'',i===lines.length-1));
+  if(sub){ r+=1; sub.forEach(ln=>line(ln,sk,'sub',false)); }
   parts.push(`<div class="pr" style="left:${M*CW}px;top:${(T0*CH).toFixed(1)}px;font-size:50px;line-height:${(k*CH).toFixed(1)}px">${esc(PROMPT[b.level])}</div>`);
-  // cursor: measured after fonts load
-  parts.push(`<div class="cur${b.soon?' soon':''}"></div>`);
   if(info.cap) parts.push(`<div class="cap" style="left:${M*CW}px;top:${(52.5*CH).toFixed(1)}px"><b>${esc(info.cap[0])}</b> ${esc(info.cap[1])}</div>`);
   parts.push(`<div class="foot im" style="left:${M*CW}px;top:${(76*CH).toFixed(1)}px">VIZUARA BOOKS<i></i></div>`);
   parts.push(`<div class="foot" style="right:${M*CW}px;top:${(76*CH).toFixed(1)}px"><b>${esc(PROMPT[b.level])}</b> ${b.level.toUpperCase()}  ·  ${esc(b.meta.toUpperCase())}</div>`);
@@ -732,18 +731,5 @@ print(p.round(3))    # a seven, like the one on the front`.split('\n');
   wrap.appendChild(back); wrap.appendChild(spine); wrap.appendChild(front);
 })();
 
-// place cursors after the last title line, using real glyph metrics
-document.fonts.ready.then(()=>{
-  document.querySelectorAll('.cover, .front').forEach(cv=>{
-    const tls=cv.querySelectorAll('.tl'), last=tls[tls.length-1], cur=cv.querySelector('.cur');
-    const k=+last.dataset.k, fs=k*10;
-    const x=last.offsetLeft+last.getBoundingClientRect().width;
-    const lh=k*CH, top=last.offsetTop;
-    cur.style.left=(x+fs*.18).toFixed(1)+'px';
-    cur.style.width=(fs*.5).toFixed(1)+'px';
-    cur.style.top=(top+lh/2-fs*.36).toFixed(1)+'px';
-    cur.style.height=(fs*.74).toFixed(1)+'px';
-  });
-});
 </script>
 </body></html>
