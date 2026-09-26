@@ -48,7 +48,7 @@ for d in sorted(p for p in ROOT.iterdir() if p.is_dir() and re.match(r"\d\d-", p
         "palette": m.get("palette") or palette(notes),
         "page": f"{d.name}/index.html",
         "covers": [{"slug": s, "src": f"{d.name}/renders/{s}.jpg"} for s in slugs],
-        "has_wrap": bool(list(renders.glob("_wrap*.jpg"))) if renders.exists() else False,
+        "wraps": [f"{d.name}/renders/{p.name}" for p in sorted(renders.glob("_wrap*.jpg"))] if renders.exists() else [],
     })
 
 before = [{"slug": p.stem, "src": f"_shared/before/{p.name}"}

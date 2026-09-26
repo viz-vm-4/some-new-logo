@@ -643,7 +643,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:'Anek Latin',
 
   // Partition walls — a decision tree as a courtyard split by ever-lower walls (root split tallest)
   SCENES.partition = (hr) => {
-    const cam = CAM({ az: 0, s: 0.86, ox: 372, el: 36 });
+    const cam = CAM({ az: 0, s: 0.8, ox: 318, el: 36 });
     const S = new Scene(); ground(S, hr, cam); S.E = frame(cam, -24);
     const t = 14, cap = 5;
     const wallY = (x, y0, y1, h) => { S.box(x - t / 2, y0, 0, x + t / 2, y1, h, { mat: hr.stone }); S.box(x - t / 2 - 1.5, y0, h, x + t / 2 + 1.5, y1, h + cap, { mat: hr.marble }); };
@@ -658,7 +658,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:'Anek Latin',
     wallY(-180, Y0, yl - t / 2, H[2]); wallY(-130, yl + t / 2, Y1, H[2]); wallY(150, Y0, yr - t / 2, H[2]); wallY(100, yr + t / 2, Y1, H[2]);
     // leaves: one block per cell, two classes
     const cells = [[X0, -180, Y0, yl, 1], [-180, xr, Y0, yl, 0], [X0, -130, yl, Y1, 0], [-130, xr, yl, Y1, 1], [xr, 150, Y0, yr, 0], [150, X1, Y0, yr, 1], [xr, 100, yr, Y1, 1], [100, X1, yr, Y1, 0]];
-    for (const [a, b, cc, d, k] of cells) { const x = (a + b) / 2, y = (cc + d) / 2, r = 20; S.box(x - r, y - r, 0, x + r, y + r, 2 * r, { mat: k ? hr.marble : hr.stone }); }
+    for (const [a, b, cc, d, k] of cells) { const x = (a + b) / 2, y = (cc + d) / 2, r = 24; S.box(x - r, y - r, 0, x + r, y + r, 2 * r, { mat: k ? hr.marble : hr.stone }); }
     return { S, cam, L: sunRel(cam, 22, 44) };
   };
 
@@ -676,15 +676,14 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:'Anek Latin',
     S.box(bx0 + 22, ym - sp / 2, 0, bx1 - 22, ym + sp / 2, H, { mat: hr.stone });
     const per = 6, fl = n / per, frun = (bx1 - bx0 - 44) / per;
     for (let f = 0; f < fl; f++) {
-      const dir = f % 2 ? -1 : 1, ya = f % 2 ? ym + sp / 2 : by0, yb = f % 2 ? by1 : ym - sp / 2;
+      const dir = f % 2 ? -1 : 1, ya = f % 2 ? ym + sp / 2 : by0, yb = f % 2 ? by1 : ym - sp / 2, zb = f * per * rs;
       for (let k = 0; k < per; k++) {
         const z = (f * per + k + 1) * rs; const xs = dir > 0 ? bx0 + 22 + k * frun : bx1 - 22 - (k + 1) * frun;
-        S.box(xs, ya, z - th, xs + frun, yb, z, { mat: hr.stone });
+        S.box(xs, ya, zb, xs + frun, yb, z, { mat: hr.stone });
       }
       const zl = (f + 1) * per * rs, xl = dir > 0 ? bx1 - 22 : bx0;
-      S.box(xl, by0, zl - th, xl + 22, by1, zl, { mat: hr.stone });
+      S.box(xl, by0, zb, xl + 22, by1, zl, { mat: hr.stone });
     }
-    S.box(bx0, by0, 0, bx0 + 22, by0 + 10, 0.01 + 0, { mat: hr.stone });
     // spiral: central column and wedge treads
     const cx = 170, cy = 180, r0 = 12, r1 = 66, seg = 16;
     const colPts = []; for (let i = 0; i < 16; i++) { const a = i / 16 * 2 * Math.PI; colPts.push(S.W(cx + r0 * Math.cos(a), cy + r0 * Math.sin(a), 0)); }
@@ -732,7 +731,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:'Anek Latin',
     const el = document.createElement('div');
     el.className = 'cover lv-' + b.level; el.dataset.slug = b.slug;
     el.style.setProperty('--sky', hr.sky); el.style.setProperty('--ink', hr.ink); el.style.setProperty('--sub', hr.sub);
-    const stats = b.soon ? 'Coming soon' : `${b.capsules} capsules · ${b.hours} hours`;
+    const stats = b.soon ? 'Coming soon' : `${b.capsules} capsules · ${b.hours} ${b.hours === 1 ? 'hour' : 'hours'}`;
     el.innerHTML = `<svg class="art" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><rect width="${W}" height="${H}" fill="${hr.sky}"/>${art}${extra}<rect x="0" y="806" width="${W}" height="${H - 806}" fill="${hr.cut.flat}"/></svg>
       <h2 class="title">${b.title.join('<br>')}</h2>
       <div class="band">

@@ -1,0 +1,333 @@
+<title>Vizuara Cover Proofs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  /* A print proofing booth: covers are judged against a neutral grey surround (≈ Munsell N8),
+     so the page itself carries no hue and the covers bring all the colour. */
+  :root {
+    --bg: #C9C9C5;
+    --panel: #D6D6D2;
+    --ink: #161615;
+    --ink-2: #44443F;
+    --rule: #9A9A94;
+    --mark: #2A2A27;
+    --chip-on-bg: #161615;
+    --chip-on-ink: #EDEDE8;
+    --shadow: 0 1px 2px rgba(0,0,0,.18), 0 8px 24px rgba(0,0,0,.12);
+    --display: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    --w: 260px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #2C2C2A; --panel: #363633; --ink: #ECECE7; --ink-2: #B0B0AA; --rule: #5C5C57;
+      --mark: #C8C8C2; --chip-on-bg: #ECECE7; --chip-on-ink: #1B1B1A;
+      --shadow: 0 1px 2px rgba(0,0,0,.5), 0 10px 28px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #2C2C2A; --panel: #363633; --ink: #ECECE7; --ink-2: #B0B0AA; --rule: #5C5C57;
+    --mark: #C8C8C2; --chip-on-bg: #ECECE7; --chip-on-ink: #1B1B1A;
+    --shadow: 0 1px 2px rgba(0,0,0,.5), 0 10px 28px rgba(0,0,0,.35);
+  }
+
+  body { background: var(--bg); color: var(--ink); font: 400 15px/1.55 var(--display); }
+  .wrap { max-width: 1480px; margin: 0 auto; padding-inline: clamp(16px, 4vw, 48px); padding-block: 0 96px; }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+  /* Masthead */
+  .mast { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px 48px; align-items: end;
+          padding-block: 56px 32px; border-bottom: 2px solid var(--ink); }
+  .eyebrow { font: 500 12px/1.4 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); margin: 0 0 14px; }
+  h1 { font: 800 clamp(40px, 7vw, 88px)/.92 var(--display); letter-spacing: -.035em; margin: 0; text-wrap: balance; }
+  .lede { max-width: 62ch; margin: 18px 0 0; font-size: 17px; color: var(--ink-2); text-wrap: pretty; }
+  .facts { display: grid; grid-template-columns: repeat(3, auto); gap: 4px 28px; margin: 0; }
+  .facts dt { font: 500 11px/1.3 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+  .facts dd { margin: 0; font: 700 36px/1 var(--display); font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+  .facts div { display: flex; flex-direction: column-reverse; gap: 6px; }
+
+  /* Control bar */
+  .bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg);
+         display: flex; flex-wrap: wrap; gap: 12px 28px; align-items: center; padding-block: 14px; border-bottom: 1px solid var(--rule); }
+  .seg { display: inline-flex; border: 1.5px solid var(--ink); border-radius: 999px; overflow: hidden; }
+  .seg button { font: 500 13px/1 var(--display); padding: 9px 14px; border: 0; background: transparent; color: var(--ink); cursor: pointer; white-space: nowrap; }
+  .seg button + button { border-left: 1.5px solid var(--ink); }
+  .seg button[aria-pressed="true"] { background: var(--chip-on-bg); color: var(--chip-on-ink); }
+  .bar .label { font: 500 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); margin-right: 8px; }
+  .bar .group { display: flex; align-items: center; }
+  .jump { display: flex; flex-wrap: wrap; gap: 6px 14px; padding-block: 14px 0; font: 500 13px/1.3 var(--display); }
+  .jump a { text-decoration: none; color: var(--ink-2); }
+  .jump a:hover { color: var(--ink); text-decoration: underline; }
+  .jump b { font: 500 11px var(--mono); margin-right: 5px; color: var(--ink-2); }
+
+  /* Current covers strip */
+  .before { display: grid; grid-template-columns: minmax(0, 220px) minmax(0, 1fr); gap: 24px; padding-block: 36px; border-bottom: 1px solid var(--rule); align-items: start; }
+  .before h2 { font: 700 20px/1.2 var(--display); margin: 0 0 8px; }
+  .before p { margin: 0; color: var(--ink-2); font-size: 14px; }
+  .before ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 14px; }
+  .before img { width: 118px; height: auto; aspect-ratio: 720 / 888; object-fit: cover; display: block; border-radius: 6px; }
+
+  /* Direction sections */
+  .dir { padding-block: 56px 8px; border-bottom: 1px solid var(--rule); scroll-margin-top: 72px; }
+  .dir-head { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px 22px; align-items: start; margin-bottom: 28px; }
+  .num { font: 500 13px/1 var(--mono); border: 1.5px solid var(--ink); border-radius: 999px; padding: 7px 10px; margin-top: 6px; font-variant-numeric: tabular-nums; }
+  .dir h2 { font: 800 clamp(26px, 3.4vw, 40px)/1.02 var(--display); letter-spacing: -.025em; margin: 0; text-wrap: balance; }
+  .dir .pitch { max-width: 70ch; margin: 10px 0 0; color: var(--ink-2); text-wrap: pretty; }
+  .dir .side { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
+  .swatches { display: flex; gap: 0; border: 1px solid var(--rule); }
+  .swatches span { width: 22px; height: 22px; display: block; }
+  .open { font: 500 13px/1.2 var(--display); text-decoration: none; border-bottom: 1.5px solid currentColor; padding-bottom: 2px; white-space: nowrap; }
+  .open:hover { opacity: .7; }
+
+  /* Proof grid with printer's crop marks */
+  .grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(var(--w), 100%), var(--w))); gap: 30px 26px; justify-content: start; }
+  .proof { margin: 0; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+  .crop { --m: 11px; --c: var(--mark); padding: var(--m); display: block; width: 100%; border: 0; cursor: zoom-in; background-color: transparent;
+    background-image:
+      linear-gradient(var(--c),var(--c)), linear-gradient(var(--c),var(--c)),
+      linear-gradient(var(--c),var(--c)), linear-gradient(var(--c),var(--c)),
+      linear-gradient(var(--c),var(--c)), linear-gradient(var(--c),var(--c)),
+      linear-gradient(var(--c),var(--c)), linear-gradient(var(--c),var(--c));
+    background-repeat: no-repeat;
+    background-size: 1px calc(var(--m) - 3px), calc(var(--m) - 3px) 1px, 1px calc(var(--m) - 3px), calc(var(--m) - 3px) 1px,
+                     1px calc(var(--m) - 3px), calc(var(--m) - 3px) 1px, 1px calc(var(--m) - 3px), calc(var(--m) - 3px) 1px;
+    background-position: left var(--m) top 0, left 0 top var(--m), right var(--m) top 0, right 0 top var(--m),
+                         left var(--m) bottom 0, left 0 bottom var(--m), right var(--m) bottom 0, right 0 bottom var(--m); }
+  .crop img { display: block; width: 100%; height: auto; aspect-ratio: 720 / 888; box-shadow: var(--shadow); background: var(--panel); }
+  .cap { padding-inline: 11px; font: 400 13px/1.35 var(--display); color: var(--ink); text-wrap: balance; }
+  .cap small { display: block; font: 400 11px/1.4 var(--mono); letter-spacing: .04em; color: var(--ink-2); margin-top: 2px; }
+  :root[data-size="180"] .cap { font-size: 12px; }
+
+  .wrapfig { margin: 28px 0 0; padding: 0; max-width: 1180px; }
+  .wrapfig button { display: block; width: 100%; padding: 0; border: 0; background: none; cursor: zoom-in; }
+  .wrapfig img { display: block; width: 100%; height: auto; box-shadow: var(--shadow); background: var(--panel); }
+  .wrapfig figcaption { margin-top: 10px; font: 400 11px/1.4 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); }
+
+  /* By-book view */
+  .picker { display: flex; flex-wrap: wrap; gap: 8px; padding-block: 28px 8px; }
+  .picker button { font: 500 13px/1.2 var(--display); padding: 8px 12px; border-radius: 999px; border: 1.5px solid var(--rule); background: transparent; color: var(--ink); cursor: pointer; text-align: left; }
+  .picker button:hover { border-color: var(--ink); }
+  .picker button[aria-pressed="true"] { background: var(--chip-on-bg); color: var(--chip-on-ink); border-color: var(--chip-on-bg); }
+  .picker button b { font: 500 11px var(--mono); opacity: .7; margin-left: 6px; }
+  .picker .sep { flex-basis: 100%; height: 0; }
+  .book-title { font: 800 clamp(28px, 4vw, 52px)/1 var(--display); letter-spacing: -.03em; margin: 24px 0 6px; text-wrap: balance; }
+  .book-sub { font: 500 12px/1.4 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); margin: 0 0 28px; }
+
+  /* Lightbox */
+  dialog { border: 0; padding: 0; background: transparent; max-width: 100vw; max-height: 100vh; width: 100vw; height: 100vh; }
+  dialog::backdrop { background: rgba(20,20,19,.86); }
+  .lb { height: 100%; display: grid; grid-template-rows: minmax(0, 1fr) auto; gap: 14px; padding: 24px 16px 20px; box-sizing: border-box; }
+  .lb figure { margin: 0; display: grid; place-items: center; min-height: 0; }
+  .lb img { max-height: 100%; max-width: 100%; height: auto; width: auto; object-fit: contain; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+  .lb-bar { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; justify-content: center; color: #ECECE7; font: 400 14px/1.3 var(--display); text-align: center; }
+  .lb-bar button, .lb-bar a { font: 500 13px/1 var(--display); color: #ECECE7; background: transparent; border: 1.5px solid #ECECE7; border-radius: 999px; padding: 9px 14px; cursor: pointer; text-decoration: none; }
+  .lb-bar button:hover, .lb-bar a:hover { background: #ECECE7; color: #161615; }
+  .lb-cap small { display: block; font: 400 12px var(--mono); opacity: .75; margin-top: 3px; }
+
+  footer { padding-block: 40px 0; color: var(--ink-2); font-size: 13px; max-width: 80ch; }
+  footer code { font: 400 12px var(--mono); }
+
+  @media (max-width: 760px) {
+    .mast { grid-template-columns: minmax(0, 1fr); padding-block: 36px 24px; }
+    .facts dd { font-size: 28px; }
+    .before { grid-template-columns: minmax(0, 1fr); }
+    .before img { width: 88px; }
+    .dir-head { grid-template-columns: auto minmax(0, 1fr); }
+    .dir .side { grid-column: 1 / -1; flex-direction: row; align-items: center; justify-content: space-between; }
+    .bar { gap: 10px 16px; }
+    .seg button { padding: 8px 11px; font-size: 12px; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .crop img { transition: transform .18s ease; }
+    .crop:hover img { transform: translateY(-3px); }
+  }
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div>
+      <p class="eyebrow">Proof set · 26 September 2026 · trim 7.5 × 9.25 in</p>
+      <h1>Vizuara cover proofs</h1>
+      <p class="lede">Ten designers each built a complete cover system for Vizuara Books, working independently from one brief. Every cover is drawn in code (HTML and SVG, no AI images), so it stays sharp at any print size and exports to a PDF at exact trim. Look through each direction, or pick one book and compare all ten versions side by side.</p>
+    </div>
+    <dl class="facts" id="facts"></dl>
+  </header>
+
+  <nav class="bar" aria-label="View controls">
+    <div class="group"><span class="label">View</span>
+      <div class="seg" role="group" aria-label="View">
+        <button type="button" id="v-dir" data-view="dir" aria-pressed="true">By direction</button>
+        <button type="button" id="v-book" data-view="book" aria-pressed="false">Same book, every direction</button>
+      </div>
+    </div>
+    <div class="group"><span class="label">Size</span>
+      <div class="seg" role="group" aria-label="Cover size">
+        <button type="button" id="s-180" data-size="180" aria-pressed="false">Thumbnail</button>
+        <button type="button" id="s-260" data-size="260" aria-pressed="true">Shelf</button>
+        <button type="button" id="s-420" data-size="420" aria-pressed="false">Proof</button>
+      </div>
+    </div>
+  </nav>
+
+  <section class="before" aria-labelledby="before-h">
+    <div>
+      <h2 id="before-h">Covers in use today</h2>
+      <p>The template these proposals replace, shown for reference.</p>
+    </div>
+    <ul id="before"></ul>
+  </section>
+
+  <main id="view"></main>
+
+  <footer>
+    Each direction folder holds the designer's own presentation page, 2× PNG renders, vector PDFs at trim, and a NOTES.md with palette, type and the reasoning behind every emblem. Rebuild this page with <code>python3 tools/build_gallery.py</code>.
+  </footer>
+</div>
+
+<dialog id="lb" aria-label="Cover preview">
+  <div class="lb">
+    <figure><img id="lb-img" alt=""></figure>
+    <div class="lb-bar">
+      <button type="button" id="lb-prev" aria-label="Previous cover">← Prev</button>
+      <div class="lb-cap" id="lb-cap"></div>
+      <button type="button" id="lb-next" aria-label="Next cover">Next →</button>
+      <a id="lb-open" href="#">Designer's page</a>
+      <button type="button" id="lb-close">Close</button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+const DATA = {"books": {"ai-context-engineering": {"title": "AI Context Engineering", "level": "intermediate", "series": null}, "mathematical-foundations-for-ml": {"title": "Mathematical Foundations for Machine Learning", "level": "beginner", "series": null}, "neural-networks-from-scratch": {"title": "Neural Networks from Scratch", "level": "beginner", "series": null}, "build-llms-from-scratch": {"title": "Build Large Language Models (LLMs) from Scratch", "level": "intermediate", "series": null}, "5d-parallelism": {"title": "5D Parallelism for Large Model Training", "level": "advanced", "series": null}, "pi-vs-hermes-vs-codex": {"title": "Pi vs Hermes vs Codex: Context Compaction and Memory", "level": "advanced", "series": null}, "deepseek-harness": {"title": "DeepSeek Harness", "level": "advanced", "series": null}, "how-to-host-kimi-k3": {"title": "How to Host Kimi K3", "level": "advanced", "series": null}, "machine-learning-fundamentals": {"title": "Machine Learning Fundamentals", "level": "beginner", "series": null}, "pretraining-mini-kimi-k3": {"title": "Pretraining a Mini Kimi K3", "level": "advanced", "series": null}, "prompt-engineering": {"title": "Prompt Engineering", "level": "beginner", "series": null}, "python-for-data-science": {"title": "Python for Data Science", "level": "beginner", "series": null}, "rag-in-production": {"title": "RAG in Production", "level": "intermediate", "series": null}, "decision-trees-from-scratch": {"title": "Build Decision Trees from Scratch", "level": "beginner", "series": null}, "deep-learning-fundamentals": {"title": "Deep Learning Fundamentals", "level": "beginner", "series": null}, "foundations-for-ai-ml": {"title": "Foundations for AI & ML", "level": "beginner", "series": null}, "generative-ai-fundamentals": {"title": "Generative AI Fundamentals", "level": "beginner", "series": null}, "git-github-masterclass": {"title": "Git & GitHub Masterclass", "level": "beginner", "series": null}, "modern-software-developer": {"title": "The Modern Software Developer", "level": "beginner", "series": null}, "r-masterclass": {"title": "R Masterclass", "level": "beginner", "series": null}, "sql-masterclass": {"title": "SQL Masterclass", "level": "beginner", "series": null}, "ai-agents-bootcamp": {"title": "AI Agents Bootcamp", "level": "intermediate", "series": null}, "claude-certified-architect": {"title": "Claude Certified Architect (CCAF)", "level": "intermediate", "series": null}, "cnn-fundamentals": {"title": "Convolutional Neural Networks Fundamentals", "level": "intermediate", "series": null}, "computer-vision-bootcamp": {"title": "Computer Vision Bootcamp", "level": "intermediate", "series": null}, "dsa-in-python": {"title": "Data Structures & Algorithms in Python", "level": "intermediate", "series": null}, "llm-finetuning": {"title": "LLM Finetuning", "level": "intermediate", "series": null}, "llm-production-deployment": {"title": "LLM Production & Deployment", "level": "intermediate", "series": null}, "memory-in-ai-systems": {"title": "Memory in AI Systems", "level": "intermediate", "series": null}, "mini-clawdbot": {"title": "Build a Mini ClawdBot from Scratch", "level": "intermediate", "series": null}, "ml-dl-mastery": {"title": "Machine Learning & Deep Learning Mastery", "level": "intermediate", "series": null}, "nlp-cv-mastery": {"title": "NLP & Computer Vision Mastery", "level": "intermediate", "series": null}, "reinforcement-learning": {"title": "Reinforcement Learning", "level": "intermediate", "series": null}, "transformers-from-scratch": {"title": "Transformers: Theory, Intuition, and Building from Scratch", "level": "intermediate", "series": null}, "vit-from-scratch": {"title": "Build a Vision Transformer (ViT) from Scratch", "level": "intermediate", "series": null}, "writing-papers": {"title": "Writing Journal & Conference Papers", "level": "intermediate", "series": null}, "deit-from-scratch": {"title": "Build a Data-Efficient Image Transformer (DeiT) from Scratch", "level": "advanced", "series": null}, "diffusion-lm-from-scratch": {"title": "Build a Diffusion Language Model from Scratch", "level": "advanced", "series": null}, "kimi-k3-from-scratch": {"title": "Build Kimi K3 from Scratch", "level": "advanced", "series": null}, "modern-robot-learning": {"title": "Modern Robot Learning", "level": "advanced", "series": null}, "nanovlm-from-scratch": {"title": "Build a NanoVLM from Scratch", "level": "advanced", "series": null}, "rlhf-from-scratch": {"title": "RLHF from Scratch", "level": "advanced", "series": null}, "sciml": {"title": "Scientific Machine Learning (SciML)", "level": "advanced", "series": null}, "transformers-vision-multimodal": {"title": "Transformers for Vision & Multimodal LLMs", "level": "advanced", "series": null}, "vla-world-models": {"title": "Vision-Language-Action & World Models for Robotics", "level": "advanced", "series": null}, "charlie-language-room": {"title": "Charlie and the Language Room", "level": "advanced", "series": "Charlie and the Intelligence Factory"}, "charlie-vision-room": {"title": "Charlie and the Vision Room", "level": "intermediate", "series": "Charlie and the Intelligence Factory"}, "charlie-sound-room": {"title": "Charlie and the Sound Room", "level": "intermediate", "series": "Charlie and the Intelligence Factory"}, "charlie-reasoning-room": {"title": "Charlie and the Reasoning Room", "level": "advanced", "series": "Charlie and the Intelligence Factory"}, "harness-engineering": {"title": "Harness Engineering", "level": "advanced", "series": null}, "kernel-engineering": {"title": "Kernel Engineering", "level": "advanced", "series": null}, "inference-engineering": {"title": "Inference Engineering", "level": "advanced", "series": null}}, "core": ["ai-context-engineering", "mathematical-foundations-for-ml", "neural-networks-from-scratch", "build-llms-from-scratch", "5d-parallelism", "pi-vs-hermes-vs-codex"], "directions": [{"id": "01-grid", "num": "01", "name": "Figure/Ground", "pitch": "One 12 × 15 module grid, one typeface and three inks for every book. Level picks the ground (paper, signal red, black), so a shelf reads as a gradient of difficulty. Each book stands one figure built from squares, circles and bars on that grid, taken from its own mechanism: a GPT's causal mask, a 5D device mesh, an ODE direction field. A notched bookmark ribbon is the imprint, and its length also encodes level.", "palette": ["#F3F2EE", "#DC2A1E", "#141414", "#E6E5E1"], "page": "01-grid/index.html", "covers": [{"slug": "ai-context-engineering", "src": "01-grid/renders/ai-context-engineering.jpg"}, {"slug": "mathematical-foundations-for-ml", "src": "01-grid/renders/mathematical-foundations-for-ml.jpg"}, {"slug": "neural-networks-from-scratch", "src": "01-grid/renders/neural-networks-from-scratch.jpg"}, {"slug": "build-llms-from-scratch", "src": "01-grid/renders/build-llms-from-scratch.jpg"}, {"slug": "5d-parallelism", "src": "01-grid/renders/5d-parallelism.jpg"}, {"slug": "pi-vs-hermes-vs-codex", "src": "01-grid/renders/pi-vs-hermes-vs-codex.jpg"}, {"slug": "machine-learning-fundamentals", "src": "01-grid/renders/machine-learning-fundamentals.jpg"}, {"slug": "rag-in-production", "src": "01-grid/renders/rag-in-production.jpg"}, {"slug": "decision-trees-from-scratch", "src": "01-grid/renders/decision-trees-from-scratch.jpg"}, {"slug": "git-github-masterclass", "src": "01-grid/renders/git-github-masterclass.jpg"}, {"slug": "diffusion-lm-from-scratch", "src": "01-grid/renders/diffusion-lm-from-scratch.jpg"}, {"slug": "sciml", "src": "01-grid/renders/sciml.jpg"}, {"slug": "vla-world-models", "src": "01-grid/renders/vla-world-models.jpg"}, {"slug": "charlie-language-room", "src": "01-grid/renders/charlie-language-room.jpg"}, {"slug": "charlie-vision-room", "src": "01-grid/renders/charlie-vision-room.jpg"}, {"slug": "charlie-sound-room", "src": "01-grid/renders/charlie-sound-room.jpg"}, {"slug": "charlie-reasoning-room", "src": "01-grid/renders/charlie-reasoning-room.jpg"}, {"slug": "kernel-engineering", "src": "01-grid/renders/kernel-engineering.jpg"}, {"slug": "git-v", "src": "01-grid/renders/git-v.jpg"}], "wraps": []}, {"id": "02-plates", "num": "02", "name": "Specimen Plates", "pitch": "Every book is a numbered plate in one atlas of machine learning: a single engraved specimen of its actual mechanism, lettered a, b, c with an italic legend, the way Gray or Haeckel documented theirs. The drawings are computed, not decorated (descent paths integrated on the real surface, the real 2⁵ device mesh). Paper tone gives level: sage, Ingres blue, sanguine. Everything prints as one spot tint plus black.", "palette": ["#15171C", "#FBF8F0", "#9FB7A4", "#9EB1C7", "#C68D79"], "page": "02-plates/index.html", "covers": [{"slug": "ai-context-engineering", "src": "02-plates/renders/ai-context-engineering.jpg"}, {"slug": "mathematical-foundations-for-ml", "src": "02-plates/renders/mathematical-foundations-for-ml.jpg"}, {"slug": "neural-networks-from-scratch", "src": "02-plates/renders/neural-networks-from-scratch.jpg"}, {"slug": "build-llms-from-scratch", "src": "02-plates/renders/build-llms-from-scratch.jpg"}, {"slug": "5d-parallelism", "src": "02-plates/renders/5d-parallelism.jpg"}, {"slug": "pi-vs-hermes-vs-codex", "src": "02-plates/renders/pi-vs-hermes-vs-codex.jpg"}, {"slug": "decision-trees-from-scratch", "src": "02-plates/renders/decision-trees-from-scratch.jpg"}, {"slug": "transformers-from-scratch", "src": "02-plates/renders/transformers-from-scratch.jpg"}, {"slug": "charlie-language-room", "src": "02-plates/renders/charlie-language-room.jpg"}, {"slug": "charlie-vision-room", "src": "02-plates/renders/charlie-vision-room.jpg"}, {"slug": "charlie-sound-room", "src": "02-plates/renders/charlie-sound-room.jpg"}, {"slug": "charlie-reasoning-room", "src": "02-plates/renders/charlie-reasoning-room.jpg"}, {"slug": "harness-engineering", "src": "02-plates/renders/harness-engineering.jpg"}], "wraps": []}, {"id": "03-pelican", "num": "03", "name": "Halcyon", "pitch": "Mid-century paperback method (Tschichold's bands, Marber's grid, Facetti's abstract science covers) without the pastiche. Every cover has the same three bands: title on paper, a black level strip, and a flat colour field holding one abstract emblem of the book's mechanism. Field colour is the level (yellow, green, ultramarine), and signal red marks the idea.", "palette": ["#F2EEE4", "#1C1B19", "#C9352B", "#EEC232", "#D6A81D", "#63B384", "#4C9C6C"], "page": "03-pelican/index.html", "covers": [{"slug": "ai-context-engineering", "src": "03-pelican/renders/ai-context-engineering.jpg"}, {"slug": "mathematical-foundations-for-ml", "src": "03-pelican/renders/mathematical-foundations-for-ml.jpg"}, {"slug": "neural-networks-from-scratch", "src": "03-pelican/renders/neural-networks-from-scratch.jpg"}, {"slug": "build-llms-from-scratch", "src": "03-pelican/renders/build-llms-from-scratch.jpg"}, {"slug": "5d-parallelism", "src": "03-pelican/renders/5d-parallelism.jpg"}, {"slug": "pi-vs-hermes-vs-codex", "src": "03-pelican/renders/pi-vs-hermes-vs-codex.jpg"}, {"slug": "rag-in-production", "src": "03-pelican/renders/rag-in-production.jpg"}, {"slug": "decision-trees-from-scratch", "src": "03-pelican/renders/decision-trees-from-scratch.jpg"}, {"slug": "sql-masterclass", "src": "03-pelican/renders/sql-masterclass.jpg"}, {"slug": "transformers-from-scratch", "src": "03-pelican/renders/transformers-from-scratch.jpg"}, {"slug": "deit-from-scratch", "src": "03-pelican/renders/deit-from-scratch.jpg"}, {"slug": "charlie-language-room", "src": "03-pelican/renders/charlie-language-room.jpg"}, {"slug": "charlie-vision-room", "src": "03-pelican/renders/charlie-vision-room.jpg"}, {"slug": "charlie-sound-room", "src": "03-pelican/renders/charlie-sound-room.jpg"}, {"slug": "charlie-reasoning-room", "src": "03-pelican/renders/charlie-reasoning-room.jpg"}, {"slug": "kernel-engineering", "src": "03-pelican/renders/kernel-engineering.jpg"}], "wraps": []}, {"id": "04-drafting", "num": "04", "name": "Drawing Office", "pitch": "Every book is issued as an engineering drawing of the machine it teaches you to build. The brand lives in the title block: drawing number, level stamped in ink squares, capsules and hours as the extent, units (“Tokens”, “GPUs”), and Vizuara as the issuing office. Each cover uses a different real drafting view (section, isometric, detail, break) on one paper, one graphite and one engineering-red ink.", "palette": ["#EBEAE4", "#1F2123", "#474B4F", "#8A8E91", "#D0381B"], "page": "04-drafting/index.html", "covers": [{"slug": "ai-context-engineering", "src": "04-drafting/renders/ai-context-engineering.jpg"}, {"slug": "mathematical-foundations-for-ml", "src": "04-drafting/renders/mathematical-foundations-for-ml.jpg"}, {"slug": "neural-networks-from-scratch", "src": "04-drafting/renders/neural-networks-from-scratch.jpg"}, {"slug": "build-llms-from-scratch", "src": "04-drafting/renders/build-llms-from-scratch.jpg"}, {"slug": "5d-parallelism", "src": "04-drafting/renders/5d-parallelism.jpg"}, {"slug": "pi-vs-hermes-vs-codex", "src": "04-drafting/renders/pi-vs-hermes-vs-codex.jpg"}, {"slug": "decision-trees-from-scratch", "src": "04-drafting/renders/decision-trees-from-scratch.jpg"}, {"slug": "charlie-language-room", "src": "04-drafting/renders/charlie-language-room.jpg"}, {"slug": "charlie-vision-room", "src": "04-drafting/renders/charlie-vision-room.jpg"}, {"slug": "charlie-sound-room", "src": "04-drafting/renders/charlie-sound-room.jpg"}, {"slug": "charlie-reasoning-room", "src": "04-drafting/renders/charlie-reasoning-room.jpg"}, {"slug": "kernel-engineering", "src": "04-drafting/renders/kernel-engineering.jpg"}], "wraps": []}, {"id": "05-algorithmic", "num": "05", "name": "Figure 0", "pitch": "Every cover is one run of the book's own algorithm, computed in the page from a seed. Gradient descent draws the maths book, a network trained in the browser draws Neural Networks, and a simulated pipeline schedule draws 5D Parallelism. The FIG. 0 caption states exactly what ran, with numbers read back from that run. Ground darkens with level: paper, signal red, carbon.", "palette": ["#EEEDE7", "#D8372B", "#141518", "#ECEAE3", "#96968F", "#9C2A21", "#5E5F63"], "page": "05-algorithmic/index.html", "covers": [{"slug": "ai-context-engineering", "src": "05-algorithmic/renders/ai-context-engineering.jpg"}, {"slug": "mathematical-foundations-for-ml", "src": "05-algorithmic/renders/mathematical-foundations-for-ml.jpg"}, {"slug": "neural-networks-from-scratch", "src": "05-algorithmic/renders/neural-networks-from-scratch.jpg"}, {"slug": "build-llms-from-scratch", "src": "05-algorithmic/renders/build-llms-from-scratch.jpg"}, {"slug": "5d-parallelism", "src": "05-algorithmic/renders/5d-parallelism.jpg"}, {"slug": "pi-vs-hermes-vs-codex", "src": "05-algorithmic/renders/pi-vs-hermes-vs-codex.jpg"}, {"slug": "decision-trees-from-scratch", "src": "05-algorithmic/renders/decision-trees-from-scratch.jpg"}, {"slug": "git-github-masterclass", "src": "05-algorithmic/renders/git-github-masterclass.jpg"}, {"slug": "sciml", "src": "05-algorithmic/renders/sciml.jpg"}, {"slug": "charlie-language-room", "src": "05-algorithmic/renders/charlie-language-room.jpg"}, {"slug": "charlie-vision-room", "src": "05-algorithmic/renders/charlie-vision-room.jpg"}, {"slug": "charlie-sound-room", "src": "05-algorithmic/renders/charlie-sound-room.jpg"}, {"slug": "charlie-reasoning-room", "src": "05-algorithmic/renders/charlie-reasoning-room.jpg"}, {"slug": "kernel-engineering", "src": "05-algorithmic/renders/kernel-engineering.jpg"}], "wraps": []}, {"id": "06-letterform", "num": "06", "name": "Codepoint", "pitch": "One book, one character. Each title gets a single glyph from its own subject (∂ for the maths, σ for neural networks, ≈ for context compaction, QKᵀ for transformers), set monumental and cropped above a fixed rule, with the title hung below like a type-specimen caption. Level is how much ink the cover carries: bare paper, ultramarine, then black.", "palette": ["#F1EDE4", "#2233C8", "#121212", "#3548EE"], "page": "06-letterform/index.html", "covers": [{"slug": "ai-context-engineering", "src": "06-letterform/renders/ai-context-engineering.jpg"}, {"slug": "mathematical-foundations-for-ml", "src": "06-letterform/renders/mathematical-foundations-for-ml.jpg"}, {"slug": "neural-networks-from-scratch", "src": "06-letterform/renders/neural-networks-from-scratch.jpg"}, {"slug": "build-llms-from-scratch", "src": "06-letterform/renders/build-llms-from-scratch.jpg"}, {"slug": "5d-parallelism", "src": "06-letterform/renders/5d-parallelism.jpg"}, {"slug": "pi-vs-hermes-vs-codex", "src": "06-letterform/renders/pi-vs-hermes-vs-codex.jpg"}, {"slug": "python-for-data-science", "src": "06-letterform/renders/python-for-data-science.jpg"}, {"slug": "decision-trees-from-scratch", "src": "06-letterform/renders/decision-trees-from-scratch.jpg"}, {"slug": "r-masterclass", "src": "06-letterform/renders/r-masterclass.jpg"}, {"slug": "transformers-from-scratch", "src": "06-letterform/renders/transformers-from-scratch.jpg"}, {"slug": "diffusion-lm-from-scratch", "src": "06-letterform/renders/diffusion-lm-from-scratch.jpg"}, {"slug": "rlhf-from-scratch", "src": "06-letterform/renders/rlhf-from-scratch.jpg"}, {"slug": "charlie-language-room", "src": "06-letterform/renders/charlie-language-room.jpg"}, {"slug": "charlie-vision-room", "src": "06-letterform/renders/charlie-vision-room.jpg"}, {"slug": "charlie-sound-room", "src": "06-letterform/renders/charlie-sound-room.jpg"}, {"slug": "charlie-reasoning-room", "src": "06-letterform/renders/charlie-reasoning-room.jpg"}, {"slug": "kernel-engineering", "src": "06-letterform/renders/kernel-engineering.jpg"}], "wraps": []}, {"id": "07-riso", "num": "07", "name": "Overprint", "pitch": "Every book looks pulled off a risograph: natural paper, two or three real riso inks that overprint, halftone screens made in code, and drums slightly out of register. The idea usually lives where the inks cross: the overprint is the GEMM output tile, the SQL join, the part of the context the model actually sees. Level is a ski-run mark (circle, square, diamond) in the key ink.", "palette": ["#F4F0E6", "#407060", "#3D5588", "#232121", "#FFB511", "#FFE800", "#FF48B0"], "page": "07-riso/index.html", "covers": [{"slug": "ai-context-engineering", "src": "07-riso/renders/ai-context-engineering.jpg"}, {"slug": "mathematical-foundations-for-ml", "src": "07-riso/renders/mathematical-foundations-for-ml.jpg"}, {"slug": "neural-networks-from-scratch", "src": "07-riso/renders/neural-networks-from-scratch.jpg"}, {"slug": "build-llms-from-scratch", "src": "07-riso/renders/build-llms-from-scratch.jpg"}, {"slug": "5d-parallelism", "src": "07-riso/renders/5d-parallelism.jpg"}, {"slug": "pi-vs-hermes-vs-codex", "src": "07-riso/renders/pi-vs-hermes-vs-codex.jpg"}, {"slug": "machine-learning-fundamentals", "src": "07-riso/renders/machine-learning-fundamentals.jpg"}, {"slug": "sql-masterclass", "src": "07-riso/renders/sql-masterclass.jpg"}, {"slug": "reinforcement-learning", "src": "07-riso/renders/reinforcement-learning.jpg"}, {"slug": "deit-from-scratch", "src": "07-riso/renders/deit-from-scratch.jpg"}, {"slug": "charlie-language-room", "src": "07-riso/renders/charlie-language-room.jpg"}, {"slug": "charlie-vision-room", "src": "07-riso/renders/charlie-vision-room.jpg"}, {"slug": "charlie-sound-room", "src": "07-riso/renders/charlie-sound-room.jpg"}, {"slug": "charlie-reasoning-room", "src": "07-riso/renders/charlie-reasoning-room.jpg"}, {"slug": "kernel-engineering", "src": "07-riso/renders/kernel-engineering.jpg"}], "wraps": []}, {"id": "08-clothbound", "num": "08", "name": "08 — Buckram: the Vizuara bindery edition", "pitch": "", "palette": ["#5B1A24", "#3F1C42", "#9A2F20", "#6A1C3C", "#C68F1F", "#515C27", "#0F4E58"], "page": "08-clothbound/index.html", "covers": [{"slug": "ai-context-engineering", "src": "08-clothbound/renders/ai-context-engineering.jpg"}, {"slug": "mathematical-foundations-for-ml", "src": "08-clothbound/renders/mathematical-foundations-for-ml.jpg"}, {"slug": "neural-networks-from-scratch", "src": "08-clothbound/renders/neural-networks-from-scratch.jpg"}, {"slug": "build-llms-from-scratch", "src": "08-clothbound/renders/build-llms-from-scratch.jpg"}, {"slug": "5d-parallelism", "src": "08-clothbound/renders/5d-parallelism.jpg"}, {"slug": "pi-vs-hermes-vs-codex", "src": "08-clothbound/renders/pi-vs-hermes-vs-codex.jpg"}, {"slug": "decision-trees-from-scratch", "src": "08-clothbound/renders/decision-trees-from-scratch.jpg"}, {"slug": "sql-masterclass", "src": "08-clothbound/renders/sql-masterclass.jpg"}, {"slug": "deit-from-scratch", "src": "08-clothbound/renders/deit-from-scratch.jpg"}, {"slug": "charlie-language-room", "src": "08-clothbound/renders/charlie-language-room.jpg"}, {"slug": "charlie-vision-room", "src": "08-clothbound/renders/charlie-vision-room.jpg"}, {"slug": "charlie-sound-room", "src": "08-clothbound/renders/charlie-sound-room.jpg"}, {"slug": "charlie-reasoning-room", "src": "08-clothbound/renders/charlie-reasoning-room.jpg"}, {"slug": "kernel-engineering", "src": "08-clothbound/renders/kernel-engineering.jpg"}], "wraps": []}, {"id": "09-atlas", "num": "09", "name": "Interchange", "pitch": "Each book is a Beck/Vignelli transit map of its own subject. Its parts are the lines and each capsule is one tick, checked against the real capsule counts, so the 69-capsule DSA book coils into a long spiral while the 9-capsule book is tiny. The key at the foot doubles as a table of contents. Beginner and intermediate books are pale day maps, advanced books are dark night maps.", "palette": ["#F3EFE6", "#15181D", "#16181B", "#EEEAE0", "#4B4D51", "#A6A8AB", "#E3DDCF"], "page": "09-atlas/index.html", "covers": [{"slug": "ai-context-engineering", "src": "09-atlas/renders/ai-context-engineering.jpg"}, {"slug": "mathematical-foundations-for-ml", "src": "09-atlas/renders/mathematical-foundations-for-ml.jpg"}, {"slug": "neural-networks-from-scratch", "src": "09-atlas/renders/neural-networks-from-scratch.jpg"}, {"slug": "build-llms-from-scratch", "src": "09-atlas/renders/build-llms-from-scratch.jpg"}, {"slug": "5d-parallelism", "src": "09-atlas/renders/5d-parallelism.jpg"}, {"slug": "pi-vs-hermes-vs-codex", "src": "09-atlas/renders/pi-vs-hermes-vs-codex.jpg"}, {"slug": "decision-trees-from-scratch", "src": "09-atlas/renders/decision-trees-from-scratch.jpg"}, {"slug": "git-github-masterclass", "src": "09-atlas/renders/git-github-masterclass.jpg"}, {"slug": "dsa-in-python", "src": "09-atlas/renders/dsa-in-python.jpg"}, {"slug": "charlie-language-room", "src": "09-atlas/renders/charlie-language-room.jpg"}, {"slug": "charlie-vision-room", "src": "09-atlas/renders/charlie-vision-room.jpg"}, {"slug": "charlie-sound-room", "src": "09-atlas/renders/charlie-sound-room.jpg"}, {"slug": "charlie-reasoning-room", "src": "09-atlas/renders/charlie-reasoning-room.jpg"}, {"slug": "inference-engineering", "src": "09-atlas/renders/inference-engineering.jpg"}], "wraps": []}, {"id": "10-wildcard", "num": "10", "name": "Some Assembly Required", "pitch": "Vizuara is a library for building things, and half its titles end in “from Scratch”, so every book is a model kit. Each emblem is an injection-moulded parts tree (a sprue) built from the book's own mechanism: an H-tree runner feeding 32 GPUs for 5D Parallelism, weights as runners for Neural Networks. Card colour and skill-level pips show level, plastic colour shows series, and kit numbers VZ-001 to VZ-052 make the shelf collectable.", "palette": ["#EEE8DC", "#A4A39B", "#C49D63", "#171717", "#3A2219", "#D8402A", "#2F57D3"], "page": "10-wildcard/index.html", "covers": [{"slug": "ai-context-engineering", "src": "10-wildcard/renders/ai-context-engineering.jpg"}, {"slug": "mathematical-foundations-for-ml", "src": "10-wildcard/renders/mathematical-foundations-for-ml.jpg"}, {"slug": "neural-networks-from-scratch", "src": "10-wildcard/renders/neural-networks-from-scratch.jpg"}, {"slug": "build-llms-from-scratch", "src": "10-wildcard/renders/build-llms-from-scratch.jpg"}, {"slug": "5d-parallelism", "src": "10-wildcard/renders/5d-parallelism.jpg"}, {"slug": "pi-vs-hermes-vs-codex", "src": "10-wildcard/renders/pi-vs-hermes-vs-codex.jpg"}, {"slug": "decision-trees-from-scratch", "src": "10-wildcard/renders/decision-trees-from-scratch.jpg"}, {"slug": "r-masterclass", "src": "10-wildcard/renders/r-masterclass.jpg"}, {"slug": "cnn-fundamentals", "src": "10-wildcard/renders/cnn-fundamentals.jpg"}, {"slug": "deit-from-scratch", "src": "10-wildcard/renders/deit-from-scratch.jpg"}, {"slug": "modern-robot-learning", "src": "10-wildcard/renders/modern-robot-learning.jpg"}, {"slug": "charlie-language-room", "src": "10-wildcard/renders/charlie-language-room.jpg"}, {"slug": "charlie-vision-room", "src": "10-wildcard/renders/charlie-vision-room.jpg"}, {"slug": "charlie-sound-room", "src": "10-wildcard/renders/charlie-sound-room.jpg"}, {"slug": "charlie-reasoning-room", "src": "10-wildcard/renders/charlie-reasoning-room.jpg"}, {"slug": "kernel-engineering", "src": "10-wildcard/renders/kernel-engineering.jpg"}], "wraps": []}, {"id": "11-kolam", "num": "11", "name": "Pulli", "pitch": "Every book gets a Tamil sikku kolam computed from the book itself. There is one dot (pulli) per capsule, laid out in the shape of the subject, and a single line weaves around them under the real kolam rules (45° runs, turns at the borders, never touching a dot, always closing). A real mirror-curve engine finds the turns: 5D Parallelism closes as five lines, Pi vs Hermes vs Codex as three. The ground gives level: ink on notebook paper, rice flour on red-oxide kaavi, rice flour on dark earth.", "palette": ["#F4EFE4", "#EEE7D7", "#1A1815", "#8A3120", "#1D1B17", "#D2603F"], "page": "11-kolam/index.html", "covers": [{"slug": "ai-context-engineering", "src": "11-kolam/renders/ai-context-engineering.jpg"}, {"slug": "mathematical-foundations-for-ml", "src": "11-kolam/renders/mathematical-foundations-for-ml.jpg"}, {"slug": "neural-networks-from-scratch", "src": "11-kolam/renders/neural-networks-from-scratch.jpg"}, {"slug": "build-llms-from-scratch", "src": "11-kolam/renders/build-llms-from-scratch.jpg"}, {"slug": "5d-parallelism", "src": "11-kolam/renders/5d-parallelism.jpg"}, {"slug": "pi-vs-hermes-vs-codex", "src": "11-kolam/renders/pi-vs-hermes-vs-codex.jpg"}, {"slug": "prompt-engineering", "src": "11-kolam/renders/prompt-engineering.jpg"}, {"slug": "r-masterclass", "src": "11-kolam/renders/r-masterclass.jpg"}, {"slug": "dsa-in-python", "src": "11-kolam/renders/dsa-in-python.jpg"}, {"slug": "deit-from-scratch", "src": "11-kolam/renders/deit-from-scratch.jpg"}, {"slug": "charlie-language-room", "src": "11-kolam/renders/charlie-language-room.jpg"}, {"slug": "charlie-vision-room", "src": "11-kolam/renders/charlie-vision-room.jpg"}, {"slug": "charlie-sound-room", "src": "11-kolam/renders/charlie-sound-room.jpg"}, {"slug": "charlie-reasoning-room", "src": "11-kolam/renders/charlie-reasoning-room.jpg"}, {"slug": "kernel-engineering", "src": "11-kolam/renders/kernel-engineering.jpg"}], "wraps": []}, {"id": "12-blockprint", "num": "12", "name": "Chhaap (छाप): a block-printed cover system for Vizuara Books", "pitch": "", "palette": ["#EAE1CC", "#9B2F25", "#1C2A4A", "#201B19", "#C8962C"], "page": "12-blockprint/index.html", "covers": [{"slug": "ai-context-engineering", "src": "12-blockprint/renders/ai-context-engineering.jpg"}, {"slug": "mathematical-foundations-for-ml", "src": "12-blockprint/renders/mathematical-foundations-for-ml.jpg"}, {"slug": "neural-networks-from-scratch", "src": "12-blockprint/renders/neural-networks-from-scratch.jpg"}, {"slug": "build-llms-from-scratch", "src": "12-blockprint/renders/build-llms-from-scratch.jpg"}, {"slug": "5d-parallelism", "src": "12-blockprint/renders/5d-parallelism.jpg"}, {"slug": "pi-vs-hermes-vs-codex", "src": "12-blockprint/renders/pi-vs-hermes-vs-codex.jpg"}, {"slug": "decision-trees-from-scratch", "src": "12-blockprint/renders/decision-trees-from-scratch.jpg"}, {"slug": "cnn-fundamentals", "src": "12-blockprint/renders/cnn-fundamentals.jpg"}, {"slug": "transformers-from-scratch", "src": "12-blockprint/renders/transformers-from-scratch.jpg"}, {"slug": "diffusion-lm-from-scratch", "src": "12-blockprint/renders/diffusion-lm-from-scratch.jpg"}, {"slug": "charlie-language-room", "src": "12-blockprint/renders/charlie-language-room.jpg"}, {"slug": "charlie-vision-room", "src": "12-blockprint/renders/charlie-vision-room.jpg"}, {"slug": "charlie-sound-room", "src": "12-blockprint/renders/charlie-sound-room.jpg"}, {"slug": "charlie-reasoning-room", "src": "12-blockprint/renders/charlie-reasoning-room.jpg"}, {"slug": "kernel-engineering", "src": "12-blockprint/renders/kernel-engineering.jpg"}], "wraps": []}, {"id": "13-miniature", "num": "13", "name": "Muraqqa", "pitch": "Every cover is a folio from one Mughal album (a muraqqa) with its page architecture held fixed. The coloured margin (hashiya) and the number of gold, vermilion and black rules (jadval) give the level, and a lobed cartouche carries the title. The central miniature is a flat, jewel-toned diagram of the book's real mechanism, such as the causal mask, the 5D device mesh or the paged KV cache, painted in the Basohli manner. A shamsa rosette is the imprint.", "palette": ["#E4A42E", "#1E6A52", "#243B8C", "#CF3B22", "#8C1F35", "#E7B09C", "#9DBBD0"], "page": "13-miniature/index.html", "covers": [{"slug": "ai-context-engineering", "src": "13-miniature/renders/ai-context-engineering.jpg"}, {"slug": "mathematical-foundations-for-ml", "src": "13-miniature/renders/mathematical-foundations-for-ml.jpg"}, {"slug": "neural-networks-from-scratch", "src": "13-miniature/renders/neural-networks-from-scratch.jpg"}, {"slug": "build-llms-from-scratch", "src": "13-miniature/renders/build-llms-from-scratch.jpg"}, {"slug": "5d-parallelism", "src": "13-miniature/renders/5d-parallelism.jpg"}, {"slug": "pi-vs-hermes-vs-codex", "src": "13-miniature/renders/pi-vs-hermes-vs-codex.jpg"}, {"slug": "sql-masterclass", "src": "13-miniature/renders/sql-masterclass.jpg"}, {"slug": "deit-from-scratch", "src": "13-miniature/renders/deit-from-scratch.jpg"}, {"slug": "charlie-language-room", "src": "13-miniature/renders/charlie-language-room.jpg"}, {"slug": "charlie-vision-room", "src": "13-miniature/renders/charlie-vision-room.jpg"}, {"slug": "charlie-sound-room", "src": "13-miniature/renders/charlie-sound-room.jpg"}, {"slug": "charlie-reasoning-room", "src": "13-miniature/renders/charlie-reasoning-room.jpg"}, {"slug": "kernel-engineering", "src": "13-miniature/renders/kernel-engineering.jpg"}], "wraps": []}, {"id": "14-bombay", "num": "14", "name": "Signboard", "pitch": "Every book is lettered like a Bombay shop board and labelled like a Sivakasi matchbox. The title is set in Board Block, a display alphabet built in SVG for this system (coal keyline, split cream-over-chrome fill, red inline, block shadow), widened or narrowed to fill the board as sign-painters do. A matchbox label carries one object from the book's mechanism. Board colour marks the shelf, a perforated stamp marks level, and the imprint runs in Latin and Devanagari at equal size, as Maharashtra's shop-sign rule requires.", "palette": ["#F3B21B", "#CF2A1E", "#6D1A24", "#0E6641", "#1F3A93", "#11837E", "#16120F"], "page": "14-bombay/index.html", "covers": [{"slug": "ai-context-engineering", "src": "14-bombay/renders/ai-context-engineering.jpg"}, {"slug": "mathematical-foundations-for-ml", "src": "14-bombay/renders/mathematical-foundations-for-ml.jpg"}, {"slug": "neural-networks-from-scratch", "src": "14-bombay/renders/neural-networks-from-scratch.jpg"}, {"slug": "build-llms-from-scratch", "src": "14-bombay/renders/build-llms-from-scratch.jpg"}, {"slug": "5d-parallelism", "src": "14-bombay/renders/5d-parallelism.jpg"}, {"slug": "pi-vs-hermes-vs-codex", "src": "14-bombay/renders/pi-vs-hermes-vs-codex.jpg"}, {"slug": "rag-in-production", "src": "14-bombay/renders/rag-in-production.jpg"}, {"slug": "sql-masterclass", "src": "14-bombay/renders/sql-masterclass.jpg"}, {"slug": "deit-from-scratch", "src": "14-bombay/renders/deit-from-scratch.jpg"}, {"slug": "vla-world-models", "src": "14-bombay/renders/vla-world-models.jpg"}, {"slug": "charlie-language-room", "src": "14-bombay/renders/charlie-language-room.jpg"}, {"slug": "charlie-vision-room", "src": "14-bombay/renders/charlie-vision-room.jpg"}, {"slug": "charlie-sound-room", "src": "14-bombay/renders/charlie-sound-room.jpg"}, {"slug": "charlie-reasoning-room", "src": "14-bombay/renders/charlie-reasoning-room.jpg"}, {"slug": "kernel-engineering", "src": "14-bombay/renders/kernel-engineering.jpg"}], "wraps": []}, {"id": "15-jantar", "num": "15", "name": "15-jantar", "pitch": "", "palette": [], "page": "15-jantar/index.html", "covers": [{"slug": "ai-context-engineering", "src": "15-jantar/renders/ai-context-engineering.jpg"}, {"slug": "mathematical-foundations-for-ml", "src": "15-jantar/renders/mathematical-foundations-for-ml.jpg"}, {"slug": "neural-networks-from-scratch", "src": "15-jantar/renders/neural-networks-from-scratch.jpg"}, {"slug": "build-llms-from-scratch", "src": "15-jantar/renders/build-llms-from-scratch.jpg"}, {"slug": "5d-parallelism", "src": "15-jantar/renders/5d-parallelism.jpg"}, {"slug": "pi-vs-hermes-vs-codex", "src": "15-jantar/renders/pi-vs-hermes-vs-codex.jpg"}, {"slug": "decision-trees-from-scratch", "src": "15-jantar/renders/decision-trees-from-scratch.jpg"}, {"slug": "transformers-from-scratch", "src": "15-jantar/renders/transformers-from-scratch.jpg"}, {"slug": "kernel-engineering", "src": "15-jantar/renders/kernel-engineering.jpg"}], "wraps": []}, {"id": "16-wit", "num": "16", "name": "Double Take", "pitch": "One idea per book: a single flat-shape pun, metaphor or figure–ground trick you get in a second, and each has to be technically true. Context engineering is the mark that reads B across and 13 down; a spider spins a neural net; a retriever fetches a document for RAG; trees are drawn upside down, the way computer scientists draw them. One typeface, and three grounds (newsprint, red, black) that give level.", "palette": ["#EFE7D6", "#D5412A", "#1A1817", "#2B4DA8", "#F0B429", "#D6C8AA", "#8FA3DA"], "page": "16-wit/index.html", "covers": [{"slug": "ai-context-engineering", "src": "16-wit/renders/ai-context-engineering.jpg"}, {"slug": "mathematical-foundations-for-ml", "src": "16-wit/renders/mathematical-foundations-for-ml.jpg"}, {"slug": "neural-networks-from-scratch", "src": "16-wit/renders/neural-networks-from-scratch.jpg"}, {"slug": "build-llms-from-scratch", "src": "16-wit/renders/build-llms-from-scratch.jpg"}, {"slug": "5d-parallelism", "src": "16-wit/renders/5d-parallelism.jpg"}, {"slug": "pi-vs-hermes-vs-codex", "src": "16-wit/renders/pi-vs-hermes-vs-codex.jpg"}, {"slug": "pretraining-mini-kimi-k3", "src": "16-wit/renders/pretraining-mini-kimi-k3.jpg"}, {"slug": "python-for-data-science", "src": "16-wit/renders/python-for-data-science.jpg"}, {"slug": "rag-in-production", "src": "16-wit/renders/rag-in-production.jpg"}, {"slug": "decision-trees-from-scratch", "src": "16-wit/renders/decision-trees-from-scratch.jpg"}, {"slug": "llm-finetuning", "src": "16-wit/renders/llm-finetuning.jpg"}, {"slug": "reinforcement-learning", "src": "16-wit/renders/reinforcement-learning.jpg"}, {"slug": "charlie-language-room", "src": "16-wit/renders/charlie-language-room.jpg"}, {"slug": "charlie-vision-room", "src": "16-wit/renders/charlie-vision-room.jpg"}, {"slug": "charlie-sound-room", "src": "16-wit/renders/charlie-sound-room.jpg"}, {"slug": "charlie-reasoning-room", "src": "16-wit/renders/charlie-reasoning-room.jpg"}, {"slug": "kernel-engineering", "src": "16-wit/renders/kernel-engineering.jpg"}, {"slug": "inference-engineering", "src": "16-wit/renders/inference-engineering.jpg"}], "wraps": []}, {"id": "17-optical", "num": "17", "name": "Interference", "pitch": "Every book is one field of black lines plus one spot colour, and the book's own idea is the force that bends them: a Gaussian swells them, a causal mask turns them, compaction squeezes them, attention makes two ring systems interfere. At 180px each field averages into one bold emblem; in the hand it shimmers. Line pitch gives level: coarse for beginner, fine for advanced.", "palette": ["#121212", "#F4F2EC", "#E2371D", "#2A3BD4", "#00906A", "#6A36CF", "#F2BD00"], "page": "17-optical/index.html", "covers": [{"slug": "ai-context-engineering", "src": "17-optical/renders/ai-context-engineering.jpg"}, {"slug": "mathematical-foundations-for-ml", "src": "17-optical/renders/mathematical-foundations-for-ml.jpg"}, {"slug": "neural-networks-from-scratch", "src": "17-optical/renders/neural-networks-from-scratch.jpg"}, {"slug": "build-llms-from-scratch", "src": "17-optical/renders/build-llms-from-scratch.jpg"}, {"slug": "5d-parallelism", "src": "17-optical/renders/5d-parallelism.jpg"}, {"slug": "pi-vs-hermes-vs-codex", "src": "17-optical/renders/pi-vs-hermes-vs-codex.jpg"}, {"slug": "prompt-engineering", "src": "17-optical/renders/prompt-engineering.jpg"}, {"slug": "sql-masterclass", "src": "17-optical/renders/sql-masterclass.jpg"}, {"slug": "transformers-from-scratch", "src": "17-optical/renders/transformers-from-scratch.jpg"}, {"slug": "deit-from-scratch", "src": "17-optical/renders/deit-from-scratch.jpg"}, {"slug": "diffusion-lm-from-scratch", "src": "17-optical/renders/diffusion-lm-from-scratch.jpg"}, {"slug": "charlie-language-room", "src": "17-optical/renders/charlie-language-room.jpg"}, {"slug": "charlie-vision-room", "src": "17-optical/renders/charlie-vision-room.jpg"}, {"slug": "charlie-sound-room", "src": "17-optical/renders/charlie-sound-room.jpg"}, {"slug": "charlie-reasoning-room", "src": "17-optical/renders/charlie-reasoning-room.jpg"}, {"slug": "kernel-engineering", "src": "17-optical/renders/kernel-engineering.jpg"}], "wraps": []}, {"id": "19-terminal", "num": "19", "name": "stdout", "pitch": "Every cover is what the book's own code prints. The top two-thirds is a full-bleed field of machine output on a 120 × 80 character grid (an attention matrix, a hex dump, a device mesh, a packed context window) that forms the emblem at arm's length and is real numbers up close. Tone comes from glyph weight, like a line printer. The title is typed at a prompt: > for beginner, $ for intermediate, # (root) for advanced.", "palette": ["#F1EEE6", "#17171C", "#2B3BD9", "#8E98FF"], "page": "19-terminal/index.html", "covers": [{"slug": "ai-context-engineering", "src": "19-terminal/renders/ai-context-engineering.jpg"}, {"slug": "mathematical-foundations-for-ml", "src": "19-terminal/renders/mathematical-foundations-for-ml.jpg"}, {"slug": "neural-networks-from-scratch", "src": "19-terminal/renders/neural-networks-from-scratch.jpg"}, {"slug": "build-llms-from-scratch", "src": "19-terminal/renders/build-llms-from-scratch.jpg"}, {"slug": "5d-parallelism", "src": "19-terminal/renders/5d-parallelism.jpg"}, {"slug": "pi-vs-hermes-vs-codex", "src": "19-terminal/renders/pi-vs-hermes-vs-codex.jpg"}, {"slug": "decision-trees-from-scratch", "src": "19-terminal/renders/decision-trees-from-scratch.jpg"}, {"slug": "charlie-language-room", "src": "19-terminal/renders/charlie-language-room.jpg"}, {"slug": "charlie-vision-room", "src": "19-terminal/renders/charlie-vision-room.jpg"}, {"slug": "charlie-sound-room", "src": "19-terminal/renders/charlie-sound-room.jpg"}, {"slug": "charlie-reasoning-room", "src": "19-terminal/renders/charlie-reasoning-room.jpg"}, {"slug": "kernel-engineering", "src": "19-terminal/renders/kernel-engineering.jpg"}], "wraps": []}, {"id": "20-cutpaper", "num": "20", "name": "20 · Paperworks", "pitch": "", "palette": ["#2A3A92", "#22704B", "#D93D2B", "#E6B422", "#1D2342", "#EE9C94", "#BD9061"], "page": "20-cutpaper/index.html", "covers": [{"slug": "ai-context-engineering", "src": "20-cutpaper/renders/ai-context-engineering.jpg"}, {"slug": "mathematical-foundations-for-ml", "src": "20-cutpaper/renders/mathematical-foundations-for-ml.jpg"}, {"slug": "neural-networks-from-scratch", "src": "20-cutpaper/renders/neural-networks-from-scratch.jpg"}, {"slug": "build-llms-from-scratch", "src": "20-cutpaper/renders/build-llms-from-scratch.jpg"}, {"slug": "5d-parallelism", "src": "20-cutpaper/renders/5d-parallelism.jpg"}, {"slug": "pi-vs-hermes-vs-codex", "src": "20-cutpaper/renders/pi-vs-hermes-vs-codex.jpg"}, {"slug": "rag-in-production", "src": "20-cutpaper/renders/rag-in-production.jpg"}, {"slug": "reinforcement-learning", "src": "20-cutpaper/renders/reinforcement-learning.jpg"}, {"slug": "charlie-language-room", "src": "20-cutpaper/renders/charlie-language-room.jpg"}, {"slug": "charlie-vision-room", "src": "20-cutpaper/renders/charlie-vision-room.jpg"}, {"slug": "charlie-sound-room", "src": "20-cutpaper/renders/charlie-sound-room.jpg"}, {"slug": "charlie-reasoning-room", "src": "20-cutpaper/renders/charlie-reasoning-room.jpg"}, {"slug": "inference-engineering", "src": "20-cutpaper/renders/inference-engineering.jpg"}], "wraps": []}, {"id": "21-wildcard2", "num": "21", "name": "Some Assembly Required II", "pitch": "A second designer, told nothing about direction 10, independently arrived at the same idea: every Vizuara book builds a model, so every cover is a model kit. This take is more pictorial. The book's real components are moulded as pictograms on a sprue, numbered in build order, and laid on a cutting mat ruled in true inches. Plastic colour names the field, Skill 1/2/3 squares give level, and the Charlie books are a gold-plated Factory Edition.", "palette": ["#1B463C", "#2D6255", "#24544A", "#79A596", "#F3EEE2", "#A7C4BA", "#3A2219"], "page": "21-wildcard2/index.html", "covers": [{"slug": "ai-context-engineering", "src": "21-wildcard2/renders/ai-context-engineering.jpg"}, {"slug": "mathematical-foundations-for-ml", "src": "21-wildcard2/renders/mathematical-foundations-for-ml.jpg"}, {"slug": "neural-networks-from-scratch", "src": "21-wildcard2/renders/neural-networks-from-scratch.jpg"}, {"slug": "build-llms-from-scratch", "src": "21-wildcard2/renders/build-llms-from-scratch.jpg"}, {"slug": "5d-parallelism", "src": "21-wildcard2/renders/5d-parallelism.jpg"}, {"slug": "pi-vs-hermes-vs-codex", "src": "21-wildcard2/renders/pi-vs-hermes-vs-codex.jpg"}, {"slug": "decision-trees-from-scratch", "src": "21-wildcard2/renders/decision-trees-from-scratch.jpg"}, {"slug": "git-github-masterclass", "src": "21-wildcard2/renders/git-github-masterclass.jpg"}, {"slug": "sql-masterclass", "src": "21-wildcard2/renders/sql-masterclass.jpg"}, {"slug": "deit-from-scratch", "src": "21-wildcard2/renders/deit-from-scratch.jpg"}, {"slug": "rlhf-from-scratch", "src": "21-wildcard2/renders/rlhf-from-scratch.jpg"}, {"slug": "charlie-language-room", "src": "21-wildcard2/renders/charlie-language-room.jpg"}, {"slug": "charlie-vision-room", "src": "21-wildcard2/renders/charlie-vision-room.jpg"}, {"slug": "charlie-sound-room", "src": "21-wildcard2/renders/charlie-sound-room.jpg"}, {"slug": "charlie-reasoning-room", "src": "21-wildcard2/renders/charlie-reasoning-room.jpg"}, {"slug": "kernel-engineering", "src": "21-wildcard2/renders/kernel-engineering.jpg"}], "wraps": []}, {"id": "22-open", "num": "22", "name": "Textmode (open brief)", "pitch": "This designer was told only who Vizuara is and that the current covers are disliked. It chose to draw every cover in text: each picture is set in a monospaced font on a strict 120 × 74 character grid, like line-printer computer art, showing the real mechanism with real numbers (the causal attention matrix, 32 GPUs labelled with their mesh coordinates, the iris decision tree). A big Fraunces title leads. Colour family marks the subject and lightness marks the level.", "palette": ["#E9F1FD", "#4780D2", "#07254F", "#FFEBE7", "#E55E40", "#4A1408", "#F3EDFB"], "page": "22-open/index.html", "covers": [{"slug": "ai-context-engineering", "src": "22-open/renders/ai-context-engineering.jpg"}, {"slug": "mathematical-foundations-for-ml", "src": "22-open/renders/mathematical-foundations-for-ml.jpg"}, {"slug": "neural-networks-from-scratch", "src": "22-open/renders/neural-networks-from-scratch.jpg"}, {"slug": "build-llms-from-scratch", "src": "22-open/renders/build-llms-from-scratch.jpg"}, {"slug": "5d-parallelism", "src": "22-open/renders/5d-parallelism.jpg"}, {"slug": "pi-vs-hermes-vs-codex", "src": "22-open/renders/pi-vs-hermes-vs-codex.jpg"}, {"slug": "decision-trees-from-scratch", "src": "22-open/renders/decision-trees-from-scratch.jpg"}, {"slug": "git-github-masterclass", "src": "22-open/renders/git-github-masterclass.jpg"}, {"slug": "sql-masterclass", "src": "22-open/renders/sql-masterclass.jpg"}, {"slug": "cnn-fundamentals", "src": "22-open/renders/cnn-fundamentals.jpg"}, {"slug": "reinforcement-learning", "src": "22-open/renders/reinforcement-learning.jpg"}, {"slug": "transformers-from-scratch", "src": "22-open/renders/transformers-from-scratch.jpg"}, {"slug": "deit-from-scratch", "src": "22-open/renders/deit-from-scratch.jpg"}, {"slug": "charlie-language-room", "src": "22-open/renders/charlie-language-room.jpg"}, {"slug": "charlie-vision-room", "src": "22-open/renders/charlie-vision-room.jpg"}, {"slug": "charlie-sound-room", "src": "22-open/renders/charlie-sound-room.jpg"}, {"slug": "charlie-reasoning-room", "src": "22-open/renders/charlie-reasoning-room.jpg"}, {"slug": "kernel-engineering", "src": "22-open/renders/kernel-engineering.jpg"}], "wraps": []}], "before": [{"slug": "ai-context-engineering", "src": "_shared/before/ai-context-engineering.png"}, {"slug": "charlie-reasoning-room", "src": "_shared/before/charlie-reasoning-room.webp"}, {"slug": "mathematical-foundations-for-ml", "src": "_shared/before/mathematical-foundations-for-ml.png"}, {"slug": "neural-networks-from-scratch", "src": "_shared/before/neural-networks-from-scratch.png"}, {"slug": "pi-vs-hermes-vs-codex", "src": "_shared/before/pi-vs-hermes-vs-codex.png"}]};
+const $ = (s, el = document) => el.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const store = {
+  get(k, d) { try { return localStorage.getItem(k) ?? d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+};
+const LEVEL = { beginner: "Beginner", intermediate: "Intermediate", advanced: "Advanced" };
+const bookTitle = (slug) => DATA.books[slug]?.title || slug.replace(/-/g, " ");
+const bookLevel = (slug) => LEVEL[DATA.books[slug]?.level] || "";
+
+const state = {
+  view: store.get("vcp.view", "dir"),
+  size: store.get("vcp.size", "260"),
+  book: store.get("vcp.book", DATA.core[0]),
+};
+let current = []; // list the lightbox steps through
+
+// Facts
+const totalCovers = DATA.directions.reduce((n, d) => n + d.covers.length, 0);
+const booksCovered = new Set(DATA.directions.flatMap((d) => d.covers.map((c) => c.slug))).size;
+$("#facts").innerHTML = [["Directions", DATA.directions.length], ["Covers", totalCovers], ["Titles", booksCovered]]
+  .map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join("");
+
+// Current covers
+$("#before").innerHTML = DATA.before.map((b) =>
+  `<li><img src="${esc(b.src)}" alt="Current cover: ${esc(bookTitle(b.slug))}" width="720" height="888" loading="lazy"></li>`).join("");
+
+function proof(item, i, caption, sub) {
+  return `<li class="proof">
+    <button type="button" class="crop" data-i="${i}" aria-label="Enlarge ${esc(caption)}">
+      <img src="${esc(item.src)}" alt="${esc(caption)}" width="720" height="888" loading="lazy" decoding="async">
+    </button>
+    <div class="cap">${esc(caption)}<small>${esc(sub)}</small></div>
+  </li>`;
+}
+
+function renderByDirection() {
+  current = [];
+  const jump = `<div class="jump">${DATA.directions.map((d) => `<a href="#d-${esc(d.id)}"><b>${esc(d.num)}</b>${esc(d.name)}</a>`).join("")}</div>`;
+  const sections = DATA.directions.map((d) => {
+    const items = d.covers.map((c) => {
+      const i = current.push({ ...c, dir: d, caption: bookTitle(c.slug), sub: bookLevel(c.slug) }) - 1;
+      return proof(c, i, bookTitle(c.slug), bookLevel(c.slug));
+    }).join("");
+    const sw = d.palette.length ? `<div class="swatches" aria-label="Palette">${d.palette.map((h) => `<span style="background:${esc(h)}" title="${esc(h)}"></span>`).join("")}</div>` : "";
+    return `<section class="dir" id="d-${esc(d.id)}" aria-labelledby="h-${esc(d.id)}">
+      <header class="dir-head">
+        <span class="num">${esc(d.num)}</span>
+        <div><h2 id="h-${esc(d.id)}">${esc(d.name)}</h2>${d.pitch ? `<p class="pitch">${esc(d.pitch)}</p>` : ""}</div>
+        <div class="side">${sw}<a class="open" href="${esc(d.page)}">Designer's page ↗</a></div>
+      </header>
+      <ul class="grid">${items}</ul>
+      ${(d.wraps || []).map((w) => {
+        const i = current.push({ src: w, slug: "", dir: d, caption: "Print wrap", sub: "back · spine · front" }) - 1;
+        return `<figure class="wrapfig"><button type="button" class="crop-wrap" data-i="${i}" aria-label="Enlarge print wrap for ${esc(d.name)}"><img src="${esc(w)}" alt="${esc(d.name)} print wrap: back cover, spine and front cover" loading="lazy" decoding="async"></button><figcaption>Print wrap · back, spine, front</figcaption></figure>`;
+      }).join("")}
+    </section>`;
+  }).join("");
+  $("#view").innerHTML = jump + sections;
+}
+
+function renderByBook() {
+  const counts = {};
+  DATA.directions.forEach((d) => d.covers.forEach((c) => { counts[c.slug] = (counts[c.slug] || 0) + 1; }));
+  const core = DATA.core.filter((s) => counts[s]);
+  const extra = Object.keys(counts).filter((s) => !DATA.core.includes(s) && counts[s] >= 2)
+    .sort((a, b) => counts[b] - counts[a] || bookTitle(a).localeCompare(bookTitle(b)));
+  if (!counts[state.book]) state.book = core[0] || extra[0];
+  const chip = (s) => `<button type="button" data-book="${esc(s)}" aria-pressed="${s === state.book}">${esc(bookTitle(s))}<b>${counts[s]}</b></button>`;
+  current = [];
+  const items = DATA.directions.map((d) => {
+    const c = d.covers.find((x) => x.slug === state.book);
+    if (!c) return "";
+    const cap = `${d.num} · ${d.name}`;
+    const i = current.push({ ...c, dir: d, caption: cap, sub: bookTitle(c.slug) }) - 1;
+    return proof(c, i, cap, "");
+  }).join("");
+  const b = DATA.books[state.book] || {};
+  $("#view").innerHTML = `
+    <div class="picker" role="group" aria-label="Choose a book">${core.map(chip).join("")}${extra.length ? `<span class="sep"></span>${extra.map(chip).join("")}` : ""}</div>
+    <h2 class="book-title">${esc(bookTitle(state.book))}</h2>
+    <p class="book-sub">${esc(LEVEL[b.level] || "")}${b.series ? " · " + esc(b.series) : ""} · ${counts[state.book]} version${counts[state.book] === 1 ? "" : "s"}</p>
+    <ul class="grid">${items}</ul>`;
+}
+
+function render() {
+  document.documentElement.style.setProperty("--w", state.size + "px");
+  document.documentElement.dataset.size = state.size;
+  document.querySelectorAll("[data-view]").forEach((b) => b.setAttribute("aria-pressed", b.dataset.view === state.view));
+  document.querySelectorAll("[data-size]").forEach((b) => b.setAttribute("aria-pressed", b.dataset.size === state.size));
+  state.view === "book" ? renderByBook() : renderByDirection();
+}
+
+document.addEventListener("click", (e) => {
+  const v = e.target.closest("[data-view]");
+  if (v) { state.view = v.dataset.view; store.set("vcp.view", state.view); render(); window.scrollTo({ top: $(".bar").offsetTop }); return; }
+  const s = e.target.closest("button[data-size]");
+  if (s) { state.size = s.dataset.size; store.set("vcp.size", state.size); render(); return; }
+  const bk = e.target.closest("[data-book]");
+  if (bk) { state.book = bk.dataset.book; store.set("vcp.book", state.book); render(); return; }
+  const c = e.target.closest(".crop, .crop-wrap");
+  if (c) openLb(+c.dataset.i);
+});
+
+// Lightbox
+const lb = $("#lb");
+let idx = 0;
+function openLb(i) {
+  idx = (i + current.length) % current.length;
+  const it = current[idx];
+  $("#lb-img").src = it.src;
+  $("#lb-img").alt = `${it.caption}${it.sub ? " — " + it.sub : ""}`;
+  $("#lb-cap").innerHTML = `${esc(it.dir.num)} · ${esc(it.dir.name)}<small>${esc(it.slug ? bookTitle(it.slug) : it.caption)} · ${idx + 1} of ${current.length}</small>`;
+  $("#lb-open").href = it.dir.page;
+  if (!lb.open) lb.showModal();
+}
+$("#lb-prev").onclick = () => openLb(idx - 1);
+$("#lb-next").onclick = () => openLb(idx + 1);
+$("#lb-close").onclick = () => lb.close();
+lb.addEventListener("click", (e) => { if (e.target === lb || e.target.classList.contains("lb") || e.target.tagName === "FIGURE") lb.close(); });
+document.addEventListener("keydown", (e) => {
+  if (!lb.open) return;
+  if (e.key === "ArrowLeft") openLb(idx - 1);
+  if (e.key === "ArrowRight") openLb(idx + 1);
+});
+
+render();
+</script>
