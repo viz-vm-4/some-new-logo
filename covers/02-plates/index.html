@@ -800,7 +800,7 @@ FIG['decision-trees-from-scratch'] = (P) => {
   P.text(X0 + S / 2, Y0 + S + 22, xs(1), 'fig', 'middle');
   P.text(X0 - 10, Y0 + S / 2 + 5, xs(2), 'fig', 'end');
   P.text(X0, Y0 - 12, 'Fig. 2', 'fig', 'start');
-  label(P, 300, 722, 190, 742, 'a', { dot: true });
+  label(P, 292, 708, 190, 742, 'a', { dot: true });
   label(P, nodes.LR.p[0] + 20, nodes.LR.p[1] - 34, 150, 318, 'b');
   label(P, nodes.RR.p[0] + 30, nodes.RR.p[1] - 22, 610, 380, 'c');
 };
@@ -1433,7 +1433,7 @@ FIG['charlie-reasoning-room'] = (P) => {
   // labels
   label(P, ax0 + 3 * adx + 26 + 58 * Math.cos(-1.05) + 6, baseY + 40 + 58 * Math.sin(-1.05) + 2, 650, 770, 'a');
   label(P, ax0 - 20, yR(means[0]) - 16, 84, 548, 'b');
-  label(P, ax0 + best * adx + 26 + 58 * Math.cos(0.5) + 6, baseY + 40 + 58 * Math.sin(0.5) + 4, 470, 780, 'c');
+  label(P, ax0 + best * adx + 26 + 58 * Math.cos(0.5) + 6, baseY + 40 + 58 * Math.sin(0.5) + 4, 470, 766, 'c');
   const dn = all.find((nd) => nd.d === 2 && !nd.hot && nd.x < 300); label(P, dn.x - 9, dn.y, 84, dn.y - 30, 'd');
   label(P, ans.x + 16, ans.y - 10, ans.x + 70, ans.y - 30, 'e');
 };
@@ -1614,7 +1614,7 @@ document.fonts.ready.then(() => requestAnimationFrame(() => {
 FIG['nn-back'] = (P) => {
   const R = rng(31);
   const layers = [3, 4, 4, 2];
-  const X = [150, 290, 430, 570], cy = 496, gapY = 64;
+  const X = [150, 290, 430, 570], cy = 484, gapY = 64;
   const nodes = layers.map((n, li) => Array.from({ length: n }, (_, k) => [X[li], cy + (k - (n - 1) / 2) * gapY]));
   for (let li = 0; li < layers.length - 1; li++) for (const a of nodes[li]) for (const b of nodes[li + 1]) {
     const wv = R() * 2 - 1, pts = sample((t) => [lerp(a[0], b[0], t), lerp(a[1], b[1], t)], 20), wd = 1 + Math.abs(wv) * 3.2;
