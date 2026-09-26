@@ -731,10 +731,10 @@ function leather(clipD, x0, P, id){
    blind: a light lip peeking out along the lower-right edge (the classic inset/letterpress read)
    foil:  a soft dark drop along the lower-right, the foil itself, then the cloth grain it picks up */
 function blindArt(art, tone, lip, K){
-  return `<g class="so" transform="translate(.9 1.1)" opacity=".55">${tok(art, lip, 'none')}</g>${tok(art, tone, K)}`;
+  return `<g class="so" transform="translate(.7 .9)" opacity=".38">${tok(art, lip, 'none')}</g>${tok(art, tone, K)}`;
 }
 function foilArt(art, P, K, grad, speckOp){
-  return `<g class="so" transform="translate(1.1 1.5)" opacity=".42">${tok(art, '#000', 'none')}</g>${tok(art, `url(#${P}${grad})`, K)}<g class="so" opacity="${speckOp}">${tok(art, `url(#${P}speck)`, K === 'none' ? 'none' : K)}</g>`;
+  return `<g class="so" transform="translate(1.1 1.5)" opacity=".42">${tok(art, '#000', 'none')}</g>${tok(art, `url(#${P}${grad})`, K)}<g class="so" opacity="${speckOp}">${tok(art, `url(#${P}speck)`, 'none')}</g>`;
 }
 function sunkRim(d, P, id){
   return `<clipPath id="${P}${id}"><path d="${d}"/></clipPath><g clip-path="url(#${P}${id})" fill="none" stroke="url(#${P}rim)">
@@ -751,7 +751,7 @@ function buildCover(b, P, opts = {}){
   const band = { x0: S || 40, y0: 418, x1: W, y1: 792 };
   const cy = 605, RING = 150;
   const arch = !!b.arch, AW = 262, AH = 340;
-  const dark = shade(cloth, -.25), sunk = shade(cloth, -.10), blindDev = shade(cloth, -.34);
+  const dark = shade(cloth, -.28), sunk = shade(cloth, -.10), blindDev = shade(cloth, -.34);
   const seed = hash(b.slug) % 97;
 
   /* --- blind band art --- */
@@ -837,7 +837,7 @@ function buildWrap(){
   const b = BOOKS.find(x => x.slug === 'neural-networks-from-scratch');
   const SP = 84, WW = W*2 + SP, P = 'wr-', S = 92, HINGE = 30;
   const cloth = CLOTH[b.cloth].hex, foil = FOILS[b.foil], seed = hash(b.slug) % 97;
-  const dark = shade(cloth, -.25);
+  const dark = shade(cloth, -.28);
   // back board: the blind band runs on; a blind colophon sits where the front has its device
   const bcx = Math.round((W - S) / 2), cy = 605;
   const band = { x0:0, y0:418, x1:W - S, y1:792 };

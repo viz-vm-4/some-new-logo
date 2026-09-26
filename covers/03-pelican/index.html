@@ -73,7 +73,7 @@ html,body{margin:0;background:var(--page);color:var(--ink);font-family:'Schibste
 .lv .chip{width:54px;height:26px}
 .specimen{font-size:64px;font-weight:500;letter-spacing:-.035em;line-height:1}
 .specimen small{display:block;font-size:14px;letter-spacing:.02em;font-weight:400;margin-top:10px;line-height:1.5}
-.dev-big{display:flex;align-items:center;gap:18px}
+.dev-big{display:flex;align-items:center;gap:18px;margin-bottom:22px}
 .dev-big svg{width:150px;height:75px}
 
 .anat{display:grid;grid-template-columns:auto 1fr;gap:36px;align-items:center;margin:48px 0 16px}
@@ -138,7 +138,7 @@ h2.sec em{font-style:normal;font-weight:400;letter-spacing:.02em;text-transform:
     <div>
       <p>Halcyon takes its method from the post-war Penguin and Pelican paperbacks — Tschichold's horizontal grid, Marber's fixed title band, Facetti's abstract science covers — and applies it to a library about machines that learn.</p>
       <p>Every cover is the same three bands: a paper band where the title is the hero, a black rule that carries the level and the length of the book, and a field of flat colour holding one abstract composition drawn from the book's own mechanism: a neuron, a causal-attention mask, a five-dimensional device mesh. The field's colour is the level, the way Penguin's green meant crime, so a shelf of Vizuara books sorts itself from across the room.</p>
-      <p>Everything is drawn in code with five inks, no raster images, and a publisher's device of its own: a kingfisher (the halcyon) in a capsule, because Vizuara teaches in capsules.</p>
+      <p>Everything is drawn in code with five inks, no raster images, and a publisher's device of its own: a kingfisher (the halcyon) diving through a capsule, because Vizuara teaches in capsules.</p>
     </div>
   </section>
 
@@ -148,23 +148,23 @@ h2.sec em{font-style:normal;font-weight:400;letter-spacing:.02em;text-transform:
       <div class="sw"><i style="background:#F2EEE4;outline:1.5px solid #1C1B19;outline-offset:-1.5px"></i><b>Paper</b><code>#F2EEE4</code></div>
       <div class="sw"><i style="background:#1C1B19"></i><b>Ink</b><code>#1C1B19</code></div>
       <div class="sw"><i style="background:#C9352B"></i><b>Signal red</b><code>#C9352B</code></div>
-      <p>Red is the house accent. It marks the idea in every emblem — the minimum, the next token, the question — and nothing else.</p>
+      <p>Red is the house accent: one element, or one set, per cover — the idea of that book (the minimum, the next token, the question) and nothing else.</p>
     </div>
     <div>
       <h3>Level</h3>
       <div class="lv"><span class="pill"><i class="on"></i><i></i><i></i></span><i class="chip" style="background:#EEC232"></i><span class="nm">Beginner<small>Chrome #EEC232</small></span></div>
-      <div class="lv"><span class="pill"><i class="on"></i><i class="on"></i><i></i></span><i class="chip" style="background:#63B384"></i><span class="nm">Intermediate<small>Viridian #63B384</small></span></div>
+      <div class="lv"><span class="pill"><i class="on"></i><i class="on"></i><i></i></span><i class="chip" style="background:#63B384"></i><span class="nm">Intermediate<small>Jade #63B384</small></span></div>
       <div class="lv"><span class="pill"><i class="on"></i><i class="on"></i><i class="on"></i></span><i class="chip" style="background:#28398A"></i><span class="nm">Advanced<small>Ultramarine #28398A</small></span></div>
-      <p>Coded three ways: field colour, filled capsules, the word. The colours step light → mid → dark, so level still reads in greyscale. Each has one deeper shade for tone-on-tone.</p>
+      <p>Coded three ways: field colour, filled capsules, the word. The fields step light → mid → dark (L* 80 / 67 / 27) and red (L* 46) sits apart from all three, so both level and accent survive greyscale. Each field has one deeper shade for tone-on-tone; red never touches it.</p>
     </div>
     <div>
       <h3>Type</h3>
-      <div class="specimen">Schibsted<br>Grotesk<small>One family, from Google Fonts. Titles 500, tracked tight (−2.8%), flush left, set by hand line by line and never broken on a short word. Labels 600–700 in spaced capitals.</small></div>
+      <div class="specimen">Schibsted<br>Grotesk<small>One family, from Google Fonts. Titles 500, tracked −2.8%, flush left, broken by hand on sense and set at one of three sizes — 92, 76 or 64 — the largest that fits the measure and clears the band. Labels 600–700 in spaced capitals.</small></div>
     </div>
     <div>
       <h3>Device</h3>
       <div class="dev-big" id="bigdev"></div>
-      <p>A kingfisher — the halcyon — built from four shapes (a half-disc, a disc, two triangles) inside a capsule. It signs every cover at 44 px, small enough never to compete with the title.</p>
+      <p>A kingfisher — the halcyon — diving: four flat shapes (tail wedge, head, swept wing, dagger bill). Its bill breaks through the bottom of the capsule and inverts to ink as it leaves. It signs every cover at 44 px, never competing with the title.</p>
     </div>
   </section>
 
@@ -172,10 +172,10 @@ h2.sec em{font-style:normal;font-weight:400;letter-spacing:.02em;text-transform:
     <div class="mini" id="mini"></div>
     <ol>
       <li><b>Imprint line.</b> Device, "Vizuara Books", catalogue number — the signature, 13 px, same place on every book.</li>
-      <li><b>Title band.</b> Paper, 336 px deep. Title at 60–92 px, hand-broken; optional subtitle or series line. The same depth on every book, so titles hang from one line across the shelf.</li>
+      <li><b>Title band.</b> Paper, 336 px deep. Title at 92, 76 or 64 px, chosen by rule; the block always ends ≥24 px above the band. The same depth on every book, so titles hang from one line across the shelf.</li>
       <li><b>Level rule.</b> A 36 px black band: level capsules and word on the left, capsules and hours on the right ("Forthcoming" for books not yet out).</li>
-      <li><b>Emblem field.</b> 720 × 516, flat level colour, one composition drawn from the subject in five inks. Compositions may bleed; nothing critical within 24 px of trim.</li>
-      <li><b>Sub-series.</b> Charlie and the Intelligence Factory keeps the grid and adds a shared set: factory roof, conveyor, and a volume numeral. The lit pane in the roof is the volume.</li>
+      <li><b>Emblem field.</b> 720 × 516, flat level colour, one composition drawn from the subject in five inks. Every element bleeds ≥12 px past trim or sits ≥48 px inside it and ≥24 px under the band; grounded compositions share one ink floor at 840.</li>
+      <li><b>Sub-series.</b> Charlie and the Intelligence Factory keeps the grid and adds a shared set: series line, “Charlie and the” in small, the room name as the hero, a volume numeral, and a factory whose lit roof pane is the volume and whose conveyor is the floor.</li>
       <li><b>Forthcoming.</b> Unpublished books print as a proof: keylines only, one element inked in red.</li>
     </ol>
   </section>

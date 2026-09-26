@@ -2,7 +2,7 @@
 <html lang="en"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Printout — Vizuara Books</title>
+<title>Stdout — Vizuara Books</title>
 <link href="https://fonts.googleapis.com/css2?family=Martian+Mono:wdth,wght@75..112.5,100..800&display=block" rel="stylesheet">
 <style>
 :root{
@@ -10,9 +10,8 @@
   --cw:6px; --ch:11.1px;
 }
 *{box-sizing:border-box}
-html,body{margin:0;background:#E4E1D9;color:var(--ink)}
+html,body{margin:0;background:#E3DFD5;color:var(--ink)}
 body{font-family:'Martian Mono',monospace;font-variation-settings:'wdth' 75}
-.covers{display:flex;flex-wrap:wrap;gap:48px;padding:48px}
 .cover{width:720px;height:888px;position:relative;overflow:hidden;background:var(--paper);color:var(--ink);flex:none;
   font-family:'Martian Mono',monospace}
 .field{position:absolute;inset:0;font-size:10px;font-variation-settings:'wdth' 75}
@@ -31,9 +30,93 @@ body{font-family:'Martian Mono',monospace;font-variation-settings:'wdth' 75}
 .foot.im{font-variation-settings:'wdth' 112.5,'wght' 800;letter-spacing:.14em}
 .foot b{color:var(--sig);font-variation-settings:'wdth' 100,'wght' 800}
 .foot.im i{display:inline-block;width:6px;height:9px;background:var(--sig);margin-left:3px;vertical-align:-1px}
+
+/* ─── presentation page: set as a man page ─── */
+.page{max-width:1536px;margin:0 auto;padding:40px 24px 96px}
+.mantop{display:flex;justify-content:space-between;font-size:13px;font-variation-settings:'wdth' 100,'wght' 700;letter-spacing:.04em;border-bottom:2px solid var(--ink);padding-bottom:10px}
+.man{display:grid;grid-template-columns:200px minmax(0,1fr);column-gap:32px;row-gap:28px;margin:40px 0 56px;max-width:1340px}
+.man h2{margin:0;font-size:14px;letter-spacing:.08em;font-variation-settings:'wdth' 100,'wght' 800}
+.man .b{font-size:15px;line-height:1.62;font-variation-settings:'wdth' 87.5,'wght' 400;max-width:88ch}
+.man .b p{margin:0 0 .8em}
+.man .b b{font-variation-settings:'wdth' 87.5,'wght' 800}
+.man .b .sig{color:var(--sig)}
+.man h1{grid-column:1/-1;margin:0;font-size:72px;line-height:1;font-variation-settings:'wdth' 75,'wght' 800;letter-spacing:-.01em}
+.man h1 i{display:inline-block;width:.46em;height:.72em;background:var(--sig);margin-left:.14em;vertical-align:-.02em}
+.man h1 u{text-decoration:none;color:var(--sig)}
+.syn{background:var(--ink);color:var(--paper);padding:14px 18px;font-size:14px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;margin:0;font-variation-settings:'wdth' 87.5,'wght' 500}
+.syn .p{color:#8e98ff}
+.sw{display:flex;gap:20px;flex-wrap:wrap}
+.sw div{width:220px;font-size:13px;line-height:1.5}
+.sw span{display:block;height:88px;margin-bottom:8px;border:1px solid rgba(23,23,28,.25)}
+.ramp{display:flex;flex-wrap:wrap;margin-top:18px;font-size:10px;font-variation-settings:'wdth' 75}
+.ramp span{display:inline-block;width:62px;height:40px;line-height:40px;text-align:center;font-size:18px;background:var(--paper);border-right:1px solid rgba(23,23,28,.08)}
+.lv{display:grid;grid-template-columns:48px 1fr;row-gap:6px;align-items:baseline}
+.lv b.g{font-size:30px;color:var(--sig);font-variation-settings:'wdth' 75,'wght' 800}
+.lv i.h{display:inline-block;width:14px;height:22px;border:3px solid var(--sig)}
+.sect{font-size:14px;letter-spacing:.08em;font-variation-settings:'wdth' 100,'wght' 800;margin:0 0 20px;border-top:2px solid var(--ink);padding-top:12px}
+.covers{display:grid;grid-template-columns:repeat(auto-fill,720px);gap:56px 48px;padding:0;margin:0 0 72px;justify-content:start}
+figure{margin:0}
+figcaption{margin-top:14px;font-size:12px;line-height:1.55;max-width:720px;font-variation-settings:'wdth' 87.5,'wght' 400}
+figcaption b{font-variation-settings:'wdth' 87.5,'wght' 800}
+figcaption code{color:var(--sig);font-family:inherit}
+.cover{box-shadow:0 1px 2px rgba(0,0,0,.18),0 10px 30px rgba(0,0,0,.10)}
+.wrapbox{overflow-x:auto;padding-bottom:12px}
+.wrap{position:relative;width:1488px;height:888px;display:flex;box-shadow:0 1px 2px rgba(0,0,0,.18),0 10px 30px rgba(0,0,0,.10)}
+.wrap>.back,.wrap>.front{width:720px;height:888px;position:relative;overflow:hidden;background:var(--paper);flex:none}
+.wrap>.spine{width:48px;height:888px;background:var(--ink);color:var(--paper);position:relative;flex:none;overflow:hidden}
+.spine .st{position:absolute;left:50%;top:40px;transform-origin:0 0;transform:rotate(90deg) translateY(-50%);white-space:nowrap;font-size:22px;line-height:1;font-variation-settings:'wdth' 75,'wght' 800;word-spacing:-.25em}
+.spine .st b{color:#8e98ff}
+.spine .st i{display:inline-block;width:11px;height:16px;background:var(--sig);margin-left:6px;vertical-align:-1px;box-shadow:0 0 0 1px var(--paper) inset}
+.spine .sm{position:absolute;left:0;right:0;bottom:30px;text-align:center;font-size:10px;line-height:1.3;letter-spacing:.1em;font-variation-settings:'wdth' 112.5,'wght' 800}
+.spine .sm i{display:block;margin:0 auto 8px;width:12px;height:18px;background:#8e98ff}
+.bk{position:absolute;white-space:normal}
+.foot2{margin-top:56px;border-top:2px solid var(--ink);padding-top:10px;display:flex;justify-content:space-between;font-size:13px;font-variation-settings:'wdth' 100,'wght' 700}
+@media (max-width:760px){ .man{grid-template-columns:1fr} .man h1{font-size:44px} }
 </style>
 </head><body>
+<div class="page">
+<div class="mantop"><span>STDOUT(7)</span><span>Vizuara Books — cover system · direction 19</span><span>STDOUT(7)</span></div>
+<div class="man">
+  <h1><u>$</u> stdout<i></i></h1>
+  <h2>NAME</h2>
+  <div class="b"><p><b>stdout</b> — every Vizuara cover is what the book's own code prints.</p></div>
+  <h2>SYNOPSIS</h2>
+  <pre class="syn"><span class="p">$</span> vz cover &lt;slug&gt; --grid 120x80 --font "Martian Mono" --paper fanfold --ink carbon --signal selection</pre>
+  <h2>DESCRIPTION</h2>
+  <div class="b">
+    <p>Each cover is a printout. The top of the page is a field of real machine output — an attention matrix, a hex dump, a histogram of samples, a device mesh, a packed context window — arranged so that at arm's length it resolves into the book's one emblem, and up close every glyph is the actual number, token or line that makes it. This is Knowlton and Harmon's mosaic and the line-printer art of the 1960s, with the pictures made of the subject instead of symbols.</p>
+    <p>Below the printout the title is typed at a prompt. The prompt tells you the level; the block cursor at the end of the line is Vizuara's mark, on every book, in the one colour the system allows itself. One typeface, one character grid, three inks.</p>
+  </div>
+  <h2>PALETTE</h2>
+  <div class="b">
+    <div class="sw">
+      <div><span style="background:#F1EEE6"></span><b>Fanfold</b> #F1EEE6<br>the paper</div>
+      <div><span style="background:#17171C"></span><b>Carbon</b> #17171C<br>ribbon ink; all tone is carbon</div>
+      <div><span style="background:#2B3BD9"></span><b class="sig">Selection</b> #2B3BD9<br>the colour of selected text: the one datum that matters, the prompt, the cursor</div>
+    </div>
+    <div class="ramp" id="ramp"></div>
+    <p style="margin-top:14px">Tone is made the way a line printer made it: with how much ink a glyph lays down. Ten steps mix carbon into paper (16–100%) while the variable weight climbs 300→800; the last step is reverse video. No transparency, no halftone photographs; in greyscale Selection falls to a 35% grey that stays apart from Carbon.</p>
+  </div>
+  <h2>TYPE</h2>
+  <div class="b"><p><b>Martian Mono</b> (Google Fonts, variable width + weight) and nothing else. Field: 10 px (7.5 pt), width 75, weight 300–800 as a tone control. Titles: 50 or 60 px, weight 800, set on 5× or 6× character cells. Subtitles 30 px. Imprint: width 112.5, weight 800, tracked.</p></div>
+  <h2>GRID</h2>
+  <div class="b"><p>120 columns × 80 rows; a cell is 6 × 11.1 px (1/16 in × 0.116 in at trim). Rows 0–50 are the printout and bleed on three sides; row 52 is a one-line caption — the expression that produced the picture; the title starts on row 56 with the prompt hanging in the margin; the imprint sits on row 76. All critical text is ≥ 24 px from the trim.</p></div>
+  <h2>LEVELS</h2>
+  <div class="b"><div class="lv">
+    <b class="g">&gt;</b><span><b>beginner</b> — a REPL prompt, the first thing you ever typed into</span>
+    <b class="g">$</b><span><b>intermediate</b> — a user shell</span>
+    <b class="g">#</b><span><b>advanced</b> — root</span>
+    <i class="h"></i><span><b>coming soon</b> — the cursor goes hollow, as it does in an unfocused terminal</span>
+  </div><p style="margin-top:12px">The level is also spelled out beside the imprint, so nobody needs to know Unix to read it.</p></div>
+  <h2>SERIES</h2>
+  <div class="b"><p><b>Charlie and the Intelligence Factory</b> is one tmux session. A carbon status bar across the head of the printout lists the four rooms as windows; the current room is selected and starred, exactly as tmux marks the active window. On a shelf the blue tab steps left to right, I to IV.</p></div>
+</div>
+<div class="sect">COVERS</div>
 <div class="covers" id="covers"></div>
+<div class="sect">PRINT WRAP — back · spine · front (7.5 × 9.25 in, 0.5 in spine)</div>
+<div class="wrapbox"><div class="wrap" id="wrap"></div></div>
+<div class="foot2"><span>Vizuara Books</span><span>stdout(7) · see NOTES.md</span><span>STDOUT(7)</span></div>
+</div>
 <script>
 // ─── grid ────────────────────────────────────────────────────────────────
 const COLS=120, ROWS=80, CW=6, CH=888/80, FR=51;

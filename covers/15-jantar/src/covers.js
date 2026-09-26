@@ -160,31 +160,28 @@
   SCENES.aperture = (hr) => {
     const cam = CAM({ az: 0, s: 1, ox: 360 });
     const S = new Scene(); ground(S, hr, cam); S.E = frame(cam, -14);
-    const y0 = 400, t = 44, X0 = -330, X1 = 380, Hh = 400, wx0 = -40, wx1 = 110, wz0 = 150, wz1 = 300;
+    const y0 = 420, t = 44, X0 = -330, X1 = 380, Hh = 350, wx0 = -30, wx1 = 110, wz0 = 130, wz1 = 270;
     const st = hr.stone;
     S.box(X0, y0, 0, wx0, y0 + t, Hh, { mat: st });
     S.box(wx1, y0, 0, X1, y0 + t, Hh, { mat: st });
     S.box(wx0, y0, 0, wx1, y0 + t, wz0, { mat: st });
     S.box(wx0, y0, wz1, wx1, y0 + t, Hh, { mat: st });
     S.box(X0 - 4, y0 - 4, Hh, X1 + 4, y0 + t + 4, Hh + 8, { mat: hr.marble });
-    for (let i = 0; i < 16; i++) { const x = -330 + i * 44; S.box(x, 150, 0, x + 30, 180, 30, { mat: hr.marble }); }
+    for (let i = 0; i < 20; i++) { const x = -360 + i * 36; S.box(x, 212, 0, x + 24, 236, 24, { mat: hr.marble }); }
     return { S, cam, L: sunRel(cam, -62, 36) };
   };
 
-  // Stair to the sky, climbing a wall — each step rests on all the steps before it
+  // Stair to the sky — each step rests on all the steps before it; the next one is still a drawing
   SCENES.stair = (hr) => {
     const cam = CAM({ az: 0, s: 1, ox: 330 });
-    const S = new Scene(); ground(S, hr, cam); S.E = frame(cam, 30);
-    const n = 12, run = 40, rise = 34, y0 = 60, y1 = 170, x0 = -230, xe = x0 + n * run;
-    const st = hr.stone;
-    for (let i = 0; i < n; i++) S.box(x0 + i * run, y0, 0, x0 + (i + 1) * run, y1, (i + 1) * rise, { mat: st });
-    // the wall behind: sloped top that follows the stair, with marble coping
-    const wy0 = y1, wy1 = y1 + 36, top = (x) => 70 + (x - x0) * rise / run;
-    S.extrude([S.W(x0 - 60, wy0, 0), S.W(xe, wy0, 0), S.W(xe, wy0, top(xe)), S.W(x0 - 60, wy0, top(x0 - 60))], mul(S.E[1], wy1 - wy0), { mat: st });
-    const cn = nrm(add(mul(S.E[0], -rise), mul(S.E[2], run)));
-    S.extrude([S.W(x0 - 60, wy0 - 3, top(x0 - 60)), S.W(xe, wy0 - 3, top(xe)), S.W(xe, wy0 - 3, top(xe) + 7), S.W(x0 - 60, wy0 - 3, top(x0 - 60) + 7)], mul(S.E[1], wy1 - wy0 + 6), { mat: hr.marble });
+    const S = new Scene(); ground(S, hr, cam); S.E = frame(cam, 34);
+    const n = 12, run = 40, rise = 34, y0 = 70, y1 = 190, x0 = -250, xe = x0 + n * run;
+    for (let i = 0; i < n; i++) {
+      S.box(x0 + i * run, y0, 0, x0 + (i + 1) * run, y1, (i + 1) * rise, { mat: hr.stone });
+      S.box(x0 + i * run - 1.5, y0 - 1.5, (i + 1) * rise, x0 + i * run + 7, y1 + 1.5, (i + 1) * rise + 3, { mat: hr.marble });
+    }
     const extra = (cam) => ghostBox(S, cam, xe, y0, n * rise, xe + run, y1, (n + 1) * rise, hr.ink, 1.4);
-    return { S, cam, L: sunRel(cam, 40, 42), extra };
+    return { S, cam, L: sunRel(cam, 26, 40), extra };
   };
 
   // Field of gnomons — one instrument, replicated

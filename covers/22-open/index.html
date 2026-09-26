@@ -273,23 +273,23 @@ EMBLEMS['neural-networks-from-scratch'] = (g) => {
 
 /* Mathematical Foundations — gradient descent zig-zagging down a quadratic bowl (level sets = ellipses of the Hessian) */
 EMBLEMS['mathematical-foundations-for-ml'] = (g) => {
-  dotGrid(g, 7, 31, 112, 66, 4, 2);
-  const X = 392, Y = 592, th = -20 * Math.PI / 180, ct = Math.cos(th), st = Math.sin(th);
+  const X = 396, Y = 596, th = -18 * Math.PI / 180, ct = Math.cos(th), st = Math.sin(th);
   const P = (u, v) => [X + u * ct - v * st, Y + u * st + v * ct];
-  for (let k = 1; k <= 6; k++) { const a = 50 * k, b = 19 * k, seen = new Set();
-    for (let i = 0; i <= 720; i++) { const t = 2 * Math.PI * i / 720, [x, y] = P(a * Math.cos(t), b * Math.sin(t)), c = colOf(x), r = rowOf(y);
-      if (!seen.has(c + ',' + r)) { seen.add(c + ',' + r); g.put(c, r, '•', 1, 0, 700); } } }
-  ['.5', '2', '4.5', '8', '12.5', '18'].forEach((t, i) => { const k = i + 1; if (k < 2) return;
-    const [x, y] = P(50 * k, 0), c = colOf(x) - Math.floor(t.length / 2), r = rowOf(y);
-    g.clear(c - 1, r, t.length + 2, 1); g.text(c, r, t, 2, 0, 500); });
-  let u = -262, v = 74; const S = [[u, v]];
+  const F = (x, y) => { const dx = x - X, dy = y - Y, u = dx * ct + dy * st, v = -dx * st + dy * ct; return Math.hypot(u / 72, v / 27); }; // level index
+  const band = ['@', '#', '=', '-', ':'];
+  for (let r = 31; r <= 66; r++) for (let c = 6; c <= 113; c++) { const k = F(cx(c), cy(r)); if (k < 5) g.put(c, r, band[Math.floor(k)], 1, 0, k < 1 ? 800 : 600); }
+  const lv = ['.5', '2', '4.5', '8', '12.5'];
+  for (let k = 1; k <= 4; k++) { const [x, y] = P(72 * k, 0), t = 'f=' + lv[k - 1], c = colOf(x), r = rowOf(y); g.clear(c - 1, r, t.length + 2, 1); g.text(c, r, t, 2, 0, 700); }
+  let u = -330, v = 92; const S = [[u, v]];
   for (let i = 0; i < 9; i++) { u *= .70; v *= -.62; S.push([u, v]); }
   const pts = S.map(([a, b]) => P(a, b));
+  // clear a channel under the path so it reads over the bands
+  for (let i = 0; i < pts.length - 1; i++) { const [x0, y0] = pts[i], [x1, y1] = pts[i + 1], n = 60;
+    for (let s = 0; s <= n; s++) { const x = x0 + (x1 - x0) * s / n, y = y0 + (y1 - y0) * s / n; g.clear(colOf(x) - 1, rowOf(y), 3, 1); } }
   polyline(g, pts, 2, { wt: 800 });
   pts.forEach(([x, y], i) => { if (i > 5) return; tileT(g, colOf(x) - 1, rowOf(y), 3, 1, 2, String(i), { inset: .5 }); });
-  const [mx, my] = P(0, 0); tileT(g, colOf(mx) - 2, rowOf(my), 4, 1, 1, 'x*', { inset: .5 });
-  g.clear(7, 31, 26, 3);
-  g.text(8, 31, 'f(x) = ½ xᵀHx', 2, 0, 700); g.text(8, 32, 'x := x - η grad f(x)', 2, 0, 500);
+  const [mx, my] = P(0, 0); tileT(g, colOf(mx) - 2, rowOf(my), 4, 1, 2, 'x*', { inset: .5 });
+  g.clear(6, 31, 24, 2); g.text(6, 31, 'f(x) = ½ xᵀHx', 2, 0, 700); g.text(6, 32, 'x := x - η grad f(x)', 2, 0, 500);
 };
 
 /* Build Decision Trees from Scratch — the classic iris tree, splits and leaves as tiles, elbow connectors */
@@ -336,8 +336,8 @@ EMBLEMS['transformers-from-scratch'] = (g) => {
   const w = [.03, .46, .02, .02, .04, .02, .09, .03, .08, .03, .04, .14], q = 8, rT = 62;
   let c = 18; const pos = toks.map((t) => { const p = { c, w: t.length + 2 }; c += p.w + 1; return p; });
   const mid = (j) => (pos[j].c + pos[j].w / 2) * CW, qx = mid(q), yb = rT * CH - 3;
-  const order = toks.map((_, j) => j).filter((j) => j !== q).sort((a, b) => w[a] - w[b]);
-  for (const j of order) { const x = mid(j), a = Math.abs(x - qx) / 2, h = Math.min(56 + a * 1.4, 336), lo = Math.min(x, qx), hi = Math.max(x, qx);
+  const order = toks.map((_, j) => j).filter((j) => j !== q && w[j] >= .03).sort((a, b) => w[a] - w[b]);
+  for (const j of order) { const x = mid(j), a = Math.abs(x - qx) / 2, h = Math.min(70 + a * 1.75, 420), lo = Math.min(x, qx), hi = Math.max(x, qx);
     if (w[j] >= .3) { polyline(g, arcPts(lo, hi, yb, h), 2, { wt: 800 }); polyline(g, arcPts(lo + 8, hi - 8, yb, h - 14), 2, { wt: 800 }); }
     else if (w[j] >= .08) polyline(g, arcPts(lo, hi, yb, h), 1, { wt: 700 });
     else polyline(g, arcPts(lo, hi, yb, h), 1, { ch: '·', wt: 800 });
@@ -345,7 +345,7 @@ EMBLEMS['transformers-from-scratch'] = (g) => {
       g.clear(lc - 1, lr, 5, 1); g.text(lc, lr, lab, w[j] >= .3 ? 2 : 1, 0, 700); } }
   toks.forEach((t, j) => tileT(g, pos[j].c, rT, pos[j].w, 3, j === q ? 2 : j === 1 ? 1 : 3, t));
   g.text(pos[q].c, rT + 3, '^ query', 2, 0, 700);
-  const f = 'softmax(QKᵀ / √d) V'.replace('√', 'sqrt '); g.text(113 - f.length, 31, f, 2, 0, 500);
+  g.text(6, rT + 3, 'softmax(QKᵀ/ sqrt d) V', 1, 0, 500);
 };
 
 /* ---------------------------------------------------------------- VISION */
@@ -379,22 +379,23 @@ EMBLEMS['cnn-fundamentals'] = (g) => {
 /* DeiT — an image cut into 16 patches, flattened into a sequence with a class token and a distillation token */
 EMBLEMS['deit-from-scratch'] = (g) => {
   const P = 4, pw = 12, ph = 6, gx = 2, gy = 1, c0 = 33, r0 = 31, L = V3.norm([-.45, -.6, -.66]);
-  const shade = (u, v) => { const dx = (u + .02) / .80, dy = (v - .02) / .80, d2 = dx * dx + dy * dy;
-    if (d2 < 1) { const n = [dx, dy, -Math.sqrt(1 - d2)], lam = Math.max(0, V3.dot(n, L)), val = .1 + .9 * lam; return [dens(val, ' .:-=+*#%@'), val > .58 ? 2 : 1]; }
-    return null; };
+  // a full-frame picture: a lit sphere, its shadow, a horizon; every patch carries something
+  const shade = (u, v) => { const dx = (u + .08) / .62, dy = (v + .1) / .62, d2 = dx * dx + dy * dy;
+    if (d2 < 1) { const n = [dx, dy, -Math.sqrt(1 - d2)], lam = Math.max(0, V3.dot(n, L)), val = .12 + .88 * lam; return [dens(val, ' .:-=+*#%@'), val > .58 ? 2 : 1]; }
+    if (v > .42) { const sh = Math.hypot((u - .22) / .7, (v - .66) / .16) < 1; return [sh ? '#' : (Math.round(v * 20) % 2 ? '-' : '='), sh ? 1 : 3]; }
+    return [(Math.round((u + 1) * 30) + Math.round((v + 1) * 11)) % 4 === 0 ? '.' : ' ', 3]; };
   for (let pj = 0; pj < P; pj++) for (let pi = 0; pi < P; pi++) {
     const pc = c0 + pi * (pw + gx), pr = r0 + pj * (ph + gy);
     for (let y = 0; y < ph; y++) for (let x = 0; x < pw; x++) { const u = (pi * pw + x + .5) / (P * pw) * 2 - 1, v = (pj * ph + y + .5) / (P * ph) * 2 - 1, s = shade(u, v);
-      if (s) g.put(pc + x, pr + y, s[0], s[1], 0, 700); else if ((x + y) % 2 === 0 && y % 2 === 0) g.put(pc + x, pr + y, '·', 3); }
-    g.text(pc, pr, String(pj * P + pi + 1), 1, 0, 500); }
-  const rs = 61; let c = 6;
-  tileT(g, c, rs, 5, 3, 1, 'cls'); c += 6; const distC = c; tileT(g, c, rs, 6, 3, 2, 'dist'); c += 7;
-  for (let k = 0; k < 16; k++) { const pi = k % P, pj = Math.floor(k / P); g.tile(c, rs, 5, 3, 3, 1);
-    for (let y = 0; y < 3; y++) for (let x = 0; x < 5; x++) { const u = (pi * pw + (x + .5) * pw / 5) / (P * pw) * 2 - 1, v = (pj * ph + (y + .5) * ph / 3) / (P * ph) * 2 - 1, s = shade(u, v);
-      if (s) g.put(c + x, rs + y, s[0], s[1], 0, 700); }
+      if (s[0] !== ' ') g.put(pc + x, pr + y, s[0], s[1], 0, 700); } }
+  for (let k = 0; k < 16; k++) { const pi = k % P, pj = Math.floor(k / P); g.text(c0 + pi * (pw + gx) + pw + (pi < 3 ? 0 : 1), r0 + pj * (ph + gy), String(k + 1).padStart(2, ' '), 1, 0, 500); }
+  const rs = 60; let c = 6;
+  tileT(g, c, rs, 5, 5, 1, 'cls'); c += 6; const distC = c; tileT(g, c, rs, 6, 5, 2, 'dist'); c += 7;
+  for (let k = 0; k < 16; k++) { const pi = k % P, pj = Math.floor(k / P); frame(g, c, rs, 5, 5, 3, 500, '+-|');
+    for (let y = 0; y < 3; y++) for (let x = 0; x < 3; x++) { const u = (pi * pw + (x + .5) * pw / 3) / (P * pw) * 2 - 1, v = (pj * ph + (y + .5) * ph / 3) / (P * ph) * 2 - 1, s = shade(u, v);
+      if (s[0] !== ' ') g.put(c + 1 + x, rs + 1 + y, s[0], s[1], 0, 700); }
     c += 6; }
-  g.text(distC, rs + 3, '^ distillation token: learns from a teacher', 1, 0, 700);
-  g.text(6, rs - 2, 'sequence', 1, 0, 500);
+  g.text(distC, rs + 5, '^ distillation token: learns from a teacher', 1, 0, 700);
 };
 
 /* ---------------------------------------------------------------- SYSTEMS */
@@ -418,6 +419,7 @@ EMBLEMS['5d-parallelism'] = (g) => {
   brace(xs[0], xs[3] + tw - 1, 33, 'dp = 0'); brace(xs[4], xs[7] + tw - 1, 33, 'dp = 1');
   g.text(6, ys[0] + 6, 'pp', 1, 0, 700); g.text(6, ys[2] + 6, 'pp', 1, 0, 700);
   g.text(6, ys[0] + 7, '=0', 1, 0, 700); g.text(6, ys[2] + 7, '=1', 1, 0, 700);
+  g.text(6, ys[0] + 2, 'cp', 1, 0, 500); g.text(6, ys[0] + 3, '=0', 1, 0, 500); g.text(6, ys[1] + 2, 'cp', 1, 0, 500); g.text(6, ys[1] + 3, '=1', 1, 0, 500);
 };
 
 /* Kernel Engineering (coming soon) — a tiled GEMM, C += A·B, caught mid-run: the kernel is still computing */
@@ -558,7 +560,8 @@ function factory(g, numeral, inside, belt) {
   inside(g, dc + 4, dr + 7, dw - 8, dh - 8);
   g.tile(dc, dr, dw, 2, 2, 0); g.tile(dc, dr, 3, dh, 2, 0); g.tile(dc + dw - 3, dr, 3, dh, 2, 0);
   tileT(g, dc + 8, dr + 3, dw - 16, 1, 1, 'ROOM ' + numeral, { inset: 0 });
-  bigNumeral(g, numeral, 112, 32, 4, 2, 1);
+  const px = 5, py = 3, wpx = [...numeral].reduce((a, ch) => a + NUMERAL[ch][0].length, 0) + numeral.length - 1;
+  bigNumeral(g, numeral, Math.round(78 + wpx * px / 2) - 1, 32, px, py, 1);
   for (let c = dc + dw; c <= 113; c++) g.put(c, br, '=', 2, 0, 800);
   for (let c = dc + dw + 1; c <= 110; c += 5) g.text(c, br + 1, '(o)', 1, 0, 700);
   for (let c = dc + dw + 9; c <= 108; c += 24) { g.put(c + 1, br + 2, '|', 1, 0, 700); g.put(c + 1, br + 3, '|', 1, 0, 700); g.text(c, br + 4, '/_\\', 1, 0, 700); }
@@ -583,7 +586,7 @@ EMBLEMS['charlie-sound-room'] = (g) => factory(g, 'III',
     for (let i = 0; i <= 90; i++) { const t = -Math.PI / 2.4 + (Math.PI / 1.2) * i / 90; pts.push([x0 + Math.cos(t) * k * 30, yc + Math.sin(t) * k * 30]); }
     polyline(g, pts, 1, { wt: 700 }); } tileT(g, c, rowOf(yc) - 1, 3, 3, 1, ''); },
   (g, c, r) => { for (let x = c; x <= 112; x++) { const t = (x - c) / 68, env = Math.sin(Math.PI * t) ** .6;
-    const a = Math.round(env * (2 + 9 * Math.abs(Math.sin(x * .9) * Math.cos(x * .23)))); for (let y = 0; y < a; y++) g.put(x, r - y, '|', y >= a - 2 ? 2 : 1, 0, 800); } });
+    const a = Math.round(env * (1 + 6 * Math.abs(Math.sin(x * .9) * Math.cos(x * .23)))); for (let y = 0; y < a; y++) g.put(x, r - y, '|', y >= a - 2 ? 2 : 1, 0, 800); } });
 
 EMBLEMS['charlie-reasoning-room'] = (g) => factory(g, 'IV',
   (g, c, r, w, h) => { for (let y = r; y < r + h; y += 3) for (let x = c + ((y - r) % 2 ? 2 : 0); x < c + w; x += 4) g.put(x, y, '?', 1, 0, 800); },

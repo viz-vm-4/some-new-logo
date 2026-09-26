@@ -93,6 +93,8 @@
       const [i, j] = [0, 1, 2].filter(a => a !== k);
       const us = f.pts.map(p => dot(p, E[i])), vs = f.pts.map(p => dot(p, E[j]));
       const r = [Math.min(...us), Math.min(...vs), Math.max(...us), Math.max(...vs)];
+      const isRect = us.every(u => Math.abs(u - r[0]) < 1e-6 || Math.abs(u - r[2]) < 1e-6) && vs.every(v => Math.abs(v - r[1]) < 1e-6 || Math.abs(v - r[3]) < 1e-6);
+      if (!isRect) return;
       const c = Math.round(dot(f.pts[0], E[k]) * 1000) / 1000;
       info.set(idx, { k, i, j, c, r, sub: [] });
       const key = k + ':' + c; if (!groups.has(key)) groups.set(key, []); groups.get(key).push(idx);

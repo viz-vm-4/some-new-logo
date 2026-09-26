@@ -183,7 +183,7 @@ const CSS = `
 *{box-sizing:border-box}
 html{background:#E4DDCF}
 body{margin:0;color:${C.ink};font-family:'Anek Latin',sans-serif;font-stretch:100%}
-.intro{max-width:1540px;margin:0 auto;padding:72px 56px 24px;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:40px 72px}
+.intro{max-width:1520px;margin:0 auto;padding:72px 56px 24px;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:40px 72px}
 .intro h1{grid-column:1/-1;margin:0;font:400 132px/0.9 'Tiro Tamil',serif;letter-spacing:-.02em;display:flex;align-items:flex-end;gap:28px;flex-wrap:wrap}
 .intro h1 small{font:500 15px/1.4 'Anek Latin',sans-serif;letter-spacing:.14em;text-transform:uppercase;padding-bottom:18px}
 .intro h1 .ta{font-family:'Anek Tamil',sans-serif;font-weight:400;font-size:64px;letter-spacing:0;color:${C.kaavi};padding-bottom:10px}
@@ -195,18 +195,18 @@ body{margin:0;color:${C.ink};font-family:'Anek Latin',sans-serif;font-stretch:10
 .sw div{height:96px;padding:10px 12px;font-size:13px;line-height:1.3;display:flex;flex-direction:column;justify-content:flex-end;border:1px solid rgba(0,0,0,.08)}
 .sw b{font-weight:600}
 .type{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.type div{border-top:2px solid ${C.ink};padding-top:10px;font-size:14px}
+.type>div{border-top:2px solid ${C.ink};padding-top:10px;font-size:14px;line-height:1.4}
 .type .s1{font:400 40px/1 'Tiro Tamil',serif;margin:4px 0 6px}
 .type .s2{font:600 30px/1 'Anek Latin',sans-serif;margin:4px 0 6px;letter-spacing:.02em}
 .type .s3{font:500 30px/1 'Anek Tamil',sans-serif;margin:4px 0 6px}
 .levels{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .levels div{padding:14px 14px 12px;font-size:14px;line-height:1.35}
-.levels b{display:block;font-weight:600;font-size:15px;margin-top:8px}
+.levels .ln{display:block;font-weight:600;font-size:15px;margin-top:10px}
 .grammar-fig{display:block;width:100%;height:auto;max-width:720px}
 .grammar-fig text{font:500 14px 'Anek Latin',sans-serif;fill:${C.ink}}
-.section-h{max-width:1540px;margin:40px auto 0;padding:0 56px;font:600 13px/1 'Anek Latin',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:${C.kaavi};display:flex;justify-content:space-between;border-top:2px solid ${C.ink};padding-top:14px}
+.section-h{max-width:1488px;margin:40px auto 0;padding:0;font:600 13px/1 'Anek Latin',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:${C.kaavi};display:flex;justify-content:space-between;border-top:2px solid ${C.ink};padding-top:14px}
 .section-h span:last-child{color:${C.ink};letter-spacing:.06em;text-transform:none;font-weight:500;font-size:15px}
-.covers{display:flex;flex-wrap:wrap;gap:56px 48px;padding:36px 56px 24px;max-width:1540px;margin:0 auto;justify-content:flex-start}
+.covers{display:flex;flex-wrap:wrap;gap:56px 40px;padding:36px 0 24px;max-width:1520px;margin:0 auto;justify-content:center}
 .cap{width:720px;font-size:14px;line-height:1.45;margin-top:12px;color:#3b362f}
 .cap b{font-weight:600;color:${C.ink}}
 figure{margin:0}
@@ -231,7 +231,7 @@ figure{margin:0}
 .spec [lang=ta],[lang=ta]{font-family:'Anek Tamil',sans-serif;letter-spacing:0}
 
 /* ---- wrap ---- */
-.wrap-holder{max-width:1540px;margin:0 auto;padding:36px 56px 24px}
+.wrap-holder{max-width:1600px;margin:0 auto;padding:36px 0 24px;display:flex;justify-content:center}
 .wrap{display:flex;height:888px;background:var(--bg);color:var(--fg);box-shadow:0 1px 0 rgba(0,0,0,.05)}
 .wrap .face{flex:none}
 .back{padding:0}
@@ -253,7 +253,7 @@ figure{margin:0}
 .spine-k{position:absolute;left:0;top:0}
 .spine-pips{position:absolute;bottom:40px;left:0;right:0;display:flex;justify-content:center}
 .spine-pips .pips{flex-direction:column}
-.notes-foot{max-width:1540px;margin:24px auto 80px;padding:18px 56px 0;font-size:14px;line-height:1.55;color:#3b362f}
+.notes-foot{max-width:1488px;margin:24px auto 80px;padding:18px 0 0;font-size:14px;line-height:1.55;color:#3b362f}
 .notes-foot p{max-width:70em;margin:0 0 8px}
 @media (max-width:900px){.intro{grid-template-columns:1fr}.intro h1{font-size:88px}}
 `;
@@ -282,9 +282,9 @@ function page() {
   <div>
     <h3>Palette — the ground is the level</h3>
     <div class="levels">
-      <div style="background:${C.paper};color:${C.ink};border:1px solid rgba(0,0,0,.1)">${pips(1)}<b>Beginner</b>Ink on notebook paper — where kolams are practised.</div>
-      <div style="background:${C.kaavi};color:${C.rice}">${pips(2)}<b>Intermediate</b>Rice flour on kaavi, the red-oxide doorstep.</div>
-      <div style="background:${C.earth};color:${C.rice}">${pips(3)}<b>Advanced</b>Rice flour on swept earth before dawn.</div>
+      <div style="background:${C.paper};color:${C.ink};border:1px solid rgba(0,0,0,.1)">${pips(1)}<span class="ln">Beginner</span>Ink on notebook paper — where kolams are practised.</div>
+      <div style="background:${C.kaavi};color:${C.rice}">${pips(2)}<span class="ln">Intermediate</span>Rice flour on kaavi, the red-oxide doorstep.</div>
+      <div style="background:${C.earth};color:${C.rice}">${pips(3)}<span class="ln">Advanced</span>Rice flour on swept earth before dawn.</div>
     </div>
     <div class="sw" style="margin-top:10px">
       <div style="background:${C.rice}"><b>Arisi maavu</b>${C.rice}</div>
