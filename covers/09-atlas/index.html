@@ -190,7 +190,7 @@ const W = 8, TICK = 5.5, R = 18, NS = 'http://www.w3.org/2000/svg';
 /* numeral colour on a bullet: whichever of white / ink contrasts more (ink on saffron, lime, lifted night inks) */
 function lum(hex){ const c=hex.replace('#',''); const v=[0,2,4].map(i=>parseInt(c.substr(i,2),16)/255).map(x=>x<=0.03928?x/12.92:Math.pow((x+0.055)/1.055,2.4)); return 0.2126*v[0]+0.7152*v[1]+0.0722*v[2]; }
 function inkOn(hex){ if(!/^#[0-9a-fA-F]{6}$/.test(hex)) return '#fff'; const L=lum(hex); return (1.05/(L+0.05)) >= ((L+0.05)/(lum('#16181B')+0.05)) ? '#fff' : '#16181B'; }
-const AUDIT=[];
+const AUDIT=[]; const MINP={};
 
 const sub=(a,b)=>[a[0]-b[0],a[1]-b[1]], add=(a,b)=>[a[0]+b[0],a[1]+b[1]], mul=(a,k)=>[a[0]*k,a[1]*k];
 const len=a=>Math.hypot(a[0],a[1]), norm=a=>{const l=len(a)||1;return [a[0]/l,a[1]/l]};
@@ -310,7 +310,7 @@ function makeMap(svg, book, slug){
         us.push(map(A*t));
       }
       const side=o.side??1;
-      for(let i=1;i<us.length;i++){ const dp=len(sub(pointAt(path,us[i]).p,pointAt(path,us[i-1]).p)); if(dp<10) AUDIT.push(`${slug}: part ${part} pitch ${dp.toFixed(1)}px`); }
+      for(let i=1;i<us.length;i++){ const dp=len(sub(pointAt(path,us[i]).p,pointAt(path,us[i-1]).p)); MINP[slug]=Math.min(MINP[slug]??1e9,dp); if(dp<10) AUDIT.push(`${slug}: part ${part} pitch ${dp.toFixed(1)}px`); }
       us.forEach((s,i)=>{
         const num=first[part]+used[part]+i;
         const {p,d}=pointAt(path,s); const nrm=mul(leftN(d),side);

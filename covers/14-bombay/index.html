@@ -547,11 +547,20 @@ function notchRect(x, y, w, h, r){
 }
 
 /* ---------- lettering pieces ---------- */
+const scriptMetrics = (size) => ({ sh: Math.max(1.5, size*0.055), sw: Math.max(2, size*0.085) });
 function scriptText(txt, x, y, size, fill, anchor='start'){
-  const sh = Math.max(1.5, size*0.055), sw = F(Math.max(2, size*0.085));
+  const {sh, sw} = scriptMetrics(size);
+  // three separate layers (shadow, keyline, fill) instead of paint-order, which Chrome's PDF ignores
   return `<g font-family="${SCRIPT}" font-size="${F(size)}" text-anchor="${anchor}" stroke-linejoin="round">
-    <text x="${F(x+sh)}" y="${F(y+sh)}" fill="${P.coal}" stroke="${P.coal}" stroke-width="${sw}">${esc(txt)}</text>
-    <text x="${F(x)}" y="${F(y)}" fill="${fill}" stroke="${P.coal}" stroke-width="${sw}" paint-order="stroke">${esc(txt)}</text></g>`;
+    <text x="${F(x+sh)}" y="${F(y+sh)}" fill="${P.coal}" stroke="${P.coal}" stroke-width="${F(sw)}">${esc(txt)}</text>
+    <text x="${F(x)}" y="${F(y)}" fill="${P.coal}" stroke="${P.coal}" stroke-width="${F(sw)}">${esc(txt)}</text>
+    <text x="${F(x)}" y="${F(y)}" fill="${fill}">${esc(txt)}</text></g>`;
+}
+// ink extents of a script word (Yellowtail's terminals hang well past its advance width)
+function scriptInk(txt, size){
+  ctx2d.font = `${size}px ${SCRIPT}`;
+  const m = ctx2d.measureText(txt);
+  return { left: m.actualBoundingBoxLeft || 0, right: (m.actualBoundingBoxRight != null ? m.actualBoundingBoxRight : m.width) };
 }
 function tradeStyle(sh, H){
   const L = sh.letter;
@@ -559,7 +568,7 @@ function tradeStyle(sh, H){
 }
 // an acronym tag: the sign-painter's small cartouche ("Regd.", "Estd.") used for (LLMs), (DeiT) ...
 function tagPiece(txt, H, sh){
-  const size = H*0.4, pad = size*0.55;
+  const size = H*0.46, pad = size*0.5;
   const w = textW(txt, `800 ${size}px "Anek Latin"`, 'condensed') + txt.length*size*0.04 + pad*2, h = size*1.3;
   const y0 = H*0.5 - h/2;
   const svg = `<rect x="${F(2)}" y="${F(y0+3)}" width="${F(w)}" height="${F(h)}" rx="${F(h/2)}" fill="${P.coal}"/>
@@ -573,7 +582,8 @@ function mixLine(items, H0, sh, measure){
   for (let pass = 0; pass < 4; pass++) {
     let x = 0, depth = 0; const parts = [];
     items.forEach((it, i) => {
-      if (i) x += H * (it.s || (items[i-1] && items[i-1].s) ? 0.16 : 0.24);
+      // x is always the right edge of the previous item's ink (incl. keyline and shadow)
+      if (i) x += H * (it.s || items[i-1].s ? 0.2 : 0.24);
       if (it.t || it.tt) {
         const txt = it.t || it.tt;
         const u = (it.r || 0.56) * H;
@@ -582,10 +592,10 @@ function mixLine(items, H0, sh, measure){
         parts.push(`<g transform="translate(${F(x)} 0)">${p.svg}</g>`);
         x += p.w; depth = Math.max(depth, p.depth);
       } else if (it.s) {
-        const size = H * (it.k || 1.0);
-        const w = textW(it.s, `${size}px ${SCRIPT}`);
-        parts.push(scriptText(it.s, x, H * (it.base || 0.94), size, sh.script));
-        x += w;
+        const size = H * (it.k || 1.0), ink = scriptInk(it.s, size), {sh: sd, sw} = scriptMetrics(size);
+        const ox = x + ink.left + sw/2;
+        parts.push(scriptText(it.s, ox, H * (it.base || 0.94), size, sh.script));
+        x = ox + ink.right + sw/2 + sd;
       } else if (it.tag) {
         const tg = tagPiece(it.tag, H, sh);
         parts.push(`<g transform="translate(${F(x)} 0)">${tg.svg}</g>`);
@@ -672,7 +682,7 @@ function label(book, sh, x, y, w, h){
 
 /* ---------- level stamp (perforated) ---------- */
 function stamp(level, x, y){
-  const Lv = LEVEL[level], w = 84, h = 104, pr = 4.2, step = 10.5;
+  const Lv = LEVEL[level], w = 94, h = 104, pr = 4.2, step = 10.5;
   // perforated outline as one vector path: walk the edges, biting a half-hole at each perforation
   const bites = (len) => { const c = []; for (let i = step/2; i < len; i += step) c.push(i); return c; };
   let d = 'M0 0';
@@ -692,7 +702,7 @@ function stamp(level, x, y){
     <rect x="8" y="8" width="${w-16}" height="${h-16}" fill="${Lv.field}" stroke="${P.coal}" stroke-width="1.5"/>
     <text x="${w/2}" y="24" text-anchor="middle" ${ANEK} font-weight="800" font-size="11" letter-spacing="2.2" fill="${Lv.num}">LEVEL</text>
     <g transform="translate(${F((w-nP.w)/2)} 31)">${nP.svg}</g>
-    <text x="${w/2}" y="${h-15}" text-anchor="middle" ${ANEK} font-weight="800" font-size="${Lv.word.length>9?8.8:10.5}" letter-spacing="${Lv.word.length>9?0.7:1.6}" fill="${Lv.num}">${Lv.word}</text>
+    <text x="${w/2}" y="${h-15}" text-anchor="middle" ${ANEK} font-weight="800" font-size="10.5" letter-spacing="0.6" fill="${Lv.num}">${Lv.word}</text>
   </g>`;
 }
 
@@ -712,17 +722,21 @@ function imprint(sh, x, y){
   </g>`;
 }
 
+/* ---------- sub-series tab: BOOK n OF IV, a painted cartouche on the label's shoulder ---------- */
+function seriesTab(no, sh, x, y){
+  const t = `BOOK ${no} OF IV`, size = 14;
+  const w = textW(t, `800 ${size}px "Anek Latin"`, 'condensed') + t.length*2.2 + 28, h = 28;
+  return `<g transform="translate(${x} ${y})">
+    <rect x="3" y="3" width="${F(w)}" height="${h}" rx="${h/2}" fill="${P.coal}" fill-opacity=".45"/>
+    <rect width="${F(w)}" height="${h}" rx="${h/2}" fill="${P.yellow}" stroke="${P.coal}" stroke-width="2.6"/>
+    <text x="${F(w/2)}" y="19" text-anchor="middle" ${ANEK} font-weight="800" font-size="${size}" letter-spacing="2.2" fill="${P.coal}">${t}</text></g>`;
+}
+
 /* ---------- the cover ---------- */
 function cover(book){
   const sh = SHELF[book.shelf];
   const W = 720, H = 888;
-  let top = 58;
-  let series = '';
-  if (book.series) {
-    top = 86;
-    series = `<text x="${W/2}" y="64" text-anchor="middle" ${ANEK} font-weight="800" font-size="15" letter-spacing="3.4" fill="${sh.ink}">CHARLIE AND THE INTELLIGENCE FACTORY&#8195;·&#8195;BOOK ${book.series}</text>
-      <path d="M190 78H530" stroke="${sh.ink}" stroke-width="2"/>`;
-  }
+  const top = 58;
   const tb = titleBlock(book.title, sh, 612);
   const bottom = 428;
   const ty = top + Math.max(0, (bottom - top - tb.h)/2);
@@ -731,10 +745,10 @@ function cover(book){
     <rect width="${W}" height="${H}" fill="${sh.board}"/>
     <path d="${notchRect(16,16,W-32,H-32,22)}" fill="none" stroke="${sh.rule}" stroke-width="4"/>
     <path d="${notchRect(25,25,W-50,H-50,16)}" fill="none" stroke="${sh.rule}" stroke-width="1.5"/>
-    ${series}
     <g transform="translate(${W/2} ${F(ty)})">${tb.svg}</g>
     ${label(book, sh, Lx, Ly, Lw, Lh)}
-    ${stamp(book.level, Lx + Lw - 58, Ly - 32)}
+    ${book.series ? seriesTab(book.series, sh, Lx + 16, Ly - 22) : ''}
+    ${stamp(book.level, Lx + Lw - 64, Ly - 32)}
     ${imprint(sh, 48, 846)}
     <text x="${W-48}" y="843" text-anchor="end" ${ANEK} font-weight="700" font-size="15" letter-spacing="2.6" fill="${sh.ink}">${esc(sh.name.toUpperCase())}</text>
   </svg>`;
@@ -762,32 +776,36 @@ const arrow = (x1,y1,x2,y2,sw=4.5,col=P.coal,dash='') => {
 };
 
 const EMBLEM = {
-  /* AI Context Engineering — an overflowing pile of candidate context, and the
-     curated window it is packed into, with its token-budget gauge. */
+  /* AI Context Engineering — the context window as one object: a frame packed with
+     system, tools, memory, documents, history and query; two slips that did not fit
+     lie across the top; a token-budget gauge runs up the side. */
   contextWindow(pw, ph){
-    const wx = 268, wy = 22, ww = 150, wh = ph - 44, cx = wx + ww/2;
+    const ww = 206, wh = 188, wx = pw/2 - ww/2 - 12, wy = ph - wh - 20, cx = wx + ww/2, cy = wy + wh/2;
     let s = '';
-    const cols = [P.paper,P.yellow,P.paper,P.blue,P.paper,P.paper,P.red,P.paper,P.green,P.paper,P.yellow,P.paper,P.paper,P.blue,P.paper,P.red,P.paper];
-    const jit = [0,6,-5,3,-7,5,-2,7,-4,2,-6,4,-3,6,-1,5,-5];
-    cols.forEach((c,i)=>{ const yy = ph - 22 - i*15; s += R_(40 + jit[i], yy, 104 - (i%3)*8, 12, c, 2.4); });
-    s += `<path d="M170 ${ph/2 - 6} C 198 ${ph/2 - 44}, 230 ${ph/2 - 44}, 252 ${ph/2 - 14}" fill="none" stroke="${P.coal}" stroke-width="5" stroke-linecap="round"/>` + arrowHead(258, ph/2 - 6, 0.95, 17);
-    s += `<rect x="${wx-10}" y="${wy-10}" width="${ww+20}" height="${wh+20}" fill="${P.coal}"/>`;
+    // left-out slips resting across the top of the frame
+    s += `<g transform="rotate(-9 ${cx - 40} ${wy - 6})">${R_(cx - 104, wy - 14, 130, 15, P.paper, 2.6)}${Ln(cx - 94, wy - 6.5, cx - 14, wy - 6.5, 2.4)}</g>`;
+    s += `<g transform="rotate(7 ${cx + 50} ${wy - 10})">${R_(cx - 6, wy - 20, 118, 15, P.blue, 2.6)}</g>`;
+    s += `<rect x="${wx-11}" y="${wy-11}" width="${ww+22}" height="${wh+22}" fill="${P.coal}"/>`;
     s += R_(wx, wy, ww, wh, P.paper);
-    const slips = [[P.red,14],[P.blue,24],[P.green,18],[P.yellow,26],[P.yellow,16],[P.paper,32],[P.red,14]];
-    let yy = wy + 7;
+    const slips = [[P.red,15],[P.blue,24],[P.green,19],[P.yellow,27],[P.yellow,17],[P.paper,34],[P.red,15]];
+    const gapY = (wh - 12 - slips.reduce((a, b) => a + b[1], 0)) / (slips.length - 1);
+    let yy = wy + 6;
     slips.forEach(([c,h])=>{
-      s += R_(wx+7, yy, ww-14, h, c, 2.4);
-      if (c === P.paper) for (let k=0;k<3;k++) s += Ln(wx+15, yy+8+k*7.5, wx+ww-(24+k*20), yy+8+k*7.5, 2);
-      yy += h + 4.5;
+      s += R_(wx+8, yy, ww-16, h, c, 2.6);
+      if (c === P.paper) for (let k=0;k<3;k++) s += Ln(wx+18, yy+9+k*8, wx+ww-(30+k*26), yy+9+k*8, 2.4);
+      yy += h + gapY;
     });
-    const gx = wx + ww + 32;
-    s += R_(gx-6, wy, 12, wh, P.paper, 2.4) + R_(gx-6, wy + wh*0.08, 12, wh*0.92, P.red, 2.4);
-    for (let k=0;k<=8;k++) s += Ln(gx+6, wy + k*wh/8, gx+13, wy + k*wh/8, 2.2);
-    return {svg:s, center:[cx, ph/2], rays:44};
+    // token-budget gauge, fixed to the frame
+    const gx = wx + ww + 11;
+    s += R_(gx, wy - 11, 22, wh + 22, P.coal, 0);
+    s += R_(gx + 5, wy - 2, 12, wh + 4, P.paper, 2) + R_(gx + 5, wy + 12, 12, wh - 10, P.red, 2);
+    for (let k=0;k<=8;k++) s += Ln(gx + 22, wy + k*wh/8, gx + 32, wy + k*wh/8, 2.6);
+    s += tagT(gx + 54, wy + wh - 12, 'BUDGET', 'middle', 12);
+    return {svg:s, center:[cx, cy], rays:44};
   },
 
   /* Mathematical Foundations — gradient descent: a ball on a curve, its tangent,
-     and the shrinking steps down to the minimum. */
+     and the shrinking steps down to the flagged minimum. */
   gradient(pw, ph){
     const cx = pw/2 + 44, bottom = ph - 40, a = 0.0027;
     const f = (x) => bottom - a*(x - cx)*(x - cx);
@@ -800,47 +818,51 @@ const EMBLEM = {
       for (let x = -20; x <= pw+20; x += 4) dd += (dd?'L':'M') + `${F(x)} ${F(f(x) + k*13)}`;
       s += `<path d="${dd}" fill="none" stroke="${P.coal}" stroke-width="2" stroke-dasharray="2 7" stroke-linecap="round"/>`;
     }
-    const xs = [cx-176, cx-112, cx-66, cx-36, cx-16, cx-5];
     const lift = (x, r) => { const sl = fp(x), n = Math.hypot(sl, 1); return [x + sl/n*r, f(x) - 1/n*r]; };
+    // the minimum, flagged exactly at the bottom of the curve
+    s += Ln(cx, f(cx) - 2, cx, f(cx) - 64, 3) + `<path d="M${cx} ${F(f(cx)-64)}l28 9l-28 9z" fill="${P.red}" stroke="${P.coal}" stroke-width="2.4" stroke-linejoin="round"/>`;
+    const xs = [cx-176, cx-112, cx-66, cx-34, cx-13, cx];
     for (let i = 0; i < xs.length-1; i++) {
       const [x1,y1] = lift(xs[i], i ? 8 : 20), [x2,y2] = lift(xs[i+1], 8);
       const mx = (x1+x2)/2, my = Math.min(y1,y2) - 30 + i*4;
       s += `<path d="M${F(x1)} ${F(y1)}Q${F(mx)} ${F(my)} ${F(x2)} ${F(y2)}" fill="none" stroke="${P.coal}" stroke-width="3" stroke-dasharray="6 5"/>`;
     }
     xs.slice(1).forEach((x)=>{ const [bx,by] = lift(x, 7); s += C_(bx, by, 6.5, P.yellow, 2.4); });
-    // flag at the minimum
-    s += Ln(cx + 26, f(cx+26) + 1, cx + 26, f(cx+26) - 58, 3) + `<path d="M${cx+26} ${F(f(cx+26)-58)}l28 9l-28 9z" fill="${P.red}" stroke="${P.coal}" stroke-width="2.4" stroke-linejoin="round"/>`;
-    // the ball and its tangent
     const x0 = xs[0], sl = fp(x0), n = Math.hypot(1, sl), tx = 1/n, ty = sl/n, L = 118;
     s += Ln(x0 - tx*L, f(x0) - ty*L, x0 + tx*L, f(x0) + ty*L, 5, P.red, 'stroke-linecap="round"');
-    // rise over run
     const [bx, by] = lift(x0, 20);
     s += C_(bx, by, 20, P.red) + `<circle cx="${F(bx-7)}" cy="${F(by-7)}" r="5" fill="${P.paper}"/>`;
     return {svg:s, center:[cx, f(cx) - 20], rays:44};
   },
 
-  /* Neural Networks from Scratch — a 3-4-4-2 multilayer perceptron; weight shown
-     by line weight, each hidden unit carrying its activation curve. */
-  network(pw, ph){
-    const cx = pw/2, cy = ph/2;
-    const layers = [3,4,4,2], gapx = 112, r = 18;
-    const X = (i) => cx + (i - (layers.length-1)/2)*gapx;
-    const Y = (n, j) => cy + (j - (n-1)/2)*50;
-    const wts = [0.9,0.3,0.2,0.7,0.1,0.3,0.5,0.2,0.8,0.1,0.6,0.4,0.6,0.1,0.9,0.2,0.2,0.5,0.3,0.4,0.8,0.1,0.6,0.2,0.2,0.7,0.4,0.9,0.3,0.6,0.2,0.5,0.1,0.6,0.8,0.3];
-    let e = '', nodes = '', q = 0;
-    for (let i = 0; i < layers.length-1; i++)
-      for (let a = 0; a < layers[i]; a++) for (let b = 0; b < layers[i+1]; b++) {
-        const wv = wts[(q++)%wts.length];
-        e += Ln(X(i), Y(layers[i],a), X(i+1), Y(layers[i+1],b), F(1.6 + wv*4.6));
-      }
-    layers.forEach((n,i)=>{ for (let j=0;j<n;j++){
-      const x = X(i), y = Y(n,j);
-      const last = i === layers.length-1;
-      nodes += C_(x, y, r, i===0?P.paper : last?P.coal : P.yellow);
-      if (i>0 && !last) nodes += `<path d="M${F(x-11)} ${F(y+6)} C ${F(x-1)} ${F(y+7)}, ${F(x+1)} ${F(y-7)}, ${F(x+11)} ${F(y-6)}" fill="none" stroke="${P.coal}" stroke-width="2.6"/>`;
-      if (last) nodes += `<circle cx="${F(x)}" cy="${F(y)}" r="6" fill="${P.yellow}"/>`;
-    }});
-    return {svg:e+nodes, rays:44};
+  /* Neural Networks from Scratch — one neuron, opened up: three input wires whose
+     thickness is their weight, the summing drum, a bias knob, the activation window,
+     one output. The thing you actually build first. */
+  neuron(pw, ph){
+    let s = '';
+    const dx = 222, dy = ph/2 - 6, r = 52;
+    const ins = [[40, 40, 3.5], [40, dy, 10], [40, ph - 52, 6.5]];
+    ins.forEach(([x, y, w]) => { s += `<path d="M${x} ${y}C ${x + 90} ${y}, ${dx - 90} ${dy}, ${dx - 20} ${dy}" fill="none" stroke="${P.coal}" stroke-width="${w}"/>`; });
+    ins.forEach(([x, y]) => { s += C_(x, y, 13, P.paper); });
+    // bias knob feeding up into the drum
+    const kx = dx, ky = ph - 30;
+    s += Ln(kx, ky - 18, kx, dy + r - 2, 4.5);
+    s += C_(kx, ky, 18, P.paper);
+    for (let k = 0; k < 5; k++) { const a = Math.PI*(1.1 + k*0.2); s += Ln(kx + Math.cos(a)*22, ky + Math.sin(a)*22, kx + Math.cos(a)*27, ky + Math.sin(a)*27, 2.4); }
+    s += Ln(kx, ky, kx + 10, ky - 11, 4, P.red, 'stroke-linecap="round"');
+    s += tagT(kx + 34, ky + 2, 'BIAS', 'start', 12);
+    // summing drum
+    s += C_(dx, dy, r, P.yellow, 4.5);
+    const sg = 30, sx = dx - sg*0.46, sy = dy - sg*0.62;
+    s += `<path d="M${F(sx + sg*0.95)} ${F(sy + 7)}V${F(sy)}H${F(sx)}L${F(sx + sg*0.5)} ${F(dy)}L${F(sx)} ${F(sy + sg*1.24)}H${F(sx + sg*0.95)}V${F(sy + sg*1.24 - 7)}" fill="none" stroke="${P.coal}" stroke-width="7" stroke-linejoin="miter" stroke-miterlimit="10"/>`;
+    // activation window
+    const ax = dx + r + 36, aw = 96, ah = 84, ay = dy - ah/2;
+    s += Ln(dx + r, dy, ax, dy, 5);
+    s += `<rect x="${ax}" y="${ay}" width="${aw}" height="${ah}" rx="12" fill="${P.paper}" stroke="${P.coal}" stroke-width="${K}"/>`;
+    s += Ln(ax + 10, dy, ax + aw - 10, dy, 2, P.coal, 'stroke-dasharray="3 5"');
+    s += `<path d="M${ax + 10} ${ay + ah - 14}C ${ax + aw*0.55} ${ay + ah - 14}, ${ax + aw*0.45} ${ay + 14}, ${ax + aw - 10} ${ay + 14}" fill="none" stroke="${P.red}" stroke-width="5.5" stroke-linecap="round"/>`;
+    s += arrow(ax + aw, dy, pw - 18, dy, 5);
+    return {svg:s, center:[dx, dy], rays:44};
   },
 
   /* Build LLMs from Scratch — the causal attention mask: each token may attend only
@@ -895,139 +917,130 @@ const EMBLEM = {
     return {svg: ax + body + zAx + lab, center:[O[0], O[1] - 10], rays:40};
   },
 
-  /* Pi vs Hermes vs Codex — the compaction press: a long history squeezed into a
-     dense block, and the block filed away in a memory drawer. */
+  /* Pi vs Hermes vs Codex — the compaction press: a history too long for the panel
+     goes in; out comes a thin brick of the same stripes, resting in the press's own
+     drawer — compaction, then memory. */
   press(pw, ph){
     let s = '';
-    const base = ph - 14;
-    // the long history
-    const hist = [P.paper,P.yellow,P.paper,P.blue,P.paper,P.red,P.paper,P.paper,P.green,P.paper,P.yellow];
-    hist.forEach((c,i)=>{ s += R_(18 + (i%2)*4, base - 12 - i*16, 62, 12, c, 2.4); });
-    s += arrow(88, 124, 116, 124, 4.5);
+    const cols = [P.paper,P.yellow,P.paper,P.blue,P.paper,P.red,P.paper,P.paper,P.green,P.paper,P.yellow,P.paper,P.blue,P.paper,P.red,P.paper];
+    // the history: a column that runs off the top of the label
+    const hx = 26, hw = 70;
+    cols.forEach((c, i) => { s += R_(hx + (i%2)*4, ph - 30 - i*15, hw - 4, 12, c, 2.4); });
+    s += arrow(hx + hw + 8, ph - 64, hx + hw + 42, ph - 64, 5);
     // the press
-    const cx = 214;
-    s += R_(cx-100, 50, 14, base-50, P.coal, 0) + R_(cx+86, 50, 14, base-50, P.coal, 0);
-    s += R_(cx-112, 40, 224, 22, P.red);
-    s += R_(cx-8, 14, 16, 104, P.paper, 2.6);
-    for (let k=0;k<6;k++) s += Ln(cx-8, 70+k*7, cx+8, 74+k*7, 2.2);
-    s += R_(cx-62, 12, 124, 9, P.coal, 0) + C_(cx-66, 16.5, 9, P.yellow, 2.6) + C_(cx+66, 16.5, 9, P.yellow, 2.6);
-    s += R_(cx-80, 116, 160, 16, P.yellow);
-    s += R_(cx-70, 136, 140, base-136-10, P.paper);
-    for (let y = 141; y < base-12; y += 4.6) s += Ln(cx-70, y, cx+70, y, 1.6);
-    s += R_(cx-110, base-10, 220, 10, P.coal, 0);
-    // the drawer
-    const dx = 372, dy = 44, dw = 112, dh = base - dy;
-    s += R_(dx, dy, dw, dh, P.green);
-    const rh = (dh - 16)/3;
-    for (let k=0;k<3;k++) {
-      const yy = dy + 8 + k*rh;
-      if (k === 1) continue;
-      s += R_(dx+8, yy, dw-16, rh-6, P.yellow, 2.4) + R_(dx+dw/2-14, yy + rh/2 - 8, 28, 8, P.coal, 0);
-    }
-    // middle drawer pulled out, block going in
-    const my = dy + 8 + rh;
-    s += R_(dx - 34, my, dw - 16 + 26, rh - 6, P.yellow, 2.6) + R_(dx - 34 + 10, my + 8, dw - 50, rh - 22, P.paper, 2.2);
-    for (let y = my + 12; y < my + rh - 16; y += 4.4) s += Ln(dx - 24, y, dx + dw - 70, y, 1.4);
-    s += arrow(cx + 106, my + rh/2 - 3, dx - 40, my + rh/2 - 3, 4.5);
-    return {svg:s, center:[cx, 120], rays:44};
+    const cx = 300, base = ph - 12;
+    const dTop = base - 46;                 // top of the drawer cabinet (the press bed)
+    s += R_(cx-126, 26, 16, dTop - 26, P.coal, 0) + R_(cx+110, 26, 16, dTop - 26, P.coal, 0);
+    s += R_(cx-140, 18, 280, 24, P.red);
+    const platY = dTop - 34 - 20;           // platen sits on a 34px brick
+    s += R_(cx-9, 6, 18, platY - 4, P.paper, 2.6);
+    for (let y = 50; y < platY - 8; y += 8) s += Ln(cx-9, y, cx+9, y + 5, 2.2);
+    s += R_(cx-76, 0, 152, 10, P.coal, 0) + C_(cx-82, 5, 10, P.yellow, 2.6) + C_(cx+82, 5, 10, P.yellow, 2.6);
+    s += R_(cx-96, platY, 192, 18, P.yellow);
+    // the brick: the same stripes, squeezed thin
+    const bw = 96, bh = 34, bx = cx - bw/2, by = dTop - bh;
+    const st = bh / cols.length;
+    cols.forEach((c, i) => { s += `<rect x="${F(bx)}" y="${F(by + i*st)}" width="${bw}" height="${F(st + 0.3)}" fill="${c}"/>`; });
+    for (let i = 1; i < cols.length; i++) s += Ln(bx, by + i*st, bx + bw, by + i*st, 0.8);
+    s += R_(bx, by, bw, bh, 'none', 2.6);
+    // the bed is a drawer cabinet: memory
+    s += R_(cx-140, dTop, 280, base - dTop, P.green);
+    s += R_(cx-120, dTop + 8, 240, base - dTop - 16, P.yellow, 2.6) + R_(cx - 18, dTop + 18, 36, 9, P.coal, 0);
+    return {svg:s, center:[cx, by + bh/2], rays:44};
   },
 
-  /* Charlie I · Language — the decode loop: tokens stamped out one at a time,
-     each new one fed back in. */
+  /* Charlie I · Language — the decode loop: a machine stamps out one token at a
+     time; the newest (red) token is fed straight back into the hopper. */
   decodeLoop(pw, ph){
     let s = '';
-    const beltY = ph - 56, mx = 58, mw = 132;
-    s += R_(mx, 44, mw, beltY - 44, P.yellow);
-    s += R_(mx + 16, 60, mw - 32, 42, P.paper, 2.6);
-    for (let k=0;k<4;k++) s += R_(mx + 26 + k*21, 72, 12, 18, k===3?P.red:P.coal, 0);
-    s += C_(mx + 36, 130, 13, P.red) + C_(mx + 96, 130, 13, P.paper);
-    s += R_(mx + mw - 4, beltY - 44, 24, 30, P.coal, 0);
-    s += R_(mx - 12, beltY, pw - mx - 16, 16, P.coal, 0);
-    for (let x = mx; x < pw - 30; x += 38) s += C_(x, beltY + 22, 8, P.paper, 2.4);
-    for (let i = 0; i < 6; i++) {
-      const x = mx + mw + 28 + i*44;
+    const beltY = ph - 50, mx = 112, mw = 150, mt = 50;
+    // belt
+    s += R_(mx - 16, beltY, pw - mx, 14, P.coal, 0);
+    for (let x = mx; x < pw; x += 40) s += C_(x, beltY + 20, 8, P.paper, 2.4);
+    // machine + hopper
+    s += `<path d="M${mx + 30} ${mt - 26}H${mx + mw - 30}L${mx + mw - 48} ${mt}H${mx + 48}Z" fill="${P.paper}" stroke="${P.coal}" stroke-width="${K}" stroke-linejoin="round"/>`;
+    s += R_(mx, mt, mw, beltY - mt, P.yellow);
+    s += R_(mx + 16, mt + 16, mw - 32, 42, P.paper, 2.6);
+    for (let k=0;k<4;k++) s += R_(mx + 28 + k*25, mt + 28, 14, 18, k===3?P.red:P.coal, 0);
+    s += C_(mx + 42, mt + 88, 14, P.red) + C_(mx + mw - 42, mt + 88, 14, P.paper);
+    s += R_(mx + mw - 2, beltY - 46, 24, 32, P.coal, 0);
+    // tokens: newest (red) at the outlet, oldest furthest along
+    const tx0 = mx + mw + 30;
+    for (let i = 0; i < 5; i++) {
+      const x = tx0 + i*46;
       s += R_(x, beltY - 36, 34, 34, i===0?P.red:P.paper, 2.6);
       s += Ln(x + 8, beltY - 19, x + 26 - (i%3)*5, beltY - 19, 3, i===0?P.paper:P.coal);
     }
-    const ex = pw - 40;
-    s += `<path d="M${ex} ${beltY-44} C ${ex} 8, ${mx+mw/2+70} 4, ${mx+mw/2+20} 34" fill="none" stroke="${P.coal}" stroke-width="5" stroke-dasharray="11 7"/>` + arrowHead(mx+mw/2+15, 41, 2.15, 17);
-    s += tagT(pw - 160, 42, 'NEXT TOKEN', 'middle', 13);
-    return {svg:s, center:[mx + mw/2, 110], rays:44};
+    // feed-back arc: from the newest token back into the hopper
+    const hx = mx + mw/2, rx = tx0 + 17;
+    s += `<path d="M${rx} ${beltY - 42}C ${rx} 4, ${hx + 30} -8, ${hx} ${mt - 34}" fill="none" stroke="${P.coal}" stroke-width="5" stroke-dasharray="11 7"/>` + arrowHead(hx - 1, mt - 26, Math.PI/2 + 0.25, 17);
+    s += tagT(rx + 24, 46, 'FED BACK', 'start', 13);
+    return {svg:s, center:[mx + mw/2, (mt + beltY)/2], rays:44};
   },
 
-  /* Charlie II · Vision — a picture cut into a 4×4 grid of patches, read off as a
-     sequence behind a class token. */
+  /* Charlie II · Vision — one picture, cut into a 4×4 grid of patches; a class token
+     joins them at the head of the sequence. */
   patches(pw, ph){
     let s = '';
-    const g = 4, c = 38, gp = 5, ix = 30, iy = ph/2 - (g*c + (g-1)*gp)/2;
+    const g = 4, c = 46, gp = 6, T = g*c + (g-1)*gp, ix = pw/2 - T/2 + 30, iy = ph/2 - T/2;
     const W0 = g*c;
     const pic = `<rect width="${W0}" height="${W0}" fill="${P.paper}"/>
-      <circle cx="${W0*0.7}" cy="${W0*0.3}" r="${W0*0.2}" fill="${P.red}"/>
-      <path d="M${-10} ${W0*0.86}L${W0*0.34} ${W0*0.36}L${W0*0.72} ${W0*0.86}Z" fill="${P.green}"/>
-      <path d="M${W0*0.44} ${W0*0.86}L${W0*0.74} ${W0*0.52}L${W0*1.08} ${W0*0.86}Z" fill="${P.blue}"/>
+      <circle cx="${W0*0.68}" cy="${W0*0.3}" r="${W0*0.19}" fill="${P.red}"/>
+      <path d="M${W0*0.06} ${W0*0.16}l${W0*0.05} ${W0*0.04}l${W0*0.05} -${W0*0.04}M${W0*0.2} ${W0*0.26}l${W0*0.04} ${W0*0.03}l${W0*0.04} -${W0*0.03}" fill="none" stroke="${P.coal}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M${-10} ${W0*0.86}L${W0*0.34} ${W0*0.38}L${W0*0.72} ${W0*0.86}Z" fill="${P.green}"/>
+      <path d="M${W0*0.44} ${W0*0.86}L${W0*0.76} ${W0*0.5}L${W0*1.1} ${W0*0.86}Z" fill="${P.blue}"/>
       <rect y="${W0*0.8}" width="${W0}" height="${W0*0.2}" fill="${P.yellow}"/>`;
     const id = uid('pt');
     let defs = `<defs><g id="${id}">${pic}</g>`;
     for (let i=0;i<g;i++) for (let j=0;j<g;j++) defs += `<clipPath id="${id}c${i}${j}"><rect x="${j*c}" y="${i*c}" width="${c}" height="${c}"/></clipPath>`;
     s += defs + `</defs>`;
+    s += `<rect x="${ix - 10}" y="${iy - 10}" width="${T + 20}" height="${T + 20}" fill="${P.coal}"/>`;
     for (let i=0;i<g;i++) for (let j=0;j<g;j++) {
       const x = ix + j*(c+gp), y = iy + i*(c+gp);
       s += `<g transform="translate(${F(x - j*c)} ${F(y - i*c)})"><use href="#${id}" clip-path="url(#${id}c${i}${j})"/></g>`;
       s += `<rect x="${F(x)}" y="${F(y)}" width="${c}" height="${c}" fill="none" stroke="${P.coal}" stroke-width="2.6"/>`;
     }
-    const sx = 250, sc = 22, st = 26;
-    s += arrow(ix + g*(c+gp) + 4, ph/2, sx - 10, ph/2, 5);
-    for (let k=0;k<17;k++) {
-      const row = k < 9 ? 0 : 1, col = k < 9 ? k : k - 8;
-      const x = sx + col*st, y = ph/2 - 34 + row*44;
-      if (k === 0) { s += R_(x, y, sc, sc, P.red, 2.6); continue; }
-      const pi = k-1, i = Math.floor(pi/g), j = pi % g;
-      s += `<g transform="translate(${F(x)} ${F(y)}) scale(${F(sc/c)}) translate(${-j*c} ${-i*c})"><use href="#${id}" clip-path="url(#${id}c${i}${j})"/></g>`;
-      s += `<rect x="${F(x)}" y="${F(y)}" width="${sc}" height="${sc}" fill="none" stroke="${P.coal}" stroke-width="2.4"/>`;
-    }
-    s += `<path d="M${sx + 8*st + sc/2} ${ph/2 - 34 + sc + 2}V${ph/2 + 1}H${sx + st + sc/2}V${ph/2 + 8}" fill="none" stroke="${P.coal}" stroke-width="2.4" stroke-dasharray="4 4"/>`;
-    s += tagT(sx + sc/2, ph/2 - 60, 'CLS', 'middle', 12);
-    return {svg:s, center:[ix + W0/2 + 8, ph/2], rays:44};
+    // class token, at the head of the sequence
+    const kx = ix - 72, ky = iy + 8;
+    s += R_(kx, ky, c - 8, c - 8, P.red) + Ln(kx + 9, ky + (c-8)/2, kx + c - 17, ky + (c-8)/2, 3.5, P.paper);
+    s += tagT(kx + (c-8)/2, ky + c + 10, 'CLS', 'middle', 13);
+    return {svg:s, center:[ix + T/2, iy + T/2], rays:44};
   },
 
-  /* Charlie III · Sound — the voice loop: a waveform heard, its spectrogram read,
-     and a street horn-speaker that answers. */
+  /* Charlie III · Sound — the voice loop as a ring: listen (mic), transcribe, reply,
+     speak (horn) and back to listening; the red gate is where a user can barge in. */
   voice(pw, ph){
     let s = '';
-    const cy = ph/2;
-    let d = `M12 ${cy}`;
-    for (let x = 12; x <= 128; x += 2.5) {
-      const env = Math.sin((x-12)/116*Math.PI);
-      d += `L${F(x)} ${F(cy + Math.sin(x*0.45)*Math.sin(x*0.12 + 0.6)*46*env)}`;
-    }
-    s += `<path d="${d}" fill="none" stroke="${P.coal}" stroke-width="4" stroke-linejoin="round"/>`;
-    s += arrow(134, cy, 160, cy, 4.5);
-    const gx = 170, gw = 126, gh = 124, gy = cy - gh/2, cols = 1, cw = gw;
-    s += R_(gx-6, gy-6, gw+12, gh+12, P.coal, 0);
-    const clipId = uid('sg');
-    s += `<defs><clipPath id="${clipId}"><rect x="${gx}" y="${gy}" width="${gw}" height="${gh}"/></clipPath></defs><g clip-path="url(#${clipId})">`;
-    const f0 = (t) => 17 + 5*Math.sin(t*4.4 + 0.4) + 3*Math.sin(t*9.0);
-    const hcol = [P.red, P.red, P.yellow, P.yellow, P.paper, P.paper, P.paper];
-    for (let k = 1; k <= 7; k++) {
-      const top = [], bot = [];
-      for (let i = 0; i <= 40; i++) {
-        const t = 0.05 + 0.9*i/40, x = gx + gw*t;
-        const taper = Math.pow(Math.max(0, Math.sin(Math.PI*(t-0.05)/0.9)), 0.5);
-        const yc = gy + gh - 6 - k*f0(t)*0.92, w = (8.5 - k*0.8)*taper*(0.75 + 0.25*Math.sin(t*6 + k));
-        top.push(`${F(x)} ${F(yc - w/2)}`); bot.unshift(`${F(x)} ${F(yc + w/2)}`);
-      }
-      s += `<path d="M${top.join('L')}L${bot.join('L')}Z" fill="${hcol[k-1]}"/>`;
-    }
-    for (let x = gx + 9; x < gx + gw; x += 9) s += Ln(x, gy, x, gy + gh, 1.8);
-    s += `</g>`;
-    s += arrow(gx + cols*cw + 12, cy, gx + cols*cw + 36, cy, 4.5);
-    const hx = gx + cols*cw + 46;
-    s += Ln(hx+11, cy+16, hx+11, cy+78, 5) + Ln(hx - 16, cy + 80, hx + 40, cy + 80, 5);
-    s += R_(hx, cy - 17, 22, 34, P.coal, 0);
-    s += `<path d="M${hx+20} ${cy-12}L${hx+100} ${cy-54}V${cy+54}L${hx+20} ${cy+12}Z" fill="${P.paper}" stroke="${P.coal}" stroke-width="${K}" stroke-linejoin="round"/>`;
-    s += `<ellipse cx="${hx+100}" cy="${cy}" rx="11" ry="54" fill="${P.yellow}" stroke="${P.coal}" stroke-width="${K}"/>`;
-    for (let k=0;k<3;k++) s += `<path d="M${hx+122+k*15} ${cy-28-k*9} Q ${hx+138+k*18} ${cy} ${hx+122+k*15} ${cy+28+k*9}" fill="none" stroke="${P.coal}" stroke-width="4" stroke-linecap="round"/>`;
-    return {svg:s, center:[gx + cols*cw/2, cy], rays:44};
+    const cx = pw/2 + 10, cy = ph/2, R = 84;
+    s += `<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${P.coal}" stroke-width="10"/>`;
+    s += `<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${P.paper}" stroke-width="3.5" stroke-dasharray="10 8"/>`;
+    [225, 315, 45, 135].forEach((deg) => {
+      const a = deg*Math.PI/180, x = cx + R*Math.cos(a), y = cy + R*Math.sin(a);
+      s += arrowHead(x + Math.cos(a + Math.PI/2)*9, y + Math.sin(a + Math.PI/2)*9, a + Math.PI/2, 22);
+    });
+    // barge-in gate (voice activity detection) just before the mic
+    const ga = 160*Math.PI/180, gx = cx + R*Math.cos(ga), gy = cy + R*Math.sin(ga);
+    s += `<g transform="translate(${F(gx)} ${F(gy)}) rotate(${160})"><rect x="-17" y="-7" width="34" height="14" fill="${P.red}" stroke="${P.coal}" stroke-width="2.6"/></g>`;
+    s += tagT(gx - 26, gy + 34, 'BARGE-IN', 'end', 12);
+    // listen: the mic at 9 o'clock
+    const mx = cx - R, my = cy;
+    s += `<rect x="${mx - 17}" y="${my - 30}" width="34" height="52" rx="17" fill="${P.paper}" stroke="${P.coal}" stroke-width="${K}"/>`;
+    for (let k=0;k<3;k++) s += Ln(mx - 9, my - 16 + k*9, mx + 9, my - 16 + k*9, 2.6);
+    s += `<path d="M${mx - 24} ${my + 4}Q${mx - 24} ${my + 34} ${mx} ${my + 34}Q${mx + 24} ${my + 34} ${mx + 24} ${my + 4}" fill="none" stroke="${P.coal}" stroke-width="4"/>` + Ln(mx, my + 34, mx, my + 46, 4);
+    // transcript at 12
+    const tx = cx, ty = cy - R;
+    s += R_(tx - 46, ty - 20, 92, 40, P.paper);
+    for (let k=0;k<3;k++) s += Ln(tx - 36, ty - 9 + k*9, tx + 34 - k*16, ty - 9 + k*9, 2.6);
+    // reply at 3
+    const rx = cx + R, ry = cy;
+    s += R_(rx - 46, ry - 20, 92, 40, P.yellow);
+    for (let k=0;k<3;k++) s += Ln(rx - 36, ry - 9 + k*9, rx + 34 - k*14, ry - 9 + k*9, 2.6, k===1?P.red:P.coal);
+    // speak: the street horn at 6, facing back towards the mic
+    const hx = cx, hy = cy + R;
+    s += R_(hx + 18, hy - 12, 22, 24, P.coal, 0);
+    s += `<path d="M${hx + 20} ${hy - 8}L${hx - 34} ${hy - 26}V${hy + 26}L${hx + 20} ${hy + 8}Z" fill="${P.paper}" stroke="${P.coal}" stroke-width="${K}" stroke-linejoin="round"/>`;
+    s += `<ellipse cx="${hx - 34}" cy="${hy}" rx="7" ry="26" fill="${P.yellow}" stroke="${P.coal}" stroke-width="${K}"/>`;
+    return {svg:s, center:[cx, cy], rays:44};
   },
 
   /* Charlie IV · Reasoning — the multi-armed bandit: three one-armed machines,
@@ -1043,10 +1056,8 @@ const EMBLEM = {
       s += `<path d="M${x} ${base}V${top+18}Q${x} ${top} ${x+18} ${top}H${x+bw-18}Q${x+bw} ${top} ${x+bw} ${top+18}V${base}Z" fill="${on?P.yellow:P.paper}" stroke="${P.coal}" stroke-width="${K}"/>`;
       s += R_(x + 12, top + 18, bw - 24, 36, P.coal, 0);
       for (let k=0;k<3;k++) s += R_(x + 16 + k*((bw-32)/3), top + 22, (bw-32)/3 - 4, 28, P.paper, 0) + `<circle cx="${F(x + 16 + k*((bw-32)/3) + ((bw-32)/3 - 4)/2)}" cy="${top + 36}" r="7" fill="${sym[i][k]}" stroke="${P.coal}" stroke-width="2"/>`;
-      // believed value
       s += R_(x + 12, top + 70, bw - 24, 16, P.chuna, 2.4) + R_(x + 12, top + 70, (bw - 24)*val[i], 16, on?P.red:P.coal, 2.4);
       s += R_(x + 30, top + 98, bw - 60, 10, P.coal, 0);
-      // lever
       const pxl = x + bw, pyl = top + 62;
       s += R_(pxl - 2, pyl - 8, 12, 16, P.coal, 0);
       const ex = on ? pxl + 26 : pxl + 22, ey = on ? pyl + 44 : pyl - 48;
@@ -1057,167 +1068,153 @@ const EMBLEM = {
     return {svg:s, center:[pw/2, top + 60], rays:44};
   },
 
-  /* Kernel Engineering — the tiled matrix multiply: a row-block of A and a
-     column-block of B are staged through fast on-chip memory to fill one tile of C. */
+  /* Kernel Engineering — the tiled matrix multiply: one row-block of A and one
+     column-block of B are all that is needed to fill one tile of C. */
   tiledMatmul(pw, ph){
     let s = '';
-    const n = 4, c = 23, M = n*c;
-    const cxg = 296, cyg = 128, axg = cxg - M - 24, byg = cyg - M - 24;
+    const n = 4, c = 25, M = n*c, gap = 20;
+    const bx = pw/2 - (2*M + gap)/2 + M + gap + 8, by = ph/2 - (2*M + gap)/2 + 2;
+    const ax = bx - M - gap, cy = by + M + gap;
     const grid = (x, y, on, fill) => {
       let g = R_(x, y, M, M, P.paper);
       for (let i=0;i<n;i++) for (let j=0;j<n;j++) if (on(i,j)) g += R_(x + j*c, y + i*c, c, c, fill, 2.2);
       for (let k=1;k<n;k++) g += Ln(x + k*c, y, x + k*c, y + M, 2) + Ln(x, y + k*c, x + M, y + k*c, 2);
       return g + R_(x, y, M, M, 'none');
     };
-    const lt = (x,y,t,a='middle') => `<text x="${x}" y="${y}" text-anchor="${a}" ${ANEK} font-weight="800" font-size="28" fill="${P.coal}" stroke="${P.paper}" stroke-width="5" paint-order="stroke">${t}</text>`;
-    // guides: row of A and column of B meet at the C tile
-    s += Ln(axg + M, cyg + 2.5*c, cxg + 1*c, cyg + 2.5*c, 3, P.coal, 'stroke-dasharray="5 5"');
-    s += Ln(cxg + 1.5*c, byg + M, cxg + 1.5*c, cyg + 2*c, 3, P.coal, 'stroke-dasharray="5 5"');
-    s += grid(axg, cyg, (i)=>i===2, P.red) + grid(cxg, byg, (i,j)=>j===1, P.red) + grid(cxg, cyg, (i,j)=>i===2&&j===1, P.yellow);
-    s += lt(axg - 10, cyg + M/2 + 10, 'A', 'end') + lt(cxg + M + 10, byg + M/2 + 10, 'B', 'start') + lt(cxg + M + 10, cyg + M/2 + 10, 'C', 'start');
-    // on-chip memory
-    const sx = 44, sy = 22, sw = 84;
-    s += R_(sx, sy, sw, sw, P.coal, 0) + R_(sx + 13, sy + 13, sw - 26, sw - 26, P.yellow, 2.4);
-    for (let k=0;k<6;k++) { const t = sy + 9 + k*13.2; s += Ln(sx - 10, t, sx, t, 3) + Ln(sx + sw, t, sx + sw + 10, t, 3); }
-    for (let k=0;k<6;k++) { const t = sx + 9 + k*13.2; s += Ln(t, sy - 10, t, sy, 3) + Ln(t, sy + sw, t, sy + sw + 10, 3); }
-    s += `<text x="${sx+sw/2}" y="${sy+sw/2+5}" text-anchor="middle" ${ANEK} font-weight="800" font-size="14" letter-spacing="1" fill="${P.coal}">SRAM</text>`;
-    s += `<path d="M${axg + 10} ${cyg + 2.5*c}C ${axg - 30} ${cyg + 2.5*c}, ${sx + sw/2} ${sy + sw + 60}, ${sx + sw/2} ${sy + sw + 16}" fill="none" stroke="${P.coal}" stroke-width="3.5" stroke-dasharray="7 5"/>` + arrowHead(sx + sw/2, sy + sw + 12, -Math.PI/2, 13);
-    s += `<path d="M${cxg + 1.5*c} ${byg + 6}C ${cxg + 1.5*c} ${sy + 10}, ${sx + sw + 60} ${sy + sw/2}, ${sx + sw + 16} ${sy + sw/2}" fill="none" stroke="${P.coal}" stroke-width="3.5" stroke-dasharray="7 5"/>` + arrowHead(sx + sw + 12, sy + sw/2, Math.PI, 13);
-    return {svg:s, center:[cxg + M/2, cyg + M/2], rays:44};
+    // guides: A's row and B's column meet at C's tile
+    s += Ln(ax + M, cy + 2.5*c, bx + 1*c, cy + 2.5*c, 3, P.coal, 'stroke-dasharray="5 5"');
+    s += Ln(bx + 1.5*c, by + M, bx + 1.5*c, cy + 2*c, 3, P.coal, 'stroke-dasharray="5 5"');
+    s += grid(ax, cy, (i)=>i===2, P.red) + grid(bx, by, (i,j)=>j===1, P.red) + grid(bx, cy, (i,j)=>i===2&&j===1, P.yellow);
+    // the k-loop: the tile walks along A's row and down B's column together
+    s += arrow(ax + 6, cy - 12, ax + M - 4, cy - 12, 4);
+    // labels last, plain (no halo), clear of every path
+    const lt = (x,y,t,a) => `<text x="${F(x)}" y="${F(y)}" text-anchor="${a}" ${ANEK} font-weight="800" font-size="30" fill="${P.coal}">${t}</text>`;
+    s += `<rect x="${ax - 44}" y="${cy + M/2 - 22}" width="32" height="36" fill="${P.paper}" stroke="${P.coal}" stroke-width="2.4"/>` + lt(ax - 28, cy + M/2 + 8, 'A', 'middle');
+    s += `<rect x="${bx + M + 12}" y="${by + M/2 - 22}" width="32" height="36" fill="${P.paper}" stroke="${P.coal}" stroke-width="2.4"/>` + lt(bx + M + 28, by + M/2 + 8, 'B', 'middle');
+    s += `<rect x="${bx + M + 12}" y="${cy + M/2 - 22}" width="32" height="36" fill="${P.paper}" stroke="${P.coal}" stroke-width="2.4"/>` + lt(bx + M + 28, cy + M/2 + 8, 'C', 'middle');
+    return {svg:s, center:[bx + 1.5*c, cy + 2.5*c], rays:44};
   },
 
-  /* SQL Masterclass — the join: two tables matched row to row on a shared key. */
+  /* SQL Masterclass — the inner join: rows are wired only where their keys match;
+     a row whose key has no partner (struck out) drops out of the result. */
   join(pw, ph){
     let s = '';
-    const rows = 5, rh = 27;
-    const table = (x, y, cw, keyCol) => {
+    const rows = 6, rh = 26;
+    const pips = (x, y, w, n) => {
+      const pos = { 1:[[0,0]], 2:[[-1,0],[1,0]], 3:[[-1,0],[0,0],[1,0]], 4:[[-1,-.5],[1,-.5],[-1,.5],[1,.5]], 5:[[-1,-.5],[0,-.5],[1,-.5],[-.5,.5],[.5,.5]], 6:[[-1,-.5],[0,-.5],[1,-.5],[-1,.5],[0,.5],[1,.5]] }[n];
+      return pos.map(([u,v]) => `<circle cx="${F(x + w/2 + u*9)}" cy="${F(y + rh/2 + v*9)}" r="3" fill="${P.coal}"/>`).join('');
+    };
+    const table = (x, y, cw, keyCol, keys, dead) => {
       const tw = cw.reduce((a,b)=>a+b,0);
       let t = R_(x, y, tw, rows*rh, P.paper) + R_(x, y, tw, rh, P.coal, 0);
-      let cx = x;
-      cw.forEach((w, j) => {
-        if (j === keyCol) t += R_(cx, y + rh, w, (rows-1)*rh, P.yellow, 2.4);
-        if (j) t += Ln(cx, y + rh, cx, y + rows*rh, 2.2);
-        cx += w;
-      });
-      for (let i=2;i<rows;i++) t += Ln(x, y + (i)*rh, x + tw, y + i*rh, 2.2);
-      for (let i=1;i<rows;i++) { let c2 = x; cw.forEach((w,j)=>{ t += Ln(c2 + 8, y + i*rh + rh/2, c2 + w - 10 - ((i+j)%3)*6, y + i*rh + rh/2, 2.6); c2 += w; }); }
+      for (let i=1;i<rows;i++) {
+        const k = keys[i-1], off = k === dead;
+        let c2 = x;
+        cw.forEach((w, j) => {
+          if (j === keyCol) t += R_(c2, y + i*rh, w, rh, off ? P.chuna : P.yellow, 2.2) + pips(c2, y + i*rh, w, k);
+          else t += Ln(c2 + 8, y + i*rh + rh/2, c2 + w - 10 - ((i+j)%3)*6, y + i*rh + rh/2, 2.6, P.coal, off ? 'stroke-opacity=".45"' : '');
+          c2 += w;
+        });
+        if (off) t += `<rect x="${x}" y="${y + i*rh}" width="${tw}" height="${rh}" fill="${P.chuna}" fill-opacity=".55"/>` + Ln(x + 4, y + i*rh + rh - 5, x + tw - 4, y + i*rh + 5, 2.6);
+      }
+      let c3 = x; cw.forEach((w, j) => { if (j) t += Ln(c3, y + rh, c3, y + rows*rh, 2.2); c3 += w; });
+      for (let i=2;i<rows;i++) t += Ln(x, y + i*rh, x + tw, y + i*rh, 2.2);
       return {svg: t + R_(x, y, tw, rows*rh, 'none'), tw};
     };
-    const y0 = ph/2 - rows*rh/2 + 12;
-    const L = table(28, y0, [64, 44, 38], 2);
-    const Rt = table(0, 0, [38, 56, 44], 0);
-    const rx = pw - 28 - Rt.tw;
-    s += L.svg + table(rx, y0, [38, 56, 44], 0).svg;
-    const lx = 28 + L.tw;
-    const map = [[1,3],[2,1],[3,4],[4,2]];
-    map.forEach(([a,b], k) => {
-      const y1 = y0 + a*rh + rh/2, y2 = y0 + b*rh + rh/2;
-      s += `<path d="M${lx} ${F(y1)}H${lx + 16}L${rx - 16} ${F(y2)}H${rx}" fill="none" stroke="${k===0?P.red:P.coal}" stroke-width="${k===0?5:3}" stroke-linejoin="round"/>`;
-      s += C_(lx, y1, 4, P.coal, 0) + C_(rx, y2, 4, P.coal, 0);
+    const y0 = ph/2 - rows*rh/2 + 10;
+    const Lk = [3, 1, 5, 4, 2], Rk = [2, 6, 1, 3, 4];
+    const L = table(26, y0, [60, 42, 46], 2, Lk, 5);
+    const Rw = [46, 52, 40].reduce((a,b)=>a+b,0), rx = pw - 26 - Rw;
+    s += L.svg + table(rx, y0, [46, 52, 40], 0, Rk, 6).svg;
+    const lx = 26 + L.tw;
+    Lk.forEach((k, a) => {
+      const b = Rk.indexOf(k);
+      if (b < 0) return;
+      const y1 = y0 + (a+1)*rh + rh/2, y2 = y0 + (b+1)*rh + rh/2, hot = k === 1;
+      s += `<path d="M${lx} ${F(y1)}H${lx + 18}L${rx - 18} ${F(y2)}H${rx}" fill="none" stroke="${hot?P.red:P.coal}" stroke-width="${hot?5:3}" stroke-linejoin="round"/>`;
     });
-    // the bow-tie join symbol, painted on a tag
-    const bx = pw/2, by = y0 - 26;
+    const bx = pw/2, by = y0 - 24;
     s += R_(bx - 30, by - 17, 60, 34, P.paper, 2.6);
     s += `<path d="M${bx-18} ${by-10}V${by+10}L${bx} ${by}ZM${bx+18} ${by-10}V${by+10}L${bx} ${by}Z" fill="${P.coal}" stroke="${P.coal}" stroke-width="2.4" stroke-linejoin="round"/>`;
     return {svg:s, center:[pw/2, ph/2], rays:44};
   },
 
-  /* DeiT from Scratch — the distillation token: a convnet teacher's prediction is
-     matched by one extra token that rides through the student beside the class token. */
+  /* DeiT from Scratch — the distillation token: a transformer student carries one
+     extra token (DIST) beside the class token, and it alone is taught by a convnet teacher. */
   distill(pw, ph){
     let s = '';
-    // teacher: a convnet drawn as shrinking feature maps
-    const maps = [[18, 116, 22],[48, 92, 22],[76, 70, 20],[100, 50, 18]];
-    const my = 96;
-    maps.forEach(([x, h, w], k) => {
-      s += `<path d="M${x} ${my - h/2 + 8}L${x + w} ${my - h/2}V${my + h/2 - 8}L${x} ${my + h/2}Z" fill="${[P.paper,P.yellow,P.paper,P.yellow][k]}" stroke="${P.coal}" stroke-width="${K}" stroke-linejoin="round"/>`;
-    });
-    s += R_(128, my - 11, 22, 22, P.red, 2.6);
-    s += tagT(78, my + 84, 'TEACHER', 'middle', 13);
-    // student: transformer blocks over a token row
-    const tx0 = 214, st = 27, tc = 22, rowY = ph - 64;
-    const sx = tx0 - 12, sw = 9*st + 14;
-    for (let k=0;k<3;k++) s += R_(sx, 74 + k*26, sw, 20, k%2?P.yellow:P.paper, 2.6);
-    for (let k=0;k<9;k++) {
+    const tc = 26, st = 31, nT = 8, tx0 = pw/2 - (nT*st)/2 + 44, rowY = ph - 44;
+    const sx = tx0 - 14, sw = nT*st + 20, bY = 76;
+    // student: three transformer blocks
+    for (let k=0;k<3;k++) s += R_(sx, bY + k*30, sw, 24, k%2?P.yellow:P.paper, 3);
+    for (let k=0;k<nT;k++) {
       const x = tx0 + k*st;
-      s += Ln(x + tc/2, rowY - 2, x + tc/2, 74 + 3*26 - 6, 2.2);
-      s += R_(x, rowY, tc, tc, k===0?P.yellow : k===1?P.red : P.paper, 2.6);
-      if (k > 1) s += R_(x + 6, rowY + 6, tc - 12, tc - 12, [P.green,P.blue,P.yellow][k%3], 1.6);
+      s += Ln(x + tc/2, rowY - 2, x + tc/2, bY + 3*30 - 6, 2.4);
+      s += R_(x, rowY, tc, tc, k===0?P.yellow : k===1?P.red : P.paper, 2.8);
+      if (k > 1) s += R_(x + 7, rowY + 7, tc - 14, tc - 14, [P.green,P.blue,P.yellow][k%3], 1.8);
     }
-    s += tagT(tx0 + tc/2, rowY + tc + 20, 'CLS', 'middle', 12) + tagT(tx0 + st + tc/2 + 18, rowY + tc + 20, 'DIST', 'start', 12);
-    // outputs of the two special tokens
-    const oy = 34;
-    s += Ln(tx0 + tc/2, 74, tx0 + tc/2, oy + tc, 2.6) + Ln(tx0 + st + tc/2, 74, tx0 + st + tc/2, oy + tc, 2.6);
-    s += R_(tx0, oy, tc, tc, P.yellow, 2.6) + R_(tx0 + st, oy, tc, tc, P.red, 2.6);
-    s += tagT(sx + sw - 6, 74 + 26 + 10, 'STUDENT', 'end', 12);
-    // the match: teacher's prediction <-> distillation output
+    // the two special outputs
+    const oy = 32;
+    s += Ln(tx0 + tc/2, bY, tx0 + tc/2, oy + tc, 2.8) + Ln(tx0 + st + tc/2, bY, tx0 + st + tc/2, oy + tc, 2.8);
+    s += R_(tx0, oy, tc, tc, P.yellow, 2.8) + R_(tx0 + st, oy, tc, tc, P.red, 2.8);
+    s += tagT(tx0 + st + tc + 10, oy + tc/2, 'DIST', 'start', 12);
+    // teacher: a convnet, shrinking feature maps, whose prediction teaches DIST
+    const maps = [[18, 104, 20],[44, 82, 20],[68, 62, 18],[90, 44, 16]], my = 124;
+    maps.forEach(([x, h, w], k) => { s += `<path d="M${x} ${my - h/2 + 8}L${x + w} ${my - h/2}V${my + h/2 - 8}L${x} ${my + h/2}Z" fill="${[P.paper,P.yellow,P.paper,P.yellow][k]}" stroke="${P.coal}" stroke-width="${K}" stroke-linejoin="round"/>`; });
+    s += R_(114, my - 10, 20, 20, P.red, 2.6);
+    s += tagT(62, my + 72, 'TEACHER', 'middle', 12);
     const dx = tx0 + st + tc/2;
-    s += `<path d="M150 ${my}C 178 ${my}, 166 12, ${dx - 30} 12 S ${dx} 12, ${dx} ${oy - 12}" fill="none" stroke="${P.red}" stroke-width="5" stroke-dasharray="10 6"/>` + arrowHead(dx, oy - 1, Math.PI/2, 15, P.red);
-    return {svg:s, center:[tx0 + st, oy + 10], rays:44};
-  },
-  /* RAG in Production — retrieval: a query goes to the card catalogue, the top
-     three cards come up, and query and cards travel on together as the prompt. */
-  catalogue(pw, ph){
-    let s = '';
-    const qx = 18, qy = ph/2 - 20;
-    s += R_(qx, qy, 84, 58, P.paper);
-    for (let k=0;k<3;k++) s += Ln(qx + 10, qy + 16 + k*13, qx + 74 - k*14, qy + 16 + k*13, 3);
-    s += tagT(qx + 42, qy - 20, 'QUERY', 'middle', 13);
-    s += arrow(qx + 90, qy + 29, qx + 124, qy + 29, 4.5);
-    // the card catalogue drawer
-    const dx = 150, dw = 186, dy = ph - 96, dh = 72;
-    const n = 11, cw = 12, cg = (dw - 24 - n*cw)/(n-1), top3 = [2, 5, 8];
-    for (let i=0;i<n;i++) {
-      const x = dx + 12 + i*(cw+cg), up = top3.includes(i);
-      const y = up ? dy - 92 : dy - 34;
-      s += R_(x, y, cw, dy + 20 - y, P.paper, 2.4);
-      if (up) s += R_(x - 3, y - 12, cw + 6, 14, P.red, 2.4);
-    }
-    s += R_(dx, dy, dw, dh, P.yellow);
-    s += R_(dx + dw/2 - 26, dy + 18, 52, 22, P.paper, 2.4) + R_(dx + dw/2 - 12, dy + 46, 24, 10, P.coal, 0);
-    s += tagT(dx + dw/2, dy - 116, 'TOP 3', 'middle', 13);
-    s += arrow(dx + dw + 8, ph/2 - 10, dx + dw + 40, ph/2 - 10, 4.5);
-    // query + cards, bundled as the prompt
-    const bx = dx + dw + 50, by = ph/2 - 70;
-    for (let k=2;k>=0;k--) s += R_(bx + 8 + k*10, by + 44 + k*12, 72, 58, P.paper, 2.4) + R_(bx + 8 + k*10 + 60, by + 44 + k*12 - 6, 14, 12, P.red, 2);
-    s += R_(bx, by + 6, 84, 44, P.paper, 2.6);
-    for (let k=0;k<2;k++) s += Ln(bx + 10, by + 20 + k*12, bx + 70 - k*16, by + 20 + k*12, 3);
-    s += tagT(bx + 48, by + 44 + 24 + 58 + 18, 'PROMPT', 'middle', 13);
-    return {svg:s, center:[dx + dw/2, dy - 30], rays:44};
+    s += `<path d="M134 ${my}C 160 ${my}, 150 12, ${dx - 30} 12 S ${dx} 12, ${dx} ${oy - 12}" fill="none" stroke="${P.red}" stroke-width="5" stroke-dasharray="10 6"/>` + arrowHead(dx, oy - 1, Math.PI/2, 15, P.red);
+    return {svg:s, center:[sx + sw/2, bY + 40], rays:44};
   },
 
-  /* VLA & World Models — see, read, act: a camera watches, an instruction is given,
-     the arm reaches; the dashed ghost is the world model's guess at the next state. */
+  /* RAG in Production — retrieval as one object: the card-catalogue drawer, with the
+     three best-matching cards pulled up out of the index. */
+  catalogue(pw, ph){
+    let s = '';
+    const dw = 292, dx = pw/2 - dw/2, dh = 84, dy = ph - dh - 16;
+    const n = 15, cw = 13, cg = (dw - 28 - n*cw)/(n-1), top3 = [3, 7, 11];
+    s += R_(dx - 10, dy - 14, dw + 20, 18, P.coal, 0);
+    for (let i=0;i<n;i++) {
+      const x = dx + 14 + i*(cw+cg), up = top3.includes(i);
+      const y = up ? dy - 128 : dy - 42;
+      s += R_(x, y, cw, dy + 20 - y, P.paper, 2.4);
+      if (up) { s += R_(x - 4, y - 14, cw + 8, 16, P.red, 2.4); for (let k=0;k<4;k++) s += Ln(x + 3, y + 12 + k*9, x + cw - 3, y + 12 + k*9, 1.8); }
+    }
+    s += R_(dx, dy, dw, dh, P.yellow);
+    s += R_(dx + dw/2 - 34, dy + 16, 68, 26, P.paper, 2.6) + Ln(dx + dw/2 - 22, dy + 29, dx + dw/2 + 20, dy + 29, 2.6);
+    s += `<path d="M${dx + dw/2 - 20} ${dy + 62}v-8h40v8" fill="none" stroke="${P.coal}" stroke-width="5"/>`;
+    s += tagT(dx + dw + 16, dy - 96, 'TOP 3', 'start', 13);
+    return {svg:s, center:[dx + dw/2, dy - 40], rays:44};
+  },
+
+  /* VLA & World Models — one arm, grasping the block it was asked for; the dashed
+     outlines above are the world model's rollout: where block and gripper will be next. */
   armWorld(pw, ph){
     let s = '';
-    const ty = ph - 40;
-    s += R_(96, ty, pw - 150, 12, P.coal, 0);
-    // camera and its view
-    const cx = 44, cy = 116;
-    s += `<path d="M${cx+22} ${cy}L318 ${ty-14}M${cx+22} ${cy}L360 ${ty-40}" stroke="${P.coal}" stroke-width="2.6" stroke-dasharray="5 5"/>`;
-    s += R_(cx - 22, cy - 18, 40, 36, P.coal, 0) + C_(cx + 14, cy, 12, P.blue, 3) + C_(cx + 14, cy, 4, P.paper, 0);
-    s += Ln(cx - 2, cy + 18, cx - 2, ty + 10, 4);
-    // the instruction
-    s += tagT(20, 22, 'PICK UP THE RED BLOCK', 'start', 13);
-    // the block
-    s += R_(322, ty - 34, 34, 34, P.red);
-    const arm = (Sx, Sy, Ex, Ey, Wx, Wy, ghost) => {
-      if (ghost) return `<path d="M${Sx} ${Sy}L${Ex} ${Ey}L${Wx} ${Wy}" fill="none" stroke="${P.paper}" stroke-width="16" stroke-linejoin="round" stroke-dasharray="8 7"/>` + C_(Ex, Ey, 9, 'none', 2.6) ;
-      let a = `<path d="M${Sx} ${Sy}L${Ex} ${Ey}L${Wx} ${Wy}" fill="none" stroke="${P.coal}" stroke-width="26" stroke-linejoin="round" stroke-linecap="round"/>`;
-      a += `<path d="M${Sx} ${Sy}L${Ex} ${Ey}L${Wx} ${Wy}" fill="none" stroke="${P.yellow}" stroke-width="19" stroke-linejoin="round" stroke-linecap="round"/>`;
-      a += C_(Ex, Ey, 11, P.paper) + C_(Wx, Wy, 9, P.paper);
-      // gripper
-      a += R_(Wx - 18, Wy + 10, 36, 10, P.coal, 0) + R_(Wx - 18, Wy + 10, 7, 30, P.coal, 0) + R_(Wx + 11, Wy + 10, 7, 30, P.coal, 0);
-      return a;
+    const ty = ph - 36;
+    s += R_(70, ty, pw - 120, 12, P.coal, 0);
+    const bxw = 34, bx0 = 318, by0 = ty - bxw;
+    const grip = (x, y, dashed) => {
+      const st = dashed ? `fill="none" stroke="${P.coal}" stroke-width="3" stroke-dasharray="6 4"` : `fill="${P.coal}"`;
+      return `<path d="M${x - 24} ${y - 14}H${x + 24 + bxw}V${y - 4}H${x + 24 + bxw - 8}V${y + 22}H${x + 24 + bxw - 16}V${y - 4}H${x - 16}V${y + 22}H${x - 24}Z" ${st}/>`;
     };
-    const Sx = 170, Sy = ty - 34;
-    s += arm(Sx, Sy, 268, 84, 339, 128, true);
-    s += `<path d="M321 138h36M321 138v26M357 138v26" fill="none" stroke="${P.paper}" stroke-width="6" stroke-dasharray="5 4"/>`;
-    s += tagT(372, 112, 'PREDICTED', 'start', 12);
-    s += `<path d="M${Sx-34} ${ty}L${Sx-22} ${Sy+8}H${Sx+22}L${Sx+34} ${ty}Z" fill="${P.coal}"/>`;
-    s += arm(Sx, Sy, 206, 62, 300, 52, false);
-    s += C_(Sx, Sy, 14, P.red);
-    return {svg:s, center:[250, 110], rays:44};
+    // rollout: t+1, t+2, t+3 — the predicted lift, outline only
+    const roll = [[bx0 + 10, by0 - 50], [bx0 + 22, by0 - 96], [bx0 + 34, by0 - 142]];
+    roll.forEach(([x, y]) => {
+      s += `<rect x="${x}" y="${y}" width="${bxw}" height="${bxw}" fill="none" stroke="${P.coal}" stroke-width="3" stroke-dasharray="6 4"/>` + grip(x - 8 + 8, y, true);
+    });
+    s += tagT(bx0 + 116, by0 - 96, 'PREDICTED', 'start', 12);
+    // the arm
+    const Sx = 150, Sy = ty - 36, Ex = 214, Ey = 64, Wx = bx0 + bxw/2, Wy = by0 - 30;
+    s += `<path d="M${Sx} ${Sy}L${Ex} ${Ey}L${Wx} ${Wy}" fill="none" stroke="${P.coal}" stroke-width="28" stroke-linejoin="round" stroke-linecap="round"/>`;
+    s += `<path d="M${Sx} ${Sy}L${Ex} ${Ey}L${Wx} ${Wy}" fill="none" stroke="${P.yellow}" stroke-width="20" stroke-linejoin="round" stroke-linecap="round"/>`;
+    s += C_(Ex, Ey, 12, P.paper) + Ln(Wx, Wy, Wx, by0 - 14, 8);
+    s += R_(bx0, by0, bxw, bxw, P.red);
+    s += grip(bx0, by0, false);
+    s += `<path d="M${Sx-36} ${ty}L${Sx-24} ${Sy+10}H${Sx+24}L${Sx+36} ${ty}Z" fill="${P.coal}"/>` + C_(Sx, Sy, 15, P.red);
+    s += tagT(Sx - 2, ty + 1, 'PICK UP THE RED BLOCK', 'middle', 11);
+    return {svg:s, center:[Wx, Wy + 10], rays:44};
   },
 };
 
@@ -1229,14 +1226,14 @@ const CORE = [
     title:[{t:'AI CONTEXT', H:132},{t:'ENGINEERING', H:132}]},
   {slug:'mathematical-foundations-for-ml', shelf:'foundations', level:1, capsules:43, hours:10, emblem:'gradient', cap:'THE GRADIENT',
     title:[{t:'MATHEMATICAL', H:82},{t:'FOUNDATIONS', H:82, gap:4},{mix:[{s:'for'},{t:'MACHINE LEARNING', r:0.5}], H:58}]},
-  {slug:'neural-networks-from-scratch', shelf:'deep', level:1, capsules:33, hours:7, emblem:'network', cap:'THE MULTILAYER PERCEPTRON',
+  {slug:'neural-networks-from-scratch', shelf:'deep', level:1, capsules:33, hours:7, emblem:'neuron', cap:'THE ARTIFICIAL NEURON',
     title:[{t:'NEURAL', H:118},{t:'NETWORKS', H:118},{mix:[{s:'from'},{t:'SCRATCH', r:0.6}], H:54}]},
   {slug:'build-llms-from-scratch', shelf:'language', level:2, capsules:20, hours:6, emblem:'causalMask', cap:'THE CAUSAL MASK',
-    title:[{t:'BUILD LARGE', H:78},{t:'LANGUAGE', H:78},{mix:[{t:'MODELS', r:0.62},{tag:'LLMs'}], H:78},{mix:[{s:'from'},{t:'SCRATCH', r:0.6}], H:46}]},
+    title:[{tr:'BUILD', H:34, gap:10},{t:'LARGE LANGUAGE', H:80},{mix:[{t:'MODELS', r:0.62},{tag:'LLMs'}], H:98},{mix:[{s:'from'},{t:'SCRATCH', r:0.6}], H:48}]},
   {slug:'5d-parallelism', shelf:'systems', level:3, capsules:40, hours:9, emblem:'mesh5d', cap:'THE DEVICE MESH',
     title:[{t:'5D', H:150, rmax:0.82},{t:'PARALLELISM', H:92},{mix:[{s:'for'},{tt:'LARGE MODEL TRAINING', r:0.46}], H:34}]},
   {slug:'pi-vs-hermes-vs-codex', shelf:'agents', level:3, capsules:9, hours:1, emblem:'press', cap:'THE COMPACTION PRESS',
-    title:[{mix:[{t:'PI', r:0.6},{s:'vs'},{t:'HERMES', r:0.56}], H:98},{mix:[{s:'vs'},{t:'CODEX', r:0.6}], H:98},{mix:[{tt:'CONTEXT COMPACTION', r:0.5},{s:'and'},{tt:'MEMORY', r:0.5}], H:38}]},
+    title:[{mix:[{t:'PI', r:0.6},{s:'vs'},{t:'HERMES', r:0.56}], H:98},{mix:[{s:'vs'},{t:'CODEX', r:0.6}], H:98},{mix:[{tt:'CONTEXT COMPACTION', r:0.48},{s:'and', k:1.25, base:0.8},{tt:'MEMORY', r:0.48}], H:38}]},
 ];
 const RANGE = [
   {slug:'charlie-language-room', shelf:'charlie', room:'language', series:'I', level:3, capsules:22, hours:5, emblem:'decodeLoop', cap:'THE DECODE LOOP',
@@ -1248,7 +1245,7 @@ const RANGE = [
   {slug:'charlie-reasoning-room', shelf:'charlie', room:'reasoning', series:'IV', level:3, capsules:21, hours:6, emblem:'bandit', cap:'THE MULTI-ARMED BANDIT',
     title:[{mix:[{t:'CHARLIE', r:0.56},{s:'and the'}], H:54},{t:'REASONING', H:96},{t:'ROOM', H:96, rmax:0.74},{tr:'FROM BANDITS TO REASONING MODELS', H:24, m:450}]},
   {slug:'deit-from-scratch', shelf:'vision', level:3, capsules:42, hours:10, emblem:'distill', cap:'THE DISTILLATION TOKEN',
-    title:[{t:'BUILD A DATA-EFFICIENT', H:52},{t:'IMAGE', H:96},{t:'TRANSFORMER', H:96},{mix:[{tag:'DeiT'},{s:'from'},{t:'SCRATCH', r:0.6}], H:46}]},
+    title:[{t:'BUILD A DATA-EFFICIENT', H:52},{t:'IMAGE', H:92},{mix:[{t:'TRANSFORMER', r:0.5},{tag:'DeiT'}], H:88},{mix:[{s:'from'},{t:'SCRATCH', r:0.6}], H:48}]},
   {slug:'rag-in-production', shelf:'language', level:2, capsules:42, hours:10, emblem:'catalogue', cap:'THE CARD CATALOGUE',
     title:[{t:'RAG', H:196, rmax:0.9},{mix:[{s:'in'},{t:'PRODUCTION', r:0.56}], H:84}]},
   {slug:'vla-world-models', shelf:'vision', level:3, capsules:42, hours:10, emblem:'armWorld', cap:'THE ARM AND ITS WORLD MODEL',

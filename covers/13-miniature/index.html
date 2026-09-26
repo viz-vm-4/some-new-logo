@@ -720,7 +720,7 @@ function wrapEl(b){
   s+=cartouche(C.x,C.y,C.w,92,P.ivory);
   let y=C.y+92; for(const [col,t] of DIV){ s+=rect(C.x,y,C.w,t,col); y+=t; }
   // a small detail of the front: one set stone and its threads, as a vignette
-  const vx=W/2, vy=364;
+  const vx=W/2, vy=386;
   s+=line(vx-86,vy-20,vx,vy,P.goldD,2.2,'stroke-linecap="round"')+line(vx-86,vy+20,vx,vy,P.vermilion,1.4,'stroke-linecap="round"')+line(vx,vy,vx+86,vy-14,P.goldD,2.8,'stroke-linecap="round"')+line(vx,vy,vx+86,vy+18,P.vermilion,1.1,'stroke-linecap="round"');
   s+=jewel(vx,vy,16,P.saffron);
   // barcode panel (left blank for the printer)
@@ -741,7 +741,7 @@ function wrapEl(b){
   d.innerHTML=s+
     `<div class="blurb" style="left:${C.x+46}px;top:${C.y+26}px;width:${C.w-92}px;height:40px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:25px;letter-spacing:-.01em">${b.title.join(' ')}</div>`+
     `<div class="blurb" style="left:${C.x+54}px;top:${C.y+128}px;width:${C.w-108}px;font-size:19px;line-height:1.5">${C2.blurb.map(p=>`<p style="margin:0 0 .75em">${p}</p>`).join('')}</div>`+
-    `<div class="blurb" style="left:${C.x+54}px;top:${C.y+338}px;width:${C.w-108}px;font-family:'Anek Latin';font-size:13.5px;line-height:1.5;color:#3A2C22"><div style="font-stretch:112%;font-weight:600;font-size:11.5px;letter-spacing:.22em;text-transform:uppercase;color:${P.vermilion};margin-bottom:8px">About the cover</div>${C2.cover}</div>`+
+    `<div class="blurb" style="left:${C.x+54}px;top:${C.y+356}px;width:${C.w-108}px;font-family:'Anek Latin';font-size:13.5px;line-height:1.5;color:#3A2C22"><div style="font-stretch:112%;font-weight:600;font-size:11.5px;letter-spacing:.22em;text-transform:uppercase;color:${P.vermilion};margin-bottom:8px">About the cover</div>${C2.cover}</div>`+
     `<div class="blurb" style="left:${C.x+30}px;top:${C.y+B.h-2*JT-92}px;width:300px;font-family:'Anek Latin';font-size:11.5px;line-height:1.45;color:#3A2C22;letter-spacing:.02em">${L.label} · ${b.capsules} capsules · ${b.hours} hours<br>books.vizuara.ai</div>`+
     `<div class="imprint" style="position:absolute;left:0;width:${W}px;top:${B.y+B.h+52}px;color:${L.text};font-family:'Anek Latin';text-transform:uppercase;font-weight:600;font-size:13px;letter-spacing:.24em;font-stretch:112%;line-height:1"><div style="position:absolute;right:calc(50% + 42px);text-align:right;white-space:nowrap">Vizuara Books</div><div style="position:absolute;left:calc(50% + 42px);white-space:nowrap">${L.label}</div></div>`+
     `<div style="position:absolute;left:${sx}px;top:${ct}px;width:${SW}px;height:${cb-ct}px;display:flex;align-items:center;justify-content:center"><div style="transform:rotate(90deg);white-space:nowrap;font-family:'Eczar';font-weight:600;font-size:19px;letter-spacing:-.005em;color:${P.ink}">${b.title.join(' ')}</div></div>`;

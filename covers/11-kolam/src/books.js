@@ -36,16 +36,17 @@ const BOOKS = {
   },
   'build-llms-from-scratch': {
     shape: () => K.fromRows(Array(10).fill(2), 'ner'), loops: 1, sym: 'none', density: 0.25,
-    // five 2 x 2 blocks stacked; between blocks exactly one crossing, alternating sides
+    // N x the same block: every 2 x 2 block is woven identically (one turn, which makes it a single
+    // line on its own), and each block joins the next through exactly one crossing, always on the left
     force: (e, d) => {
-      if (e.dir !== 'N') return undefined;
-      const y = d[1], k = Math.round(y - 0.5);            // boundary between display rows k and k+1
-      if (k % 2 === 0) return undefined;                   // inside a block: free
-      const side = ((k - 1) / 2) % 2 === 0 ? 0 : 1;        // which column carries the crossing
-      return Math.round(d[0]) === side ? 'x' : 'm';
+      const x = Math.round(d[0]), y = d[1];
+      if (e.dir === 'E') return Math.round(y) % 2 === 0 ? 'm' : 'x';
+      const k = Math.round(y - 0.5);                      // boundary between display rows k and k+1
+      if (k % 2 === 1) return x === 0 ? 'x' : 'm';        // seam between blocks
+      return 'x';                                          // inside a block
     },
-    spec: 'a tower of five 2 × 2 blocks',
-    why: 'Five blocks of four stacked into a tower: the N× decoder stack. Each block is woven on its own and joined to the next by exactly one crossing, alternating sides, so a single line climbs the whole model.',
+    spec: 'N × block: five identical 2 × 2 blocks',
+    why: 'Five identical blocks of four stacked into a tower: the N× decoder stack. Each block is woven the same way and is one line on its own; each joins the next through exactly one crossing, so a single line climbs the whole model.',
   },
   'ai-context-engineering': {
     shape: () => K.fromMask([
