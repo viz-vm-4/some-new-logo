@@ -23,16 +23,21 @@ image, so it stays vector in the PDFs.
 ## Level = lighting (paper key)
 | Level | Paper | Hex | Light |
 |---|---|---|---|
-| Beginner | Chalk | `#E7E3DB` | high key: bright, airy, soft shadows |
-| Intermediate | Stone | `#A8A39A` | mid key: grey seamless, one softbox |
-| Advanced | Soot | `#232120` | low key: dark paper, a single spot from the side |
+| Beginner | Chalk | `#E8E5DE` (wall ≈ 234) | high key: bright, airy, soft shadows |
+| Intermediate | Stone | `#9C988F` (wall ≈ 155) | mid key: grey seamless, one softbox |
+| Advanced | Soot | `#3A3734` (wall ≈ 55) | low key: dark paper, a single spot from the side |
+
+The hex values are what actually renders on the wall at title height, measured, not stated.
+Each cover checks itself after rendering. It reads the wall at a fixed point (CSS 660,300), and if that
+is more than ±8 levels from its key, it logs `WALL CHECK FAILED` as a page error, which
+`tools/render.js` prints. The check caught three camera angles drifting during the revision.
 
 Level is a difference of value, not hue, so it survives greyscale print and reads at 180 px across a shelf
 of fifty. The bottom-right corner repeats it with a three-step grey-scale target, the kind photographers
 place beside artworks, plus the level in words.
 
 ## Palette
-- Papers: Chalk `#E7E3DB`, Stone `#A8A39A`, Soot `#232120`.
+- Papers (as rendered): Chalk `#E8E5DE`, Stone `#9C988F`, Soot `#3A3734`.
 - Ink: `#171614` on chalk and stone; Bone `#EEE9E0` on soot.
 - There is no brand accent colour. Colour on the shelf comes only from the materials: plaster, terracotta,
   travertine, slate, oxblood glaze, oak, Carrara marble, beeswax, granite, red lacquer, limestone with
@@ -50,14 +55,15 @@ A V standing on a plinth (inline SVG): the publisher as the one who puts ideas o
 small, top left, next to "VIZUARA BOOKS", and never louder than the title.
 
 ## Objects, one line each
-- **AI Context Engineering**: a travertine *window*, packed block by block with slate, marble, sandstone
-  and terracotta, with headroom at the top and one block left out on the floor. Context engineering
-  decides what goes in, in what order, and what stays out.
+- **AI Context Engineering**: a travertine *window*, packed block by block with slate, marble, sandstone,
+  terracotta and serpentine, with headroom at the top and one block left out on the floor. Context
+  engineering decides what goes in, in what order, and what stays out.
 - **Mathematical Foundations for ML**: the hyperbolic paraboloid *z = xy* in cast plaster, with its
   straight rulings drawn in graphite. It carries linear algebra (straight lines) and calculus (curvature,
   the saddle point) at once, in the lineage of 19th-century mathematical models.
-- **Neural Networks from Scratch**: three layers of terracotta spheres (4 → 4 → 1), every node joined to
-  every node in the next layer, modelled by hand.
+- **Neural Networks from Scratch**: a string construction in the Gabo and Hepworth tradition. Three
+  upright oak boards are the layers (4, 5 and 2 brass pins, the neurons), and black linen threads join
+  every pin to every pin on the next board. Each thread's thickness is its weight.
 - **Build LLMs from Scratch**: a Brancusi-like column of twelve *identical* modules in oxblood glaze, the
   same block repeated (GPT-2 small has twelve).
 - **5D Parallelism**: a rhombic icosahedron in Carrara marble. It is the parallel projection of a
@@ -66,18 +72,27 @@ small, top left, next to "VIZUARA BOOKS", and never louder than the title.
 - **Pi vs Hermes vs Codex: Context Compaction and Memory**: nine beeswax tablets pressed three ways, as
   three stacks of nine (the book has nine capsules) under granite weights, each compacted to its own
   height. Wax is Plato's model of memory.
-- **Prompt Engineering**: a heavy slate slab raised by a small red-lacquer wedge. A small, deliberate input
-  gives a large change in outcome (after Serra's prop pieces).
+- **Prompt Engineering**: a lapis cylinder seal (the prompt) resting at the head of a terracotta slab, and
+  the frieze it has rolled into the clay (the continuation). The carved motif repeats every 2πr, so the
+  whole output is shaped by that one small object.
 - **RAG in Production**: an oak cabinet of twelve drawers with one drawer drawn: retrieval.
-- **Build a Data-Efficient Image Transformer (DeiT) from Scratch**: one image (an iron-oxide disc) cut into
-  sixteen limestone patches standing in sequence, led by a gilt distillation token.
+- **Build a Data-Efficient Image Transformer (DeiT) from Scratch**: a frieze of limestone tiles on a rail,
+  in DeiT's input order `[CLS, DIST, patch 1 … 16]`. A plaster class token and a gilt distillation token
+  lead, then sixteen patches each carry their piece of one image (a near-black oxide disc).
 - **Kernel Engineering** (forthcoming): a tiled block with one tile lifted out and set on top (GEMM tiling,
-  a tile staged into fast memory). As a forthcoming title it is shown as a **white plaster maquette**
-  "to be cast in silicon bronze". That is the rule for all coming-soon books.
+  a tile staged into fast memory). It is shown under the **forthcoming rule**: the sculptor's working
+  maquette in raw plaster, with the steel armature showing, graphite pointing marks and a paper tag tied
+  on, "to be cast in silicon bronze".
 - **Charlie and the Intelligence Factory** (sub-series I–IV): one porcelain cube, the "room", with a single
-  gilded opening cut in its face: a *mouth* for Language, an *eye* for Vision, an *ear* (stepped horn) for
-  Sound, a *stair* for Reasoning. The camera and light are identical across the four, and the gold is a
-  nod to the golden ticket. The paper still follows each book's level.
+  gilded opening cut in its face. Language gets a *mouth* (slot). Vision gets *sixteen square
+  patch-windows* (Vision Transformers see in patches). Sound gets a stepped *ear* (horn). Reasoning gets a
+  six-step *stair* rising through the cube. The camera and light are identical across the four, and the
+  gold is a nod to the golden ticket. The paper follows each book's level.
+
+## Material rule (for the remaining ~36 books)
+At most about one white object in four per paper key, spread across warm (terracotta, oak, wax), dark
+(slate, lapis, iron) and metallic materials. White plaster is kept for the forthcoming state. The Charlie
+porcelain is the one deliberate exception: it is the sub-series identity.
 
 ## Extras on the page
 - A thumbnail strip showing all 14 covers at 180 px.
@@ -90,10 +105,19 @@ small, top left, next to "VIZUARA BOOKS", and never louder than the title.
   that waits on the page, such as `document.fonts.ready` or a screenshot, queues until the last canvas is
   painted. This keeps it independent of the harness's navigation timeout, even on software GL
   (SwiftShader). Expect roughly 5 s per cover on SwiftShader under load.
-- The print pass reloads the page once per cover and hides everything except that cover. If the same
-  browser rendered the full page within the last 20 minutes, the page waits for that isolation and paints
-  only the one cover left visible. If nothing isolates a cover within 4 s it renders everything, so a cover
-  is never left blank. This takes the `--pdf` run from about 16 full renders down to 2.
+- Nothing is ever cached, so nothing can be stale. Every paint comes from the live shaders, in one of
+  three modes:
+  - A person (no WebDriver) always gets a full render, one cover per task from top to bottom, so the page
+    stays responsive.
+  - An automated capture (`navigator.webdriver`) gets everything painted synchronously right after load,
+    so screenshots and `fonts.ready` queue behind it.
+  - The print pass of that same automated session: `tools/render.js` reloads the page once per cover in a
+    context that has just completed a full render, then hides every other cover. Only then (WebDriver and
+    a full render flagged in this browser context within 10 minutes) does the page wait for the isolation
+    and paint just the visible cover. If no single cover is isolated within 4 s it paints everything, so a
+    cover can never come out blank.
+
+  This takes a `--pdf` run from about 16 full renders down to 2.
 - One shared GL context renders every book, then copies into a 2D canvas per cover, so there is no
   WebGL context limit.
 - If WebGL2 is missing, the covers fall back to flat paper in the level colour with all the typography.
@@ -104,3 +128,44 @@ small, top left, next to "VIZUARA BOOKS", and never louder than the title.
 - An animated web variant: the object turns slowly on hover (same shader, different camera).
 - Spines that line up into one continuous paper sweep on the shelf.
 - A physical edition: actually cast the forthcoming plaster maquettes.
+
+## Review response (revision round 1)
+I checked every claim against the renders before changing anything. All four must-fix items were right.
+
+**Must fix, all done**
+1. *Kernel tagline widow*: confirmed. `.tag` now uses `text-wrap: balance`, a non-breaking space is
+   inserted before the last word of every tag, and one is inserted before every em dash, as system rules.
+   It now breaks "From silicon to speculative decoding — / GPU kernels for modern LLMs."
+2. *DeiT token order and missing class token*: confirmed. DeiT's sequence is `[CLS, DIST, patches]`.
+   The object is rebuilt as a frontal frieze in that order: a plaster class token, a gilt distillation
+   token, then sixteen patches. The label now reads "led by a class token and a distillation token". The
+   ink is near-black oxide (#3A1A12). I did not only turn the camera to -25°: standing plates side by side
+   shadowed each other's faces under any key light, so the patches now face the camera on a rail, and the
+   disc reads on every tile.
+3. *"Oxblood" rendering coral*: partly confirmed. The median lit face was already oxblood-ish
+   (141,54,49), but the top 10% of lit faces reached coral (223,108,103). The albedo is lowered so lit
+   faces sit around #8E2B25 with a gloss highlight, and extra fill keeps the shadow faces off black.
+4. *Context stone list*: confirmed. The medium line and the wrap's back copy both now read "travertine,
+   slate, marble, sandstone, terracotta, serpentine".
+
+**Improvements taken**
+- *Intermediate paper too light*: agreed and measured (166–211). Stone is retuned to about 155 at title
+  height. Every cover now self-checks its wall value (±8) and logs a page error on drift. The check is in
+  the page because the tools folder is not mine to edit; render.js surfaces it as `[page error]`.
+- *Forthcoming must look unfinished on the object*: agreed. Kernel is now raw plaster with the steel
+  armature showing, graphite pointing marks and a tied paper tag. This is the rule for every forthcoming
+  book.
+- *Charlie Reasoning and Vision*: agreed. Vision now has a 4×4 grid of square patch-windows. Reasoning
+  has a six-step stair rising diagonally through the face, as a stairwell in section with gilded treads,
+  rather than a flight receding in depth, which is illegible at this camera angle. Crevices no longer go
+  pure black: occlusion now has a floor, because real cavities get bounce light. The Sound horn is rebuilt
+  as an exact union of cylinders, which removes the broken ring edges.
+- *Prompt*: agreed, and the cylinder seal is a better idea than my wedge. It is adopted as described.
+- *Neural Networks*: agreed. It read as a molecule, and the string construction is adopted.
+- *Build LLMs framing*: agreed. The column is scaled to 0.8, centred like every other object, and the
+  title is set at 62 px with "(LLMs)" ending the roman second line.
+
+**Declined or partial**
+- *"At most one white object in four per key"*: adopted as the rule for the remaining books, not
+  retrofitted here. The Charlie porcelain is the sub-series identity, and the 5D marble's value contrast
+  is the point on soot paper.

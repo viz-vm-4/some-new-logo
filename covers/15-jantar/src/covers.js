@@ -437,14 +437,16 @@
   function roomScene(hr, o) {
     const cam = CAM({ az: 0, s: 0.8, ox: 372, el: 26 });
     const S = new Scene(); ground(S, hr, cam);
-    const b = 30; S.E = frame(cam, b); S.O = add(mul(cam.f, 150), mul(cam.rh, -20));
-    const X = 170, T = 34, Y1 = 300, Hr = 380, R = Hr + 30;
+    const b = 18; S.E = frame(cam, b); S.O = add(mul(cam.f, 90), mul(cam.rh, -10));
+    const X = 190, T = 34, Y1 = 250, Hr = 370, R = Hr + 12;
     const onCut = (pts) => pts.every(p => Math.abs(dot(sub(p, S.O), S.E[1])) < 1e-6);
     const cm = (n, pts) => (dot(n, S.E[1]) < -0.99 && onCut(pts)) ? hr.cut : hr.stone;
     // three walls; the near wall is cut away and its section drawn in poché
     S.box(-X - T, 0, 0, -X, Y1 + T, R, { mat: cm });
     S.box(X, 0, 0, X + T, Y1 + T, R, { mat: cm });
     S.box(-X, Y1, 0, X, Y1 + T, R, { mat: cm });
+    // the cut-away near wall still casts its shadow (the drawing convention for a lit section)
+    S.box(-X, -T, 0, X, 0, R, { mat: hr.stone, hide: true, noTrim: true });
     // roof slab between the walls, pierced in the room's own pattern
     const holes = o.holes || [];
     const xs = [-X, X], ys = [0, Y1];
@@ -460,25 +462,25 @@
     S.box(X - 3, 0, R, X + T + 3, Y1 + T + 3, R + 6, { mat: (n, pts) => (dot(n, S.E[1]) < -0.99 && onCut(pts)) ? hr.cut : hr.marble });
     S.box(-X + 3, Y1 - 3, R, X - 3, Y1 + T + 3, R + 6, { mat: hr.marble });
     if (o.inside) o.inside(S, { X, Y1, Hr });
-    const al = (o.alt || 52) * D, sx = o.sx == null ? 0.3 : o.sx;
+    const al = (o.alt || 50) * D, sx = o.sx == null ? 0 : o.sx;
     const L = nrm(add(add(mul(S.E[0], sx), mul(S.E[1], -Math.cos(al))), [0, 0, Math.sin(al)]));
-    const Sx = S.E, So = S.O; S.E = frame(cam, 0); S.O = [0, 0, 0];
+    S.E = frame(cam, 0); S.O = [0, 0, 0];
     return { S, cam, L };
   }
   SCENES.roomLanguage = (hr) => roomScene(hr, {
-    holes: Array.from({ length: 7 }, (_, i) => [-142 + i * 44, -142 + i * 44 + 14, 40, 170]),
+    holes: Array.from({ length: 7 }, (_, i) => [-130 + i * 46, -130 + i * 46 + 14, 10, 146]),
   });
   SCENES.roomVision = (hr) => roomScene(hr, {
-    holes: (() => { const h = []; for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) h.push([-130 + i * 70, -130 + i * 70 + 40, 30 + j * 56, 30 + j * 56 + 40]); return h; })(),
+    holes: (() => { const h = []; for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) h.push([-104 + i * 70, -104 + i * 70 + 30, 6 + j * 36, 6 + j * 36 + 30]); return h; })(),
   });
   SCENES.roomSound = (hr) => roomScene(hr, {
-    holes: (() => { const amp = [30, 80, 140, 100, 180, 70, 130, 60, 110, 40]; return amp.map((a, i) => [-150 + i * 32, -150 + i * 32 + 12, 110 - a / 2.2, 110 + a / 2.2]); })(),
+    holes: (() => { const amp = [30, 80, 140, 100, 180, 70, 130, 60, 110, 40]; return amp.map((a, i) => [-138 + i * 32, -138 + i * 32 + 13, 76 - a / 2.6, 76 + a / 2.6]); })(),
   });
   SCENES.roomReason = (hr) => roomScene(hr, {
-    holes: [[40, 150, 40, 120]],
+    holes: [[40, 150, 20, 100]],
     inside: (S, r) => {
-      const n = 11, run = 28, rise = 30;
-      for (let i = 0; i < n; i++) S.box(-170 + i * run, 170, 0, -170 + (i + 1) * run, 300, (i + 1) * rise, { mat: hr.stone });
+      const n = 11, run = 30, rise = 26;
+      for (let i = 0; i < n; i++) S.box(-190 + i * run, 130, 0, -190 + (i + 1) * run, 250, (i + 1) * rise, { mat: hr.stone });
     },
   });
 

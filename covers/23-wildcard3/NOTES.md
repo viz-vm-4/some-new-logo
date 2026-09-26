@@ -81,8 +81,10 @@ level/extent pinned to its foot on a 2 px rule.
 
 **Level = the ground the shield is displayed on** (lightness steps survive greyscale):
 - Beginner — **Argent** ground (paper) `#ECE6D9`, sable type
-- Intermediate — **Or** ground `#D4A236`, sable type
-- Advanced — **Sable** ground `#161517`, argent type, and the shield fimbriated (rimmed) Or
+- Intermediate — **Or** ground `#D4A236`, sable type, the shield fimbriated Argent
+- Advanced — **Sable** ground `#161517`, argent type, the shield fimbriated (rimmed) Or
+- On both coloured grounds the shield carries a 6-unit fimbriation in the other metal (Argent on Or,
+  Or on Sable), drawn *inside* the fixed 400 × 480 box so every shield on every level has one outline.
 - The level is also written at the foot of the register.
 
 **Field of study = the tincture of the shield's field:**
@@ -92,9 +94,13 @@ level/extent pinned to its foot on a 2 px rule.
 | Argent | `#F8F5EE` (ground `#ECE6D9`) | metal; beginner ground |
 | Or | `#D4A236` | metal; intermediate ground; most charges |
 | Gules | `#B3261E` | language — LLMs, transformers, prompting, finetuning |
-| Azure | `#213F93` | foundations — maths, classical ML, code and data |
+| Azure | `#213F93` | foundations — maths and ML bear Or; code-and-data books (Git, SQL, Python, R, DSA) bear Argent |
 | Vert | `#1D6946` | vision and embodiment — CNNs, ViTs, VLMs, robots |
 | Purpure | `#5E2B5F` | agents, context and memory; RL |
+
+The Charlie sub-series is tinctured by modality instead, one colour per room: Language Gules,
+Vision Vert, Sound Azure, Reason Purpure (four rooms need four colours; the shared chief says
+"Factory" before the field says anything).
 | Sable | `#161517` | compute and systems — parallelism, kernels, serving; advanced ground |
 
 The old orange / sky-blue / magenta pinwheel is gone entirely. All shields obey the rule of
@@ -113,12 +119,14 @@ catalogue order in books.json).
 
 **The Ordinary (lexicon).** One meaning per charge across the whole library, so the language is
 learnable: roundel = token / data point; annulet = the token still to come, or a neighbourhood;
-billet = a document / a prompt; mullet = the query; estoile = a reward; lozenge = another class;
+billet = a document / a prompt; mullet = the query; estoile = a reward; the tincture of a
+roundel = its class;
 bend = a boundary drawn by a line; grady (stepped) = causality; fess = the context window;
 pall = a branch; chequy = a matrix or an image; canton = a kernel; barry = the turns of a
 conversation; plain = a summary; escutcheon = a whole system (in pretence: a teacher);
 quartering / lines of partition = work shared out; impalement = a join; pallets couped = a
-waveform; chief sawtoothed = the Intelligence Factory.
+waveform; chief sawtoothed = the Intelligence Factory. Marks of cadency (label, crescent,
+mullet, martlet) are not charges: on a Charlie chief they only number the sons.
 
 **Sub-series.** The four *Charlie and the Intelligence Factory* books share a chief sawtoothed Or
 (the factory's north-light roof) and are differenced on it by the English marks of cadency —
@@ -136,37 +144,44 @@ the tinctures written in (sa, or, gu). Drafted, not yet painted; painted on publ
 | Neural Networks from Scratch | Azure, on a bend Or two torteaux between two plates | XOR, which one neuron can't solve; a hidden layer's two parallel lines put the positive class inside the bend |
 | Build LLMs from Scratch | Per bend grady of eight Argent and Gules | the 8 × 8 causal attention mask, row by row |
 | 5D Parallelism | Chequy of 32 Or and Sable, each axis its own line of partition | the smallest 2×2×2×2×2 mesh (data plain, tensor indented, pipeline embattled, context wavy, expert dovetailed) — the axes of the HF Ultra-Scale Playbook the book replicates |
-| Pi vs Hermes vs Codex | Three escutcheons, barry with plain summaries | read from the book's own description: Pi cuts once and writes two summaries; Hermes keeps head and tail and compresses the middle; Codex hands on one summary |
-| Build Decision Trees from Scratch | Per pale Or and per fess Argent and Azure; hurts, mullets, lozenges | a real depth-2 tree on Fisher's iris data, split at petal length 2.45 cm and petal width 1.75 cm, one charge per species, lines placed to scale |
-| Git & GitHub Masterclass | Azure, a pall Or charged with seven hurts | one trunk of commits branching in two |
-| SQL Masterclass | Azure barry impaling Or barry, a pallet Gules | heraldry's impalement (two houses joined in one shield) = a join, rows side by side along the key |
+| Pi vs Hermes vs Codex | Three escutcheons, barry with plain summaries | read from the book's own page on books.vizuara.ai ("split turns and two summaries"; "head/middle/tail with tail repair"; "a summary written as a handoff"): Pi cuts once and writes two summaries; Hermes keeps head and tail and compresses the middle; Codex hands on one summary |
+| Build Decision Trees from Scratch | Per pale Or and per fess Argent and Azure; hurts, torteaux, plates | a real depth-2 tree on Fisher's iris data, split at petal length 2.45 cm and petal width 1.75 cm, lines placed to scale; every iris a roundel, its species its tincture |
+| Git & GitHub Masterclass | Azure, a pall Argent charged with seven hurts | one trunk of commits branching in two |
+| SQL Masterclass | Azure impaling Argent, barry of ten counterchanged, a pallet Gules | heraldry's impalement (two houses joined in one shield) = a join, rows side by side along the key |
 | RAG in Production | Purpure billetty Argent, an annulet Or with a mullet and three billets Or | k-NN retrieval, drawn exactly: on an equilateral lattice of documents the ring holds precisely the query's three nearest |
 | CNN Fundamentals | Chequy Argent and Vert, a canton Or gridded of nine | a 3 × 3 kernel at its first position on the pixel grid |
 | DeiT from Scratch | Vert, a chief compony with a torteau and a pellet; over all the arms of Convolution | patch tokens with class token (start) and distillation token (end); the CNN teacher borne in pretence — marshalling as distillation |
-| Kernel Engineering (soon) | in trick: Sable, a bar and a pallet Or, crossing Gules, latticed | a tiled matmul: a row of A tiles, a column of B tiles, one output tile |
+| Kernel Engineering (soon) | in trick: Sable, a bar and a pallet Or, each of tiles, their crossing Gules | a tiled matmul: a row of A tiles, a column of B tiles, one output tile; dashed Or rim = drafted, still advanced |
 | Charlie I — Language Room | Gules, factory chief with a label; a billet, two plates and an annulet | inference in two halves: prefill (one pass) then decode, one token at a time |
 | Charlie II — Vision Room | Vert, factory chief with a crescent; a square quarterly and a bar compony of the same | ViT: the same four patches as an image and as a row of tokens |
-| Charlie III — Sound Room | Azure, factory chief with a mullet; eleven pallets couped, five Argent six Or | a voice conversation as a waveform: caller, then agent |
-| Charlie IV — Reasoning Room | Purpure, factory chief with a martlet; four steps Or and an estoile | RL, "the one room where the machine is never shown the right answer": steps climbed, reward only at the top |
+| Charlie III — Sound Room | Azure, factory chief with a mullet; five pallets couped Argent in chief, five Or in base, offset | turn-taking on one timeline: the caller speaks, silence is detected, the agent answers; the gap is the latency budget the book is about |
+| Charlie IV — Reasoning Room | Purpure, factory chief with a martlet; four plates and a bezant in fess, the bezant ensigned with an estoile | many attempts, one reward: arms pulled (bandits) or answers sampled (GRPO-style reasoning training), only the right one reinforced |
 
 ## 5. How the rest of the Roll would be blazoned (drafted, not drawn)
 
-- Machine Learning Fundamentals — *Azure, a bend Or between six plates*: the line of best fit
-  (structurally the Howard arms).
-- Deep Learning Fundamentals — *Azure, three chevronels Or*: each ReLU layer folds the space once more.
+Every draft below uses the Ordinary as it stands; a draft that needed a new meaning says so.
+Before any of these is drawn, all 52 go through a 180 px confusability review (see §6).
+
+- Machine Learning Fundamentals — *Azure, a bendlet Or between six plates, each joined to it by an
+  endorse Argent*: least squares, the fitted line and its residuals (new: endorse = a residual).
+  Redrafted away from the plain bend so it cannot be mistaken for Neural Networks' XOR bend.
+- Deep Learning Fundamentals — *Azure, three chevronels Or*: each ReLU layer folds the space once
+  more. Straight-limbed and threefold against Maths' single curved band; to be checked at 180 px.
 - Prompt Engineering — *Gules, three billets Argent in chief, a mullet Or in base*: few-shot examples, then the question.
-- Python for Data Science — *Azure, a chief Or, the field barry Argent and Azure*: a DataFrame, header over rows.
-- DSA in Python — *Azure, seven roundels 1, 2 and 4 Or*: a binary heap in heraldry's own arrangement.
-- Transformers from Scratch — *Gules, four pallets each per bend grady Argent*: four causal heads side by side.
-- LLM Finetuning — *Chequy Gules and Argent, a pallet and a bar Or conjoined in chief*: frozen W, low-rank B and A.
-- Diffusion LM from Scratch — *Gules, barry of four compony, each bar with fewer pellets*: masked tokens revealed in parallel over steps.
-- Build Kimi K3 / Pretraining a Mini Kimi K3 — *Gules, eight pallets Or, two of them Argent*: a router choosing two experts.
-- RLHF from Scratch — *Gules, two billets Argent, the dexter ensigned with a mullet Or*: a preference pair.
-- Memory in AI Systems — *Purpure barry, a canton Argent*: the conversation and the file it writes to.
-- AI Agents Bootcamp / DeepSeek Harness — *Purpure, an escutcheon Or within an orle of plates*: the model inside its loop of tool calls.
-- Computer Vision Bootcamp — *Vert, an orle Or about a roundel*: a bounding box.
+- Python for Data Science — *Azure, a chief Argent, the base chequy Argent and Azure*: a table, header over cells.
+- DSA in Python — *Azure, eight plates in fess, graduated*: a sorted array (redrafted from a heap,
+  which sat too close to Git's pall of roundels).
+- Transformers from Scratch — *Gules, four pallets, each per bend grady Argent*: four causal heads side by side.
+- LLM Finetuning — *Chequy Gules and Argent, over all an endorse and a barrulet Or conjoined in chief*: frozen W, low-rank B and A.
+- Diffusion LM from Scratch — *Gules, four bars compony Argent and Sable, fewer Sable squares in each bar downward*: masked tokens revealed in parallel, step by step.
+- Build Kimi K3 / Pretraining a Mini Kimi K3 — *Gules, eight escutcheons Or four and four, two of them Argent*: a router choosing two experts.
+- RLHF from Scratch — *Gules, two billets Argent, the dexter ensigned with an estoile Or*: a preference pair, one rewarded.
+- Memory in AI Systems — *Purpure, barry Or and Purpure, a billet Argent in dexter chief*: the conversation and the file it writes to.
+- AI Agents Bootcamp / DeepSeek Harness — *Purpure, an escutcheon Or within an orle of plates*: the model inside its loop of tool calls (new: orle of roundels = a loop).
+- Computer Vision Bootcamp — *Vert, a square voided Or about a roundel Argent*: a bounding box around the object.
 - NanoVLM — *Per pale Vert and Gules, a bar compony over all*: image and text tokens in one sequence.
 - ViT from Scratch — the Vision Room's device as a book in its own right.
+- Git-family code books (R, Modern Software Developer) — Azure with Argent charges, per the code-and-data rule.
 - Harness / Inference Engineering (coming soon) — drawn in trick until published.
 - Omnibus titles (ML & DL Mastery, NLP & CV Mastery) — the two books' arms *dimidiated* (halved and joined per pale).
 
@@ -190,3 +205,50 @@ the tinctures written in (sa, or, gu). Drafted, not yet painted; painted on publ
   `src/page.html` — layout and CSS.
 - `renders/` — PNG (2×), JPG (1×), `pdf/` vector PDFs at trim, `_wrap.jpg` (back, spine, front),
   `_contact-180.png` thumbnails.
+- The wrap's back-cover facts ("20 capsules · 115 figures · about 6 hours") and blurb are taken from
+  the book's page, books.vizuara.ai/book/build-llm-from-scratch (checked 2026-09-26).
+
+## Review response (art-director review, 8/10)
+
+**Must-fix — all three confirmed against the renders and fixed.**
+1. "9 capsules · 1 hours" on Pi vs Hermes vs Codex — true. The extent line now pluralises both
+   words ("1 hour").
+2. Vision Room bar clipped by the flanks — true (at y 418 the flank is at x ≈ 317; the bar ran to
+   320). The device moved up and the token cells shrank to 56: square at y 156–296, bar at y 326–382,
+   clearing the inner outline by more than 20 units on both sides.
+3. Decision Trees used mullets against my own Ordinary — true. Every iris is now a roundel with
+   its species as its tincture (hurts, torteaux, plates), re-blazoned. The Ordinary's "lozenge =
+   another class" entry is gone, replaced by "the tincture of a roundel = its class" (also how
+   Neural Networks' XOR shield already worked). The Ordinary now says outright that marks of cadency
+   are not charges, so the Sound Room's mullet is not a query.
+
+**Improvements taken.**
+- Shield against ground: shields on Or are now fimbriated Argent, as those on Sable are fimbriated
+  Or. The CNN canton and the Factory chiefs no longer dissolve into the gold ground. All rims are
+  drawn inside the 400 × 480 box, so every shield on every level has one outer outline and nothing
+  goes past x 676.
+- Azure monotony and look-alikes: code-and-data books now bear Argent (Git's pall is Argent; SQL
+  went back to Azure and Argent counterchanged). ML Fundamentals was redrafted as least squares with
+  residuals, and DSA as a sorted array. The rest of the drafts were rechecked against the Ordinary
+  and five that broke it were fixed (canton, barry twice, pallets and orle had been reused with other meanings).
+- Reasoning Room: I agree the staircase was a poster metaphor. It is now five attempts in fess,
+  the rewarded one Or and ensigned with the estoile: bandits and GRPO in one row. The martlet is
+  redrawn from the heraldic model (footless, tufted, closed pointed wing, forked tail) at 136 units.
+- Kernel Engineering: the field lattice is gone. The bar and pallet are drawn at 8 px, divided into
+  tiles, with the crossing tile at 11 px. The tincture words are set at 38 px and the shield has the
+  advanced Or rim, dashed to mean drafted.
+- Sound Room: the rounded-bar icon is gone. It is now two rows of square-ended pallets on one
+  timeline, the caller above in Argent and the agent below in Or, starting only after an empty gap.
+  That gap is the latency budget, the subject of the book.
+- Craft: "Build Decision Trees / from Scratch", "RAG / in Production". The Maths plates are now
+  24/18/13 with clear gaps. Context Engineering’s scattered plates are kept at least 12 units clear of the shield’s edge.
+- "115 figures" on the wrap: it comes from the book's page on books.vizuara.ai, which lists
+  "20 capsules · 115 figures · ~6 hours". I kept it and noted the source under Files.
+
+**Declined, with reasons.**
+- Re-tincturing the Sound Room away from Azure: declined. The four Charlie rooms need four
+  different colours for four modalities, and Purpure is already the Reasoning Room's. I documented
+  the sub-series rule (tincture by modality) in the tincture table instead.
+- Adding a fimbriation on the paper (beginner) ground: not proposed by the reviewer, and not
+  needed. Paper (#ECE6D9) and Argent (#F8F5EE) differ, and the 6-unit sable outline holds the edge
+  in colour and in greyscale.

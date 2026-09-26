@@ -3,31 +3,38 @@
 const LEVEL = { beginner: 'Beginner', intermediate: 'Intermediate', advanced: 'Advanced' };
 const pad2 = (k) => String(k).padStart(2, '0');
 
-function shieldSVG(inner, id, { rim = null, cls = 'arms', w = 400, outline = S, sw = 6 } = {}) {
+// The shield always occupies the same 400 x 480 box. On a coloured ground it is fimbriated (rimmed)
+// in the metal that stands against that ground: the rim is the outer 6 units, the arms sit inside it.
+const RIM = 6, RS = (400 - 2 * RIM) / 400;
+function shieldSVG(inner, id, { rim = null, dashed = false, cls = 'arms', w = 400, outline = S, sw = 6 } = {}) {
   const h = w * 1.2;
-  const rimPath = rim ? `<path d="${SHIELD}" fill="none" stroke="${rim}" stroke-width="12"/>` : '';
-  return `<svg class="${cls}" viewBox="0 0 400 480" width="${w}" height="${n(h)}" overflow="visible" aria-hidden="true">${rimPath}` +
-    `<clipPath id="${id}"><path d="${SHIELD}"/></clipPath><g clip-path="url(#${id})">${inner}</g>` +
-    `<path d="${SHIELD_IN}" fill="none" stroke="${outline}" stroke-width="${sw}"/></svg>`;
+  const body = `<clipPath id="${id}"><path d="${SHIELD}"/></clipPath><g clip-path="url(#${id})">${inner}</g>` +
+    `<path d="${SHIELD_IN}" fill="none" stroke="${outline}" stroke-width="${sw}"/>`;
+  let out = body;
+  if (rim) {
+    const rimEl = dashed
+      ? `<path d="${SHIELD_IN}" fill="none" stroke="${rim}" stroke-width="6" stroke-dasharray="16 11"/>`
+      : `<path d="${SHIELD}" fill="${rim}"/>`;
+    out = rimEl + `<g transform="translate(${RIM} ${n(480 * (1 - RS) / 2)}) scale(${RS})">${body}</g>`;
+  }
+  return `<svg class="${cls}" viewBox="0 0 400 480" width="${w}" height="${n(h)}" aria-hidden="true">${out}</svg>`;
 }
+const RIMS = { beginner: null, intermediate: T.argent, advanced: T.or };
 
 function armsFor(b, suffix = '', w = 400, cls = 'arms') {
   if (b.soon) return trickSVG(b, suffix, w, cls);
   const id = 'c-' + b.slug + suffix;
-  return shieldSVG(ARMS[b.slug](b.slug + suffix), id, { rim: b.level === 'advanced' ? T.or : null, w, cls });
+  return shieldSVG(ARMS[b.slug](b.slug + suffix), id, { rim: RIMS[b.level], w, cls });
 }
 
-// Coming soon: the arms "in trick" — drafted in outline with the tinctures written in
+// Coming soon: the arms "in trick" — drafted in outline with the tinctures written in, inside a dashed rim
 function trickSVG(b, suffix = '', w = 400, cls = 'arms') {
   const ink = b.level === 'advanced' ? T.argent : T.sable;
   const id = 'c-' + b.slug + suffix;
   const lab = (x, y, t) => `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" fill="${ink}">${t}</text>`;
   const inner = `<g style="color:${ink}">${ARMS[b.slug]()}</g>` +
-    lab(40, 40, 'sa') + lab(360, 120, 'sa') + lab(120, 360, 'sa') + lab(200, 440, 'sa') +
-    lab(120, 200, 'or') + lab(360, 200, 'or') + lab(280, 40, 'or') + lab(280, 360, 'or') + lab(280, 200, 'gu');
-  return `<svg class="${cls} trick" viewBox="0 0 400 480" width="${w}" height="${n(w * 1.2)}" overflow="visible" aria-hidden="true">` +
-    `<clipPath id="${id}"><path d="${SHIELD}"/></clipPath><g clip-path="url(#${id})">${inner}</g>` +
-    `<path d="${SHIELD_IN}" fill="none" stroke="${ink}" stroke-width="6"/></svg>`;
+    lab(118, 84, 'sa') + lab(130, 340, 'sa') + lab(120, 200, 'or') + lab(360, 200, 'or') + lab(280, 120, 'or') + lab(280, 360, 'or') + lab(280, 200, 'gu');
+  return shieldSVG(inner, id, { rim: RIMS[b.level], dashed: true, cls: cls + ' trick', w, outline: ink });
 }
 
 function titleHTML(b) {
@@ -39,7 +46,8 @@ function coverInner(b, suffix = '') {
   const fg = adv ? T.argent : T.sable, bg = adv ? T.sable : (b.level === 'intermediate' ? T.or : GROUND.beginner);
   const lines = b.title.split('|').length;
   const size = (b.subtitle || b.series) && lines <= 2 ? 76 : { 1: 86, 2: 86, 3: 70, 4: 58 }[lines];
-  const ext = b.soon ? 'Coming soon' : `${b.capsules} capsules · ${b.hours} hours`;
+  const pl = (k, word) => `${k} ${word}${k === 1 ? '' : 's'}`;
+  const ext = b.soon ? 'Coming soon' : `${pl(b.capsules, 'capsule')} · ${pl(b.hours, 'hour')}`;
   return `
     <div class="imprint">${imprintMark(fg, bg)}<span>Vizuara Books</span></div>
     <div class="roll">Nº ${pad2(b.no)}</div>
@@ -84,9 +92,9 @@ function buildTinctures() {
     ['Argent', 'argent', 'The metal white. Beginner ground (as paper), and silver on shields.', '#F8F5EE · paper #ECE6D9'],
     ['Or', 'or', 'The metal gold. Intermediate ground; the metal of most charges.', '#D4A236'],
     ['Gules', 'gules', 'Language: LLMs, transformers, prompting, finetuning.', '#B3261E'],
-    ['Azure', 'azure', 'Foundations: mathematics, classical ML, code and data.', '#213F93'],
+    ['Azure', 'azure', 'Foundations. Maths and ML bear Or; code and data books bear Argent.', '#213F93'],
     ['Vert', 'vert', 'Vision and embodiment: CNNs, ViTs, VLMs, robots.', '#1D6946'],
-    ['Purpure', 'purpure', 'Agents, context and memory; reinforcement learning.', '#5E2B5F'],
+    ['Purpure', 'purpure', 'Agents, context and memory; RL. (Charlie rooms go by modality: Language Gules, Vision Vert, Sound Azure, Reason Purpure.)', '#5E2B5F'],
     ['Sable', 'sable', 'Compute and systems: parallelism, kernels, serving. Advanced ground.', '#161517'],
   ];
   document.getElementById('tinctures').innerHTML = rows.map(([name, k, role, hex]) => `
@@ -102,9 +110,9 @@ function buildOrdinary() {
     ['Roundel', 'a token; a data point', fieldRect(T.argent) + roundel(200, 200, 90, T.gules)],
     ['Annulet', 'the token still to come; a neighbourhood', fieldRect(T.azure) + annulet(200, 200, 100, 34, T.or)],
     ['Billet', 'a document; a prompt', fieldRect(T.purpure) + billet(200, 210, 130, 200, T.argent)],
-    ['Mullet', 'a query, the question', fieldRect(T.argent) + mullet(200, 210, 120, T.azure)],
+    ['Mullet', 'a query, the question (on a Charlie chief it is only a cadency mark)', fieldRect(T.argent) + mullet(200, 210, 120, T.azure)],
     ['Estoile', 'a reward', fieldRect(T.purpure) + estoile(200, 210, 120, T.or)],
-    ['Lozenge', 'another class of data', fieldRect(T.or) + lozenge(200, 210, 150, 240, T.vert)],
+    ['Roundels by tincture', 'data points, coloured by their class', fieldRect(T.argent) + roundel(130, 130, 56, T.gules) + roundel(270, 130, 56, T.azure) + roundel(200, 280, 56, T.or)],
     ['Bend', 'a boundary drawn by a line', fieldRect(T.argent) + poly([[-60, -20], [40, -80], [480, 360], [380, 420]], T.azure)],
     ['Grady', 'causality: one step at a time', ARMS['build-llms-from-scratch']()],
     ['Fess', 'the context window', fieldRect(T.purpure) + poly([[-10, 170], [410, 170], [410, 300], [-10, 300]], T.or)],

@@ -16,6 +16,25 @@ const S = T.sable;
 const W = 400, H = 480;
 const SHIELD = 'M0 0H400V250C400 360 320 440 200 480C80 440 0 360 0 250Z';
 const SHIELD_IN = 'M3 3H397V250C397 358 318 437 200 477C82 437 3 358 3 250Z';
+// the shield's outline as a polyline, for keeping scattered charges clear of the edge
+const SHIELD_POLY = (() => {
+  const bz = (t, a, b, c, d) => (1 - t) ** 3 * a + 3 * (1 - t) ** 2 * t * b + 3 * (1 - t) * t * t * c + t ** 3 * d;
+  const pts = [[0, 0], [400, 0], [400, 250]];
+  for (let i = 1; i <= 40; i++) { const t = i / 40; pts.push([bz(t, 400, 400, 320, 200), bz(t, 250, 360, 440, 480)]); }
+  for (let i = 1; i <= 40; i++) { const t = i / 40; pts.push([bz(t, 200, 80, 0, 0), bz(t, 480, 440, 360, 250)]); }
+  return pts;
+})();
+const ctx = document.createElement('canvas').getContext('2d');
+const SHIELD_P2D = new Path2D(SHIELD);
+function edgeDist(x, y) {
+  let d = Infinity;
+  for (let i = 0; i < SHIELD_POLY.length; i++) {
+    const [ax, ay] = SHIELD_POLY[i], [bx, by] = SHIELD_POLY[(i + 1) % SHIELD_POLY.length];
+    const dx = bx - ax, dy = by - ay, t = Math.max(0, Math.min(1, ((x - ax) * dx + (y - ay) * dy) / (dx * dx + dy * dy)));
+    d = Math.min(d, Math.hypot(x - ax - t * dx, y - ay - t * dy));
+  }
+  return d;
+}
 const LW = 3.5;   // line of partition
 const CW = 3;     // charge outline
 
@@ -113,16 +132,17 @@ function label(x, y, w, fill) {
   return `<path d="${d}" fill="${fill}" stroke="${S}" stroke-width="${CW}" stroke-linejoin="miter"/>`;
 }
 function martlet(x, y, w, fill) {
-  // a heraldic martlet facing dexter: beak, round head, folded pointed wing, forked tail, tufts for legs
+  // a heraldic martlet facing dexter: short beak, round head, closed pointed wing,
+  // deeply forked tail, and tufts of feathers in place of feet (a martlet has none)
   const s = w / 100;
-  const body = 'M8 27L17 23C19 16 26 13 33 14C42 16 52 21 66 23L95 13L83 29L96 44L64 36C55 42 42 46 31 43C23 41 18 35 17 31Z';
-  const wing = 'M30 27C44 19 66 18 90 25C72 31 50 34 33 33Z';
-  const tuft = 'M33 42L29 53L37 46L39 56L45 45L47 55L51 43Z';
-  const tf = `translate(${n(x - 52 * s)} ${n(y - 32 * s)}) scale(${n(s)})`;
+  const body = 'M2 22L9 19C10 13 16 10.5 22 11.5C34 13 46 14 58 17C66 19 71 21 75 23L100 9L87 28L100 43L72 33C64 38 54 42 42 43C32 44 24 41 18 36C14 32 11 28 9 26Z';
+  const wing = 'M23 24C37 15.5 60 15.5 88 21.5C71 27 53 31.5 36 32.5C29 32.5 24.5 29 23 24Z';
+  const tuft = 'M29 40L25.5 52L33 45L35 55L39.5 45L43.5 54L46 42Z';
+  const tf = `translate(${n(x - 51 * s)} ${n(y - 31 * s)}) scale(${n(s)})`;
   const sw = n(CW / s);
   return `<g transform="${tf}"><path d="${tuft}" fill="${fill}" stroke="${S}" stroke-width="${sw}" stroke-linejoin="round"/>` +
     `<path d="${body}" fill="${fill}" stroke="${S}" stroke-width="${sw}" stroke-linejoin="round"/>` +
-    `<path d="${wing}" fill="${fill}" stroke="${S}" stroke-width="${sw}" stroke-linejoin="round"/><circle cx="25" cy="21" r="2.3" fill="${S}"/></g>`;
+    `<path d="${wing}" fill="${fill}" stroke="${S}" stroke-width="${sw}" stroke-linejoin="round"/><circle cx="13" cy="18.5" r="1.9" fill="${S}"/></g>`;
 }
 function escutcheon(x, y, w, inner, id) {
   // a small shield (same outline as the main one) with arbitrary contents drawn in 400x480 space
@@ -167,29 +187,26 @@ ARMS['mathematical-foundations-for-ml'] = () => {
   const curve = openPath(pts);
   // gradient descent with a fixed learning rate on a parabola: each step halves the distance to the minimum
   const us = [-148, -74, -37];
-  const rs = [27, 22, 18];
+  const rs = [24, 18, 13];
   let out = `<rect width="400" height="480" fill="${T.azure}"/>`;
   out += `<path d="${curve}" fill="none" stroke="${S}" stroke-width="60"/><path d="${curve}" fill="none" stroke="${T.or}" stroke-width="53"/>`;
   us.forEach((u, i) => { out += roundel(vx + u, f(vx + u), rs[i], T.argent); });
-  out += roundel(vx, vy, 15, T.gules);
+  out += roundel(vx, vy, 13, T.gules);
   return out;
 };
 
 // Decision trees — Fisher's iris, split at petal length 2.45 cm, then petal width 1.75 cm
 ARMS['decision-trees-from-scratch'] = () => {
-  // petal length axis 0.6..7.0 cm across; petal width axis 0..2.6 cm up
+  // petal length axis 0.6..7.0 cm across; petal width axis 0..2.6 cm up; every iris a roundel, its species its tincture
   const X = (cm) => ((cm - 0.6) / 6.4) * 400, Y = (cm) => 480 - (cm / 2.6) * 480;
   const x0 = X(2.45), y0 = Y(1.75);
   let out = `<rect width="400" height="480" fill="${T.azure}"/>`;
   out += poly([[-10, -10], [x0, -10], [x0, 500], [-10, 500]], T.or);
   out += poly([[x0, -10], [410, -10], [410, y0], [x0, y0]], T.argent);
-  // setosa: three hurts in pale
-  [96, 196, 296].forEach((y) => { out += roundel(x0 / 2 + 2, y, 26, T.azure); });
-  // virginica: two mullets in fess
+  [96, 196, 296].forEach((y) => { out += roundel(x0 / 2 + 2, y, 27, T.azure); });            // setosa
   const cx = (x0 + 400) / 2;
-  out += mullet(cx - 68, y0 / 2 + 4, 40, T.azure) + mullet(cx + 68, y0 / 2 + 4, 40, T.azure);
-  // versicolor: three lozenges two and one
-  out += lozenge(cx - 66, y0 + 88, 52, 76, T.argent) + lozenge(cx + 66, y0 + 88, 52, 76, T.argent) + lozenge(cx, y0 + 196, 52, 76, T.argent);
+  out += roundel(cx - 66, y0 / 2 + 2, 34, T.gules) + roundel(cx + 66, y0 / 2 + 2, 34, T.gules); // virginica
+  out += roundel(cx - 64, y0 + 86, 34, T.argent) + roundel(cx + 64, y0 + 86, 34, T.argent) + roundel(cx, y0 + 190, 34, T.argent); // versicolor
   return out;
 };
 
@@ -206,17 +223,18 @@ ARMS['build-llms-from-scratch'] = () => {
 // AI Context Engineering — the fess is the context window: scattered outside, engineered within
 ARMS['ai-context-engineering'] = () => {
   let out = `<rect width="400" height="480" fill="${T.purpure}"/>`;
-  const y0 = 188, y1 = 292;
-  // a seeded scatter of plates: everything the model could be shown
+  const y0 = 188, y1 = 292, r = 8.5;
+  // a seeded scatter of plates: everything the model could be shown (kept clear of the shield's edge)
   let seed = 7; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
   const pts = [];
-  for (let tries = 0; tries < 4000 && pts.length < 64; tries++) {
+  for (let tries = 0; tries < 6000 && pts.length < 60; tries++) {
     const x = 10 + rnd() * 380, y = 12 + rnd() * 460;
     if (y > y0 - 22 && y < y1 + 22) continue;
+    if (!ctx.isPointInPath(SHIELD_P2D, x, y) || edgeDist(x, y) < r + 12) continue;
     if (pts.some(([px, py]) => Math.hypot(px - x, py - y) < 40)) continue;
     pts.push([x, y]);
   }
-  pts.forEach(([x, y]) => { out += roundel(x, y, 8.5, T.argent); });
+  pts.forEach(([x, y]) => { out += roundel(x, y, r, T.argent); });
   out += poly([[-10, y0], [410, y0], [410, y1], [-10, y1]], T.or);
   // on it, in order: instructions, tools, retrieved knowledge, memory
   [[74, T.sable], [158, T.gules], [242, T.azure], [326, T.argent]].forEach(([x, f]) => { out += roundel(x, (y0 + y1) / 2, 30, f); });
@@ -250,12 +268,12 @@ ARMS['5d-parallelism'] = () => {
 // Git & GitHub — a pall: one trunk of commits parting into two branches
 ARMS['git-github-masterclass'] = () => {
   const w = 88, c = [200, 214];
-  // pall: arms to the chief corners, tail to the base
+  // pall: arms to the chief corners, tail to the base (code-and-data books bear Argent)
   const pall = [
-    [-40, -40 + 0], [0 - 40 + w * 0.9, -40], [c[0], c[1] - w * 0.62], [440 - w * 0.9, -40], [440, -40], [440, 30],
+    [-40, -40], [-40 + w * 0.9, -40], [c[0], c[1] - w * 0.62], [440 - w * 0.9, -40], [440, -40], [440, 30],
     [c[0] + w / 2, c[1] + w * 0.2], [c[0] + w / 2, 520], [c[0] - w / 2, 520], [c[0] - w / 2, c[1] + w * 0.2], [-40, 30],
   ];
-  let out = `<rect width="400" height="480" fill="${T.azure}"/>` + poly(pall, T.or);
+  let out = `<rect width="400" height="480" fill="${T.azure}"/>` + poly(pall, T.argent);
   const r = 22;
   [[200, 420], [200, 338], [200, 256]].forEach(([x, y]) => { out += roundel(x, y, r, T.azure); });
   [[126, 150], [62, 86], [274, 150], [338, 86]].forEach(([x, y]) => { out += roundel(x, y, r, T.azure); });
@@ -265,7 +283,7 @@ ARMS['git-github-masterclass'] = () => {
 // SQL Masterclass — a join is an impalement: two tables side by side, row matched to row along the key
 ARMS['sql-masterclass'] = () => {
   let out = `<rect width="400" height="480" fill="${T.azure}"/>`;
-  out += poly([[200, -10], [410, -10], [410, 500], [200, 500]], T.or);
+  out += poly([[200, -10], [410, -10], [410, 500], [200, 500]], T.argent);
   const bh = 48;
   for (let i = 1; i < 10; i += 2) {
     out += poly([[-10, i * bh], [200, i * bh], [200, (i + 1) * bh], [-10, (i + 1) * bh]], T.argent);
@@ -322,13 +340,14 @@ ARMS['deit-from-scratch'] = (slug) => {
 
 // Kernel Engineering (coming soon) — a tiled matrix multiply; drawn in trick
 ARMS['kernel-engineering'] = () => {
-  const cw = 80;
-  let g = '';
-  for (let c = 1; c < 5; c++) g += `M${c * cw} 0V480`;
-  for (let r = 1; r < 6; r++) g += `M0 ${r * cw}H400`;
-  return `<path d="${g}" stroke="currentColor" stroke-width="2" fill="none"/>` +
-    `<path d="M-10 160H410V240H-10ZM240 -10V490H320V-10Z" stroke="currentColor" stroke-width="5" fill="none"/>` +
-    `<rect x="240" y="160" width="80" height="80" fill="none" stroke="currentColor" stroke-width="5"/>`;
+  // a tiled matrix multiply: a bar of A tiles, a pallet of B tiles, the output tile where they cross
+  const t = 80;
+  let tiles = '';
+  for (let x = t; x < 400; x += t) if (x !== 240 && x !== 320) tiles += `M${x} 160V240`;
+  for (let y = t; y < 480; y += t) if (y !== 160 && y !== 240) tiles += `M240 ${y}H320`;
+  return `<path d="${tiles}" stroke="currentColor" stroke-width="3" fill="none"/>` +
+    `<path d="M-10 160H410V240H-10ZM240 -10V490H320V-10Z" stroke="currentColor" stroke-width="8" fill="none"/>` +
+    `<rect x="240" y="160" width="80" height="80" fill="none" stroke="currentColor" stroke-width="11"/>`;
 };
 
 /* The Intelligence Factory — four rooms, four sons differenced by cadency */
@@ -344,34 +363,34 @@ ARMS['charlie-language-room'] = () => {
 
 ARMS['charlie-vision-room'] = () => {
   let out = `<rect width="400" height="480" fill="${T.vert}"/>` + factoryChief(T.or) + crescent(200, 50, 28, T.vert);
-  const s = 74, x0 = 200 - s, y0 = 168, cols = [T.or, T.argent, T.argent, T.or];
+  const s = 70, x0 = 200 - s, y0 = 156, cols = [T.or, T.argent, T.argent, T.or];
   const sq = (x, y, w, h, c) => poly([[x, y], [x + w, y], [x + w, y + h], [x, y + h]], c);
   // the image, quarterly
   out += sq(x0, y0, s, s, cols[0]) + sq(x0 + s, y0, s, s, cols[1]) + sq(x0, y0 + s, s, s, cols[2]) + sq(x0 + s, y0 + s, s, s, cols[3]);
-  // the same patches as a row of tokens
-  const bw = 60, bx = 200 - 2 * bw, by = 358;
+  // the same patches as a row of tokens, clear of the flanks
+  const bw = 56, bx = 200 - 2 * bw, by = 326;
   cols.forEach((c, i) => { out += sq(bx + i * bw, by, bw, bw, c); });
   return out;
 };
 
 ARMS['charlie-sound-room'] = () => {
   let out = `<rect width="400" height="480" fill="${T.azure}"/>` + factoryChief(T.or) + mullet(200, 50, 32, T.azure);
-  // a voice as pallets couped of diverse lengths: the caller (Argent), then the agent (Or)
-  const hs = [46, 104, 168, 120, 70, 30, 84, 150, 196, 132, 60];
-  const pw = 22, gap = 11.5, x0 = 200 - (hs.length * (pw + gap) - gap) / 2, cy = 282;
-  hs.forEach((h, i) => {
-    const x = x0 + i * (pw + gap);
-    out += `<rect x="${n(x)}" y="${n(cy - h / 2)}" width="${pw}" height="${h}" rx="${pw / 2}" fill="${i < 5 ? T.argent : T.or}" stroke="${S}" stroke-width="${CW}"/>`;
-  });
+  // turn-taking on one timeline (left to right): the caller speaks, silence is detected,
+  // and only then does the agent answer. The empty gap between the rows is the latency budget.
+  const pitch = 25.5, pw = 18, x0 = 46;
+  const caller = [50, 96, 124, 80, 108];            // slots 0-4
+  const agent = [74, 112, 86, 100, 40];             // slots 7-11, after a two-slot silence
+  caller.forEach((h, i) => { const x = x0 + i * pitch; out += billet(x + pw / 2, 228, pw, h, T.argent); });
+  agent.forEach((h, i) => { const x = x0 + (i + 7) * pitch; out += billet(x + pw / 2, 344, pw, h, T.or); });
   return out;
 };
 
 ARMS['charlie-reasoning-room'] = () => {
-  let out = `<rect width="400" height="480" fill="${T.purpure}"/>` + factoryChief(T.or) + martlet(200, 52, 104, T.purpure);
-  // four steps climbed without ever being shown the answer; the reward only at the top
-  const pts = [[-20, 500], [-20, 440], [100, 440], [100, 380], [200, 380], [200, 320], [300, 320], [300, 260], [420, 260], [420, 500]];
-  out += poly(pts, T.or);
-  out += estoile(350, 200, 48, T.argent);
+  let out = `<rect width="400" height="480" fill="${T.purpure}"/>` + factoryChief(T.or) + martlet(200, 44, 136, T.purpure);
+  // many attempts, one reward: five roundels in fess, the rewarded one Or and ensigned with an estoile
+  const y = 318, xs = [72, 136, 200, 264, 328];
+  xs.forEach((x, i) => { out += roundel(x, y, 25, i === 2 ? T.or : T.argent); });
+  out += estoile(200, 226, 44, T.argent);
   return out;
 };
 

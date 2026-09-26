@@ -250,8 +250,7 @@ const BLOCKS = {
     accent+=`<polyline points="0,45 60,75 120,45" fill="none" stroke="currentColor" stroke-width="4.2"/>`;
     accent+=`<polyline points="0,105 60,15 120,105" fill="none" stroke="currentColor" stroke-width="4.2"/>`;
     for(const x of [0,60]) for(const y of ys){ main+=C(x,y,9); ground+=C(x,y,3.6); }
-    // the fine mesh is inked more densely: a 1.6px printed line should hold solid
-    return {w:120,h:120,voids:{line:.84},layers:{line,accent,main,ground},order:['line','accent','main','ground']};
+    return {w:120,h:120,layers:{line,accent,main,ground},order:['line','accent','main','ground']};
   },
 
   /* Build LLMs from Scratch — the causal attention mask. Lower triangle: tokens

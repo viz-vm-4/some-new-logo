@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&family=Instrument+Sans:ital,wdth,wght@0,75..100,400..700;1,75..100,400..700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --chalk:#E7E3DB; --stone:#A8A39A; --soot:#232120;
+  --chalk:#E8E5DE; --stone:#9C988F; --soot:#3A3734;
   --ink:#171614; --bone:#EEE9E0;
   --page:#F3F0EA; --pageInk:#1d1c1a; --rule:#c9c3b8;
 }
@@ -147,10 +147,10 @@ footer.colophon b{font:600 11px/1 "Instrument Sans";letter-spacing:.18em;text-tr
       <section>
         <h3>Paper is the level</h3>
         <div class="keys">
-          <div class="sw k0"><span>Beginner</span><div><b>Chalk</b><br>#E7E3DB · high key</div></div>
-          <div class="sw k1"><span>Intermediate</span><div><b>Stone</b><br>#A8A39A · mid key</div></div>
-          <div class="sw k2"><span>Advanced</span><div><b>Soot</b><br>#232120 · low key</div></div>
-          <p>Level is lighting. Beginner books are shot bright and airy, advanced books under a single spot on dark paper. It is a difference of value, not hue, so it survives greyscale print and reads from across a room. A small grey-scale target, the kind photographers put beside an artwork, repeats it in words.</p>
+          <div class="sw k0"><span>Beginner</span><div><b>Chalk</b><br>#E8E5DE · high key</div></div>
+          <div class="sw k1"><span>Intermediate</span><div><b>Stone</b><br>#9C988F · mid key</div></div>
+          <div class="sw k2"><span>Advanced</span><div><b>Soot</b><br>#3A3734 · low key</div></div>
+          <p>Level is lighting. Beginner books are shot bright and airy, advanced books under a single spot on dark paper. It is a difference of value, not hue, so it survives greyscale print and reads from across a room. A small grey-scale target, the kind photographers put beside an artwork, repeats it in words. Every render checks its own wall value against its key (±8 levels).</p>
         </div>
       </section>
       <section>
@@ -322,7 +322,7 @@ vec3 shadeObj(vec3 p, vec3 rd){
   Mat m=material(id,p,n);
   vec3 L; float dist; float ka=keyAtten(p,L,dist);
   float sh=dot(n,L)+m.wrap<0.?0.:softShadow(p+n*0.004,L,dist,uKeySoft,SHT);
-  float ao=calcAO(p,n,0.35);
+  float ao=0.16+0.84*calcAO(p,n,0.35);
   float ndl=dot(n,L);
   float diff=max((ndl+m.wrap)/(1.+m.wrap),0.);
   float up=0.5+0.5*n.y;
@@ -539,7 +539,7 @@ book({ slug:'neural-networks-from-scratch', key:0,
   title:'Neural Networks<span class="sub">from Scratch</span>',
   obj:'Three layers, fully connected in thread; each thread’s thickness is its weight', med:'Oak, brass pins, black linen', dim:'33 capsules · 7 hours',
   cam:{ look:[0,0.98,0], dist:15, el:9, yaw:30, frame:[0.5,0.6] }, bound:[0,0.98,0,1.6], box:[[-0.9,0,-0.3],[0.9,1.92,0.3]], steps:140,
-  light:{ keyPos:[-9,7.5,-4], keyPow:230 },
+  light:{ keyPos:[-7.5,10,-6.5], glow:0.5, glowRad:7, glowPos:[3,3,5] },
   glsl:`
 vec2 scene(vec3 p){
   float d=1e9;
@@ -638,8 +638,8 @@ Mat material(float id, vec3 p, vec3 n){
 book({ slug:'prompt-engineering', key:0,
   title:'Prompt<br>Engineering',
   obj:'Cylinder seal, and the frieze it rolls into clay', med:'Lapis lazuli, terracotta', dim:'31 capsules · 7 hours',
-  cam:{ look:[0.2,0.2,0], dist:17.5, el:25, yaw:16, frame:[0.5,0.645] }, bound:[0.2,0.2,0,1.75], box:[[-1.2,0,-0.52],[1.65,0.46,0.52]], steps:140,
-  light:{ keyPos:[-7,5.5,-6.5] },
+  cam:{ look:[0.22,0.2,0], dist:15, el:24, yaw:16, frame:[0.5,0.64] }, bound:[0.2,0.2,0,1.75], box:[[-1.2,0,-0.52],[1.65,0.46,0.52]], steps:140,
+  light:{ keyPos:[-7,6.5,-6.5], keyPow:262 },
   glsl:`
 const float R=0.13; const float P=0.81681; const float TOP=0.18; const float XS=-0.62; const float XE=1.5;
 float motif(float u, float z){
@@ -654,7 +654,7 @@ float motif(float u, float z){
 vec2 scene(vec3 p){
   float slab=sdRBox(p-vec3(0.225,TOP*0.5,0.),vec3(1.375,TOP*0.5,0.46),0.03);
   float band=max(max(XS-p.x,p.x-XE),abs(p.z)-0.215);
-  float rec=max(band,(TOP-0.024)-p.y);
+  float rec=max(band,(TOP-0.034)-p.y);
   float cut=max(rec,-motif(p.x-XS,p.z));
   slab=max(slab,-cut);
   vec2 r=vec2(slab,1.);
@@ -784,12 +784,13 @@ book({ slug:'charlie-reasoning-room', key:2, series:'Charlie and the Intelligenc
 vec2 scene(vec3 p){ vec3 q=cubeP(p);
   float d=sdRBox(q,vec3(S),0.03);
   float w=q.z+S;
-  const float RUN=0.13, RISE=0.13, X0=-0.42, Y0=-0.47, HC=0.3;
+  const float RUN=0.13, RISE=0.13, X0=-0.42, Y0=-0.47, HC=0.36;
+  float mx=-q.x;
   float cut=1e9, tr=1e9;
   for(int k=0;k<6;k++){ float fk=float(k); float xa=X0+fk*RUN, xb=xa+RUN, yt=Y0+fk*RISE;
-    cut=min(cut,max(max(xa-q.x,q.x-xb),yt-q.y));
-    if(q.x>xa-0.004 && q.x<xb+0.004) tr=min(tr,abs(q.y-yt)); }
-  cut=max(cut,(q.y-(Y0+HC+(q.x-X0)))*0.7071);
+    cut=min(cut,max(max(xa-mx,mx-xb),yt-q.y));
+    if(mx>xa-0.004 && mx<xb+0.004) tr=min(tr,abs(q.y-yt)); }
+  cut=max(cut,(q.y-(Y0+HC+(mx-X0)))*0.7071);
   cut=max(cut,max(w-0.3,-w-0.5));
   float dd=max(d,-cut);
   return vec2(dd, (tr<0.008 && w>-0.01 && w<0.305)?2.:1.);
@@ -819,16 +820,16 @@ vec2 scene(vec3 p){
   float tile=sdRBox(t,vec3(0.5*TS-0.01,TH*0.5,0.5*TS-0.01),0.012);
   vec2 r=vec2(min(d,tile),1.);
   // armature: one rod rising from the block corner, one through the lifted tile
-  float rod=min(sdCapsule(p,RA+vec3(0,0.05,0),RA+vec3(0,1.02,0),0.018), sdCapsule(p,TC+vec3(0,-0.1,0),TC+vec3(0.,0.36,0.),0.016));
-  rod=min(rod,sdCapsule(p,RA+vec3(0,1.02,0),RA+vec3(-0.12,1.07,0.02),0.018));
+  float rod=min(sdCapsule(p,RA+vec3(0,0.05,0),RA+vec3(0,1.02,0),0.024), sdCapsule(p,TC+vec3(0,-0.1,0),TC+vec3(0.,0.38,0.),0.02));
+  rod=min(rod,sdCapsule(p,RA+vec3(0,1.02,0),RA+vec3(-0.14,1.08,0.02),0.024));
   if(rod<r.x) r=vec2(rod,2.);
   // tag tied to the rod
-  vec3 k=p-(RA+vec3(0.035,0.8,-0.05)); k.xz=rot(0.9)*k.xz; k.xy=rot(-0.18)*k.xy;
-  float tag=sdRBox(k,vec3(0.075,0.05,0.003),0.002);
-  tag=max(tag,-(length(k.xy-vec2(-0.052,0.022))-0.009));
+  vec3 k=p-(RA+vec3(0.06,0.77,-0.08)); k.xz=rot(0.9)*k.xz; k.xy=rot(-0.18)*k.xy;
+  float tag=sdRBox(k,vec3(0.11,0.07,0.003),0.002);
+  tag=max(tag,-(length(k.xy-vec2(-0.08,0.035))-0.012));
   if(tag<r.x) r=vec2(tag,3.);
-  float str=sdCapsule(p,RA+vec3(0.,0.86,0.),RA+vec3(0.0,0.84,-0.06),0.0035);
-  str=min(str,sdCapsule(p,RA+vec3(0.,0.86,0.),RA+vec3(-0.035,0.838,-0.03),0.0035));
+  float str=sdCapsule(p,RA+vec3(0.,0.88,0.),RA+vec3(0.02,0.83,-0.07),0.004);
+  str=min(str,sdCapsule(p,RA+vec3(0.,0.88,0.),RA+vec3(-0.03,0.84,-0.04),0.004));
   if(str<r.x) r=vec2(str,4.);
   return r;
 }
@@ -844,46 +845,51 @@ Mat material(float id, vec3 p, vec3 n){
     float mark=(h>0.5)?1.-smoothstep(0.,0.0025,cr):0.;
     m.alb=mix(m.alb,vec3(0.2,0.2,0.21),mark*0.85); }
   else if(id<2.5){ float f=fbm(p*30.); m.alb=vec3(0.26,0.14,0.08)*(0.7+0.6*f); m.rough=0.75; m.metal=0.5; }
-  else if(id<3.5){ vec3 k=p-(RA+vec3(0.035,0.8,-0.05)); k.xz=rot(0.9)*k.xz; k.xy=rot(-0.18)*k.xy;
-    float ink=(1.-smoothstep(0.003,0.005,abs(k.y+0.004+0.004*sin(k.x*90.))))*step(abs(k.x+0.005),0.045);
-    ink=max(ink,(1.-smoothstep(0.003,0.005,abs(k.y+0.024)))*step(abs(k.x+0.02),0.03));
+  else if(id<3.5){ vec3 k=p-(RA+vec3(0.06,0.77,-0.08)); k.xz=rot(0.9)*k.xz; k.xy=rot(-0.18)*k.xy;
+    float ink=(1.-smoothstep(0.004,0.006,abs(k.y+0.006+0.006*sin(k.x*70.))))*step(abs(k.x+0.005),0.07);
+    ink=max(ink,(1.-smoothstep(0.004,0.006,abs(k.y+0.036)))*step(abs(k.x+0.03),0.045));
     m.alb=mix(vec3(0.78,0.66,0.44),vec3(0.08,0.07,0.09),ink); m.rough=0.9; m.wrap=0.3; }
   else { m.alb=vec3(0.7,0.66,0.58); m.rough=0.9; }
   return m;
 }`});
 
 /* ============ DEIT FROM SCRATCH ============ */
-/* DeiT's input sequence is [CLS, DIST, patch_1 … patch_16]: the two tokens lead the row. */
+/* DeiT's input sequence is [CLS, DIST, patch_1 … patch_16]: the two tokens lead the row,
+   and the sixteen patches carry, in order, their piece of one image (a dark disc). */
 book({ slug:'deit-from-scratch', key:2,
   title:'Build a Data-<br>Efficient Image<br>Transformer (DeiT)<span class="sub">from Scratch</span>', size:'s1',
   obj:'One image as sixteen patches, led by a class token and a distillation token', med:'Limestone, iron-oxide ink, plaster, gilt bronze', dim:'42 capsules · 10 hours',
-  cam:{ look:[0.,0.3,0], dist:16.5, el:13, yaw:25, frame:[0.5,0.72] }, bound:[0.,0.3,0,2.1], box:[[-1.8,0,-0.3],[1.7,0.66,0.3]], steps:130,
-  light:{ keyPos:[-8,7,-4.5], keyPow:140 },
+  cam:{ look:[-0.15,0.16,0], dist:17, el:13, yaw:36, frame:[0.54,0.7] }, bound:[0.,0.2,0,2.4], box:[[-2.3,0,-0.1],[2.3,0.4,0.1]], steps:130,
+  light:{ keyPos:[-6,7,-8], glow:0.72, glowRad:6, glowPos:[4.5,3,5] },
   glsl:`
-const float SP=0.2; const float HT=0.28;
+const float PT=0.25; const float TW=0.108; const float TT=0.018; const float X0=-2.125; const float RH=0.045;
 vec2 scene(vec3 p){
-  float x=p.x+1.75;
-  float i=clamp(floor(x/SP+0.5),0.,17.);
-  vec3 q=vec3(x-i*SP,p.y-HT,p.z);
-  float tall=i<1.5?0.045:0.;
-  q.y-=tall;
-  float d=sdRBox(q,vec3(0.03,HT+tall,HT),0.01);
-  return vec2(d, i<0.5?41.:(i<1.5?40.:i-1.));
+  float x=p.x-X0;
+  float i=clamp(floor(x/PT+0.5),0.,17.);
+  float tall=i<1.5?0.035:0.;
+  vec3 q=vec3(x-i*PT,p.y-(RH+TW+tall),p.z);
+  float d=sdRBox(q,vec3(TW,TW+tall,TT),0.006);
+  vec2 r=vec2(d, i<0.5?41.:(i<1.5?40.:i-1.));
+  float rail=sdRBox(p-vec3(0.,RH*0.5,0.),vec3(2.28,RH*0.5,0.06),0.008);
+  if(rail<r.x) r=vec2(rail,42.);
+  return r;
 }
 Mat material(float id, vec3 p, vec3 n){
-  Mat m;
-  if(id>40.5){ float f=fbm(p*14.); m.alb=vec3(0.87,0.86,0.83)*(0.95+0.06*f); m.rough=0.9; m.metal=0.; m.coat=0.; m.wrap=0.35; return m; }
-  if(id>39.5){ m.alb=vec3(0.98,0.76,0.38); m.rough=0.22; m.metal=1.; m.coat=0.; m.wrap=0.; return m; }
+  Mat m; m.metal=0.; m.coat=0.; m.wrap=0.3;
+  float fb=fbm(p*14.); float pits=smoothstep(0.82,0.9,noise(p*80.));
+  vec3 lime=vec3(0.80,0.77,0.70)*(0.9+0.14*fb)*(1.-0.2*pits);
+  if(id>41.5){ m.alb=lime*0.92; m.rough=0.85; return m; }
+  if(id>40.5){ m.alb=vec3(0.87,0.86,0.83)*(0.95+0.06*fb); m.rough=0.9; m.wrap=0.35; return m; }
+  if(id>39.5){ float g=noise(p*60.); m.alb=vec3(0.92,0.68,0.28)*(0.93+0.1*g); m.rough=0.3; m.metal=0.45; m.wrap=0.; return m; }
   float i=floor(id-0.5);
   float r=floor(i/4.), c=mod(i,4.);
-  vec2 f=vec2((p.z/HT+1.)*0.5, p.y/(2.*HT));
+  float x=p.x-X0; float k=floor(x/PT+0.5);
+  vec2 f=vec2((x-k*PT)/TW*0.5+0.5, (p.y-RH)/(2.*TW));
   vec2 uv=vec2((c+f.x)/4., (3.-r+f.y)/4.);
   float disc=length(uv-vec2(0.5))-0.33;
-  float ink=(1.-smoothstep(-0.004,0.004,disc))*step(0.5,abs(n.x));
-  float fb=fbm(p*9.); float pits=smoothstep(0.82,0.9,noise(p*60.));
-  m.alb=vec3(0.80,0.77,0.70)*(0.9+0.14*fb)*(1.-0.2*pits);
-  m.alb=mix(m.alb,vec3(0.041,0.010,0.006)*(0.9+0.2*fb),ink*0.95);
-  m.rough=0.85; m.metal=0.; m.coat=0.; m.wrap=0.3;
+  float ink=(1.-smoothstep(-0.003,0.003,disc))*step(0.5,abs(n.z));
+  m.alb=mix(lime,vec3(0.041,0.010,0.006)*(0.9+0.2*fb),ink*0.95);
+  m.rough=0.85;
   return m;
 }`});
 
@@ -896,7 +902,7 @@ function coverInner(b){
     <div class="head">
       ${b.series?`<p class="series">${b.series}</p>`:''}
       <h2 class="title ${b.size||''}">${b.title}</h2>
-      ${b.tag?`<p class="tag${b.tagSmall?' small':''}">${b.tag.replace(/ (\S+)$/,'&nbsp;$1')}</p>`:''}
+      ${b.tag?`<p class="tag${b.tagSmall?' small':''}">${b.tag.replace(/ — /g,'&nbsp;— ').replace(/ (\S+)$/,'&nbsp;$1')}</p>`:''}
     </div>
     <div class="label"><p class="obj">${b.obj}</p><p class="med">${b.med}</p><p class="dim">${b.dim}</p></div>
     <div class="level"><div class="scale"><i class="${b.key==0?'on':''}"></i><i class="${b.key==1?'on':''}"></i><i class="${b.key==2?'on':''}"></i></div><span>${lv}</span></div>
@@ -982,7 +988,7 @@ function renderBook(b, canvas, RW, offX){
   if(k.spot){ const d=[bc[0]-k.keyPos[0],bc[1]-k.keyPos[1],bc[2]-k.keyPos[2]]; const l=Math.hypot(...d);
     gl.uniform3f(U('uSpotDir'),d[0]/l,d[1]/l,d[2]/l); gl.uniform2fv(U('uSpotCone'),k.spot); }
   else gl.uniform2f(U('uSpotCone'),0,0);
-  const gp=k.glowPos||[bc[0]+0.4,bc[1]+1.6,(b.wallZ||5)];
+  const gp=k.glowPos||b.glowPos||[bc[0]+0.4,bc[1]+1.6,(b.wallZ||5)];
   gl.uniform3fv(U('uGlowPos'),gp); gl.uniform1f(U('uGlow'),k.glow); gl.uniform1f(U('uGlowRad'),k.glowRad);
   gl.uniform1f(U('uFill'),k.fill); gl.uniform1f(U('uBoxLum'),k.boxLum); gl.uniform2fv(U('uBoxSize'),k.boxSize); gl.uniform1f(U('uEnvDark'),k.envDark);
   const pans=(k.panels||[]).slice(0,4); const PD=new Float32Array(16), PS=new Float32Array(8);
