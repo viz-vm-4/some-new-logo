@@ -43,7 +43,7 @@ figcaption{font-stretch:75%;font-weight:700;letter-spacing:.08em;font-size:14px;
 figcaption span:last-child{font-weight:500;letter-spacing:.02em;text-transform:none;font-stretch:100%;opacity:.75;text-align:right}
 .cover{width:720px;height:888px;position:relative;overflow:hidden;flex:none;box-shadow:0 2px 0 rgba(0,0,0,.08),0 22px 44px -22px rgba(40,20,0,.5)}
 .cover svg,.wrap svg{display:block}
-.wrap{width:1500px;height:888px;position:relative;overflow:hidden;box-shadow:0 22px 44px -22px rgba(40,20,0,.5)}
+.wrap{width:1504px;height:888px;position:relative;overflow:hidden;box-shadow:0 22px 44px -22px rgba(40,20,0,.5)}
 .wrap-holder{padding:28px 48px 90px}
 .foot{padding:0 48px 80px;max-width:1100px;font-size:15.5px}
 </style>
@@ -613,7 +613,7 @@ const EMBLEM = {
       }
       s += `<path d="M${top.join('L')}L${bot.join('L')}Z" fill="${hcol[k-1]}"/>`;
     }
-    for (let x = gx + 7; x < gx + gw; x += 7) s += Ln(x, gy, x, gy + gh, 2.2);
+    for (let x = gx + 9; x < gx + gw; x += 9) s += Ln(x, gy, x, gy + gh, 1.8);
     s += `</g>`;
     s += arrow(gx + cols*cw + 12, cy, gx + cols*cw + 36, cy, 4.5);
     const hx = gx + cols*cw + 46;
@@ -757,11 +757,11 @@ const EMBLEM = {
    ========================================================================== */
 const CORE = [
   {slug:'ai-context-engineering', shelf:'agents', level:2, capsules:43, hours:10, emblem:'contextWindow', cap:'THE CONTEXT WINDOW',
-    title:[{t:'AI CONTEXT', H:116},{t:'ENGINEERING', H:116}]},
+    title:[{t:'AI CONTEXT', H:132},{t:'ENGINEERING', H:132}]},
   {slug:'mathematical-foundations-for-ml', shelf:'foundations', level:1, capsules:43, hours:10, emblem:'gradient', cap:'THE GRADIENT',
     title:[{t:'MATHEMATICAL', H:82},{t:'FOUNDATIONS', H:82, gap:4},{mix:[{s:'for'},{t:'MACHINE LEARNING', r:0.5}], H:58}]},
   {slug:'neural-networks-from-scratch', shelf:'deep', level:1, capsules:33, hours:7, emblem:'network', cap:'THE MULTILAYER PERCEPTRON',
-    title:[{t:'NEURAL', H:112},{t:'NETWORKS', H:112},{mix:[{s:'from'},{t:'SCRATCH', r:0.6}], H:52}]},
+    title:[{t:'NEURAL', H:118},{t:'NETWORKS', H:118},{mix:[{s:'from'},{t:'SCRATCH', r:0.6}], H:54}]},
   {slug:'build-llms-from-scratch', shelf:'language', level:2, capsules:20, hours:6, emblem:'causalMask', cap:'THE CAUSAL MASK',
     title:[{t:'BUILD LARGE', H:78},{t:'LANGUAGE', H:78},{mix:[{t:'MODELS', r:0.62},{tag:'LLMs'}], H:78},{mix:[{s:'from'},{t:'SCRATCH', r:0.6}], H:46}]},
   {slug:'5d-parallelism', shelf:'systems', level:3, capsules:40, hours:9, emblem:'mesh5d', cap:'THE DEVICE MESH',
@@ -817,13 +817,68 @@ function build(){
   const sw = [['Chrome Yellow',P.yellow],['Signal Red',P.red],['Maroon',P.maroon],['Bottle Green',P.green],['Post Blue',P.blue],['Firozi',P.firozi],['Coal',P.coal],['Chuna',P.chuna]];
   document.getElementById('swatches').innerHTML = sw.map(([n,c])=>`<div class="sw"><i style="background:${c}"></i><span>${n}<br><em>${c}</em></span></div>`).join('');
   // board block specimen
-  const sp = Board.fit('ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789', 30, 330, {rmax:0.55});
-  const pp = Board.paint('ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789', sp.u, sp.H, {fillTop:P.chuna, fillBot:P.yellow, outline:P.coal, shadow:P.red, inline:null, depth:3, o:1.6});
-  document.getElementById('spec-board').innerHTML = `<svg width="340" height="${F(sp.H+10)}"><g transform="translate(2 3)">${pp.svg}</g></svg>`;
+  const specSt = {fillTop:P.chuna, fillBot:P.yellow, outline:P.coal, shadow:P.red, inline:P.red, depth:4, o:1.8, t:1.2};
+  const l1 = Board.fit('ABCDEFGHIJKLM', 40, 318, {rmax:0.6}), l2 = Board.fit('NOPQRSTUVWXYZ', 40, 318, {rmax:0.6}), l3 = Board.fit('0123456789', 40, 318, {rmax:0.6});
+  const p1 = Board.paint('ABCDEFGHIJKLM', l1.u, l1.H, specSt), p2 = Board.paint('NOPQRSTUVWXYZ', l2.u, l2.H, specSt), p3 = Board.paint('0123456789', l3.u, l3.H, specSt);
+  document.getElementById('spec-board').innerHTML = `<svg width="330" height="164" style="background:${P.coal};display:block;margin-bottom:10px"><g transform="translate(6 8)">${p1.svg}</g><g transform="translate(6 60)">${p2.svg}</g><g transform="translate(6 112)">${p3.svg}</g></svg>`;
   document.getElementById('legend').innerHTML = [1,2,3].map((l)=>`<svg width="90" height="110" viewBox="-3 -3 92 112">${stamp(l,0,0)}</svg>`).join('');
   buildWrap();
 }
-function buildWrap(){ /* filled in below */ }
+function buildWrap(){
+  const b = CORE[0], sh = SHELF[b.shelf];
+  const W = 720, SP = 64, H = 888, TW = W*2 + SP;
+  // spine
+  const st = Board.fit('AI CONTEXT ENGINEERING', 30, 560, {rmax:0.6});
+  const sp = Board.paint('AI CONTEXT ENGINEERING', st.u, st.H, {...sh.letter, depth:3, o:1.8, t:1.1});
+  const spine = `<g transform="translate(${W} 0)">
+    <rect width="${SP}" height="${H}" fill="${sh.board}"/>
+    <path d="M6 16V${H-16}M${SP-6} 16V${H-16}" stroke="${sh.rule}" stroke-width="2"/>
+    <g transform="translate(${SP/2 - 21} 26) scale(0.5)">${stamp(b.level,0,0)}</g>
+    <g transform="translate(${F(SP/2 + st.H/2 + 1)} ${F(140 + (600 - sp.w)/2)}) rotate(90)">${sp.svg}</g>
+    <g transform="translate(${SP/2 - 18} ${H - 118})">${vBadge(36, sh.ink, sh.board)}</g>
+    <text transform="translate(${SP/2 + 6} ${H - 64}) rotate(90)" text-anchor="start" font-family="Anek Devanagari" font-weight="600" font-size="13" fill="${sh.ink}">विज़ुआरा</text>
+  </g>`;
+  // back: a painter's rate-board that keys the whole system
+  const tt = Board.fit('AI CONTEXT ENGINEERING', 46, 560, {rmax:0.6});
+  const tp = Board.paint('AI CONTEXT ENGINEERING', tt.u, tt.H, {...sh.letter});
+  const rows = [['foundations','Chrome Yellow'],['deep','Signal Red'],['language','Maroon'],['agents','Bottle Green'],['systems','Post Blue'],['vision','Firozi'],['charlie','Coal']];
+  const rx = 96, ry = 346, rw = 528;
+  let rate = `<path d="${notchRect(rx, ry, rw, 318, 14)}" fill="${P.paper}" stroke="${P.coal}" stroke-width="3"/>
+    <path d="${notchRect(rx+5, ry+5, rw-10, 308, 10)}" fill="none" stroke="${P.coal}" stroke-width="1.2"/>`;
+  const cap = Board.fit('THE SHELVES', 20, 300, {rmax:0.6, track:0.8, space:0.8});
+  rate += `<g transform="translate(${rx + 24} ${ry + 16})">${Board.paint('THE SHELVES', cap.u, cap.H, {fillTop:P.coal, outline:P.coal, o:0, depth:0}, {track:0.8, space:0.8}).svg}</g>`;
+  rate += `<text x="${rx + rw - 24}" y="${ry + 34}" text-anchor="end" ${ANEK} font-weight="700" font-size="13" letter-spacing="2" fill="${P.coal}">BOARD COLOUR TELLS THE SHELF</text>`;
+  rows.forEach(([k, cname], i) => {
+    const y = ry + 70 + i*27, on = k === b.shelf;
+    rate += `<rect x="${rx + 24}" y="${y - 15}" width="30" height="20" fill="${SHELF[k].board}" stroke="${P.coal}" stroke-width="2"/>`;
+    rate += `<text x="${rx + 66}" y="${y}" font-family="Anek Latin" font-weight="${on?700:500}" font-size="17" fill="${P.coal}">${esc(SHELF[k].name)}</text>` + (on ? `<path d="M${rx + 12} ${y - 12}l8 7l-8 7z" fill="${P.red}"/>` : '');
+    rate += `<line x1="${rx + 290}" x2="${rx + rw - 150}" y1="${y - 3}" y2="${y - 3}" stroke="${P.coal}" stroke-width="2" stroke-dasharray="1.5 6" stroke-linecap="round"/>`;
+    rate += `<text x="${rx + rw - 24}" y="${y}" text-anchor="end" ${ANEK} font-weight="700" font-size="14" letter-spacing="1.5" fill="${P.coal}">${cname.toUpperCase()}</text>`;
+  });
+  rate += `<line x1="${rx + 20}" x2="${rx + rw - 20}" y1="${ry + 262}" y2="${ry + 262}" stroke="${P.coal}" stroke-width="2"/>`;
+  rate += `<text x="${rx + 24}" y="${ry + 292}" ${ANEK} font-weight="700" font-size="14" letter-spacing="2" fill="${P.coal}">THE STAMP TELLS THE LEVEL</text>`;
+  [1,2,3].forEach((l, i) => { rate += `<g transform="translate(${rx + 300 + i*74} ${ry + 268}) scale(0.4)">${stamp(l,0,0)}</g>`; });
+  const back = `<g>
+    <rect width="${W}" height="${H}" fill="${sh.board}"/>
+    <path d="${notchRect(16,16,W-32,H-32,22)}" fill="none" stroke="${sh.rule}" stroke-width="4"/>
+    <path d="${notchRect(25,25,W-50,H-50,16)}" fill="none" stroke="${sh.rule}" stroke-width="1.5"/>
+    <g transform="translate(${F((W - tp.w - tp.depth)/2)} 70)">${tp.svg}</g>
+    <text x="${W/2}" y="160" text-anchor="middle" font-family="Anek Latin" font-weight="600" font-size="21" fill="${sh.ink}">${b.capsules} capsules · about ${b.hours} hours · Level ${b.level}, ${LEVEL[b.level].word[0] + LEVEL[b.level].word.slice(1).toLowerCase()}</text>
+    <line x1="220" x2="500" y1="190" y2="190" stroke="${sh.ink}" stroke-width="2"/>
+    <text x="${W/2}" y="232" text-anchor="middle" ${ANEK} font-weight="800" font-size="15" letter-spacing="3" fill="${P.yellow}">ON THE LABEL — ${esc(b.cap)}</text>
+    <text x="${W/2}" y="266" text-anchor="middle" font-family="Anek Latin" font-weight="500" font-size="19" fill="${sh.ink}">Everything that could go into a prompt, piled high —</text>
+    <text x="${W/2}" y="292" text-anchor="middle" font-family="Anek Latin" font-weight="500" font-size="19" fill="${sh.ink}">and the curated window it is packed into, on a token budget.</text>
+    ${rate}
+    <rect x="${W - 48 - 170}" y="700" width="170" height="96" fill="${P.paper}" stroke="${P.coal}" stroke-width="2.5"/>
+    <text x="${W - 48 - 85}" y="754" text-anchor="middle" ${ANEK} font-weight="700" font-size="13" letter-spacing="2" fill="${P.coal}" opacity=".75">ISBN / BARCODE</text>
+    <text x="48" y="740" font-family="Anek Latin" font-weight="700" font-size="17" letter-spacing="1" fill="${sh.ink}">books.vizuara.ai</text>
+    <text x="48" y="768" ${ANEK} font-weight="700" font-size="14" letter-spacing="3" fill="${sh.ink}">LETTERED IN BOMBAY BOARD BLOCK · MADE IN INDIA</text>
+    ${imprint(sh, 48, 846)}
+  </g>`;
+  const front = `<g transform="translate(${W + SP} 0)">${cover(b).replace(/^<svg[^>]*>/, '').replace(/<\/svg>\s*$/, '')}</g>`;
+  document.getElementById('wrap-holder').innerHTML = `<div class="wrap"><svg width="${TW}" height="${H}" viewBox="0 0 ${TW} ${H}">${back}${spine}${front}</svg></div>
+    <p style="font-size:14px;margin:12px 0 0;max-width:1100px"><b>AI Context Engineering</b>, full wrap at trim: back 7.5in · spine 0.67in · front 7.5in. The back is painted like a shop's rate board: it keys the whole system — shelf colours, level stamps — so every book on the shelf teaches the reader how to read the others.</p>`;
+}
 const faces = ['40px Yellowtail','700 17px "Anek Latin"','800 15px "Anek Latin"','600 18px "Anek Devanagari"'];
 Promise.all(faces.map((f) => document.fonts.load(f, 'Aav विज़ुआरा बुक्स'))).catch(()=>{}).then(build);
 </script>

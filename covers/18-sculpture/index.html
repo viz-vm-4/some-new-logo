@@ -91,7 +91,7 @@ uniform vec3 uSpotDir; uniform vec2 uSpotCone;
 uniform vec3 uGlowPos; uniform float uGlow; uniform float uGlowRad;
 uniform float uFill; uniform float uBoxLum; uniform vec2 uBoxSize; uniform float uEnvDark;
 uniform vec4 uPan[4]; uniform vec2 uPanS[4];
-uniform vec4 uBound; uniform float uWallZ, uCoveR; uniform float uExpo; uniform float uVig;
+uniform vec4 uBound; uniform vec3 uBMin, uBMax; uniform float uWallZ, uCoveR; uniform float uExpo; uniform float uVig;
 
 struct Mat { vec3 alb; float rough; float metal; float coat; float wrap; };
 #define PI 3.14159265
@@ -119,8 +119,11 @@ vec3 calcNormal(vec3 p){ const float e=0.0006; vec2 k=vec2(1,-1);
   return normalize(k.xyy*map(p+k.xyy*e)+k.yyx*map(p+k.yyx*e)+k.yxy*map(p+k.yxy*e)+k.xxx*map(p+k.xxx*e)); }
 
 bool sphereSpan(vec3 ro, vec3 rd, float rad, out float t0, out float t1){
-  vec3 oc=ro-uBound.xyz; float b=dot(oc,rd); float c=dot(oc,oc)-rad*rad; float h=b*b-c;
-  if(h<0.) return false; h=sqrt(h); t0=-b-h; t1=-b+h; return true; }
+  float m=rad-uBound.w;
+  vec3 inv=1./rd; vec3 a=(uBMin-m-ro)*inv, b=(uBMax+m-ro)*inv;
+  vec3 lo=min(a,b), hi=max(a,b);
+  t0=max(max(lo.x,lo.y),lo.z); t1=min(min(hi.x,hi.y),hi.z);
+  return t1>max(t0,0.); }
 
 float marchObj(vec3 ro, vec3 rd, float tmax){
   float t0,t1; if(!sphereSpan(ro,rd,uBound.w,t0,t1)) return -1.;
@@ -212,7 +215,7 @@ vec3 shadeBackdrop(vec3 p, vec3 n){
   vec3 L; float dist; float ka=keyAtten(p,L,dist);
   float ndl=max(dot(n,L),0.);
   float sh=ka*ndl<1e-4?1.:softShadowC(p+n*0.002,L,dist,uKeySoft);
-  float near=length(p-uBound.xyz)-uBound.w;
+  vec3 bq=max(max(uBMin-p,p-uBMax),0.); float near=length(bq);
   float ao=1.;
   if(near<1.2){ ao=mix(calcAO(p,n,0.6),1.,smoothstep(0.,1.2,near)); ao=ao*ao; }
   float g=exp(-dot(p-uGlowPos,p-uGlowPos)/(uGlowRad*uGlowRad));
@@ -281,7 +284,7 @@ book({ slug:'5d-parallelism', key:2, no:'05',
   title:'5D Parallelism<span class="sub">for Large Model Training</span>', size:'',
   obj:'Shadow of a five-dimensional cube: every edge runs in one of five parallel directions',
   med:'Carrara marble, polished', dim:'40 capsules · 9 hours',
-  cam:{ look:[0,ZONO.rest,0], dist:19, el:12, yaw:-6, frame:[0.5,0.62] }, bound:[0,ZONO.rest,0,ZONO.rest*1.9], steps:110,
+  cam:{ look:[0,ZONO.rest,0], dist:19, el:12, yaw:-6, frame:[0.5,0.62] }, bound:[0,ZONO.rest,0,ZONO.rest*1.9], box:[[-1.35,0,-1.35],[1.35,2*ZONO.rest+0.02,1.35]], steps:110,
   light:{ keyPos:[-9,6,-2.5], keyPow:120 },
   glsl: ZONO.glsl+`
 vec2 scene(vec3 p){
@@ -307,7 +310,7 @@ Mat material(float id, vec3 p, vec3 n){
 book({ slug:'mathematical-foundations-for-ml', key:0, no:'02',
   title:'Mathematical Foundations<span class="sub">for Machine Learning</span>', size:'',
   obj:'Saddle surface <i>z = xy</i>, with its rulings', med:'Cast plaster, graphite', dim:'43 capsules · 10 hours',
-  cam:{ look:[0,0.62,0], dist:19, el:9, yaw:-8, frame:[0.52,0.63] }, bound:[0,0.65,0,1.75], steps:150,
+  cam:{ look:[0,0.62,0], dist:19, el:9, yaw:-8, frame:[0.52,0.63] }, bound:[0,0.65,0,1.75], box:[[-1.6,0,-1.6],[1.6,1.4,1.6]], steps:150,
   light:{ keyPos:[-10,6.5,-3], keyPow:210 },
   glsl:`
 const float K=0.55; const float T=0.075;
@@ -339,7 +342,7 @@ Mat material(float id, vec3 p, vec3 n){
 book({ slug:'ai-context-engineering', key:1,
   title:'AI Context<br>Engineering',
   obj:'Window, packed by hand; one block left out', med:'Travertine, slate, marble, terracotta', dim:'43 capsules · 10 hours',
-  cam:{ look:[0.3,1.15,0], dist:18.5, el:9, yaw:-16, frame:[0.5,0.64] }, bound:[0.3,1.2,0,2.25], steps:130,
+  cam:{ look:[0.3,1.15,0], dist:18.5, el:9, yaw:-16, frame:[0.5,0.64] }, bound:[0.3,1.2,0,2.25], box:[[-1.05,0,-0.62],[2.1,2.43,0.25]], steps:130,
   light:{ keyPos:[-8,8,-6] },
   glsl:`
 // frame: outer half (1.0,1.2,0.2); opening half (0.8,1.0)
@@ -356,7 +359,6 @@ vec2 scene(vec3 p){
   if(sdBox(q-vec3(0,-0.1,0),vec3(0.82,0.9,0.22))<r.x){
     int i0=b.y<0.9?0:(b.y<1.2?3:6); int i1=b.y<0.6?3:(b.y<1.05?6:(b.y<1.35?8:9));
     for(int i=i0;i<i1;i++){ float d=sdRBox(b-vec3(BL[i].x,BL[i].y,0.),vec3(BL[i].z-0.008,BL[i].w-0.008,0.17),0.012); if(d<r.x) r=vec2(d,2.+float(i)); }
-    float drow=abs(b.y-0.97)-0.66; if(drow>0.) r.x=min(r.x,drow+0.0);
   }
   vec3 o=p-vec3(1.72,0.17,-0.35); o.xz=rot(0.5)*o.xz;
   float dout=sdRBox(o,vec3(0.26,0.17,0.17),0.012); if(dout<r.x) r=vec2(dout,11.);
@@ -388,7 +390,7 @@ Mat material(float id, vec3 p, vec3 n){
 book({ slug:'neural-networks-from-scratch', key:0,
   title:'Neural Networks<span class="sub">from Scratch</span>',
   obj:'Three layers, fully connected, modelled by hand', med:'Terracotta', dim:'33 capsules · 7 hours',
-  cam:{ look:[0,1.25,0], dist:20, el:10, yaw:-10, frame:[0.52,0.62] }, bound:[0,1.3,0,1.75], steps:140,
+  cam:{ look:[0,1.25,0], dist:20, el:10, yaw:-10, frame:[0.52,0.62] }, bound:[0,1.3,0,1.75], box:[[-0.95,0,-0.95],[0.95,2.66,0.95]], steps:140,
   light:{ keyPos:[-8,9,-5] },
   glsl:`
 const float R0=0.19; const float R1=0.17; const float R2=0.22; const float RR=0.036;
@@ -417,7 +419,7 @@ Mat material(float id, vec3 p, vec3 n){
 book({ slug:'build-llms-from-scratch', key:1,
   title:'Build Large Language Models<span class="sub">(LLMs) from Scratch</span>', size:'s1',
   obj:'Column of twelve identical blocks', med:'Stoneware, oxblood glaze', dim:'20 capsules · 6 hours',
-  cam:{ look:[0,2.0,0], dist:24, el:6, yaw:-8, frame:[0.64,0.585] }, bound:[0,2.0,0,2.1], steps:150,
+  cam:{ look:[0,2.0,0], dist:24, el:6, yaw:-8, frame:[0.64,0.585] }, bound:[0,2.0,0,2.1], box:[[-0.36,0,-0.36],[0.36,3.97,0.36]], steps:150,
   light:{ keyPos:[-8,8,-5] },
   glsl:`
 const float HM=0.33; const float WW=0.25; const float WN=0.125;
@@ -444,8 +446,8 @@ Mat material(float id, vec3 p, vec3 n){
 /* ============ PI VS HERMES VS CODEX ============ */
 book({ slug:'pi-vs-hermes-vs-codex', key:2,
   title:'Pi vs Hermes<br>vs Codex<span class="sub">Context Compaction and Memory</span>', size:'s1',
-  obj:'Three stacks of nine wax tablets, each pressed to its own height', med:'Beeswax, steel weights', dim:'9 capsules · 1 hour',
-  cam:{ look:[0,0.5,0], dist:20, el:13, yaw:-4, frame:[0.5,0.69] }, bound:[0,0.55,0,2.1], steps:130,
+  obj:'Nine wax tablets, three ways of pressing them', med:'Beeswax, granite weights', dim:'9 capsules · 1 hour',
+  cam:{ look:[0,0.5,0], dist:20, el:13, yaw:-4, frame:[0.5,0.69] }, bound:[0,0.55,0,2.1], box:[[-1.95,0,-0.72],[1.95,1.32,0.78]], steps:130,
   light:{ keyPos:[-8,7,-4], keyPow:150 },
   glsl:`
 const float TH0=0.105, TH1=0.07, TH2=0.042;
@@ -473,7 +475,8 @@ vec2 scene(vec3 p){
 }
 Mat material(float id, vec3 p, vec3 n){
   Mat m;
-  if(id>1.5){ float g=noise(p*vec3(200.,4.,200.)); m.alb=vec3(0.80,0.80,0.81)*(0.95+0.08*g); m.rough=0.38; m.metal=1.; m.coat=0.; m.wrap=0.; }
+  if(id>1.5){ float g=noise(p*95.); float g2=noise(p*31.+7.); float sp=smoothstep(0.62,0.7,g)*0.55+smoothstep(0.7,0.78,g2)*0.35;
+    m.alb=vec3(0.70,0.69,0.67)*(1.-sp)+vec3(0.08)*sp; m.rough=0.35; m.metal=0.; m.coat=0.5; m.wrap=0.; }
   else { float f=fbm(p*9.); m.alb=vec3(0.80,0.52,0.14)*(0.85+0.25*f); m.rough=0.42; m.metal=0.; m.coat=0.25; m.wrap=0.65; }
   return m;
 }`});
@@ -482,7 +485,7 @@ Mat material(float id, vec3 p, vec3 n){
 book({ slug:'prompt-engineering', key:0,
   title:'Prompt<br>Engineering',
   obj:'Slab, raised by a wedge', med:'Slate and red lacquer', dim:'31 capsules · 7 hours',
-  cam:{ look:[0,0.35,0], dist:20, el:12, yaw:-18, frame:[0.5,0.66] }, bound:[0,0.4,0,1.85], steps:130,
+  cam:{ look:[0,0.35,0], dist:20, el:12, yaw:-18, frame:[0.5,0.66] }, bound:[0,0.4,0,1.85], box:[[-1.4,0,-0.8],[1.4,0.85,0.8]], steps:130,
   light:{ keyPos:[-8,9,-6] },
   glsl:`
 const float TA=0.16;
@@ -511,7 +514,7 @@ Mat material(float id, vec3 p, vec3 n){
 book({ slug:'rag-in-production', key:1,
   title:'RAG in<br>Production',
   obj:'Cabinet of twelve drawers, one drawn', med:'Oak, oiled', dim:'42 capsules · 10 hours',
-  cam:{ look:[0,0.95,0], dist:20, el:11, yaw:-22, frame:[0.5,0.64] }, bound:[0,0.95,-0.2,1.75], steps:130,
+  cam:{ look:[0,0.95,0], dist:20, el:11, yaw:-22, frame:[0.5,0.64] }, bound:[0,0.95,-0.2,1.75], box:[[-0.97,0,-1.05],[0.97,1.82,0.57]], steps:130,
   light:{ keyPos:[-8,8,-6] },
   glsl:`
 const vec3 CB=vec3(0.95,0.9,0.55); const float DW=0.3, DH=0.21;
@@ -568,7 +571,7 @@ vec3 cubeP(vec3 p){ p.y-=S; p.xz=rot(0.42)*p.xz; return p; }
 book({ slug:'charlie-language-room', key:2, series:'Charlie and the Intelligence Factory · I',
   title:'Charlie and the<br>Language Room', tag:'Language — Inference Engineering',
   obj:'Room I: a cube with a mouth', med:'Porcelain, gilded interior', dim:'22 capsules · 5 hours',
-  cam:CHARLIE_CAM, bound:[0,0.72,0,1.35], steps:120,
+  cam:CHARLIE_CAM, bound:[0,0.72,0,1.35], box:[[-1.0,0,-1.0],[1.0,1.46,1.0]], steps:120,
   glsl: CUBE+`
 vec2 scene(vec3 p){ vec3 q=cubeP(p);
   float d=sdRBox(q,vec3(S),0.03);
@@ -579,7 +582,7 @@ vec2 scene(vec3 p){ vec3 q=cubeP(p);
 book({ slug:'charlie-vision-room', key:1, series:'Charlie and the Intelligence Factory · II',
   title:'Charlie and the<br>Vision Room', tag:'Vision — Vision Transformers',
   obj:'Room II: a cube with an eye', med:'Porcelain, gilded interior', dim:'20 capsules · 6 hours',
-  cam:CHARLIE_CAM, bound:[0,0.72,0,1.35], steps:120,
+  cam:CHARLIE_CAM, bound:[0,0.72,0,1.35], box:[[-1.0,0,-1.0],[1.0,1.46,1.0]], steps:120,
   glsl: CUBE+`
 vec2 scene(vec3 p){ vec3 q=cubeP(p);
   float d=sdRBox(q,vec3(S),0.03);
@@ -590,7 +593,7 @@ vec2 scene(vec3 p){ vec3 q=cubeP(p);
 book({ slug:'charlie-sound-room', key:1, series:'Charlie and the Intelligence Factory · III',
   title:'Charlie and the<br>Sound Room', tag:'Audio — Voice Agents',
   obj:'Room III: a cube with an ear', med:'Porcelain, gilded interior', dim:'20 capsules · 6 hours',
-  cam:CHARLIE_CAM, bound:[0,0.72,0,1.35], steps:130,
+  cam:CHARLIE_CAM, bound:[0,0.72,0,1.35], box:[[-1.0,0,-1.0],[1.0,1.46,1.0]], steps:130,
   glsl: CUBE+`
 vec2 scene(vec3 p){ vec3 q=cubeP(p);
   float d=sdRBox(q,vec3(S),0.03);
@@ -607,23 +610,26 @@ vec2 scene(vec3 p){ vec3 q=cubeP(p);
 }`+CHARLIE_MAT });
 book({ slug:'charlie-reasoning-room', key:2, series:'Charlie and the Intelligence Factory · IV',
   title:'Charlie and the<br>Reasoning Room', tag:'Reason — Reinforcement Learning, from bandits to reasoning models', tagSmall:true,
-  obj:'Room IV: a cube with a stair', med:'Porcelain, gilded interior', dim:'21 capsules · 6 hours',
-  cam:CHARLIE_CAM, bound:[0,0.72,0,1.35], steps:130,
+  obj:'Room IV: a cube with a stair, one step at a time', med:'Porcelain, gilded treads', dim:'21 capsules · 6 hours',
+  cam:CHARLIE_CAM, bound:[0,0.72,0,1.35], box:[[-1.0,0,-1.0],[1.0,1.46,1.0]], steps:130,
   glsl: CUBE+`
 vec2 scene(vec3 p){ vec3 q=cubeP(p);
   float d=sdRBox(q,vec3(S),0.03);
-  float u=q.z+S; float n=6.; float st=0.2;
-  float k=clamp(floor(u/st),0.,n-1.);
-  float stair=max(abs(q.x)-0.46, max(u-n*st, (S-(n-k)*0.165)-q.y));
-  float dd=max(d,-stair);
-  return vec2(dd, abs(stair)<0.008?2.:1.);
+  float u=q.z+S; float run=0.18; float rise=0.18;
+  float k=clamp(floor(u/run),0.,3.);
+  float ytop=(k+1.)*rise-0.0;
+  float cut=max(u-4.*run+0.0, ytop-q.y);
+  cut=max(cut,-u-1.);
+  float dd=max(d,-cut);
+  float tread=abs(q.y-ytop);
+  return vec2(dd, (tread<0.01 && u<4.*run-0.01 && u>-0.01)?2.:1.);
 }`+CHARLIE_MAT });
 
 /* ============ KERNEL ENGINEERING (forthcoming) ============ */
 book({ slug:'kernel-engineering', key:2, forthcoming:true,
   title:'Kernel<br>Engineering', tag:'From silicon to speculative decoding — GPU kernels for modern LLMs.',
   obj:'Maquette for a tiled block, one tile lifted', med:'Plaster maquette · to be cast in silicon bronze', dim:'Forthcoming',
-  cam:{ look:[0,0.3,0], dist:16.5, el:24, yaw:-20, frame:[0.5,0.67] }, bound:[0,0.35,0,1.75], steps:130,
+  cam:{ look:[0,0.3,0], dist:16.5, el:24, yaw:-20, frame:[0.5,0.67] }, bound:[0,0.35,0,1.75], box:[[-1.05,0,-1.05],[1.05,0.95,1.05]], steps:130,
   glsl:`
 const float TS=0.36; const float TH=0.3;
 vec2 scene(vec3 p){
@@ -649,7 +655,7 @@ Mat material(float id, vec3 p, vec3 n){
 book({ slug:'deit-from-scratch', key:2,
   title:'Build a Data-<br>Efficient Image<br>Transformer (DeiT)<span class="sub">from Scratch</span>', size:'s1',
   obj:'One image as sixteen patches, led by a distillation token', med:'Limestone, iron-oxide ink, gilt bronze', dim:'42 capsules · 10 hours',
-  cam:{ look:[0.,0.3,0], dist:18, el:13, yaw:-50, frame:[0.5,0.735] }, bound:[0.,0.3,0,2.1], steps:130,
+  cam:{ look:[0.,0.3,0], dist:18, el:13, yaw:-50, frame:[0.5,0.735] }, bound:[0.,0.3,0,2.1], box:[[-1.75,0,-0.3],[1.75,0.68,0.3]], steps:130,
   light:{ keyPos:[6,8,-7], keyPow:140 },
   glsl:`
 const float SP=0.21; const float HT=0.28;
@@ -744,7 +750,9 @@ function renderBook(b, canvas){
   const pans=(k.panels||[]).slice(0,4); const PD=new Float32Array(16), PS=new Float32Array(8);
   pans.forEach((p,i)=>{ const l=Math.hypot(p[0],p[1],p[2]); PD.set([p[0]/l,p[1]/l,p[2]/l,p[3]],i*4); PS.set([p[4],p[5]],i*2); });
   gl.uniform4fv(U('uPan'),PD); gl.uniform2fv(U('uPanS'),PS);
-  gl.uniform4fv(U('uBound'),bc); gl.uniform1f(U('uWallZ'),b.wallZ||5); gl.uniform1f(U('uCoveR'),b.coveR||2.6);
+  gl.uniform4fv(U('uBound'),bc);
+  const bb=b.box||[[bc[0]-bc[3],Math.max(0,bc[1]-bc[3]),bc[2]-bc[3]],[bc[0]+bc[3],bc[1]+bc[3],bc[2]+bc[3]]];
+  gl.uniform3fv(U('uBMin'),bb[0]); gl.uniform3fv(U('uBMax'),bb[1]); gl.uniform1f(U('uWallZ'),b.wallZ||5); gl.uniform1f(U('uCoveR'),b.coveR||2.6);
   gl.uniform1f(U('uExpo'),k.expo); gl.uniform1f(U('uVig'),k.vig);
   gl.viewport(0,0,W,H); gl.enable(gl.SCISSOR_TEST);
   const T=480; const px=new Uint8Array(4);

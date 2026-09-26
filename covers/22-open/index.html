@@ -8,54 +8,161 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1;1,9..144,100..900,0..100,0..1&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;0,800;1,400&display=swap" rel="stylesheet">
 <style>
-  :root { --page:#f1efe9; --pageInk:#1d1c1a; --rule:#cfcac0; }
+  :root { --page:#eeebe3; --pageInk:#1c1b18; --muted:#6b665c; --rule:#cbc5b8; }
   * { box-sizing:border-box; }
   html, body { margin:0; background:var(--page); color:var(--pageInk); }
-  body { font:16px/1.5 'JetBrains Mono', ui-monospace, monospace; }
+  body { font:14px/1.6 'JetBrains Mono', ui-monospace, monospace; -webkit-font-smoothing:antialiased; }
 
-  /* ---------------- the cover ---------------- */
-  .cover { position:relative; width:720px; height:888px; overflow:hidden; flex:none;
-           background:var(--ground); color:var(--B); }
-  .cover svg.field { position:absolute; left:0; top:0; width:720px; height:888px; display:block; }
-  .cover .imprint { position:absolute; left:36px; right:36px; top:30px; height:24px;
-           display:flex; align-items:center; justify-content:space-between;
-           font:700 11px/1 'JetBrains Mono', monospace; letter-spacing:.14em; text-transform:uppercase; }
-  .cover .imprint .brand { display:flex; align-items:center; gap:10px; }
-  .cover .imprint svg { display:block; }
-  .cover .imprint .lvl { display:flex; align-items:center; gap:10px; }
-  .cover .meter { display:flex; gap:2px; }
-  .cover .meter i { display:block; width:6px; height:12px; border:1.25px solid var(--B); }
-  .cover .meter i.on { background:var(--B); }
-  .cover h1.title { position:absolute; left:36px; right:30px; top:var(--ty,78px); margin:0;
-           font-family:'Fraunces', serif; font-weight:640; font-size:var(--ts,96px);
-           line-height:var(--tl,.98); letter-spacing:-.022em; color:var(--B);
-           font-variation-settings:'opsz' 144, 'SOFT' 0, 'WONK' 0; font-optical-sizing:none; }
-  .cover h1.title span.l { display:block; width:max-content; white-space:nowrap; }
-  .cover h1.title .soft { font-weight:420; font-style:italic; }
-  .cover h1.title .cur { display:inline-block; width:.42em; height:.70em; margin-left:.07em;
-           background:var(--A); vertical-align:-.02em; }
-  .cover .sub { position:absolute; left:36px; right:36px; margin:0; max-width:620px;
-           font:italic 400 27px/1.2 'Fraunces', serif; font-variation-settings:'opsz' 36; letter-spacing:-.005em; color:var(--B); }
-  .cover .kicker { position:absolute; left:36px; right:36px; top:80px;
-           font:700 11px/1 'JetBrains Mono', monospace; letter-spacing:.14em; text-transform:uppercase; color:var(--B); }
-  .cover .foot { position:absolute; left:36px; right:36px; bottom:30px; height:24px;
-           display:flex; align-items:center; justify-content:space-between;
-           font:500 11px/1 'JetBrains Mono', monospace; letter-spacing:.06em; }
-  .cover .foot .cap { text-transform:none; }
-  .cover .foot .meta { text-transform:uppercase; letter-spacing:.14em; font-weight:700; }
+  /* ================= the cover (shared by .cover, the wrap's front and the shelf copies) ================= */
+  .cv { position:relative; width:720px; height:888px; overflow:hidden; flex:none; background:var(--ground); color:var(--B); }
+  .cv svg.field { position:absolute; left:0; top:0; width:720px; height:888px; display:block; }
+  .cv .imprint { position:absolute; left:36px; right:36px; top:30px; height:24px; display:flex; align-items:center; justify-content:space-between;
+         font:700 11px/1 'JetBrains Mono', monospace; letter-spacing:.14em; text-transform:uppercase; }
+  .cv .imprint .brand, .cv .imprint .lvl { display:flex; align-items:center; gap:10px; }
+  .cv .imprint svg { display:block; }
+  .meter { display:flex; gap:2px; }
+  .meter i { display:block; width:6px; height:12px; border:1.25px solid var(--B); }
+  .meter i.on { background:var(--B); }
+  .cv h1.title { position:absolute; left:36px; right:30px; top:80px; margin:0; font-family:'Fraunces', serif; font-weight:640; font-size:var(--ts,96px);
+         line-height:.98; letter-spacing:-.022em; color:var(--B); font-variation-settings:'opsz' 144, 'SOFT' 0, 'WONK' 0; font-optical-sizing:none; }
+  .cv h1.title span.l { display:block; width:max-content; white-space:nowrap; }
+  .cv h1.title .soft { font-weight:420; font-style:italic; }
+  .cur { display:inline-block; width:.42em; height:.70em; margin-left:.07em; background:var(--A); vertical-align:-.02em; }
+  .cv .sub { position:absolute; left:36px; right:36px; margin:0; max-width:620px; font:italic 400 27px/1.2 'Fraunces', serif;
+         font-variation-settings:'opsz' 36; letter-spacing:-.005em; color:var(--B); }
+  .cv .kicker { position:absolute; left:36px; right:36px; top:80px; font:700 11px/1 'JetBrains Mono', monospace; letter-spacing:.14em; text-transform:uppercase; }
+  .cv .foot { position:absolute; left:36px; right:36px; bottom:30px; height:24px; display:flex; align-items:center; justify-content:space-between;
+         font:500 11px/1 'JetBrains Mono', monospace; letter-spacing:.06em; }
+  .cv .foot .meta { text-transform:uppercase; letter-spacing:.14em; font-weight:700; }
 
-  /* ---------------- presentation page ---------------- */
-  .wrapall { max-width:1560px; margin:0 auto; padding:64px 48px 120px; }
-  .covers { display:flex; flex-wrap:wrap; gap:56px 48px; margin-top:40px; }
+  /* ================= presentation page ================= */
+  .page { max-width:1600px; margin:0 auto; padding:72px 48px 140px; }
+  .kick { font:700 11px/1 'JetBrains Mono', monospace; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); }
+  .hero { display:grid; grid-template-columns: 1fr 1fr; gap:24px 64px; align-items:end; padding-bottom:48px; border-bottom:1.5px solid var(--pageInk); }
+  .hero h1 { grid-column:1 / -1; margin:18px 0 0; font:640 188px/.9 'Fraunces', serif; font-variation-settings:'opsz' 144; letter-spacing:-.03em; --A:#e0482a; }
+  .hero .lede { margin:0; font:400 27px/1.34 'Fraunces', serif; font-variation-settings:'opsz' 36; max-width:720px; }
+  .hero .lede em { font-style:italic; }
+  .hero .side { font-size:14px; color:#35322c; max-width:640px; }
+  .hero .side p { margin:0 0 12px; }
+  h2.sec { display:flex; align-items:baseline; gap:20px; margin:96px 0 28px; font:600 44px/1 'Fraunces', serif; font-variation-settings:'opsz' 72; letter-spacing:-.015em; }
+  h2.sec .n { font:700 12px/1 'JetBrains Mono', monospace; letter-spacing:.14em; color:var(--muted); }
+  h2.sec .d { font:400 14px/1.4 'JetBrains Mono', monospace; letter-spacing:0; color:var(--muted); margin-left:auto; max-width:620px; }
+  .rules { display:grid; grid-template-columns:repeat(4, 1fr); gap:0; border-bottom:1.5px solid var(--pageInk); }
+  .rules > div { padding:28px 28px 32px 0; border-right:1px solid var(--rule); }
+  .rules > div + div { padding-left:28px; }
+  .rules > div:last-child { border-right:0; }
+  .rules b { display:block; font:600 24px/1.15 'Fraunces', serif; font-variation-settings:'opsz' 48; margin:10px 0 10px; }
+  .rules p { margin:0; font-size:13px; color:#35322c; }
+
+  .pal { display:grid; grid-template-columns: 250px repeat(3, 1fr) 1.2fr; border-top:1.5px solid var(--pageInk); }
+  .pal > div { border-bottom:1px solid var(--rule); padding:10px 12px 10px 0; display:flex; align-items:center; min-height:84px; }
+  .pal .hd { min-height:0; padding:12px 12px 10px 0; font:700 11px/1.2 'JetBrains Mono', monospace; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); }
+  .pal .fam { font:600 23px/1.1 'Fraunces', serif; font-variation-settings:'opsz' 48; flex-direction:column; align-items:flex-start; justify-content:center; }
+  .pal .fam small { font:400 11px/1.4 'JetBrains Mono', monospace; color:var(--muted); margin-top:6px; }
+  .sw { width:100%; height:64px; display:flex; align-items:flex-end; justify-content:space-between; padding:8px 10px; font:500 11px/1 'JetBrains Mono', monospace; }
+  .sw .aa { font:640 30px/1 'Fraunces', serif; font-variation-settings:'opsz' 144; }
+  .pal .ex { font-size:12px; color:#35322c; }
+
+  .type { display:grid; grid-template-columns: 1.25fr 1fr; gap:48px; }
+  .spec { border-top:1.5px solid var(--pageInk); padding-top:18px; }
+  .spec .big { font:640 92px/.95 'Fraunces', serif; font-variation-settings:'opsz' 144; letter-spacing:-.022em; margin:14px 0 18px; }
+  .spec .big i { font-weight:420; }
+  .spec pre { margin:14px 0 18px; font:700 15px/1.25 'JetBrains Mono', monospace; letter-spacing:0; white-space:pre; }
+  .spec p { margin:0; font-size:13px; color:#35322c; max-width:640px; }
+
+  .markrow { display:grid; grid-template-columns: 220px 1fr 1fr; gap:48px; align-items:center; border-top:1.5px solid var(--pageInk); padding-top:28px; }
+  .markrow .m { display:flex; gap:18px; align-items:flex-end; }
+  .markrow p { margin:0 0 10px; font-size:13px; color:#35322c; max-width:560px; }
+
+  .covers { display:flex; flex-wrap:wrap; gap:64px 48px; }
   .covers figure { margin:0; }
-  .covers figcaption { margin-top:12px; font-size:12px; color:#5e5a52; }
+  .covers figcaption { margin-top:14px; display:flex; justify-content:space-between; gap:24px; font-size:12px; color:var(--muted); max-width:720px; }
+  .covers figcaption b { color:var(--pageInk); font-weight:700; }
+
+  .shelf { display:grid; grid-template-columns:repeat(auto-fill, 180px); gap:22px 16px; padding:32px; background:#e2ded3; }
+  .shelf + .shelf { margin-top:16px; }
+  .shelf.grey { filter:grayscale(1); }
+  .thumb { width:180px; height:222px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,.28); }
+  .thumb > .cv { transform:scale(.25); transform-origin:0 0; }
+  .shelfcap { margin:10px 0 0; font-size:12px; color:var(--muted); }
+
+  /* print wrap: back + spine + front at trim, crop marks at the folds */
+  .wrap { position:relative; display:flex; width:max-content; margin:36px 0 12px; box-shadow:0 2px 10px rgba(0,0,0,.18); }
+  .wrap .back, .wrap .spine { position:relative; height:888px; background:var(--ground); color:var(--B); overflow:hidden; }
+  .wrap .back { width:720px; }
+  .wrap .spine { width:var(--sp); border-left:1px dashed color-mix(in srgb, var(--B) 30%, transparent); border-right:1px dashed color-mix(in srgb, var(--B) 30%, transparent); }
+  .wrap .fold { position:absolute; width:1px; height:20px; background:var(--pageInk); }
+  .spine .sm { position:absolute; left:50%; top:30px; transform:translateX(-50%); }
+  .spine .st { position:absolute; left:50%; top:88px; transform:translateX(-50%); writing-mode:vertical-rl; white-space:nowrap;
+               font:640 25px/1 'Fraunces', serif; font-variation-settings:'opsz' 72; letter-spacing:-.01em; }
+  .spine .st .soft { font-weight:420; font-style:italic; }
+  .spine .sb { position:absolute; left:50%; bottom:30px; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:10px;
+               font:700 10px/1 'JetBrains Mono', monospace; letter-spacing:.12em; }
+  .back .bk { position:absolute; left:36px; right:36px; top:80px; font:700 11px/1.5 'JetBrains Mono', monospace; letter-spacing:.14em; text-transform:uppercase; }
+  .back .q { position:absolute; left:36px; right:60px; top:128px; margin:0; font:italic 420 50px/1.06 'Fraunces', serif; font-variation-settings:'opsz' 96; letter-spacing:-.015em; }
+  .back .about { position:absolute; left:36px; width:420px; top:420px; font:500 12.5px/1.62 'JetBrains Mono', monospace; }
+  .back .about h4 { margin:0 0 8px; font:700 11px/1 'JetBrains Mono', monospace; letter-spacing:.14em; text-transform:uppercase; }
+  .back .about p { margin:0 0 22px; }
+  .back .bar { position:absolute; right:36px; bottom:74px; width:196px; height:112px; }
+  .back .imprint { position:absolute; left:36px; right:36px; top:30px; display:flex; align-items:center; gap:10px;
+                   font:700 11px/1 'JetBrains Mono', monospace; letter-spacing:.14em; text-transform:uppercase; }
+  .back .foot { position:absolute; left:36px; right:36px; bottom:30px; display:flex; justify-content:space-between; font:700 11px/1 'JetBrains Mono', monospace; letter-spacing:.14em; text-transform:uppercase; }
+  .wrapcap { font-size:12px; color:var(--muted); }
 </style>
 </head>
 <body>
-<div class="wrapall">
-  <header id="intro"></header>
-  <section class="covers" id="covers"></section>
-</div>
+<main class="page">
+  <header class="hero">
+    <div class="kick">Vizuara Books &middot; a cover system &middot; direction 22</div>
+    <h1>Textmode<span class="cur"></span></h1>
+    <p class="lede">Every Vizuara book teaches a machine that reads and writes text, so <em>every cover is made of text</em>. Each figure is set in a monospaced font on a strict 120&thinsp;&times;&thinsp;74 character grid, the way the first computer art came off line printers. It always shows the book&rsquo;s real mechanism, with real numbers in it: the causal mask, the device mesh, the gradient step. No picture of &ldquo;AI&rdquo;.</p>
+    <div class="side">
+      <p>The title, set large in Fraunces, is the hero and ends in a text cursor. The Vizuara cell mark sits small in the corner as a signature. Hue files a book on its shelf, and lightness says how deep it goes, so the level survives a greyscale printer and reads across a room.</p>
+      <p>Everything on the covers is live HTML, SVG and type: no raster images, nothing generated by an image model. Every glyph is placed on the grid by code, so a cover prints as sharp as the text inside the book.</p>
+    </div>
+  </header>
+
+  <section class="rules">
+    <div><span class="kick">01 &middot; Grid</span><b>120 &times; 74 cells</b><p>A cover is a terminal screen of 6&thinsp;&times;&thinsp;12&thinsp;px cells. Figures are drawn only with glyphs, slope-aware lines (<code>- / | \</code>), frames (<code>+--+</code>) and inverse-video tiles that carry a number or a label. Margins are 6 columns and 3 rows.</p></div>
+    <div><span class="kick">02 &middot; Title first</span><b>Fraunces, then a cursor</b><p>Titles are set by hand (no orphans) and sized to fill 648&thinsp;px, up to 112&thinsp;px. Text after a colon becomes the italic subtitle. The last line ends in a cursor block in the second ink: the shelf signature.</p></div>
+    <div><span class="kick">03 &middot; Hue</span><b>Hue is the shelf</b><p>Eight subject families, as Penguin once coded its genres by colour. Each family is exactly three inks (paper, vivid, deep), so any cover can be printed in three spot colours.</p></div>
+    <div><span class="kick">04 &middot; Level</span><b>Lightness is the level</b><p>Beginner books are printed on the family&rsquo;s paper, intermediate on its vivid, advanced on its deep. The other two inks draw the figure. The level stays visible in greyscale and at thumbnail size, and the meter in the corner spells it out.</p></div>
+  </section>
+
+  <h2 class="sec"><span class="n">A</span>Palette<span class="d">Eight families &times; three inks, defined in OKLCH so every family's paper, vivid and deep sit at the same lightness. That is what makes level a lightness.</span></h2>
+  <div class="pal" id="palette"></div>
+
+  <h2 class="sec"><span class="n">B</span>Type &amp; mark</h2>
+  <div class="type">
+    <div class="spec"><span class="kick">Titles &middot; Fraunces 640, optical size 144</span>
+      <div class="big">Build Large<br>Language Models<br><i>(LLMs)</i> from Scratch<span class="cur" style="--A:#e0482a"></span></div>
+      <p>A soft, literate display serif with real contrast. It says <i>book</i> on a shelf full of tech, and holds up at 180&thinsp;px because the weight carries it. Parentheticals drop to the italic.</p></div>
+    <div class="spec"><span class="kick">Everything else &middot; JetBrains Mono 500 / 700 / 800</span>
+<pre>  ramp    .:-=+*#%@
+  lines   ----  /  |  \  +--+
+  tiles   [.46] [token] [rank 0]
+  imprint VIZUARA BOOKS   ADVANCED [#][#][#]</pre>
+      <p>The same monospace draws the figures, the imprint, the level, the caption and the lesson count. Only glyphs from the Latin, Latin-1, punctuation and Greek sets are used, so every cover renders from the Google Fonts subset alone.</p></div>
+  </div>
+  <div class="markrow" style="margin-top:48px">
+    <div class="m" id="markbig"></div>
+    <div><span class="kick">The Vizuara cell</span><p style="margin-top:10px">One character cell with a V knocked out. It is the text cursor at rest, the same block that ends every title. It works as a favicon, as a spine mark and as a blind-deboss, and it replaces the retired pinwheel without borrowing any of its colours.</p></div>
+    <div><span class="kick">Caption &amp; count</span><p style="margin-top:10px">Bottom left, every cover says what its figure is (<code>fig. causal self-attention over twelve tokens</code>), like O&rsquo;Reilly's colophon but on the front. Bottom right, the capsule and hour count from the library, or <code>coming soon</code>.</p></div>
+  </div>
+
+  <h2 class="sec"><span class="n">C</span>Core set<span class="d">The six books in the brief.</span></h2>
+  <section class="covers" id="core"></section>
+  <h2 class="sec"><span class="n">D</span>Range<span class="d">The shortest and longest titles, every family, all three levels, and a coming-soon book whose kernel is still running.</span></h2>
+  <section class="covers" id="range"></section>
+  <h2 class="sec"><span class="n">E</span>Sub-series<span class="d">Charlie and the Intelligence Factory, one family (cocoa) and four rooms. Each cover has a door showing what's inside, a painted room number and a belt carrying what the room makes.</span></h2>
+  <section class="covers" id="series"></section>
+  <h2 class="sec"><span class="n">F</span>On the shelf<span class="d">Every cover at 180&thinsp;px on a 1&times; screen, then the same shelf in greyscale: the level still sorts light, mid and dark.</span></h2>
+  <div class="shelf" id="shelf"></div>
+  <div class="shelf grey" id="shelfg"></div>
+  <h2 class="sec"><span class="n">G</span>Print wrap<span class="d">Back, spine and front at trim for one core title. The back carries the colophon: what the figure shows and how the system works.</span></h2>
+  <div id="wrap"></div>
+  <p class="wrapcap">7.5 &times; 9.25 in trim per panel &middot; 0.5 in spine shown &middot; add 0.125 in bleed on the outer edges for press; nothing critical sits within 0.25 in of any edge.</p>
+</main>
 
 <script>
 /* =====================================================================
@@ -600,43 +707,43 @@ EMBLEMS['charlie-reasoning-room'] = (g) => factory(g, 'IV',
    ===================================================================== */
 const BOOKS = [
   // core set
-  { slug: 'ai-context-engineering', fam: 'agents', level: 'intermediate', capsules: 43, hours: 10,
+  { slug: 'ai-context-engineering', group: 'core', fam: 'agents', level: 'intermediate', capsules: 43, hours: 10,
     title: ['AI Context', 'Engineering'], fig: 'fig. sixteen candidates, six admitted, one budget' },
-  { slug: 'mathematical-foundations-for-ml', fam: 'found', level: 'beginner', capsules: 43, hours: 10,
+  { slug: 'mathematical-foundations-for-ml', group: 'core', fam: 'found', level: 'beginner', capsules: 43, hours: 10,
     title: ['Mathematical', 'Foundations for', 'Machine Learning'], fig: 'fig. gradient descent on a quadratic bowl' },
-  { slug: 'neural-networks-from-scratch', fam: 'found', level: 'beginner', capsules: 33, hours: 7,
+  { slug: 'neural-networks-from-scratch', group: 'core', fam: 'found', level: 'beginner', capsules: 33, hours: 7,
     title: ['Neural Networks', 'from Scratch'], fig: 'fig. a 3-4-4-2 perceptron, one forward pass lit' },
-  { slug: 'build-llms-from-scratch', fam: 'lang', level: 'intermediate', capsules: 20, hours: 6,
+  { slug: 'build-llms-from-scratch', group: 'core', fam: 'lang', level: 'intermediate', capsules: 20, hours: 6,
     title: ['Build Large', 'Language Models', '<span class="soft">(LLMs)</span> from Scratch'], fig: 'fig. causal self-attention over twelve tokens' },
-  { slug: '5d-parallelism', fam: 'sys', level: 'advanced', capsules: 40, hours: 9,
+  { slug: '5d-parallelism', group: 'core', fam: 'sys', level: 'advanced', capsules: 40, hours: 9,
     title: ['5D Parallelism', 'for Large Model', 'Training'], fig: 'fig. 32 GPUs as a 2x2x2x2x2 mesh; rank 0 and its five partners' },
-  { slug: 'pi-vs-hermes-vs-codex', fam: 'agents', level: 'advanced', capsules: 9, hours: 1,
+  { slug: 'pi-vs-hermes-vs-codex', group: 'core', fam: 'agents', level: 'advanced', capsules: 9, hours: 1,
     title: ['Pi vs Hermes', 'vs Codex'], sub: 'Context Compaction and Memory', fig: 'fig. three transcripts, each folded when the window fills' },
   // range
-  { slug: 'sql-masterclass', fam: 'code', level: 'beginner', capsules: 36, hours: 8,
+  { slug: 'sql-masterclass', group: 'range', fam: 'code', level: 'beginner', capsules: 36, hours: 8,
     title: ['SQL', 'Masterclass'], fig: 'fig. one query, eight rows' },
-  { slug: 'git-github-masterclass', fam: 'code', level: 'beginner', capsules: 40, hours: 9,
+  { slug: 'git-github-masterclass', group: 'range', fam: 'code', level: 'beginner', capsules: 40, hours: 9,
     title: ['Git &amp; GitHub', 'Masterclass'], fig: 'fig. git log --graph, two branches merged' },
-  { slug: 'decision-trees-from-scratch', fam: 'found', level: 'beginner', capsules: 23, hours: 5,
+  { slug: 'decision-trees-from-scratch', group: 'range', fam: 'found', level: 'beginner', capsules: 23, hours: 5,
     title: ['Build Decision', 'Trees from Scratch'], fig: 'fig. the iris tree: three splits, four leaves' },
-  { slug: 'transformers-from-scratch', fam: 'lang', level: 'intermediate', capsules: 20, hours: 5,
+  { slug: 'transformers-from-scratch', group: 'range', fam: 'lang', level: 'intermediate', capsules: 20, hours: 5,
     title: ['Transformers'], sub: 'Theory, Intuition, and Building from Scratch', fig: 'fig. one attention head: "it" looks back at "animal"' },
-  { slug: 'reinforcement-learning', fam: 'rl', level: 'intermediate', capsules: 38, hours: 8,
+  { slug: 'reinforcement-learning', group: 'range', fam: 'rl', level: 'intermediate', capsules: 38, hours: 8,
     title: ['Reinforcement', 'Learning'], fig: 'fig. a gridworld solved by value iteration' },
-  { slug: 'cnn-fundamentals', fam: 'vision', level: 'intermediate', capsules: 34, hours: 8,
+  { slug: 'cnn-fundamentals', group: 'range', fam: 'vision', level: 'intermediate', capsules: 34, hours: 8,
     title: ['Convolutional', 'Neural Networks', 'Fundamentals'], fig: 'fig. a sobel kernel slides over a handwritten 7' },
-  { slug: 'deit-from-scratch', fam: 'vision', level: 'advanced', capsules: 42, hours: 10,
+  { slug: 'deit-from-scratch', group: 'range', fam: 'vision', level: 'advanced', capsules: 42, hours: 10,
     title: ['Build a Data-Efficient', 'Image Transformer', '<span class="soft">(DeiT)</span> from Scratch'], fig: 'fig. sixteen patches, a class token, a distillation token' },
-  { slug: 'kernel-engineering', fam: 'sys', level: 'advanced', soon: true,
+  { slug: 'kernel-engineering', group: 'range', fam: 'sys', level: 'advanced', soon: true,
     title: ['Kernel', 'Engineering'], sub: 'From silicon to speculative decoding — GPU kernels for modern LLMs.', fig: 'fig. a tiled matmul, still running' },
   // sub-series
-  { slug: 'charlie-language-room', fam: 'factory', level: 'advanced', capsules: 22, hours: 5, kicker: 'Charlie and the Intelligence Factory · I',
+  { slug: 'charlie-language-room', group: 'series', fam: 'factory', level: 'advanced', capsules: 22, hours: 5, kicker: 'Charlie and the Intelligence Factory · I',
     title: ['Charlie and the', 'Language Room'], sub: 'Language — Inference Engineering', fig: 'fig. room I ships tokens' },
-  { slug: 'charlie-vision-room', fam: 'factory', level: 'intermediate', capsules: 20, hours: 6, kicker: 'Charlie and the Intelligence Factory · II',
+  { slug: 'charlie-vision-room', group: 'series', fam: 'factory', level: 'intermediate', capsules: 20, hours: 6, kicker: 'Charlie and the Intelligence Factory · II',
     title: ['Charlie and the', 'Vision Room'], sub: 'Vision — Vision Transformers', fig: 'fig. room II ships patches' },
-  { slug: 'charlie-sound-room', fam: 'factory', level: 'intermediate', capsules: 20, hours: 6, kicker: 'Charlie and the Intelligence Factory · III',
+  { slug: 'charlie-sound-room', group: 'series', fam: 'factory', level: 'intermediate', capsules: 20, hours: 6, kicker: 'Charlie and the Intelligence Factory · III',
     title: ['Charlie and the', 'Sound Room'], sub: 'Audio — Voice Agents', fig: 'fig. room III ships waveforms' },
-  { slug: 'charlie-reasoning-room', fam: 'factory', level: 'advanced', capsules: 21, hours: 6, kicker: 'Charlie and the Intelligence Factory · IV',
+  { slug: 'charlie-reasoning-room', group: 'series', fam: 'factory', level: 'advanced', capsules: 21, hours: 6, kicker: 'Charlie and the Intelligence Factory · IV',
     title: ['Charlie and the', 'Reasoning Room'], sub: 'Reason — Reinforcement Learning, from bandits to reasoning models', fig: 'fig. room IV ships rewarded rollouts' },
 ];
 
@@ -648,18 +755,20 @@ function markSVG(fg, bgc, h = 22) {
     `<path d="M2.2 4.2h2.5L6 11.2l1.3-7h2.5L7.4 15.8H4.6z" fill="${bgc}"/></svg>`;
 }
 const LEVELN = { beginner: 1, intermediate: 2, advanced: 3 };
-function buildCover(b) {
-  const K = inksFor(b.fam, b.level), g = new Grid(K.dark);
-  (EMBLEMS[b.slug] || (() => {}))(g, K, b);
+const meterHTML = (level) => `<span class="meter">${[1, 2, 3].map((i) => `<i class="${i <= LEVELN[level] ? 'on' : ''}"></i>`).join('')}</span>`;
+const inkVars = (K) => `--ground:${K.ground};--A:${K.A};--B:${K.B};--faint:${K.faint}`;
+const GRIDS = {};
+function buildCover(b, real = true) {
+  const K = inksFor(b.fam, b.level);
+  if (!GRIDS[b.slug]) { const g = new Grid(K.dark); (EMBLEMS[b.slug] || (() => {}))(g, K, b); GRIDS[b.slug] = gridSVG(g, K); }
   const el = document.createElement('div');
-  el.className = 'cover'; el.dataset.slug = b.slug;
-  el.style.cssText = `--ground:${K.ground};--A:${K.A};--B:${K.B};--faint:${K.faint}`;
-  const lv = LEVELN[b.level];
+  el.className = real ? 'cover cv' : 'cv'; if (real) el.dataset.slug = b.slug;
+  el.style.cssText = inkVars(K);
   const lines = b.title.map((l, i) => `<span class="l">${l}${i === b.title.length - 1 ? '<span class="cur"></span>' : ''}</span>`).join('');
   el.innerHTML =
-    `<svg class="field" viewBox="0 0 720 888" font-family="JetBrains Mono" font-size="10">${gridSVG(g, K)}</svg>` +
+    `<svg class="field" viewBox="0 0 720 888" font-family="JetBrains Mono" font-size="10">${GRIDS[b.slug]}</svg>` +
     `<div class="imprint"><div class="brand">${markSVG(K.B, K.ground)}<span>Vizuara Books</span></div>` +
-    `<div class="lvl"><span>${b.level}</span><span class="meter">${[1, 2, 3].map((i) => `<i class="${i <= lv ? 'on' : ''}"></i>`).join('')}</span></div></div>` +
+    `<div class="lvl"><span>${b.level}</span>${meterHTML(b.level)}</div></div>` +
     (b.kicker ? `<div class="kicker">${b.kicker}</div>` : '') +
     `<h1 class="title">${lines}</h1>` +
     (b.sub ? `<p class="sub">${b.sub}</p>` : '') +
@@ -678,14 +787,55 @@ function fitTitle(el, b) {
   if (sub) sub.style.top = (top + h1.getBoundingClientRect().height + 10) + 'px';
 }
 
+/* ---------- the presentation around the covers ---------- */
+function buildPalette() {
+  const host = document.getElementById('palette');
+  const books = (k) => BOOKS.filter((b) => b.fam === k).map((b) => b.title.join(' ').replace(/<[^>]+>/g, '')).slice(0, 3).join(' · ');
+  host.innerHTML = ['Family', 'Beginner ground · paper', 'Intermediate ground · vivid', 'Advanced ground · deep', 'On these covers'].map((t) => `<div class="hd">${t}</div>`).join('') +
+    Object.entries(FAM).map(([k, f]) => {
+      const sw = (lvl, hexv) => { const K = inksFor(k, lvl); return `<div><div class="sw" style="background:${K.ground};color:${K.B}"><span class="aa">Aa<span class="cur" style="--A:${K.A}"></span></span><span>${hexv}</span></div></div>`; };
+      return `<div class="fam">${f.label}<small>hue ${f.h}° (oklch)</small></div>` + sw('beginner', f.P) + sw('intermediate', f.V) + sw('advanced', f.D) + `<div class="ex">${books(k) || '—'}</div>`;
+    }).join('');
+}
+function buildWrap(b) {
+  const K = inksFor(b.fam, b.level), host = document.getElementById('wrap');
+  const w = document.createElement('div'); w.className = 'wrap'; w.style.cssText = inkVars(K) + ';--sp:48px';
+  const title = b.title.join(' ');
+  w.innerHTML =
+    `<div class="back">` +
+      `<div class="imprint">${markSVG(K.B, K.ground)}<span>Vizuara Books</span></div>` +
+      `<div class="bk">${title.replace(/<[^>]+>/g, '')}</div>` +
+      `<p class="q">The model reads one token at a time and writes the next.</p>` +
+      `<div class="about"><h4>About the cover</h4><p>The figure is a causal self-attention matrix over a twelve-token sentence. Each row is one token looking back at the tokens before it. The numbers are its attention weights, a softmax, so every row sums to one. The empty triangle is the mask: no token may look ahead. Dark tiles mark the strongest weights, and the last row hands its prediction to the next position.</p>` +
+      `<h4>About Textmode</h4><p>Vizuara covers are drawn in text. Every figure is set in a monospaced font on a 120 &times; 74 character grid and shows the mechanism the book teaches, with real numbers. Hue is the subject shelf; lightness is the level.</p></div>` +
+      `<svg class="bar" viewBox="0 0 196 112"><rect x=".75" y=".75" width="194.5" height="110.5" fill="${K.A}" stroke="${K.B}" stroke-width="1.5" stroke-dasharray="4 3"/>` +
+      `<text x="98" y="52" text-anchor="middle" font-family="JetBrains Mono" font-weight="700" font-size="11" letter-spacing="1.5" fill="${K.B}">ISBN / BARCODE</text>` +
+      `<text x="98" y="70" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="${K.B}">placeholder</text></svg>` +
+      `<div class="foot"><span>${b.capsules} capsules · ${b.hours} hours · ${b.level}</span><span>books.vizuara.ai</span></div>` +
+    `</div>` +
+    `<div class="spine"><div class="sm">${markSVG(K.B, K.ground, 26)}</div>` +
+      `<div class="st">${title}<span class="cur" style="margin:.1em 0 0;width:.7em;height:.42em;display:block"></span></div>` +
+      `<div class="sb">${meterHTML(b.level)}<span>VB</span></div></div>`;
+  const front = buildCover(b, false); w.appendChild(front);
+  for (const x of [720, 768]) for (const y of [-28, 896]) { const f = document.createElement('i'); f.className = 'fold'; f.style.left = x + 'px'; f.style.top = y + 'px'; w.appendChild(f); }
+  host.appendChild(w); fitTitle(front, b);
+}
+
 Promise.all([
-  document.fonts.load('640 96px Fraunces'), document.fonts.load('italic 420 96px Fraunces'), document.fonts.load('italic 400 24px Fraunces'),
-  document.fonts.load('700 10px "JetBrains Mono"'), document.fonts.load('500 10px "JetBrains Mono"'), document.fonts.load('800 10px "JetBrains Mono"'),
+  document.fonts.load('640 96px Fraunces'), document.fonts.load('italic 420 96px Fraunces'), document.fonts.load('italic 400 24px Fraunces'), document.fonts.load('600 44px Fraunces'),
+  document.fonts.load('700 10px "JetBrains Mono"'), document.fonts.load('500 10px "JetBrains Mono"'), document.fonts.load('800 10px "JetBrains Mono"'), document.fonts.load('400 14px "JetBrains Mono"'),
 ]).then(() => {
-  const host = document.getElementById('covers');
-  for (const b of BOOKS) { const fig = document.createElement('figure'); const el = buildCover(b); fig.appendChild(el);
-    const cap = document.createElement('figcaption'); cap.textContent = `${b.slug} · ${FAM[b.fam].label} · ${b.level}`; fig.appendChild(cap);
-    host.appendChild(fig); fitTitle(el, b); }
+  buildPalette();
+  document.getElementById('markbig').innerHTML = markSVG('#1c1b18', '#eeebe3', 120) + markSVG('#1c1b18', '#eeebe3', 40) + markSVG('#1c1b18', '#eeebe3', 16);
+  const built = [];
+  for (const b of BOOKS) {
+    const fig = document.createElement('figure'), el = buildCover(b); fig.appendChild(el);
+    const cap = document.createElement('figcaption'); cap.innerHTML = `<span><b>${FAM[b.fam].label}</b> · ${b.level}</span><span>${b.slug}</span>`; fig.appendChild(cap);
+    document.getElementById(b.group).appendChild(fig); fitTitle(el, b); built.push(el);
+  }
+  for (const id of ['shelf', 'shelfg']) { const host = document.getElementById(id);
+    for (const el of built) { const t = document.createElement('div'); t.className = 'thumb'; const c = el.cloneNode(true); c.className = 'cv'; delete c.dataset.slug; t.appendChild(c); host.appendChild(t); } }
+  buildWrap(BOOKS.find((b) => b.slug === 'build-llms-from-scratch'));
 });
 </script>
 </body>

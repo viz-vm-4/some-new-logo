@@ -291,18 +291,32 @@
   // weight rule: heavy, but condensed letters get lighter so counters stay open
   const weight = (u, H) => Math.min(0.2 * H, 0.33 * u);
 
-  function lineWidth(text, u, H, opt) {
+  // optical spacing: air each glyph leaves on its right / left side, in three bands
+  // (top, middle, bottom) x u. A pair is kerned by half the narrowest combined band.
+  const OPEN_R = { T: [0, 0.4, 0.4], L: [0.55, 0.55, 0], F: [0, 0.1, 0.55], P: [0, 0, 0.45], Y: [0, 0.3, 0.4],
+    V: [0, 0.15, 0.35], '7': [0, 0.2, 0.35], A: [0.3, 0.12, 0], K: [0, 0.3, 0], E: [0, 0.08, 0], '1': [0.2, 0.2, 0] };
+  const OPEN_L = { T: [0, 0.4, 0.4], A: [0.3, 0.12, 0], J: [0.55, 0.55, 0], V: [0, 0.15, 0.35], Y: [0, 0.3, 0.4], X: [0, 0.2, 0] };
+  const kern = (a, b) => {
+    const r = OPEN_R[a], l = OPEN_L[b];
+    if (!r && !l) return 0;
+    const R = r || [0, 0, 0], Lf = l || [0, 0, 0];
+    return Math.min(0.25, 0.5 * Math.min(R[0] + Lf[0], R[1] + Lf[1], R[2] + Lf[2]));
+  };
+  function layout(text, u, H, opt) {
     const S = weight(u, H);
     const gap = (opt.track != null ? opt.track : 0.5) * S + 0.012 * H;
-    let x = 0, n = 0;
+    let x = 0, prev = null;
+    const pos = [];
     for (const ch of text) {
-      if (ch === ' ') { x += u * (opt.space || 0.5); n = 0; continue; }
-      if (n) x += gap;
+      if (ch === ' ') { x += u * (opt.space || 0.5); prev = null; continue; }
+      if (prev) x += gap - kern(prev, ch) * u;
+      pos.push([ch, x]);
       x += W[ch] === 0 ? S : (W[ch] || 1) * u;
-      n++;
+      prev = ch;
     }
-    return x;
+    return { pos, w: x, S };
   }
+  function lineWidth(text, u, H, opt) { return layout(text, u, H, opt).w; }
   // Solve base width u so the line fills `measure`, within [rmin,rmax]*H.
   function fit(text, H, measure, opt = {}) {
     const rmin = opt.rmin || 0.36, rmax = opt.rmax || 0.72;
@@ -326,14 +340,10 @@
      st: {fillTop, fillBot, split, outline, o, shadow, depth, inline, halo, h}  (colours + sizes) */
   function paint(text, u, H, st, opt = {}) {
     const id = 'bb' + (UID++);
-    const S = weight(u, H);
-    const gap = (opt.track != null ? opt.track : 0.5) * S + 0.012 * H;
-    let x = 0, n = 0;
+    const L0 = layout(text, u, H, opt), S = L0.S;
     let geo = '', inl = '';
     const ins = S * 0.55;
-    for (const ch of text) {
-      if (ch === ' ') { x += u * (opt.space || 0.5); n = 0; continue; }
-      if (n) x += gap;
+    for (const [ch, x] of L0.pos) {
       const g = glyph(ch, u, H, S);
       let d = '', di = '';
       for (const s of g.subs) {
@@ -342,10 +352,8 @@
       }
       geo += `<path transform="translate(${f(x)} 0)" d="${d}"/>`;
       inl += `<path transform="translate(${f(x)} 0)" d="${di}"/>`;
-      x += g.w;
-      n++;
     }
-    const w = x;
+    const w = L0.w;
     const o = st.o != null ? st.o : Math.max(1.6, S * 0.13);
     const depth = st.depth != null ? st.depth : S * 0.55;
     const halo = st.halo ? (st.h != null ? st.h : Math.max(1.4, S * 0.1)) : 0;

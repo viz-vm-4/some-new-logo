@@ -49,7 +49,8 @@ body{font-family:'Martian Mono',monospace;font-variation-settings:'wdth' 75}
 .sw div{width:220px;font-size:13px;line-height:1.5}
 .sw span{display:block;height:88px;margin-bottom:8px;border:1px solid rgba(23,23,28,.25)}
 .ramp{display:flex;flex-wrap:wrap;margin-top:18px;font-size:10px;font-variation-settings:'wdth' 75}
-.ramp span{display:inline-block;width:62px;height:40px;line-height:40px;text-align:center;font-size:18px;background:var(--paper);border-right:1px solid rgba(23,23,28,.08)}
+.ramp span{display:inline-block;width:62px;height:40px;line-height:40px;text-align:center;font-size:18px;border-right:1px solid rgba(23,23,28,.08)}
+.ramp span:not(.t9):not(.s9){background:var(--paper)}
 .lv{display:grid;grid-template-columns:48px 1fr;row-gap:6px;align-items:baseline}
 .lv b.g{font-size:30px;color:var(--sig);font-variation-settings:'wdth' 75,'wght' 800}
 .lv i.h{display:inline-block;width:14px;height:22px;border:3px solid var(--sig)}
@@ -64,11 +65,11 @@ figcaption code{color:var(--sig);font-family:inherit}
 .wrap{position:relative;width:1488px;height:888px;display:flex;box-shadow:0 1px 2px rgba(0,0,0,.18),0 10px 30px rgba(0,0,0,.10)}
 .wrap>.back,.wrap>.front{width:720px;height:888px;position:relative;overflow:hidden;background:var(--paper);flex:none}
 .wrap>.spine{width:48px;height:888px;background:var(--ink);color:var(--paper);position:relative;flex:none;overflow:hidden}
-.spine .st{position:absolute;left:50%;top:40px;transform-origin:0 0;transform:rotate(90deg) translateY(-50%);white-space:nowrap;font-size:22px;line-height:1;font-variation-settings:'wdth' 75,'wght' 800;word-spacing:-.25em}
+.spine .st{position:absolute;left:0;right:0;top:36px;writing-mode:vertical-rl;display:flex;align-items:center;white-space:nowrap;font-size:22px;line-height:48px;font-variation-settings:'wdth' 75,'wght' 800;word-spacing:-.25em}
 .spine .st b{color:#8e98ff}
-.spine .st i{display:inline-block;width:11px;height:16px;background:var(--sig);margin-left:6px;vertical-align:-1px;box-shadow:0 0 0 1px var(--paper) inset}
-.spine .sm{position:absolute;left:0;right:0;bottom:30px;text-align:center;font-size:10px;line-height:1.3;letter-spacing:.1em;font-variation-settings:'wdth' 112.5,'wght' 800}
-.spine .sm i{display:block;margin:0 auto 8px;width:12px;height:18px;background:#8e98ff}
+.spine .st i{display:inline-block;width:16px;height:11px;background:#8e98ff;margin-top:6px}
+.spine .sm{position:absolute;left:0;right:0;bottom:34px;writing-mode:vertical-rl;display:flex;align-items:center;font-size:11px;line-height:48px;letter-spacing:.16em;font-variation-settings:'wdth' 112.5,'wght' 800}
+.spine .sm i{display:inline-block;width:9px;height:6px;background:#8e98ff;margin-top:4px}
 .bk{position:absolute;white-space:normal}
 .foot2{margin-top:56px;border-top:2px solid var(--ink);padding-top:10px;display:flex;justify-content:space-between;font-size:13px;font-variation-settings:'wdth' 100,'wght' 700}
 @media (max-width:760px){ .man{grid-template-columns:1fr} .man h1{font-size:44px} }
@@ -225,7 +226,7 @@ EMBLEM['neural-networks-from-scratch']=function(g){
     const r=pr+k*2, on=k===7;
     g.text(r,pc,String(k),on?.95:.8,on?1:0);
     const L=Math.max(1,Math.round(P[k]*24));
-    for(let i=0;i<L;i++) g.put(r,pc+2+i,on?' ':'=',on?.95:.7,on?1:0);
+    for(let i=0;i<L;i++) g.put(r,pc+2+i,on?' ':'#',on?.95:.8,on?1:0);
     g.text(r,pc+3+L,P[k].toFixed(3),on?.8:.55,on?1:0);
   }
   return {cap:['p','= softmax(W2 @ relu(W1 @ (img / 255)))   # -> 7']};
@@ -262,7 +263,7 @@ EMBLEM['mathematical-foundations-for-ml']=function(g){
   }
   for(let c=0;c<COLS;c++){ const r=Math.round(pts[c])-1; if(r<0||r>=base) continue; const q=g.get(r,c);
     if(q.t<.86) g.put(r,c,'*',.95,1); }
-  return {cap:['x','= np.random.default_rng(3664).standard_normal(420)   * N(0, 1)']};
+  return {cap:['x','= randn(420); hist(x, bins=20)   # * marks 420 · 0.25 · pdf(x)']};
 };
 
 
@@ -339,7 +340,7 @@ EMBLEM['ai-context-engineering']=function(g){
   for(let r=ur;r<r1-1;r++)for(let c=L+uw+2;c<R;c++) g.put(r,c,(c+r)%2?' ':'·',.34);
   g.text(ur+1,L+uw+5,' 594 tokens free ',.7);
   // a document that did not fit: dashed outline above the window
-  const ob={r:0,c:62,h:5,w:50};
+  const ob={r:1,c:62,h:5,w:50};
   g.fill(ob.r,ob.c,ob.r+ob.h,ob.c+ob.w,' ',-1);
   for(let c=ob.c;c<ob.c+ob.w;c++){ if(c%2===0){ g.put(ob.r+ob.h-1,c,'-',.62); g.put(ob.r,c,'-',.62);} }
   for(let r=ob.r;r<ob.r+ob.h;r++){ g.put(r,ob.c,'¦',.62); g.put(r,ob.c+ob.w-1,'¦',.62); }
@@ -602,7 +603,7 @@ function build(b){
   const info=EMBLEM[b.slug](g)||{};
   const parts=[];
   const M=6, T0=56;
-  const [lines,k,sub,sk=3]=b.title, TX=M+2*k;
+  const [lines,k,sub,sk=3]=b.title, TX=15;
   let r=T0;
   const line=(txt,kk,cls)=>{ parts.push(`<div class="tl ${cls||''}" data-k="${kk}" style="left:${TX*CW}px;top:${(r*CH).toFixed(1)}px;font-size:${kk*10}px;line-height:${(kk*CH).toFixed(1)}px">${esc(txt)}</div>`); r+=kk; };
   lines.forEach(ln=>line(ln,k));
@@ -691,12 +692,14 @@ for epoch in range(10):
 _, _, p = forward(x_test[:1])
 print(p.round(3))    # a seven, like the one on the front`.split('\n');
   const g=new Grid();
-  const half=Math.ceil(code.length/2);
-  code.forEach((ln,i)=>{
-    const col=i<half?4:63, row=(i<half?i:i-half)+1;
-    g.text(row,col,String(i+1).padStart(3,' ')+'  ',.34);
-    const hot=ln.includes('# a seven');
-    g.text(row,col+5,ln.slice(0,54),hot?.84:.7,hot?1:0);
+  for(let r=0;r<FR;r++)for(let x=0;x<40;x++) g.text(r,x*3,'00 ',.02);
+  const lines=code.filter(ln=>ln!=='');
+  lines.slice(0,FR-1).forEach((ln,i)=>{
+    const row=i+1, hot=ln.includes('# a seven');
+    const txt=String(i+1).padStart(3,' ')+'  '+ln;
+    g.fill(row,3,row+1,Math.min(COLS,5+txt.length),' ',-1);
+    g.text(row,4,txt.slice(0,5),.34);
+    g.text(row,9,ln,hot?.84:.72,hot?1:0);
   });
   const M=6, back=document.createElement('div'); back.className='back';
   back.innerHTML=`<div class="field">${g.html()}</div>
@@ -710,7 +713,7 @@ print(p.round(3))    # a seven, like the one on the front`.split('\n');
    <div class="bk" style="right:${M*CW}px;top:${(62*CH).toFixed(1)}px;width:192px;height:${(14*CH).toFixed(1)}px;border:2px dashed var(--ink);font-size:10px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:10px;letter-spacing:.08em;font-variation-settings:'wdth' 100,'wght' 600">ISBN · BARCODE</div>
    <div class="foot im" style="left:${M*CW}px;top:${(76*CH).toFixed(1)}px">VIZUARA BOOKS<i></i></div>`;
   const spine=document.createElement('div'); spine.className='spine';
-  spine.innerHTML=`<div class="st"><b>&gt;</b> Neural Networks from Scratch<i></i></div><div class="sm"><i></i>VIZ<br>UARA</div>`;
+  spine.innerHTML=`<div class="st"><b>&gt;</b>&nbsp;Neural Networks from Scratch<i></i></div><div class="sm">VIZUARA<i></i></div>`;
   wrap.appendChild(back); wrap.appendChild(spine); wrap.appendChild(front);
 })();
 

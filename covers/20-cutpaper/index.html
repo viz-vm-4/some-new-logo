@@ -10,7 +10,7 @@
 <style>
 :root{
   --ivory:#F4EDDF; --ink:#1B1A22; --ultra:#2A3A92; --leaf:#22704B; --verm:#D93D2B; --saff:#EDB22C;
-  --night:#1C1E2C; --rose:#EE9C94; --kraft:#BD9061; --lemon:#F5D55A; --blush:#F7CDC2; --mist:#BCCCD8;
+  --night:#1D2342; --rose:#EE9C94; --kraft:#BD9061; --lemon:#F5D55A; --blush:#F7CDC2; --mist:#BCCCD8;
   --mint:#9ED0B3; --lilac:#B6A6D6; --cobalt:#4C66C4;
   --mat:#2C423C;
 }
@@ -29,7 +29,7 @@ body{
   font-optical-sizing:auto;
   -webkit-font-smoothing:antialiased;
 }
-.page{width:1560px;margin:0 auto;padding:72px 36px 120px}
+.page{width:1600px;margin:0 auto;padding:72px 50px 120px}
 
 /* ---------- presentation ---------- */
 .intro{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:end;margin-bottom:64px}
@@ -66,10 +66,26 @@ h2.section::after{content:"";flex:1;border-top:1.5px dashed rgba(244,237,223,.45
 .item .cap b{font-weight:700}
 
 /* ---------- the cover ---------- */
-.cover{position:relative;width:720px;height:888px;overflow:hidden;isolation:isolate;flex:none;
-  background:var(--board);box-shadow:0 2px 2px rgba(0,0,0,.3),0 24px 40px -18px rgba(0,0,0,.6);color:var(--ink)}
-.cover svg.art,.cover svg.grain{position:absolute;left:0;top:0;width:720px;height:888px;display:block}
-.cover svg.grain{pointer-events:none;z-index:3;mix-blend-mode:soft-light}
+.book{position:relative;width:720px;height:888px;overflow:hidden;isolation:isolate;flex:none;
+  background:var(--board);color:var(--ink)}
+.cover{box-shadow:0 2px 2px rgba(0,0,0,.3),0 24px 40px -18px rgba(0,0,0,.6)}
+.book svg.art,.book svg.grain{position:absolute;left:0;top:0;width:720px;height:888px;display:block}
+.book svg.grain,.wrap svg.grain{pointer-events:none;z-index:3;mix-blend-mode:soft-light}
+/* ---------- the print wrap: back, spine, front ---------- */
+.wrap{display:flex;width:1500px;height:888px;box-shadow:0 2px 2px rgba(0,0,0,.3),0 24px 40px -18px rgba(0,0,0,.6);margin-bottom:22px}
+.wrap .back,.wrap .spine{position:relative;height:888px;overflow:hidden;isolation:isolate;flex:none;background:var(--board);color:var(--ink)}
+.wrap .back{width:720px}.wrap .spine{width:60px}
+.wrap .back > svg,.wrap .spine > svg{position:absolute;left:0;top:0;display:block}
+.back .bslip{position:absolute;left:66px;top:572px;width:588px;height:256px;z-index:2}
+.back .blurb{margin:18px 0 0;font-family:'Fraunces',serif;font-style:italic;font-size:25px;line-height:1.18;letter-spacing:-.005em;font-variation-settings:'SOFT' 100,'WONK' 0;max-width:560px}
+.back .about{margin:14px 0 0;font-size:13px;line-height:1.42;max-width:400px}
+.back .about b{font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:11.5px;display:block;margin-bottom:3px}
+.back .code{position:absolute;right:0;bottom:0;width:150px;height:92px;border:1.5px dashed var(--ink);display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;text-align:center;line-height:1.3}
+.spine .stitle{position:absolute;left:30px;top:150px;transform-origin:0 0;transform:rotate(90deg) translate(0,-50%);white-space:nowrap;z-index:2;
+  font-weight:800;font-size:25px;letter-spacing:-.02em;line-height:1}
+.spine .smark{position:absolute;left:17px;bottom:44px;width:26px;height:26px;z-index:2}
+.wrapcap{font-size:15px;line-height:1.5;max-width:1000px;margin:0 0 80px}
 .slip{position:absolute;left:66px;top:572px;width:588px;height:256px;z-index:2}
 .meta{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;font-weight:700;
   letter-spacing:.14em;text-transform:uppercase;line-height:1;height:16px;font-variation-settings:'opsz' 12}
@@ -106,6 +122,8 @@ h2.section::after{content:"";flex:1;border-top:1.5px dashed rgba(244,237,223,.45
   <div class="shelf" id="core"></div>
   <h2 class="section">Range: a sub-series, a coming-soon title, other shelves</h2>
   <div class="shelf" id="more"></div>
+  <h2 class="section">On press: the full wrap</h2>
+  <div id="wrapzone"></div>
 </div>
 
 <script>
@@ -116,7 +134,7 @@ h2.section::after{content:"";flex:1;border-top:1.5px dashed rgba(244,237,223,.45
    ===================================================================== */
 const C = {
   ivory:'#F4EDDF', ink:'#1B1A22', ultra:'#2A3A92', leaf:'#22704B', verm:'#D93D2B', saff:'#EDB22C',
-  night:'#1C1E2C', rose:'#EE9C94', kraft:'#BD9061', lemon:'#F5D55A', blush:'#F7CDC2', mist:'#BCCCD8',
+  night:'#1D2342', rose:'#EE9C94', kraft:'#BD9061', lemon:'#F5D55A', blush:'#F7CDC2', mist:'#BCCCD8',
   mint:'#9ED0B3', lilac:'#B6A6D6', cobalt:'#4C66C4', plum:'#55284A'
 };
 const SHELF = {
@@ -355,10 +373,10 @@ ART['build-llms-from-scratch'] = () => {
    data (replica blocks), pipeline (stages), tensor (columns). */
 ART['5d-parallelism'] = () => {
   let s = '';
-  const W=200, H=232, gap=10;
+  const W=206, H=236, gap=10;
   const cuts = ['experts','sequence','data','pipeline','tensor'];
   cuts.forEach((cut,i) => {           // i = 0 is the far plane (top right), i = 4 the near one
-    const L = 60 + (4-i)*90, T = 18 + i*64;
+    const L = 48 + (4-i)*100, T = 12 + i*66;
     const c = i===4 ? C.lemon : mix(C.ivory, C.mist, (3-i)*.3);
     let g = '';
     if (cut==='tensor'){ const w=(W-3*gap)/4; for(let j=0;j<4;j++) g += rect(L+j*(w+gap), T, w, H, jit(c)); }
@@ -568,6 +586,38 @@ ART['reinforcement-learning'] = () => {
   return s;
 };
 
+/* RAG in Production: a card-catalogue drawer of index cards; the top-k have been pulled up
+   out of the drawer to be read. Retrieval, done the way libraries always did it. */
+ART['rag-in-production'] = () => {
+  let s = '';
+  const X = 150, Wc = 420, N = 13, step = 10, top0 = 236;
+  const skip = new Set([3,7,10]);
+  const tabs = [18,120,230,326];
+  const card = (x,y,w,h,tabX,tabC,lines) => {
+    let g = path(`M${x} ${y}H${x+tabX}V${y-22}H${x+tabX+74}V${y}H${x+w}V${y+h}H${x}Z`, jit(C.ivory));
+    g += rect(x+tabX+8, y-16, 58, 10, tabC);
+    if (lines){ g += rect(x+18, y+30, w-36, 2.6, C.verm); for (let k=1;k<7;k++) g += rect(x+18, y+30+k*25, w-36, 1.5, '#8FA6CF'); }
+    return g;
+  };
+  // the cards still in the drawer, tab after tab
+  for (let i=0;i<N;i++){
+    if (skip.has(i)) continue;
+    s += lift(1, card(X, top0 + i*step, Wc, 150, tabs[i%4], i%3===0 ? shade(C.ivory,.14) : shade(C.ivory,.05), false));
+  }
+  // the drawer front, with its label and brass pull
+  const D = {x:108, y:370, w:504, h:162};
+  s += lift(4, rect(D.x, D.y, D.w, D.h, jit(C.ultra)) + rect(360-62, D.y+30, 124, 46, jit(C.ivory)) +
+    rect(360-50, D.y+40, 100, 3.5, C.ink) + rect(360-50, D.y+50, 72, 3.5, C.ink) + rect(360-50, D.y+60, 88, 3.5, C.ink));
+  s += lift(6, `<path d="M${360-36} ${D.y+104} a36 30 0 0 0 72 0" fill="none" stroke="url(#${PFX}-brass)" stroke-width="7"/>` + brad(360-36, D.y+104, 7) + brad(360+36, D.y+104, 7));
+  // the top three, pulled out and fanned like a hand of cards
+  const fan = [ {cx:222, cy:170, r:-10, tab:C.verm, tx:18, z:7}, {cx:498, cy:176, r:9, tab:C.leaf, tx:230, z:8}, {cx:360, cy:132, r:-1, tab:C.cobalt, tx:120, z:10} ];
+  fan.forEach(c => {
+    const w = 330, h = 206, x = c.cx - w/2, y = c.cy - h/2;
+    s += lift(c.z, `<g transform="rotate(${c.r} ${c.cx} ${c.cy})">${card(x, y, w, h, c.tx, c.tab, true)}</g>`);
+  });
+  return s;
+};
+
 /* =====================================================================
    BOOK DATA
    ===================================================================== */
@@ -577,24 +627,26 @@ const BOOKS = [
   {slug:'mathematical-foundations-for-ml', shelf:'found', level:'beginner', lines:['Mathematical','Foundations for','Machine Learning'], capsules:43, hours:10, core:true,
     note:'Graph paper (the grid of linear algebra), three normal distributions cut in card (probability), and a tangent strip pinned at an inflection point (calculus).'},
   {slug:'neural-networks-from-scratch', shelf:'neural', level:'beginner', lines:['Neural Networks','from Scratch'], capsules:33, hours:7, core:true,
-    note:'A 3-4-2 network built like a jointed paper toy. Each weight is a strip whose width is its magnitude (ivory positive, ink negative), pinned at the neurons with brass fasteners.'},
+    note:'A 3-4-2 network built like a jointed paper toy. Each weight is a strip as wide as its magnitude (ivory positive, ink negative), pinned at the neurons with brass fasteners.'},
   {slug:'build-llms-from-scratch', shelf:'lang', level:'intermediate', lines:['Build Large','Language Models','(LLMs) from Scratch'], capsules:20, hours:6, ply:[C.ink], core:true,
     note:'A line of tokens. Paper loops of attention, width by weight, all land on the empty slot, and the next token is being lifted into place above it.'},
   {slug:'5d-parallelism', shelf:'systems', level:'advanced', lines:['5D Parallelism','for Large','Model Training'], capsules:40, hours:9, ply:[C.lemon, C.verm], core:true,
-    note:'Five parallel planes of the same model, each cut a different way: tensor columns, pipeline bands, data blocks, sequence chunks, sparse expert tiles.'},
+    note:'Five parallel planes of one model fanned out in depth, each cut a different way. Near to far: tensor columns, pipeline stages, data blocks, sequence chunks, then expert tiles with the active experts in red.'},
   {slug:'pi-vs-hermes-vs-codex', shelf:'agents', level:'advanced', lines:['Pi vs Hermes','vs Codex'], sub:'Context Compaction and Memory', capsules:9, hours:1, ply:[C.ultra, C.verm], core:true,
     note:'The same long context compacted three ways. Recent turns stay flat; older history is pleated into a concertina, tighter each time.'},
 
   {slug:'charlie-language-room', shelf:'factory', level:'advanced', lines:['Charlie and the','Language Room'], sub:'Language: Inference Engineering', series:'I', capsules:22, hours:5, ply:[C.verm, C.ink],
-    note:'<b>Sub-series.</b> Every Intelligence Factory book is a pop-up room seen through a factory-roof die-cut in kraft board. Here tokens ride a conveyor under a speech bubble.'},
+    note:'<b>Sub-series.</b> Every Intelligence Factory book is a pop-up room seen through a factory-roof die-cut in kraft board; the back wall is the colour of the shelf the subject belongs to. Here blank tokens ride a conveyor into the inference machine and come out generated.'},
   {slug:'charlie-vision-room', shelf:'factory', level:'intermediate', lines:['Charlie and the','Vision Room'], sub:'Vision: Vision Transformers', series:'II', capsules:20, hours:6, ply:[C.leaf],
-    note:'A picture cut into patches, as a vision transformer sees it; one patch travels forward to be embedded.'},
+    note:'A picture cut into patches, the way a vision transformer sees it. The top row has already left, in raster order, as a sequence.'},
   {slug:'charlie-sound-room', shelf:'factory', level:'intermediate', lines:['Charlie and the','Sound Room'], sub:'Audio: Voice Agents', series:'III', capsules:20, hours:6, ply:[C.saff],
-    note:'A waveform of standing cards on the floor, a paper speaker on the wall.'},
+    note:'A waveform of standing cards on the floor; on the wall, two paper waves: a voice and the agent answering it.'},
   {slug:'charlie-reasoning-room', shelf:'factory', level:'advanced', lines:['Charlie and the','Reasoning Room'], sub:'Reason: Reinforcement Learning, from bandits to reasoning models', series:'IV', capsules:21, hours:6, ply:[C.rose, C.ink],
     note:'A pop-up staircase, the oldest trick in paper engineering, for step-by-step reasoning toward a reward flag.'},
   {slug:'inference-engineering', shelf:'systems', level:'advanced', lines:['Inference','Engineering'], sub:'Serve LLMs fast: batching, KV-cache, paged attention, speculative decoding.', soon:true, ply:[C.lemon, C.verm],
-    note:'<b>Coming soon</b> books show the kit before assembly: a punch-out sheet with die lines. Here the pieces are KV-cache pages; a few are already pressed out.'},
+    note:'<b>Coming soon</b> books show the kit before assembly: a punch-out sheet with die lines and registration marks. Here the pieces are numbered KV-cache pages; a few are already pressed out and no longer in order, as in paged attention.'},
+  {slug:'rag-in-production', shelf:'agents', level:'intermediate', lines:['RAG in','Production'], capsules:42, hours:10, ply:[C.ultra],
+    note:'A card-catalogue drawer: retrieval the way libraries always did it. The top three cards have been pulled up out of the drawer to be read.'},
   {slug:'reinforcement-learning', shelf:'world', level:'intermediate', lines:['Reinforcement','Learning'], capsules:38, hours:8, ply:[C.ink],
     note:'A grid world where each tile is lifted by its value: the nearer the goal, the higher the card stands and the longer its shadow.'}
 ];
@@ -607,8 +659,8 @@ const plyIcon = n => `<svg viewBox="0 0 22 18" aria-hidden="true">${[0,1,2].map(
   return `<rect x="1.2" y="${y+.6}" width="19.6" height="3.8" fill="${on?C.ink:'none'}" stroke="${C.ink}" stroke-width="1.2"/>`; }).join('')}</svg>`;
 const MARK = `<svg viewBox="0 0 40 40" aria-hidden="true"><polygon points="2,4 12,4 25,37 15,37" fill="${C.ink}"/><polygon points="28,4 38,4 25,37 15,37" fill="${C.verm}" style="filter:drop-shadow(1px 1.5px 0.6px rgba(0,0,0,.35))"/></svg>`;
 
-function coverHTML(b, i){
-  PFX = 'c' + i;
+function bookInner(b, i, pfx){
+  PFX = pfx;
   rnd = mulberry(1000 + i*97);
   wrnd = mulberry(55 + i*31);
   const shelf = SHELF[b.shelf];
@@ -617,8 +669,7 @@ function coverHTML(b, i){
   const lvl = b.level[0].toUpperCase() + b.level.slice(1);
   const right = b.series ? `Intelligence Factory · ${b.series}` : shelf.name;
   const stats = b.soon ? `<span class="stats soon">Coming soon</span>` : `<span class="stats">${b.capsules} capsules · ${b.hours} ${b.hours===1?'hour':'hours'}</span>`;
-  return `<div class="cover" data-slug="${b.slug}" style="--board:${shelf.board}">
-    <svg class="art" viewBox="0 0 720 888" aria-hidden="true">${defs()}
+  return `<svg class="art" viewBox="0 0 720 888" aria-hidden="true">${defs()}
       <rect width="720" height="888" fill="${shelf.board}"/>
       ${art}
       ${slipAndPly(b)}
@@ -629,8 +680,53 @@ function coverHTML(b, i){
       ${b.sub ? `<p class="sub">${b.sub}</p>` : ''}
       <div class="foot"><span class="imprint">${MARK}<span><b>Vizuara</b> Books</span></span>${stats}</div>
     </div>
-    ${grainSVG(11 + i)}
+    ${grainSVG(11 + i)}`;
+}
+function coverHTML(b, i){
+  return `<div class="book cover" data-slug="${b.slug}" style="--board:${SHELF[b.shelf].board}">${bookInner(b, i, 'c'+i)}</div>`;
+}
+
+/* ---------- the wrap: back (the offcuts + colophon), spine, front ---------- */
+function wrapHTML(b, i){
+  const shelf = SHELF[b.shelf], n = LEVEL[b.level];
+  const front = `<div class="book" style="--board:${shelf.board}">${bookInner(b, i, 'wf')}</div>`;
+  // back: the sheets the neurons were punched from, holes and all
+  PFX = 'wb'; rnd = mulberry(4242); wrnd = mulberry(99);
+  const holesL = [[150,160],[150,290],[150,420]].map(([x,y]) => circPath(x-10,y-40,40)).join('');
+  const holesH = [[360,96],[360,226],[360,356],[360,486]].map(([x,y]) => circPath(x+40,y-10,36)).join('');
+  let art = '';
+  art += lift(2, `<g transform="rotate(-4 170 260)">${path(rectPath(56,70,250,420) + holesL, jit(C.lemon), 'fill-rule="evenodd"')}</g>`);
+  art += lift(3, `<g transform="rotate(5 420 300)">${path(rectPath(300,40,220,500) + holesH, jit(C.verm), 'fill-rule="evenodd"')}</g>`);
+  const holesO = [[600,120],[600,236]].map(([x,y]) => circPath(x,y,42)).join('');
+  art += lift(2, `<g transform="rotate(-8 600 180)">${path(rectPath(544,52,112,248) + holesO, jit(C.ivory), 'fill-rule="evenodd"')}</g>`);
+  art += R(536, 340, 140, 10, C.ivory, 4, {r:-18}) + R(560, 400, 120, 8, C.ink, 5, {r:12});
+  art += lift(6, brad(596, 474, 7)) + lift(6, brad(628, 490, 7));
+  const plyB = slipAndPly(b);
+  const back = `<div class="back" style="--board:${shelf.board}">
+    <svg viewBox="0 0 720 888" width="720" height="888" aria-hidden="true">${defs()}<rect width="720" height="888" fill="${shelf.board}"/>${art}${plyB}</svg>
+    <div class="bslip">
+      <div class="meta"><span class="lvl">${plyIcon(n)}${b.level}</span><span>${shelf.name}</span></div>
+      <p class="blurb">Build a neural network the way you would build a paper toy: one neuron, one weight, one pin at a time.</p>
+      <p class="about"><b>About the cover</b>A 3-4-2 network cut from card: each weight a strip as wide as its magnitude, pinned with brass fasteners. This side shows the offcuts.</p>
+      <div class="foot"><span class="imprint">${MARK}<span><b>Vizuara</b> Books</span></span></div>
+      <div class="code">ISBN /<br>barcode area</div>
+    </div>
+    ${grainSVG(77)}
   </div>`;
+  // spine: board colour, a vertical slip, and the ply stripes at the head so level shows on the shelf
+  PFX = 'ws'; wrnd = mulberry(5);
+  let sp = defs() + `<rect width="60" height="888" fill="${shelf.board}"/>`;
+  const plyCols = [C.ivory, ...(b.ply||[])];
+  for (let k=0;k<n;k++) sp += R(10, 36 + k*14, 40, 9, k===0 ? C.ivory : plyCols[k], 2);
+  sp += R(8, 118, 44, 648, C.ivory, 3);
+  const spine = `<div class="spine" style="--board:${shelf.board}">
+    <svg viewBox="0 0 60 888" width="60" height="888" aria-hidden="true">${sp}</svg>
+    <div class="stitle">${b.lines.join(' ')}</div>
+    <div class="smark">${MARK}</div>
+    ${grainSVG(78)}
+  </div>`;
+  return `<div class="wrap" data-wrap="${b.slug}">${back}${spine}${front}</div>
+  <p class="wrapcap"><b>Back, spine, front</b> for <i>${b.lines.join(' ')}</i>. The back shows the offcuts: the sheets the neurons were punched from. The spine carries the level as ply stripes at its head, so a shelf of Vizuara books sorts itself by depth at a glance. The back slip carries a short colophon explaining the construction, the way every book in the system would.</p>`;
 }
 
 function build(){
@@ -641,12 +737,14 @@ function build(){
     el.innerHTML = coverHTML(b,i) + `<p class="cap">${b.note}</p>`;
     (b.core ? core : more).appendChild(el);
   });
+  const nn = BOOKS.findIndex(b => b.slug === 'neural-networks-from-scratch');
+  document.getElementById('wrapzone').innerHTML = wrapHTML(BOOKS[nn], nn);
   tightenFilters();
   buildSystem();
 }
 
 function fitTitles(){
-  document.querySelectorAll('.cover').forEach(cv => {
+  document.querySelectorAll('.book').forEach(cv => {
     const t = cv.querySelector('.title'), sub = cv.querySelector('.sub'), slip = cv.querySelector('.slip');
     const foot = cv.querySelector('.foot');
     let size = 76;
@@ -663,7 +761,7 @@ function fitTitles(){
 
 /* shrink every shadow filter's region to its own piece: far cheaper to render */
 function tightenFilters(){
-  document.querySelectorAll('.cover svg.art').forEach(svg => {
+  document.querySelectorAll('.book svg.art, .wrap .back svg, .wrap .spine svg').forEach(svg => {
     const dfs = svg.querySelector('defs');
     let n = 0;
     svg.querySelectorAll('g[filter]').forEach(g => {

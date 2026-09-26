@@ -100,8 +100,13 @@ const BOOKS = {
     spec: 'idukku pulli 1–2–3–4–5–6',
     why: 'Interlaced dots fanning out row by row, a tree of possible moves. Mirror symmetry through the centre forces exactly three lines: bandits, reinforcement learning, reasoning models.',
   },
+  'prompt-engineering': {
+    shape: () => K.fromMask(['ooooooo', 'ooooooo', 'ooooooo', 'ooooooo', '..o....', '.oo....'].join('\n'), 'ner'), loops: 1, sym: 'none', density: 0.22,
+    spec: 'a speech bubble: 7 × 4 and a tail of 3',
+    why: 'Thirty-one dots in the shape of a speech bubble: a prompt is something you say. With no symmetry to lean on, the turns fall where the conversation takes them.',
+  },
   'kernel-engineering': {
-    shape: () => K.fromRows([8, 8, 8, 8], 'ner'), loops: 1, sym: 'MX', density: 0.22, partial: 0.27,
+    shape: () => K.fromRows([8, 8, 8, 8], 'ner'), loops: 1, sym: 'MX', density: 0.22, partial: 0.34,
     spec: '8 × 4 — one warp',
     why: 'Thirty-two dots, one warp of GPU threads. The book is coming, so the dots are down and the line has only just begun.',
   },

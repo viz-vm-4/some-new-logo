@@ -38,7 +38,8 @@ h2.section{max-width:1512px;margin:96px auto 8px;padding:0 44px;font-weight:800;
 p.note{max-width:1512px;margin:0 auto 28px;padding:0 44px;font-size:17px;line-height:1.5;color:var(--muted)}
 .covers{display:flex;flex-wrap:wrap;gap:64px 48px;justify-content:center;padding:24px 44px 0}
 figure.kit{margin:0;width:720px}
-.cover{position:relative;width:720px;height:888px;overflow:hidden;flex:none;background:var(--bench);box-shadow:0 2px 0 rgba(0,0,0,.06),0 18px 40px -18px rgba(20,32,29,.45)}
+.cover{position:relative;width:720px;height:888px;overflow:hidden;flex:none;background:var(--bench)}
+.lift{width:720px;height:888px;box-shadow:0 2px 0 rgba(0,0,0,.06),0 18px 40px -18px rgba(20,32,29,.45)}
 .cover svg{position:absolute;left:0;top:0;display:block}
 figcaption{font:500 12px/1.65 'Martian Mono',monospace;margin-top:16px;color:#2D3A35}
 figcaption span{color:var(--muted)}
@@ -336,7 +337,7 @@ const PARTS = {
   badge(kind) {
     const r=40, cx=r, cy=r; let el='';
     if (kind==='pi') el = `<path d="M${cx-22} ${cy-12}Q${cx-20} ${cy-20} ${cx-10} ${cy-20}H${cx+24}V${cy-10}H${cx+10}V${cy+14}Q${cx+10} ${cy+20} ${cx+18} ${cy+20}V${cy+24}Q${cx} ${cy+26} ${cx} ${cy+12}V${cy-10}H${cx-8}V${cy+24}H${cx-18}V${cy-10}Q${cx-20} ${cy-10} ${cx-22} ${cy-6}Z"/>`;
-    if (kind==='wing') el = ROD(`M${cx-16} ${cy+14}L${cx+22} ${cy-22}`,9)+ROD(`M${cx-16} ${cy+14}L${cx+24} ${cy-6}`,9)+ROD(`M${cx-16} ${cy+14}L${cx+20} ${cy+10}`,9)+`<circle cx="${cx-14}" cy="${cy+12}" r="11"/>`;
+    if (kind==='wing') el = `<path d="M16 52C16 32 32 18 64 18L50 28L58 32L44 40L50 44L36 50L38 54C30 58 18 58 16 52Z" stroke-linejoin="round" stroke-width="2"/>`;
     if (kind==='codex') el = `<path d="M${cx-24} ${cy-18}Q${cx-12} ${cy-24} ${cx-2} ${cy-18}V${cy+22}Q${cx-12} ${cy+16} ${cx-24} ${cy+22}Z M${cx+2} ${cy-18}Q${cx+12} ${cy-24} ${cx+24} ${cy-18}V${cy+22}Q${cx+12} ${cy+16} ${cx+2} ${cy+22}Z"/>`;
     return {w:2*r,h:2*r,g:C(cx,cy,r),d:ENG(circ(cx,cy,r-6),1.4)+RELIEF(el),gates:[[cx,0,'up'],[cx,2*r,'down']],name:{pi:'Pi',wing:'Hermes',codex:'Codex'}[kind]};
   },
@@ -413,7 +414,7 @@ const PARTS = {
     return {w:128,h:80,g,d:'',gates:[[40,0,'up'],[88,80,'down']],name:'Join'};
   },
   funnel() {
-    const g=P(`M0 6Q0 0 6 0H90Q96 0 96 6L58 52V84Q58 90 52 88L42 84Q38 82 38 78V52Z`);
+    const g=P(`M0 6Q0 0 6 0H90Q96 0 96 6L58 50V82Q58 88 52 88H44Q38 88 38 82V50Z`);
     return {w:96,h:90,g,d:ENG(`M8 12H88`,1.6),gates:[[48,0,'up'],[48,88,'down']],name:'Filter'};
   },
   /* ----- alignment ----- */
@@ -518,12 +519,12 @@ function sprue(fr, rows, pl, mat, opts={}) {
   const TF=11, TR=9, {x,y,w,h}=fr;
   let geo=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="18" fill="none" stroke-width="${TF}"/>`, deco='', tags='';
   const tw=rows.reduce((a,r)=>a+(r.h||1),0);
-  const runners=[{y, t:TF, occ:[]}]; const gates=[]; const parts=[];
+  const runners=[{y, t:TF, occ:[], block:[]}]; const gates=[]; const parts=[];
   let top=y, num=1;
   rows.forEach((row,ri)=>{
     const bh=h*(row.h||1)/tw, bot=top+bh;
     if (ri<rows.length-1) geo += `<path d="M${x} ${n2(bot)}H${x+w}" fill="none" stroke-width="${TR}"/>`;
-    runners.push({y:bot, t: ri<rows.length-1?TR:TF, occ:[]});
+    runners.push({y:bot, t: ri<rows.length-1?TR:TF, occ:[], block:[]});
     const items=row.parts.map(p=>p.w?{p}:p);
     const padY=row.padY||30, padX=26;
     const maxH=Math.max(...items.map(q=>q.p.h*(q.s||1)));
@@ -537,6 +538,7 @@ function sprue(fr, rows, pl, mat, opts={}) {
       deco += `<g transform="translate(${n2(px)} ${n2(py)}) scale(${n2(s)})">${q.p.d}</g>`;
       q.p.gates.forEach(([gx,gy,dir],gi)=>{ const ro=dir==='up'?runners[ri]:runners[ri+1];
         gates.push({X:px+gx*s, Y:py+gy*s, ro, dir, num, first:gi===0}); ro.occ.push([px+gx*s-7, px+gx*s+7]); });
+      if (py-top<40) runners[ri].block.push([px-6,px+pw+6]); if (bot-(py+ph)<40) runners[ri+1].block.push([px-6,px+pw+6]);
       parts.push({num, name:q.p.name});
       num++; cx+=pw+gap;
     });
@@ -558,7 +560,7 @@ function sprue(fr, rows, pl, mat, opts={}) {
   // maker's tab: scan the top frame, then the bottom frame, right to left, for a clear span
   const first=runners[0], last=runners[runners.length-1];
   if (opts.reserve) first.occ.push(opts.reserve);
-  const scan=(ro,tw)=>{ for (let tx=x+w-24-tw; tx>=x+24; tx-=4) if (!ro.occ.some(([p,q])=>!(tx+tw<p-5||tx>q+5))) return tx; return null; };
+  const scan=(ro,tw)=>{ for (let tx=x+w-24-tw; tx>=x+24; tx-=4) if (!ro.occ.concat(ro.block).some(([p,q])=>!(tx+tw<p-5||tx>q+5))) return tx; return null; };
   let tabW=116, tro=first, tabX=scan(first,tabW);
   if (tabX===null){ tro=last; tabX=scan(last,tabW); }
   if (tabX===null){ tabW=44; tro=first; tabX=scan(first,tabW); if(tabX===null){ tro=last; tabX=scan(last,tabW)??(x+w-24-tabW);} }
@@ -654,7 +656,7 @@ function stamp(x,y,mat) {
 async function renderCover(b, host) {
   const fig=document.createElement('figure'); fig.className='kit';
   const el=document.createElement('div'); el.className='cover'; el.dataset.slug=b.slug;
-  fig.appendChild(el); host.appendChild(fig);
+  const lift=document.createElement('div'); lift.className='lift'; lift.appendChild(el); fig.appendChild(lift); host.appendChild(fig);
   let size=b.size, out=coverInner(b,size); el.innerHTML=svgWrap(W,H,out.inner);
   const widest=Math.max(...[...el.querySelectorAll('g.title text')].map(t=>t.getComputedTextLength()));
   if (widest>TITLE_MAX) { size=Math.floor(size*TITLE_MAX/widest*10)/10; out=coverInner(b,size); el.innerHTML=svgWrap(W,H,out.inner); }

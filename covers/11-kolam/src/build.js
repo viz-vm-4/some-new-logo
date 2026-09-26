@@ -30,10 +30,11 @@ const COVERS = [
   { slug: 'mathematical-foundations-for-ml', t: 'Mathematical|Foundations for|Machine Learning', size: 72, seed: 3 },
   { slug: 'neural-networks-from-scratch', t: 'Neural Networks|from Scratch', seed: 5 },
   { slug: 'build-llms-from-scratch', t: 'Build Large|Language Models|(LLMs) from Scratch', size: 64, seed: 4 },
-  { slug: '5d-parallelism', t: '5D Parallelism|for Large|Model Training', seed: 1 },
+  { slug: '5d-parallelism', t: '5D Parallelism|for Large|Model Training', seed: 7 },
   { slug: 'pi-vs-hermes-vs-codex', t: 'Pi vs Hermes|vs Codex', sub: 'Context Compaction and Memory', seed: 1 },
-  { slug: 'dsa-in-python', t: 'Data Structures|& Algorithms|in Python', seed: 2 },
   { slug: 'r-masterclass', t: 'R Masterclass', seed: 3 },
+  { slug: 'prompt-engineering', t: 'Prompt|Engineering', seed: 2 },
+  { slug: 'dsa-in-python', t: 'Data Structures|& Algorithms|in Python', seed: 2 },
   { slug: 'deit-from-scratch', t: 'Build a Data-|Efficient Image|Transformer (DeiT)|from Scratch', size: 64, seed: 3 },
   { slug: 'charlie-language-room', t: 'Charlie and the|Language Room', seed: 4 },
   { slug: 'charlie-vision-room', t: 'Charlie and the|Vision Room', seed: 1 },
@@ -72,15 +73,21 @@ function drawKolam(sol, color, box, extra = {}) {
     return { svg: K.svg(sol, Object.assign({ pitch, stroke, wall, dot: Math.max(3.4, pitch * 0.075), color, cx: box.cx, cy: box.cy }, extra)).svg, pitch, stroke };
   }
   const stroke = Math.max(box.minStroke || 4.4, Math.min(10, pitch * 0.098));
-  return { svg: K.svg(sol, Object.assign({ pitch, stroke, dot: stroke * 0.78, color, cx: box.cx, cy: box.cy }, extra)).svg, pitch, stroke };
+  return { svg: K.svg(sol, Object.assign({ pitch, stroke, color, cx: box.cx, cy: box.cy }, extra, { dot: extra.dot === 0 ? 0 : stroke * 0.78 })).svg, pitch, stroke };
 }
 
+const mix = (a, b, t) => { // a over b at opacity t, as a flat colour (no transparency in print)
+  const h = (x) => [1, 3, 5].map((i) => parseInt(x.slice(i, i + 2), 16));
+  const A = h(a), B = h(b);
+  return '#' + A.map((v, i) => Math.round(v * t + B[i] * (1 - t)).toString(16).padStart(2, '0')).join('');
+};
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
 const NUMW = ['zero', 'one', 'two', 'three', 'four', 'five', 'six'];
 const TA_LINES = ['', 'ஒரு கோடு', 'இரு கோடுகள்', 'மூன்று கோடுகள்', 'நான்கு கோடுகள்', 'ஐந்து கோடுகள்'];
+const SYMWORD = { D2: 'mirrored about both axes', D4: 'with the full symmetry of the square', C2: 'unchanged by a half turn', C4: 'unchanged by a quarter turn', MX: 'mirrored left to right', MY: 'mirrored top to bottom', none: 'free of symmetry' };
 const pips = (n, cls = '') => `<b class="pips ${cls}">${[1, 2, 3].map((i) => `<i class="${i <= n ? 'on' : ''}"></i>`).join('')}</b>`;
 
-const BOX = { cx: 360, cy: 584, w: 600, h: 412 };
+const BOX = { cx: 360, cy: 596, w: 600, h: 396 };
 const SERIES_BOX = { cx: 360, cy: 600, w: 580, h: 372 };
 
 function cover(c, opts = {}) {
@@ -100,12 +107,14 @@ function cover(c, opts = {}) {
     art = drawKolam(sol, L.fg, SERIES_BOX, { hollow: L.bg }).svg;
   } else if (soon) {
     // coming soon: the dots are down, the line has only just begun
-    const k = drawKolam(sol, L.fg, BOX, { partial: b.partial || 0.4, compactStart: b.partial || 0.4, biasX: 0.6 });
-    art = k.svg;
+    // the whole design is pencilled in faintly (as in a kolam notebook), the drawn part is bright
+    const ghost = drawKolam(sol, mix(L.fg, L.bg, 0.24), BOX, { dotColor: L.fg });
+    const k = drawKolam(sol, L.fg, BOX, { partial: b.partial || 0.4, compactStart: b.partial || 0.4, biasX: 0.6, dot: 0 });
+    art = ghost.svg + k.svg;
   } else {
     art = drawKolam(sol, L.fg, BOX).svg;
   }
-  const right = soon ? 'Coming soon' : `${d.capsules} capsules · ${d.hours} hours`;
+  const right = soon ? 'Coming soon' : `${d.capsules} capsules · ${d.hours} hour${d.hours === 1 ? '' : 's'}`;
   const taSpec = soon ? `${n} புள்ளி · கோடு தொடங்கியது` : `${n} புள்ளி · ${TA_LINES[sol.loops]}`;
   const enSpec = soon ? `${n} pulli · the line has begun` : `${n} pulli · ${NUMW[sol.loops]} line${sol.loops > 1 ? 's' : ''}`;
   return `
@@ -116,7 +125,7 @@ function cover(c, opts = {}) {
   <h1 class="title" style="font-size:${size}px;top:${top}px">${lines.map(esc).join('<br>')}</h1>
   ${sub ? `<p class="sub" style="top:${titleBottom + 16}px">${esc(sub)}</p>` : ''}
   <footer class="foot"><span class="imprint">${mark(L.fg, 24)}<span>Vizuara Books</span></span>
-    <span class="spec"><span lang="ta">${taSpec}</span><span>${enSpec}</span></span></footer>
+    <span class="spec"><span lang="ta" class="acc">${taSpec}</span><span>${enSpec}</span></span></footer>
 </div>`;
 }
 
@@ -144,7 +153,7 @@ function wrap(slug) {
     <ol class="rules">
       <li><b>One dot, one capsule.</b> This book has ${d.capsules} capsules, so its kolam has ${n} pulli.</li>
       <li><b>The shape is the subject.</b> ${esc(b.why)}</li>
-      <li><b>The line obeys the rules.</b> Where two dots are linked the line crosses; where they are not it turns back. Turns were placed by a search, symmetric about both axes, until the drawing closed into exactly ${NUMW[sol.loops]} line${sol.loops > 1 ? 's' : ''}.</li>
+      <li><b>The line obeys the rules.</b> Where two dots are linked the line crosses; where they are not it turns back. Turns were placed by a search, ${SYMWORD[b.sym]}, until the drawing closed into exactly ${NUMW[sol.loops]} line${sol.loops > 1 ? 's' : ''}.</li>
       <li><b>The ground is the level.</b> Beginner books are drawn in ink on notebook paper, intermediate in rice flour on red-oxide kaavi, advanced on the dark swept earth before dawn.</li>
     </ol>
     <p class="back-spec"><span lang="ta">${n} புள்ளி · ${TA_LINES[sol.loops]}</span> — ${esc(b.spec)}</p>
@@ -220,6 +229,7 @@ figure{margin:0}
 .pips{display:inline-flex;gap:5px}
 .pips i{width:9px;height:9px;border-radius:50%;border:1.6px solid currentColor}
 .pips i.on{background:currentColor}
+.cover .pips,.face .pips,.acc{color:var(--acc)}
 .title{position:absolute;left:52px;right:48px;margin:0;font:400 80px/1 'Tiro Tamil',serif;letter-spacing:-.014em;font-kerning:normal;text-wrap:nowrap;white-space:nowrap}
 .sub{position:absolute;left:56px;right:56px;margin:0;font:italic 400 27px/1.2 'Tiro Tamil',serif}
 .series-line{position:absolute;left:56px;right:56px;top:86px;margin:0;font:500 14px/1 'Anek Latin',sans-serif;letter-spacing:.14em;text-transform:uppercase;display:flex;gap:10px;align-items:center}
@@ -303,7 +313,7 @@ function page() {
     </div>
   </div>
 </section>
-<div class="section-h"><span>The core set and the range</span><span>14 covers · 720 × 888 px = 7.5 × 9.25 in</span></div>
+<div class="section-h"><span>The core set and the range</span><span>${COVERS.length} covers · 720 × 888 px = 7.5 × 9.25 in</span></div>
 <main class="covers">${covers}</main>
 <div class="section-h"><span>Full wrap</span><span>Back · spine · front — AI Context Engineering</span></div>
 <div class="wrap-holder">${wrap('ai-context-engineering')}</div>
