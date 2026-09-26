@@ -42,5 +42,9 @@
   "17-optical": {
     "name": "Interference",
     "pitch": "Every book is one field of black lines plus one spot colour, and the book's own idea is the force that bends them: a Gaussian swells them, a causal mask turns them, compaction squeezes them, attention makes two ring systems interfere. At 180px each field averages into one bold emblem; in the hand it shimmers. Line pitch gives level: coarse for beginner, fine for advanced."
+  },
+  "16-wit": {
+    "name": "Double Take",
+    "pitch": "One idea per book: a single flat-shape pun, metaphor or figure–ground trick you get in a second, and each has to be technically true. Context engineering is the mark that reads B across and 13 down; a spider spins a neural net; a retriever fetches a document for RAG; trees are drawn upside down, the way computer scientists draw them. One typeface, and three grounds (newsprint, red, black) that give level."
   }
 }

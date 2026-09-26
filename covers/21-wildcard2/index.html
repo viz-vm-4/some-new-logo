@@ -131,7 +131,7 @@ const MATS = {
 };
 const PLASTIC = {
   bone:   {base:'#ECE4D1', hi:'#FFFDF7', lo:'#9D947D', ink:'#6F6752'},
-  red:    {base:'#DE4A2E', hi:'#FF9277', lo:'#8A2412', ink:'#6E1A0B'},
+  red:    {base:'#E2533A', hi:'#FF9A80', lo:'#8A2412', ink:'#6A180A'},
   yellow: {base:'#F1BF2C', hi:'#FFEBA6', lo:'#9C7507', ink:'#6B5005'},
   grey:   {base:'#B8BDC1', hi:'#F3F5F6', lo:'#687076', ink:'#474E54'},
   lilac:  {base:'#B6A5E6', hi:'#EAE2FF', lo:'#62539A', ink:'#43387A'},
@@ -440,7 +440,7 @@ const PARTS = {
   commitGraph() {
     let g=ROD(`M8 70H286`,7)+ROD(`M76 70C100 70 100 22 124 22H176C200 22 200 70 216 70`,7), d='';
     [[20,70,13],[76,70,13],[216,70,16],[272,70,13],[124,22,12],[176,22,12]].forEach(([x,y,r])=>{ g+=C(x,y,r); d+=EDOT(x,y,r*.38); });
-    return {w:290,h:86,g,d,gates:[[150,22-12,'up'],[48,77,'down']],name:'Commit graph'};
+    return {w:290,h:86,g,d,gates:[[150,18.6,'up'],[48,73,'down']],name:'Commit graph'};
   },
   terminal() {
     const g=R(0,0,124,80,9);
@@ -730,7 +730,7 @@ function chip(k) {
 function buildIntro() {
   const fam = FAMILIES.map(([k,n,d])=>`<li>${chip(k)}<div><b>${n}</b> <code>${k==='gold'?'#D5A84C':PLASTIC[k].base}</code><br>${d}</div></li>`).join('');
   document.getElementById('families').innerHTML = fam;
-  const lv = ['beginner','intermediate','advanced'].map((l,i)=>`<div class="lvl">${svgWrap(250,26,levelRow(1,2,i+1,l,{...MATS.bench,text:'#14201D',dim:'#8A958F',ground:'#F3EEE2'}))}</div>`).join('');
+  const lv = ['beginner','intermediate','advanced'].map((l,i)=>`<div class="lvl">${svgWrap(320,26,levelRow(1,2,i+1,l,{...MATS.bench,text:'#14201D',dim:'#8A958F',ground:'#F3EEE2'}))}</div>`).join('');
   document.getElementById('levels').innerHTML = lv;
   document.getElementById('markbig').innerHTML = svgWrap(64,64,mark(4,4,1.75,'#1B463C'));
 }
@@ -766,7 +766,7 @@ const BOOKS = [
     lines:['Charlie and the','Sound Room'], size:84, sub:'Book III · Audio — Voice Agents',
     rows:P=>[ {h:1.1, max:1.45, parts:[P.waveform()]}, {h:1, parts:[P.mic(), P.bubble(84,60), P.bubble(70,52), P.speaker()]} ] },
   { slug:'charlie-reasoning-room', group:'factory', kitLabel:'INTELLIGENCE FACTORY · IV', level:'advanced', capsules:21, hours:6, plastic:'gold', mat:'factory', letter:'IV',
-    lines:['Charlie and the','Reasoning Room'], size:84, sub:'Book IV · Reinforcement learning, from bandits to reasoning',
+    lines:['Charlie and the','Reasoning Room'], size:84, sub:'Book IV · Reason — Reinforcement learning, from bandits to reasoning models',
     rows:P=>[ {h:1.1, parts:[P.bandit(), P.gridworld()]}, {h:.85, parts:[P.coin(), P.chain()]} ] },
   { slug:'decision-trees-from-scratch', group:'range', kit:14, level:'beginner', capsules:23, hours:5, plastic:'bone',
     lines:['Build Decision Trees','from Scratch'], size:76, sub:'Splits, impurity and leaves, one question at a time',

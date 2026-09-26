@@ -273,14 +273,14 @@ EMBLEMS['neural-networks-from-scratch'] = (g) => {
 
 /* Mathematical Foundations — gradient descent zig-zagging down a quadratic bowl (level sets = ellipses of the Hessian) */
 EMBLEMS['mathematical-foundations-for-ml'] = (g) => {
-  const X = 396, Y = 596, th = -18 * Math.PI / 180, ct = Math.cos(th), st = Math.sin(th);
+  const X = 376, Y = 590, th = -18 * Math.PI / 180, ct = Math.cos(th), st = Math.sin(th), A = 62, B = 23;
   const P = (u, v) => [X + u * ct - v * st, Y + u * st + v * ct];
-  const F = (x, y) => { const dx = x - X, dy = y - Y, u = dx * ct + dy * st, v = -dx * st + dy * ct; return Math.hypot(u / 72, v / 27); }; // level index
+  const F = (x, y) => { const dx = x - X, dy = y - Y, u = dx * ct + dy * st, v = -dx * st + dy * ct; return Math.hypot(u / A, v / B); }; // level index
   const band = ['@', '#', '=', '-', ':'];
-  for (let r = 31; r <= 66; r++) for (let c = 6; c <= 113; c++) { const k = F(cx(c), cy(r)); if (k < 5) g.put(c, r, band[Math.floor(k)], 1, 0, k < 1 ? 800 : 600); }
+  for (let r = 31; r <= 66; r++) for (let c = 6; c <= 113; c++) { const k = F(cx(c), cy(r)); if (k < 4.7) g.put(c, r, band[Math.floor(k)], 1, 0, k < 1 ? 800 : 600); }
   const lv = ['.5', '2', '4.5', '8', '12.5'];
-  for (let k = 1; k <= 4; k++) { const [x, y] = P(72 * k, 0), t = 'f=' + lv[k - 1], c = colOf(x), r = rowOf(y); g.clear(c - 1, r, t.length + 2, 1); g.text(c, r, t, 2, 0, 700); }
-  let u = -330, v = 92; const S = [[u, v]];
+  for (let k = 1; k <= 4; k++) { const [x, y] = P(A * k, 0), t = 'f=' + lv[k - 1], c = colOf(x), r = rowOf(y); g.clear(c - 1, r, t.length + 2, 1); g.text(c, r, t, 2, 0, 700); }
+  let u = -300, v = 84; const S = [[u, v]];
   for (let i = 0; i < 9; i++) { u *= .70; v *= -.62; S.push([u, v]); }
   const pts = S.map(([a, b]) => P(a, b));
   // clear a channel under the path so it reads over the bands
@@ -419,7 +419,7 @@ EMBLEMS['5d-parallelism'] = (g) => {
   brace(xs[0], xs[3] + tw - 1, 33, 'dp = 0'); brace(xs[4], xs[7] + tw - 1, 33, 'dp = 1');
   g.text(6, ys[0] + 6, 'pp', 1, 0, 700); g.text(6, ys[2] + 6, 'pp', 1, 0, 700);
   g.text(6, ys[0] + 7, '=0', 1, 0, 700); g.text(6, ys[2] + 7, '=1', 1, 0, 700);
-  g.text(6, ys[0] + 2, 'cp', 1, 0, 500); g.text(6, ys[0] + 3, '=0', 1, 0, 500); g.text(6, ys[1] + 2, 'cp', 1, 0, 500); g.text(6, ys[1] + 3, '=1', 1, 0, 500);
+  g.text(12, 65, 'each label is a coordinate: dp pp cp tp ep', 1, 0, 500);
 };
 
 /* Kernel Engineering (coming soon) — a tiled GEMM, C += A·B, caught mid-run: the kernel is still computing */
