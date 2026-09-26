@@ -814,7 +814,7 @@ function buildWrap(b) {
       `<div class="foot"><span>${b.capsules} capsules · ${b.hours} hours · ${b.level}</span><span>books.vizuara.ai</span></div>` +
     `</div>` +
     `<div class="spine"><div class="sm">${markSVG(K.B, K.ground, 26)}</div>` +
-      `<div class="st">${title}<span class="cur" style="margin:.1em 0 0;width:.7em;height:.42em;display:block"></span></div>` +
+      `<div class="st">${title}<span class="cur" style="margin:.14em 0 0;width:.66em;height:.42em;vertical-align:middle"></span></div>` +
       `<div class="sb">${meterHTML(b.level)}<span>VB</span></div></div>`;
   const front = buildCover(b, false); w.appendChild(front);
   for (const x of [720, 768]) for (const y of [-28, 896]) { const f = document.createElement('i'); f.className = 'fold'; f.style.left = x + 'px'; f.style.top = y + 'px'; w.appendChild(f); }

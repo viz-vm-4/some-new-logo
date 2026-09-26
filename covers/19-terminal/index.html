@@ -463,7 +463,7 @@ EMBLEM['charlie-language-room']=function(g){
     const v=Math.exp(Math.log(BW*.8)+(base-rr)/(base-top)*(Math.log(PEAK)-Math.log(BW*.8)));
     const lab=(v>=100?Math.round(v):v>=10?v.toFixed(0):v.toFixed(1))+' TFLOP/s · ';
     let k=0;
-    for(let c=x0;c<=x1;c++){ if(roof[c-x0]>=rr) continue; const q=g.get(rr,c); if(q.t>=.86) continue; g.put(rr,c,lab[k%lab.length],.5+.3*(rr-top)/(base-top)); k++; }
+    for(let c=x0;c<=x1;c++){ if(roof[c-x0]>=rr) continue; const q=g.get(rr,c); if(q.t>=.86) continue; g.put(rr,c,lab[k%lab.length],.62+.22*(rr-top)/(base-top)); k++; }
   }
   // axis
   for(let c=x0;c<=x1;c++) g.put(base,c,(c-x0)%Math.round((x1-x0)/12)===0?'+':'-',.8);
@@ -546,8 +546,8 @@ EMBLEM['charlie-reasoning-room']=function(g){
             ['10x24 + 7x24',['240 + 168','408'],['240 + 148','388']]];
   const X=[15,45,75,105], R0=7, R1=17, R2=28, R3=37, R4=43;
   const chip=(r,x,t,tone,s)=>{ const w=t.length+2; g.text(r,x-Math.floor(w/2),' '+t+' ',tone,s); };
-  const vline=(c,r0,r1,s)=>{ for(let r=r0;r<=r1;r++) g.put(r,c,'|',s?.84:.72,s?1:0); };
-  const hline=(r,c0,c1,s)=>{ for(let c=Math.min(c0,c1);c<=Math.max(c0,c1);c++) g.put(r,c,c===c0||c===c1?'+':'-',s?.84:.72,s?1:0); };
+  const vline=(c,r0,r1,s)=>{ for(let r=r0;r<=r1;r++){ g.put(r,c,' ',.95,s?1:0); g.put(r,c+1,' ',.95,s?1:0); } };
+  const hline=(r,c0,c1,s)=>{ for(let c=Math.min(c0,c1);c<=Math.max(c0,c1)+1;c++) g.put(r,c,' ',.95,s?1:0); };
   const HOT=[0,0];
   // root -> approaches
   vline(60,R0+1,R0+4,1); hline(R0+5,X[0],X[3],0); hline(R0+5,X[0],60,1);
