@@ -1,0 +1,14 @@
+# Final proof — 07-riso
+
+All 9 REVIEW must-fix items are fixed in the renders and PDFs: the math PDF now embeds only STIX Two for the labels, and no DejaVu or Liberation face appears anywhere. Every capsule and hour count matches books.json, and pdfpeek reports every PDF ok. Three minor defects remain, none blocking: the wrap's back attention strip doesn't match the front's last row, the Language Room's final token run is cut mid-step, and one Reasoning Room leaf collides with the door arch.
+
+Review must-fixes confirmed fixed: 9
+
+## Defects
+
+- **_wrap (build-llms-from-scratch back cover)** (minor) — The back-cover strip 'ATTENTION FROM THE LAST TOKEN' is described in NOTES and the wrap.js comment as the front matrix's last row, read across. It is not. wrap.js re-rolls the weights with a different RNG seed (slug + ':back') and a different noise amplitude (±0.7 vs ±0.8). The two panels of the same wrap show different data. Measured ink coverage on the wrap, front row 9 vs back strip: attends 0.08 vs 0.02, to 0.05 vs 0.04 (the order of those two is reversed), itself 0.20 vs 0.06, and 0.23 vs 0.08, those 0.28 vs 0.09, before 0.31 vs 0.15. Front and back strip are visibly different.
+  - *Fix:* Compute the last-row weights once, in the build-llms emblem or in a shared helper, and pass them to buildWrap. The back strip then draws the exact tones of front row i=8. Re-render _wrap.jpg.
+- **charlie-language-room** (minor) — The last line of the speculative-decoding paragraph reads: struck draft, key token, then one solid pink 'accepted' token directly followed by three dashed 'unverified' drafts and the cursor. The final line's limit (x0+118) cuts the token stream mid-step (step 7 has 3 accepted + reject + target), so an accepted token is shown with no target token closing its run. That breaks the cover's own grammar, and speculative decoding itself: every verification step ends in a target token, and accepted and unverified drafts cannot share a run. There are also only 3 dashed drafts although the code states k = 4.
+  - *Fix:* In EMBLEMS['charlie-language-room'], lay out the final line only up to a step boundary (break after a 'tgt' token, never mid-step), then append the dashed run with k = 4 outlines and the cursor.
+- **charlie-reasoning-room** (minor) — The rightmost leaf halftone of the search tree (about x 515–525, y 550–565 at 1x) runs into the door-arch stroke. About half of its green dots print on top of the black frame, so the leaf reads as cut off, unlike the other eight leaves, which sit clear inside the door.
+  - *Fix:* Keep leaves inside the door's inner radius minus a margin (about 8px): narrow the child offsets of the third arm (spec [[-30,0,30],92]), or shift the tree down or left so the last leaf clears the arch. Re-render the cover and its PDF.

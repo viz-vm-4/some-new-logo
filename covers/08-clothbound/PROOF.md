@@ -1,0 +1,16 @@
+# Final proof — 08-clothbound
+
+All five must-fixes hold up in the renders: type foil is even along each line, copper now clears the check on the deeper Peacock, the half-bound Charlie head rules are gone, the 14 PDFs are flat vector (0 images, 0 shadings, only Cormorant Garamond embedded), and Pi's device now shows one generic compaction cycle. Every capsule count and level matches books.json. What remains are four minor collisions or knock-out cuts inside devices on Pi, Reasoning Room, Decision Trees and SQL.
+
+Review must-fixes confirmed fixed: 5
+
+## Defects
+
+- **pi-vs-hermes-vs-codex** (minor) — The triptych device runs into its roundel frame, in both the JPG and the PDF. The ring has r=150 (stroke 148-152) and the inner ring r=141. The rounded panel corners (±107, -104 plus a 4.5px stroke) reach r≈150, so all four cross the inner ring and butt into the outer ring. The 6px plinth (M-112 104 H112) ends at r≈155, which is past the outer rim of the roundel. The thin sub-rule (±96 at y 115) crosses the inner ring at r≈150. This is the only roundel device on the shelf that leaves its frame, and on a hot-foil die the device and ring would merge where they meet.
+  - *Fix:* Wrap the triptych in scale(0.85), or rebuild it at xs=[-68,0,68], w=52, top=-92, bot=80 with the plinth at ±92, so that no point goes beyond r≈132 (8px or more clear of the inner ring). If the plinth is meant to be a chord touching the ring, end it 6px inside the inner ring instead of past the rim.
+- **charlie-reasoning-room** (minor) — The heavy best chain's 13px knock-out stroke (BLK, drawn from the base at y 124) cuts through the two thin chains next to it (ends at (-28,-16) open and (46,-50) solid). Both stop about 15-20px above the prompt node with knife-cut tips, and their lowest step dots are sliced in half (around x≈398 and x≈416, y≈712-716 on the cover). Two of the six 'sampled chains' therefore visibly don't come from the prompt, which contradicts NOTES ('One prompt fans into six reasoning chains'). The same cut is in the PDF.
+  - *Fix:* Start the bold chain's BLK knock-out above the fan-out (e.g. from y≈96 up rather than from the base at 124), or narrow it to about 8px. Alternatively, spread the chains' origins across the top edge of the prompt node (x -9…+9) so the thin chains stay outside the knock-out. Skip any step dot that falls inside the knock-out.
+- **decision-trees-from-scratch** (minor) — The tree is off-centre (it spans x -106…+120), so the rightmost leaf 'bbb' at (110,82) sits at r≈137. Its open ring (outer radius 10) reaches r≈147 and crosses the inner roundel ring (r 141). In the render and the PDF, the leaf outline fuses with the ring at about (484,687).
+  - *Fix:* Scale the dtree group by 0.92, or centre the tree (shift x by -9) and move the bottom row up by about 8px, so that the bbb leaf ends at r≤134.
+- **sql-masterclass** (minor) — The thin outer bars of the ⋈ device (x=±122, y -78…78) end at r≈144.8, so all four bar tips cut about 7px through the inner roundel ring (r 141). This is visible at full size in the render and the PDF, where the bar ends touch the ring at the top and bottom on both sides.
+  - *Fix:* Scale the sql device by 0.93 (the bar ends then sit at r≈135), or shorten and move the bars in to x=±118, y=±66.

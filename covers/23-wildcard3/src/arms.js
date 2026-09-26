@@ -253,17 +253,25 @@ ARMS['pi-vs-hermes-vs-codex'] = (slug) => {
 };
 
 // 5D Parallelism — chequy of 32; each axis of the mesh is its own line of partition
-ARMS['5d-parallelism'] = () => {
+ARMS['5d-parallelism'] = (uid = '5d') => {
+  const TP = { p: 30, a: 12, origin: 7.5 }, EP = { p: 50, a: 11, origin: 0 };
   const subs = [];
   subs.push(rightOfPts(200, 'plain'));                                                    // data
-  for (const x of [100, 300]) subs.push(rightOfPts(x, 'indented', { p: 30, a: 12, origin: 7.5 })); // tensor (teeth cross each fess line mid-edge, never at a tip)
+  for (const x of [100, 300]) subs.push(rightOfPts(x, 'indented', TP));                  // tensor
   subs.push(below(240, 'embattled', { p: 50, a: 12, origin: -12.5 }));                   // pipeline
   for (const y of [120, 360]) subs.push(below(y, 'wavy', { p: 50, a: 12, origin: -12.5 })); // context
-  for (const y of [60, 180, 300, 420]) subs.push(below(y, 'dovetailed', { p: 50, a: 11, origin: 0 })); // expert
+  for (const y of [60, 180, 300, 420]) subs.push(below(y, 'dovetailed', EP));            // expert
   const d = subs.map(pathOf).join('');
-  // In the point, the outer squares of the last rank (0,7) and (3,7) survive the shield's curve only as
-  // specks cut off by the tensor teeth. Give each the tincture of its two neighbours so no speck is left.
-  const specks = `<path d="M294 414.5H430V520H294Z" fill="${T.sable}"/><path d="M-30 414.5H106V520H-30Z" fill="${T.or}"/>`;
+  // In the point, squares (0,7) and (3,7) survive the shield's curve only as specks cut off by the tensor
+  // teeth. Each is repainted, exactly along its own lines, in the tincture of its two neighbours.
+  const leftOf = (x) => [...along('indented', [x, -60], [x, 560], { ...TP, u0: TP.origin + 60 }), [-60, 560], [-60, -60]];
+  // fills reach 2 units above the expert line to swallow its stroke; the stroke-covering pass stays below it
+  const cid = 'rank8-' + uid;
+  const specks = `<clipPath id="${cid}a"><path d="${pathOf(below(418, 'dovetailed', EP))}"/></clipPath>` +
+    `<clipPath id="${cid}b"><path d="${pathOf(below(420, 'dovetailed', EP))}"/></clipPath>` +
+    `<g clip-path="url(#${cid}a)"><path d="${pathOf(leftOf(100))}" fill="${T.or}"/>` +
+    `<path d="${pathOf(rightOfPts(300, 'indented', TP))}" fill="${T.sable}" stroke="${T.sable}" stroke-width="4"/></g>` +
+    `<g clip-path="url(#${cid}b)"><path d="${pathOf(leftOf(100))}" fill="none" stroke="${T.or}" stroke-width="4"/></g>`;
   return `<rect width="400" height="480" fill="${T.or}"/><path d="${d}" fill="${T.sable}" fill-rule="evenodd"/>` +
     `<path d="${d}" fill="none" stroke="${S}" stroke-width="3"/>` + specks;
 };

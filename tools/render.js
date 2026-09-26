@@ -44,15 +44,40 @@ function curlFetch(url, ua) {
   return { status, contentType: ct, body: fs.readFileSync(body) };
 }
 
-// A cover laid out at a fractional y (e.g. under a caption with a non-integer line-height)
-// screenshots as 720x889 with a sliver of page background. Nudge it onto whole pixels first.
-async function snapped(el, shoot) {
-  const b = await el.boundingBox();
-  const dx = Math.round(b.x) - b.x, dy = Math.round(b.y) - b.y;
-  const nudge = Math.abs(dx) > 0.001 || Math.abs(dy) > 0.001;
-  if (nudge) await el.evaluate((e, d) => { e.dataset.prevTranslate = e.style.translate; e.style.translate = `${d[0]}px ${d[1]}px`; }, [dx, dy]);
-  try { await shoot(); } finally {
-    if (nudge) await el.evaluate((e) => { e.style.translate = e.dataset.prevTranslate || ''; delete e.dataset.prevTranslate; });
+// Screenshots must start on a whole pixel, or the first/last row blends with the page behind
+// (a cover laid out at y=100.5 comes out with a grey hairline). So each capture isolates its
+// element at the page origin, exactly like the PDF path: siblings hidden, ancestors collapsed
+// to plain blocks. Inline styles are saved and restored, so the page is untouched afterwards.
+async function isolated(page, sel, shoot, width) {
+  const restore = await page.evaluate(({ sel, width }) => {
+    const el = document.querySelector(sel);
+    const saved = [];
+    const set = (n, props) => {
+      saved.push([n, n.getAttribute('style')]);
+      for (const [k, v] of Object.entries(props)) n.style.setProperty(k, v, 'important');
+    };
+    for (let node = el; node.parentElement; node = node.parentElement) {
+      const parent = node.parentElement;
+      for (const sib of parent.children) if (sib !== node && sib.tagName !== 'SCRIPT' && sib.tagName !== 'STYLE') set(sib, { display: 'none' });
+      set(parent, { display: 'block', position: 'static', width: width + 'px', 'min-width': '0', 'max-width': 'none',
+        height: 'auto', 'min-height': '0', margin: '0', padding: '0', border: '0', transform: 'none',
+        float: 'none', overflow: 'visible', 'box-shadow': 'none' });
+    }
+    const pos = getComputedStyle(el).position;
+    set(el, { margin: '0', transform: 'none', float: 'none', ...(pos === 'absolute' || pos === 'fixed' || pos === 'sticky' ? { position: 'relative', inset: 'auto' } : {}) });
+    window.scrollTo(0, 0);
+    window.__vzRestore = saved;
+    const r = el.getBoundingClientRect();
+    return { x: r.x, y: r.y, w: r.width, h: r.height };
+  }, { sel, width });
+  try {
+    await page.waitForTimeout(120);
+    await shoot({ x: 0, y: 0, width: Math.round(restore.w), height: Math.round(restore.h) }, restore);
+  } finally {
+    await page.evaluate(() => {
+      for (const [n, st] of (window.__vzRestore || []).reverse()) { if (st === null) n.removeAttribute('style'); else n.setAttribute('style', st); }
+      delete window.__vzRestore;
+    });
   }
 }
 
@@ -84,8 +109,10 @@ async function snapped(el, shoot) {
     const box = await el.boundingBox();
     if (Math.round(box.width) !== 720 || Math.round(box.height) !== 888)
       console.warn(`! ${slug}: cover box is ${box.width}x${box.height}, expected 720x888`);
-    await el.scrollIntoViewIfNeeded();
-    await snapped(el, () => el.screenshot({ path: path.join(outDir, `${slug}.png`) }));
+    await isolated(page, `.cover[data-slug="${slug}"]`, (clip, b) => {
+      if (Math.abs(b.x) > 0.01 || Math.abs(b.y) > 0.01) console.warn(`! ${slug}: isolated cover sits at ${b.x},${b.y}`);
+      return page.screenshot({ path: path.join(outDir, `${slug}.png`), clip });
+    }, 720);
     done.push(slug);
   }
   // 1x JPGs for the gallery
@@ -101,18 +128,20 @@ async function snapped(el, shoot) {
   await p1.evaluate(() => document.fonts.ready); await p1.waitForTimeout(800);
   for (const slug of pdfOnly ? [] : done) {
     const el = await p1.$(`.cover[data-slug="${slug}"]`);
-    await el.scrollIntoViewIfNeeded();
-    await snapped(el, () => el.screenshot({ path: path.join(outDir, `${slug}.jpg`), type: 'jpeg', quality: 90 }));
+    await isolated(p1, `.cover[data-slug="${slug}"]`, (clip) =>
+      p1.screenshot({ path: path.join(outDir, `${slug}.jpg`), type: 'jpeg', quality: 90, clip }), 720);
   }
   if (!only && !pdfOnly) {
     // Print wraps (back + spine + front), if the page has any: renders/_wrap.jpg, _wrap-2.jpg, ...
     for (const f of fs.readdirSync(outDir)) if (/^_wrap(-\d+)?\.jpg$/.test(f)) fs.unlinkSync(path.join(outDir, f));
-    const wraps = await p1.$$('.wrap');
-    for (let i = 0; i < wraps.length; i++) {
-      await wraps[i].scrollIntoViewIfNeeded();
+    const wrapCount = await p1.$$eval('.wrap', (els) => els.map((e, i) => { e.dataset.vzWrap = String(i); return i; }).length);
+    for (let i = 0; i < wrapCount; i++) {
       const name = i ? `_wrap-${i + 1}.jpg` : '_wrap.jpg';
-      await snapped(wraps[i], () => wraps[i].screenshot({ path: path.join(outDir, name), type: 'jpeg', quality: 88 }));
+      const w = await p1.$eval(`.wrap[data-vz-wrap="${i}"]`, (e) => Math.ceil(e.getBoundingClientRect().width));
+      await isolated(p1, `.wrap[data-vz-wrap="${i}"]`, (clip) =>
+        p1.screenshot({ path: path.join(outDir, name), type: 'jpeg', quality: 88, clip }), w);
     }
+    const wraps = { length: wrapCount };
     if (wraps.length) console.log(`Rendered ${wraps.length} print wrap(s)`);
   }
   if (wantSheet) await page.screenshot({ path: path.join(outDir, `_sheet.png`), fullPage: true });

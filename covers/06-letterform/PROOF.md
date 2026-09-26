@@ -1,0 +1,14 @@
+# Final proof — 06-letterform
+
+All four must-fixes are confirmed in the renders: no DejaVu in the transformers PDF or the chart, every JPG is 720×888 with no page-colour edge, the kernel hatch is paper at 3px on a 5px pitch with the runs on the 36px margins, and both Unicode names are corrected. Titles, captions, margins, levels and capsule/hour counts all match books.json, and pdfpeek shows every PDF matching its render; the only issues are three minor ones in the wrap chart glyph, the presentation-page figcaptions and the missing _wrap.jpg.
+
+Review must-fixes confirmed fixed: 4
+
+## Defects
+
+- **back-cover chart (print wrap, ai-agents-bootcamp cell)** (minor) — The chart cell labelled U+21C4 (RIGHTWARDS ARROW OVER LEFTWARDS ARROW) prints an arrow pair with the leftwards arrow on top and the rightwards arrow underneath. That is the ⇆ U+21C6 shape. The Google-served Libertinus Math has its uni21C4 and uni21C6 outlines swapped: in a fontTools/PIL render of that font's U+21C4 the top arrowhead is on the left, and DejaVu draws the same codepoint the other way round. The browser render of the wrap at 3x shows the same thing. So the codepoint label contradicts the glyph printed next to it, on the back of every wrap.
+  - *Fix:* Outline the correct ⇄ (→ over ←) as an SVG path for that cell. As a stopgap, set the character U+21C6 in Libertinus Math (whose outline draws → over ←) and keep the label U+21C4. Then re-render the wrap and confirm that the top arrow points right.
+- **index.html presentation figcaptions** (minor) — Five of the rationale sentences under the covers on the client presentation page fall back to system fonts. Chromium's CSS.getPlatformFontsForNode reports ≤ in Liberation Serif (decision-trees), and ∈ (ai-context-engineering), ℱ (charlie-sound-room), ≻ (rlhf-from-scratch) and 𝔼 (charlie-reasoning-room) in DejaVu Sans. On _sheet.png the ≤ is visibly a thin mismatched glyph inside the Libertinus Serif sentence. The covers, the cover PDFs and the wrap are clean, but NOTES says there is 'no fallback font anywhere'.
+  - *Fix:* In the figcaption `why` strings, wrap the maths characters in <span class="f-math"> (Libertinus Math), the same way the wrap's back-cover ∂ is wrapped. Re-check with getPlatformFontsForNode or a print-to-PDF font listing, then regenerate _sheet.png.
+- **renders/_wrap.jpg** (minor) — The delivered renders folder has no print-wrap render (no _wrap*.jpg), although index.html contains a .wrap (back, spine, front for Mathematical Foundations) and NOTES describes it. The renders were made before tools/render.js started writing wraps, so the client and printer get no proof of the back-cover chart or spine. A fresh render to scratch produced a clean wrap apart from the ⇄ cell above.
+  - *Fix:* Re-run `node tools/render.js covers/06-letterform/index.html --pdf` so that renders/_wrap.jpg is written, and deliver it with the covers after the ⇄ fix.
