@@ -62,8 +62,9 @@ small, top left, next to "VIZUARA BOOKS", and never louder than the title.
   straight rulings drawn in graphite. It carries linear algebra (straight lines) and calculus (curvature,
   the saddle point) at once, in the lineage of 19th-century mathematical models.
 - **Neural Networks from Scratch**: a string construction in the Gabo and Hepworth tradition. Three
-  upright oak boards are the layers (4, 5 and 2 brass pins, the neurons), and black linen threads join
-  every pin to every pin on the next board. Each thread's thickness is its weight.
+  upright oak boards are the layers, with 4, 5 and 2 brass pins (the neurons) standing proud of their
+  front edges. Black linen threads run in front of the boards from every pin to every pin on the next
+  board, so both ends of every thread are visible. Each thread's thickness is its weight.
 - **Build LLMs from Scratch**: a Brancusi-like column of twelve *identical* modules in oxblood glaze, the
   same block repeated (GPT-2 small has twelve).
 - **5D Parallelism**: a rhombic icosahedron in Carrara marble. It is the parallel projection of a
@@ -142,9 +143,10 @@ I checked every claim against the renders before changing anything. All four mus
    ink is near-black oxide (#3A1A12). I did not only turn the camera to -25°: standing plates side by side
    shadowed each other's faces under any key light, so the patches now face the camera on a rail, and the
    disc reads on every tile.
-3. *"Oxblood" rendering coral*: partly confirmed. The median lit face was already oxblood-ish
-   (141,54,49), but the top 10% of lit faces reached coral (223,108,103). The albedo is lowered so lit
-   faces sit around #8E2B25 with a gloss highlight, and extra fill keeps the shadow faces off black.
+3. *"Oxblood" rendering coral*: confirmed. After the first fix, the mirror-like clear coat still washed
+   the key-lit facets pink. The coat is now satin (roughness 0.24, strength 0.45), and an object-only fill
+   card on the right lifts the shadow facets without touching the paper-key wall value. Measured at 2x:
+   lit facets #8D3B36–#A24944, shadow facets 56–68/255.
 4. *Context stone list*: confirmed. The medium line and the wrap's back copy both now read "travertine,
    slate, marble, sandstone, terracotta, serpentine".
 

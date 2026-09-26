@@ -126,6 +126,11 @@ The wrap uses a 0.75 in spine carrying the character, the title reading top to b
    - (c) The series name is set under the numeral, not in the caption's right slot. For 𝔼, the official name plus "THE INTELLIGENCE FACTORY · IV · ADVANCED" would overflow the 648 px measure.
    - (d) Two spots are now specified; see Palette.
 
+**Final proof**
+- Google's Libertinus Math has the U+21C4 and U+21C6 outlines swapped, so the chart's ⇄ (→ over ←) is now drawn as an SVG path.
+- In the page's figcaptions, maths symbols are wrapped in Libertinus Math. CDP `getPlatformFontsForNode` now reports only Libertinus Serif, Libertinus Math, Chivo Mono and Archivo across the whole page.
+- `renders/_wrap.jpg` is now rendered.
+
 **Still open**
 - Advanced characters are about 3:1 against black. That is fine for a 500 px image, but it depends on spot 2 being proofed as bright as #3548EE.
 

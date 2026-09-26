@@ -144,3 +144,14 @@ Beyond the review, as the coordinator asked, the flagged "illustrative" emblems 
 - **Iris:** Fisher's data.
 - **Roofline:** already computed from H100 peak specs, and now documented as such.
 - **The eye:** still procedural, but its bytes are now the true luminance of the image that is shown.
+
+## Proof response
+
+- **Top margin:** the tree's upper leaf chips moved to row 5; the 5-cube is compressed so rank 00 sits on row 3; the wrap's listing starts on row 3.
+- **Sound room:** the gap label is now `240ms`, with a blank column on each side.
+- **Context:** TOOLS now holds two complete, valid schemas; the third tool was dropped rather than cut mid-object.
+- **Roofline:** ticks are drawn at true doublings, `col(2**k)`, so they sit under their labels.
+- **Pi vs Hermes vs Codex:**
+  - The summaries now state only what is in their transcripts (no "next: commit" and no "flag").
+  - All three pour through one fixed funnel: the same `\ … /` walls, 32 columns tapering to 10 over the same rows, into the same MEMORY block. "Drawn identically" is now literally true.
+- **Wrap:** the stdout command reads `python mnist_from_scratch.py | tail -2`, which is exactly the two lines shown.

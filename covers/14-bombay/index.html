@@ -583,14 +583,14 @@ function mixLine(items, H0, sh, measure){
     let x = 0, depth = 0; const parts = [];
     items.forEach((it, i) => {
       // x is always the right edge of the previous item's ink (incl. keyline and shadow)
-      if (i) x += H * (it.s || items[i-1].s ? 0.2 : 0.24);
+      if (i) x += (it.s || items[i-1].s) ? Math.max(10, H*0.2) : H*0.24;
       if (it.t || it.tt) {
         const txt = it.t || it.tt;
         const u = (it.r || 0.56) * H;
         const st = it.t ? sh.letter : tradeStyle(sh, H);
         const p = Board.paint(txt, u, H, st, it.tt ? {track:0.7, space:0.7} : {});
-        parts.push(`<g transform="translate(${F(x)} 0)">${p.svg}</g>`);
-        x += p.w; depth = Math.max(depth, p.depth);
+        parts.push(`<g transform="translate(${F(x + p.o)} 0)">${p.svg}</g>`);
+        x += p.o + p.w + p.o + p.depth; depth = Math.max(depth, p.depth);
       } else if (it.s) {
         const size = H * (it.k || 1.0), ink = scriptInk(it.s, size), {sh: sd, sw} = scriptMetrics(size);
         const ox = x + ink.left + sw/2;
@@ -602,7 +602,7 @@ function mixLine(items, H0, sh, measure){
         x += tg.w;
       }
     });
-    const w = x + depth;
+    const w = x;
     if (w <= measure || pass === 3) return {svg: parts.join(''), w, h: H, depth};
     H *= (measure / w) * 0.995;
   }
@@ -681,7 +681,7 @@ function label(book, sh, x, y, w, h){
 }
 
 /* ---------- level stamp (perforated) ---------- */
-function stamp(level, x, y){
+function stamp(level, x, y, mini=false){
   const Lv = LEVEL[level], w = 94, h = 104, pr = 4.2, step = 10.5;
   // perforated outline as one vector path: walk the edges, biting a half-hole at each perforation
   const bites = (len) => { const c = []; for (let i = step/2; i < len; i += step) c.push(i); return c; };
@@ -694,8 +694,12 @@ function stamp(level, x, y){
   d += `L0 ${h}`;
   bites(h).reverse().forEach((c) => d += `L0 ${F(c+pr)}A${pr} ${pr} 0 0 0 0 ${F(c-pr)}`);
   d += 'Z';
-  const num = Board.fit(String(level), 48, 60, {rmax:0.72});
+  const num = Board.fit(String(level), mini ? 62 : 48, 60, {rmax:0.72});
   const nP = Board.paint(String(level), num.u, num.H, {fillTop:Lv.num, outline:Lv.field, o:0, depth:0});
+  if (mini) return `<g transform="translate(${x} ${y})">
+    <path d="${d}" fill="${P.paper}"/>
+    <rect x="8" y="8" width="${w-16}" height="${h-16}" fill="${Lv.field}" stroke="${P.coal}" stroke-width="2.5"/>
+    <g transform="translate(${F((w-nP.w)/2)} ${F((h-num.H)/2)})">${nP.svg}</g></g>`;
   return `<g transform="translate(${x} ${y})">
     <path d="${d}" transform="translate(3 4)" fill="${P.coal}" fill-opacity=".45"/>
     <path d="${d}" fill="${P.paper}"/>
@@ -966,7 +970,7 @@ const EMBLEM = {
     s += R_(mx + mw - 2, beltY - 46, 24, 32, P.coal, 0);
     // tokens: newest (red) at the outlet, oldest furthest along
     const tx0 = mx + mw + 30;
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 4; i++) {
       const x = tx0 + i*46;
       s += R_(x, beltY - 36, 34, 34, i===0?P.red:P.paper, 2.6);
       s += Ln(x + 8, beltY - 19, x + 26 - (i%3)*5, beltY - 19, 3, i===0?P.paper:P.coal);
@@ -1163,7 +1167,8 @@ const EMBLEM = {
     s += R_(114, my - 10, 20, 20, P.red, 2.6);
     s += tagT(62, my + 72, 'TEACHER', 'middle', 12);
     const dx = tx0 + st + tc/2;
-    s += `<path d="M134 ${my}C 160 ${my}, 150 12, ${dx - 30} 12 S ${dx} 12, ${dx} ${oy - 12}" fill="none" stroke="${P.red}" stroke-width="5" stroke-dasharray="10 6"/>` + arrowHead(dx, oy - 1, Math.PI/2, 15, P.red);
+    const ax = sx - 14;
+    s += `<path d="M134 ${my}H${ax - 12}Q${ax} ${my} ${ax} ${my - 12}V26Q${ax} 12 ${ax + 14} 12H${dx - 14}Q${dx} 12 ${dx} 26V${oy - 12}" fill="none" stroke="${P.red}" stroke-width="5" stroke-dasharray="10 6"/>` + arrowHead(dx, oy - 1, Math.PI/2, 15, P.red);
     return {svg:s, center:[sx + sw/2, bY + 40], rays:44};
   },
 
@@ -1301,10 +1306,10 @@ function buildWrap(){
   const spine = `<g transform="translate(${W} 0)">
     <rect width="${SP}" height="${H}" fill="${sh.board}"/>
     <path d="M6 16V${H-16}M${SP-6} 16V${H-16}" stroke="${sh.rule}" stroke-width="2"/>
-    <g transform="translate(${SP/2 - 21} 26) scale(0.5)">${stamp(b.level,0,0)}</g>
+    <g transform="translate(${F(SP/2 - 94*0.42/2)} 30) scale(0.42)">${stamp(b.level,0,0,true)}</g>
     <g transform="translate(${F(SP/2 + st.H/2 + 1)} ${F(140 + (600 - sp.w)/2)}) rotate(90)">${sp.svg}</g>
-    <g transform="translate(${SP/2 - 18} ${H - 118})">${vBadge(36, sh.ink, sh.board)}</g>
-    <text transform="translate(${SP/2 + 6} ${H - 64}) rotate(90)" text-anchor="start" font-family="Anek Devanagari" font-weight="600" font-size="13" fill="${sh.ink}">विज़ुआरा</text>
+    <g transform="translate(${SP/2 - 18} ${H - 158})">${vBadge(36, sh.ink, sh.board)}</g>
+    <text transform="translate(${SP/2 + 6} ${H - 108}) rotate(90)" text-anchor="start" font-family="Anek Devanagari" font-weight="600" font-size="13" fill="${sh.ink}">विज़ुआरा</text>
   </g>`;
   // back: a painter's rate-board that keys the whole system
   const tt = Board.fit('AI CONTEXT ENGINEERING', 46, 560, {rmax:0.6});
@@ -1324,8 +1329,14 @@ function buildWrap(){
     rate += `<text x="${rx + rw - 24}" y="${y}" text-anchor="end" ${ANEK} font-weight="700" font-size="14" letter-spacing="1.5" fill="${P.coal}">${cname.toUpperCase()}</text>`;
   });
   rate += `<line x1="${rx + 20}" x2="${rx + rw - 20}" y1="${ry + 262}" y2="${ry + 262}" stroke="${P.coal}" stroke-width="2"/>`;
-  rate += `<text x="${rx + 24}" y="${ry + 292}" ${ANEK} font-weight="700" font-size="14" letter-spacing="2" fill="${P.coal}">THE STAMP TELLS THE LEVEL</text>`;
-  [1,2,3].forEach((l, i) => { rate += `<g transform="translate(${rx + 300 + i*74} ${ry + 268}) scale(0.4)">${stamp(l,0,0)}</g>`; });
+  rate += `<text x="${rx + 24}" y="${ry + 294}" ${ANEK} font-weight="700" font-size="14" letter-spacing="2" fill="${P.coal}">LEVEL STAMP</text>`;
+  let lx = rx + 150;
+  [1,2,3].forEach((l) => {
+    const word = LEVEL[l].word, ww = textW(word, `700 12px "Anek Latin"`, 'condensed') + word.length*0.8;
+    rate += `<g transform="translate(${F(lx)} ${ry + 270}) scale(0.36)">${stamp(l,0,0,true)}</g>`;
+    rate += `<text x="${F(lx + 40)}" y="${ry + 294}" ${ANEK} font-weight="700" font-size="12" letter-spacing="0.8" fill="${P.coal}">${word}</text>`;
+    lx += 40 + ww + 26;
+  });
   const back = `<g>
     <rect width="${W}" height="${H}" fill="${sh.board}"/>
     <path d="${notchRect(16,16,W-32,H-32,22)}" fill="none" stroke="${sh.rule}" stroke-width="4"/>

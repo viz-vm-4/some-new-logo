@@ -63,7 +63,7 @@ The pips carry the level by themselves in greyscale and on the Cocoa sub-series,
 ## Spec rules added in revision
 - **Moulded text only on plastic.** Every label sits on a part or a plate, never on bare card.
 - **No glyph may fall back to a system font.** Subscripts and superscripts are real Archivo digits in `<tspan>`s: the `rich()` markup `x_1`, `h^1_2`. Symbols missing from the loaded fonts (≤, π, Σ, ∇…) are drawn as moulded paths. The PDFs embed only Archivo and IBM Plex Mono.
-- **Test-shot stamp** (all coming-soon covers): the stamp is rotated −6°, at `right:40px; top:312px`. It deliberately overprints the frame's top-right corner and sits above the sprue, as a rubber stamp would.
+- **Test-shot stamp** (all coming-soon covers): the stamp is rotated −6°, at `right:40px; top:302px`. It deliberately overprints the frame's top-right corner and sits above the sprue, as a rubber stamp would. Its small second line has a card-coloured knockout, so the rail never cuts the lettering.
 - **Silhouette rule** (against labelled-brick monotony): every emblem must have a unique silhouette in a blurred 180 px thumbnail, and at most one row of labelled rectangles. Prefer non-rectangular parts (glyphs, discs, curves, trees, funnels). Pi vs Hermes, Context Engineering and Robot Learning were redrawn to meet it.
 
 ## System anatomy (720 × 888, 36 px margins; critical text ≥ 30 px from trim)
@@ -94,7 +94,7 @@ The pips carry the level by themselves in greyscale and on the Cocoa sub-series,
 - **VZ-020 R Masterclass.** Least squares, moulded. The fitted line is the runner, each observation hangs off it by a gate as long as its residual, and `lm(y ~ x)` is moulded on the axis.
 - **VZ-024 CNN Fundamentals.** The input map with the kernel's footprint, the 3×3 Sobel kernel with its weights, and the output map with the cell it just filled. Below them, the feature maps shrink spatially while channel depth grows from 2 to 8 layers.
 - **VZ-037 Build a DeiT from Scratch.** A picture cut into 3×3 patches, and the token row with the learned CLS and DIST tokens, both fed like the patches. CLS goes to the class head and DIST to the distillation head. The CNN teacher's runner comes down the right-hand side into the distillation head through a TARGET plate: the teacher supervises that head.
-- **VZ-040 Modern Robot Learning.** Learning from demonstration. The demonstrated trajectory is the main runner, with eight action chunks a₁–a₈ gated along it (spaced by arc length). A camera observation feeds a π(a | o) policy plate at the start, and the gripper jaws wait at the goal. One arm link is the only hardware.
+- **VZ-040 Modern Robot Learning.** Learning from demonstration. The demonstrated trajectory is the main runner, with eight action chunks a₁–a₈ gated along its convex side (spaced ≥ 60 px apart by arc length along that offset curve). A camera observation feeds a π(a | o) policy plate at the start, and the gripper jaws wait at the goal. One arm link is the only hardware.
 - **VZ-051 Kernel Engineering** (coming soon). Tiled GEMM: A tiles and B tiles meet in one C₁₂ tile, with the HBM, SMEM and register hierarchy beside it. It is shown as a clear test shot.
 - **VZ-046 Charlie I · Language Room.** Generation, one token at a time. Every token leaves a K and a V in the cache. Position 6 (the '?', K₆ and V₆) is hollow: pending until the token is produced. p(next) sits on its own plate below.
 - **VZ-047 Charlie II · Vision Room.** An eye cut into 16 patches (ViT), then [CLS], the position embedding, the head and the answer, "eye".

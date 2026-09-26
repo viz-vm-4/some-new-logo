@@ -215,7 +215,7 @@ ART['neural-networks-from-scratch'] = () => {
 // Babel, rebuilt honestly: seven identical blocks (a decoder is a stack of identical layers), an eighth on the hook.
 ART['build-llms-from-scratch'] = () => {
   const out = [], base = 584, th = 50, jt = 4, W = 264, X = 360 - W/2;
-  const glyphs = ['A','अ','λ','ط','言','Я','あ','Ω','क','ж','語','ه','e','ह','β','и'];
+  const glyphs = ['A','अ','λ','ط','言', 'Я','e','क','Ω','ه', 'β','ж','あ','ह','A', 'ط','語','и','अ','λ', 'e','Ω','Я','言','क', 'ه','A','β','ж','あ', 'ह','λ','ط','e','語'];
   let gi = 0;
   const block = (y, col, lettered) => {
     let s = rect(X, y, W, th, col);
@@ -461,21 +461,22 @@ ART['pretraining-mini-kimi-k3'] = () => {
   const wheel = (x,y,r=15) => circ(x, y, r, C.paper) + circ(x, y, 5, C.ink);
   const engine = `
     ${P('M-84 -44 L-110 -6 L-84 -6 Z', C.red)}
-    ${rect(-80, -96, 118, 58, C.red)}${rect(6, -142, 72, 110, C.red)}
+    ${rect(-80, -96, 118, 58, C.red)}${rect(6, -142, 72, 106, C.red)}
     ${rect(-2, -152, 88, 14, C.paper)}${rect(22, -126, 36, 34, C.ink)}
     ${rect(-62, -140, 26, 50, C.red)}${rect(-68, -148, 38, 12, C.paper)}
     <path d="M-26 -96 a18 18 0 0 1 36 0 z" fill="${C.yellow}"/>
     ${rect(-88, -44, 176, 12, C.ink)}
-    ${wheel(-54,-15)}${wheel(-10,-15)}${wheel(46,-20,20)}
     ${circ(-40,-172,16,C.paper)}${circ(-10,-206,22,C.paper)}${circ(34,-240,28,C.paper)}`;
-  const car = (col, top) => `${rect(-48,-84,96,52,col)}${top}${rect(-52,-38,104,10,C.ink)}${rect(-62,-54,16,6,C.paper)}${wheel(-26,-15)}${wheel(26,-15)}`;
-  const cars = [[176, engine, 66], [96, car(C.yellow, rect(-48,-96,96,12,C.paper)), 26], [96, car(C.blue, [0,1,2].map(i=>rect(-36+i*26,-74,18,20,C.paper)).join('')), 26]];
+  const car = (col, top) => `${rect(-48,-84,96,52,col)}${top}${rect(-52,-38,104,10,C.ink)}${rect(-62,-54,16,6,C.paper)}`;
+  const cars = [[176, engine, 66, [[-54,15],[-10,15],[46,20]]], [96, car(C.yellow, rect(-48,-96,96,12,C.paper)), 26, [[-26,15],[26,15]]], [96, car(C.blue, [0,1,2].map(i=>rect(-36+i*26,-74,18,20,C.paper)).join('')), 26, [[-26,15],[26,15]]]];
   const total = cars.reduce((a,c)=>a+c[0],0) + 14*(cars.length-1);
   let s = mid - total/2;
-  cars.forEach(([L, g, wb])=>{
-    const p1 = at(s + L/2 - wb), p2 = at(s + L/2 + wb);
-    const ang = Math.atan2(p2[1]-p1[1], p2[0]-p1[0])*180/Math.PI;
-    out.push(`<g transform="translate(${f((p1[0]+p2[0])/2)} ${f((p1[1]+p2[1])/2)}) rotate(${f(ang)})">${g}</g>`);
+  cars.forEach(([L, g, wb, wheels])=>{
+    const sc = s + L/2, p1 = at(sc - wb), p2 = at(sc + wb);
+    const a = Math.atan2(p2[1]-p1[1], p2[0]-p1[0]), M = [(p1[0]+p2[0])/2, (p1[1]+p2[1])/2];
+    // each wheel sits on the rail at its own point: the rail's local y under that wheel, minus the radius
+    const wh = wheels.map(([x,r])=>{ const W = at(sc + x); const ly = -Math.sin(a)*(W[0]-M[0]) + Math.cos(a)*(W[1]-M[1]); return wheel(x, f(ly - r), r); }).join('');
+    out.push(`<g transform="translate(${f(M[0])} ${f(M[1])}) rotate(${f(a*180/Math.PI)})">${g}${wh}</g>`);
     s += L + 14;
   });
   return out.join('');
@@ -536,7 +537,7 @@ const belt = (fg, bg) => {
   [96, 360, 624].forEach(x=> s += rect(x-7, 530, 14, 60, fg));
   return s;
 };
-const ticket = (n, col, txt) => `<g transform="translate(48 44)"><path d="M0 0 H256 V13 A8 8 0 0 0 256 29 V42 H0 V29 A8 8 0 0 0 0 13 Z" fill="${col}"/><text x="128" y="26" text-anchor="middle" font-family="Albert Sans" font-weight="700" font-size="11.5" letter-spacing="1.9" fill="${txt}">THE INTELLIGENCE FACTORY · ${n}</text></g>`;
+const ticket = (n, col, txt) => `<g transform="translate(48 44)"><path d="M0 0 H274 V13 A8 8 0 0 0 274 29 V42 H0 V29 A8 8 0 0 0 0 13 Z" fill="${col}"/><text x="137" y="26" text-anchor="middle" font-family="Albert Sans" font-weight="700" font-size="11.5" letter-spacing="1.9" fill="${txt}">THE INTELLIGENCE FACTORY · ${n}</text></g>`;
 
 // I. Language: tokens leave the machine one at a time; the next one is still coming out of the slot.
 ART['charlie-language-room'] = () => {
@@ -545,7 +546,6 @@ ART['charlie-language-room'] = () => {
   out.push(`<rect x="424" y="${500-66}" width="60" height="66" rx="6" fill="${C.yellow}"/>`);
   out.push(rect(452, 250, 224, 250, C.red));
   out.push(rect(440, 236, 248, 22, C.red));
-  out.push(rect(452, 420, 20, 80, C.ink));
   out.push(circ(580, 340, 58, C.paper));
   const tk=[]; for(let k=0;k<=10;k++){ const a = Math.PI*(0.8 + 1.4*k/10); tk.push(`M${f(580+Math.cos(a)*44)} ${f(340+Math.sin(a)*44)} L${f(580+Math.cos(a)*52)} ${f(340+Math.sin(a)*52)}`); }
   out.push(S(tk.join(' '), C.ink, 3.4));
@@ -643,7 +643,7 @@ const BOOKS = [
   {slug:'neural-networks-from-scratch', group:'core', level:'beginner', title:'Neural Networks<br>from Scratch', meta:'33 capsules · 7 hours',
    cap:'<b>Web → net.</b> A spider spinning a fully connected network instead of a web, one thread at a time. The last connection isn’t finished yet.'},
   {slug:'build-llms-from-scratch', group:'core', level:'intermediate', title:'Build<br>Large Language Models<br>(LLMs) from Scratch', meta:'20 capsules · 6 hours',
-   cap:'<b>Babel, rebuilt.</b> Build + large + language. Seven identical blocks, stacked — a decoder is a stack of identical layers — with a different script in every window. The crane lowers an eighth, identical block; its windows are still blank.'},
+   cap:'<b>Babel, rebuilt.</b> Build + large + language. Seven identical blocks, stacked — a decoder is a stack of identical layers — with windows full of different scripts — no tier repeats one. The crane lowers an eighth, identical block; its windows are still blank.'},
   {slug:'5d-parallelism', group:'core', level:'advanced', title:'5D Parallelism<br>for Large Model Training', meta:'40 capsules · 9 hours',
    cap:'<b>Five dimensions of parallel lines.</b> A 5-cube is exactly a 2×2×2×2×2 device mesh: 32 GPUs, every one visible (the data axis is drawn a little longer so no two coincide). In this projection every edge along one axis is parallel to the rest — so the five kinds of parallelism are, literally, five families of parallel lines. The key draws each axis at its own angle.'},
   {slug:'pi-vs-hermes-vs-codex', group:'core', level:'advanced', title:'Pi vs Hermes<br>vs Codex', sub:'Context Compaction and Memory', meta:'9 capsules · 1 hour',

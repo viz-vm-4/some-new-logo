@@ -523,14 +523,15 @@ function room(w,h,r,wallCol,wallArt,floorArt,overArt){
 EMBLEM.roomLanguage=(w,h,r)=>{
   const st={};
   const tokCol=i=> i===11?P.gold:[P.ivory,P.saffron,P.pink][i%3];
-  const owner={5:0,2:1,7:2};              // this sequence: run -> page (non-adjacent, out of order)
-  const other={0:1,4:1};                  // pages held by another request
+  // this sequence: page -> run. Out of order (4, 3, 7), and no owned page sits directly above another owned page.
+  const owner={4:0,3:1,7:2};
+  const other={0:1,5:1};                  // pages held by another request; 1, 2 and 6 are free
   return room(w,h,r,P.lapis,
     (x,y,ww,hh)=>{ st.wall={x,y,ww,hh}; return ''; },
     (x,y,ww,hh)=>{ st.floor={x,y,ww,hh}; return ''; },
     ()=>{
       let s=''; const {x,y,ww,hh}=st.wall, F=st.floor;
-      const rows=4, pg=16, pw=(ww-pg)/2, gy=10, ch=(hh-(rows-1)*gy)/rows, nw=(pw-12-3*3)/4;
+      const rows=4, pg=34, pw=(ww-pg)/2, gy=10, ch=(hh-(rows-1)*gy)/rows, nw=(pw-12-3*3)/4;
       const page=p=>({x:x+(p%2)*(pw+pg), y:y+Math.floor(p/2)*(ch+gy)});
       // floor: 12 tokens in three runs of four
       const tw=24, ing=5, rg=22, tot=12*tw+3*3*ing+2*rg, fx=F.x+(F.ww-tot)/2, th=F.hh-26, fy=F.y+16;
@@ -546,8 +547,12 @@ EMBLEM.roomLanguage=(w,h,r)=>{
       for(let i=0;i<12;i++){ const tx=tokX(i); s+=tile(tx,fy,tw,th,tokCol(i),1.2)+glyph(tx,fy,tw,th,rng('t'+i)); }
       // the block table: one gold thread from each run of the sequence to the page that holds it
       for(let run=0;run<3;run++){ const p=+Object.keys(owner).find(k=>owner[k]===run), P0=page(p);
-        const x1=(tokX(run*4)+tokX(run*4+3)+tw)/2, y1=fy-7, x2=P0.x+pw/2, y2=P0.y+ch+3;
-        s+=line(x1,y1,x2,y2,P.ink,5.2)+line(x1,y1,x2,y2,P.gold,2.8)+circ(x2,y2,4,P.gold,S(1.2))+circ(x1,y1,3.4,P.gold,S(1.1)); }
+        // ruled like a block table: up from the run, along a channel under the pages, up its own lane in the central
+        // gutter, then straight into the inner edge of its page. Lanes are ordered so no thread crosses another or any page.
+        const x1=(tokX(run*4)+tokX(run*4+3)+tw)/2, y1=fy-7, c=x+ww/2, lane=c+(run-1)*8, yb=y+hh+8;
+        const right=(p%2===1), ym=P0.y+ch/2, xe=right?P0.x-3:P0.x+pw+3;
+        const d=`M${f(x1)},${f(y1)} V${f(yb)} H${f(lane)} V${f(ym)} H${f(xe)}`;
+        s+=`<path d="${d}" fill="none" stroke="${P.ink}" stroke-width="4.8" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="${P.gold}" stroke-width="2.6" stroke-linejoin="round"/>`+circ(xe,ym,4,P.gold,S(1.2))+circ(x1,y1,3.4,P.gold,S(1.1)); }
       for(let run=0;run<3;run++){ const a=tokX(run*4), b=tokX(run*4+3)+tw; s+=`<path d="M${f(a)},${f(fy-3)} V${f(fy-7)} H${f(b)} V${f(fy-3)}" fill="none" stroke="${P.ink}" stroke-width="3.6"/><path d="M${f(a)},${f(fy-3)} V${f(fy-7)} H${f(b)} V${f(fy-3)}" fill="none" stroke="${P.gold}" stroke-width="1.8"/>`; }
       return s; });
 };

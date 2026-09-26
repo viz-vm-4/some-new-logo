@@ -301,7 +301,7 @@ EMBLEM['5d-parallelism']=function(g){
   const H=FR*CH, cx=360, cy=H/2;
   const ang=[0,1,2,3,4].map(k=>(k*36+18)*Math.PI/180);
   const sy=ang.reduce((a,t)=>a+Math.abs(Math.sin(t)),0), sx=ang.reduce((a,t)=>a+Math.abs(Math.cos(t)),0);
-  const scy=(H-34)/sy, scx=(720-70)/sx;
+  const scy=(H-68)/sy, scx=(720-70)/sx;
   const E=ang.map(a=>[Math.cos(a)*scx, Math.sin(a)*scy]);
   const V=[]; for(let m=0;m<32;m++){ let x=0,y=0; for(let k=0;k<5;k++){ const b=(m>>k)&1; x+=(b-.5)*E[k][0]; y+=(b-.5)*E[k][1]; } V.push([cx+x,cy+y]); }
   const node=V.map(([x,y])=>[Math.floor(y/CH), Math.round(x/CW)-2]);
@@ -326,7 +326,7 @@ EMBLEM['ai-context-engineering']=function(g){
   const L=c0+4, R=c1-4, mid=L+46;
   const B=[
     {l:'SYSTEM',r:r0+2,c:L,h:6,w:R-L,t:.9,x:'You are the on-call assistant for the billing platform. Answer only from the documents and tool results provided in this context. Cite every claim as [doc:n] or [tool:n]. If the context does not contain the answer, say exactly what is missing instead of guessing. Prefer short answers; show commands in code blocks; never run a destructive command without asking first; escalate to a human when a fix touches customer money. Timezone for all logs: UTC.'},
-    {l:'TOOLS',r:r0+9,c:L,h:16,w:mid-L-2,t:.62,x:'{"name": "search_logs", "description": "Full-text search over service logs", "input_schema": {"type": "object", "properties": {"query": {"type": "string"}, "since": {"type": "string"}, "limit": {"type": "integer"}}, "required": ["query"]}} {"name": "get_metric", "description": "Fetch a time series", "input_schema": {"type": "object", "properties": {"name": {"type": "string"}, "window": {"type": "string"}}, "required": ["name"]}} {"name": "diff_deploy", "description": "Show config changes in a deploy", "input_schema": {"type": "object", "properties": {"id": {"type": "string"}}}}'},
+    {l:'TOOLS',r:r0+9,c:L,h:16,w:mid-L-2,t:.62,x:'{"name": "search_logs", "description": "Full-text search over service logs", "input_schema": {"type": "object", "properties": {"query": {"type": "string"}, "since": {"type": "string"}, "limit": {"type": "integer"}}, "required": ["query"]}} {"name": "get_metric", "description": "Fetch a time series", "input_schema": {"type": "object", "properties": {"name": {"type": "string"}, "window": {"type": "string"}}, "required": ["name"]}}'},
     {l:'DOCS',r:r0+9,c:mid,h:10,w:R-mid,t:.8,x:'[doc:1] The response cache sits in front of the orders service; entries expire after 300 s. [doc:2] Cache keys are built from the tenant id and the request path; query strings are ignored unless listed in vary_on. [doc:3] On a miss the service calls the upstream ledger, p95 180 ms, which is rate limited to 2,000 requests per second per region. [doc:5] Config changes to vary_on take effect on the next deploy.'},
     {l:'MEMORY',r:r0+20,c:mid,h:5,w:R-mid,t:.5,x:'- user is on the payments team - prefers commands over prose - last week: rolled back cache v2 after key collisions - staging mirrors prod config'},
     {l:'HISTORY',r:r0+26,c:L,h:11,w:R-L,t:.4,x:'user: latency alarms again on orders. assistant: checking the dashboards [tool:1] p95 went from 190 ms to 410 ms at 13:58, right after deploy 8812. user: that deploy only touched the cache config. assistant: then misses are the first suspect; pulling the miss ratio [tool:2] 0.31, up from 0.04. user: so the cache is barely working? assistant: it is working, but on the wrong keys: [tool:3] deploy 8812 added the session cookie to vary_on, so every user now gets a private copy of every response. user: which endpoints are affected? assistant: all GET routes under /v1/orders; the ledger is absorbing the misses, which is why p95 doubled rather than failing outright. user: can we just drop the cookie from vary_on? assistant: yes for anonymous routes; two authenticated routes render per-user totals and need the user id in the key instead. user: ok, what else? assistant: purge the cache after the fix so the private copies do not linger for the full 300 s.'},
@@ -359,26 +359,27 @@ EMBLEM['pi-vs-hermes-vs-codex']=function(g){
     ["user: the nightly ingest job got slow after yesterday's merge, can you profile it?",'assistant: running it with the profiler on a one percent sample.','tool: 71 percent of time in normalize_rows.','assistant: the merge replaced a vectorised call with a python loop over every row. restoring the vectorised path and adding a benchmark so it cannot regress silently.','tool: sample run 4.1 s, was 58 s.','user: why did review miss it?','assistant: the diff was large and the loop looked equivalent; the benchmark now fails the build if the sample run exceeds 8 s.','user: good, ship it.'],
   ];
   const S=[
-    'summary: parser tests failed because the lexer returned bytes where the parser expects str; fixed in lexer.py, 44 passed. input is now streamed through a chunk iterator with a carry buffer for split tokens: peak memory 38 MB, was 1.2 GB. test_split_token added for chunk sizes 1, 2 and 7; 47 passed. next: commit.',
-    'summary: the webhook handler dropped events when the ledger was slow. added backoff with jitter, at most five attempts, and an idempotency key so no event applies twice; 12 passed. after five failures the event goes to the dead letter queue with its error and an alert fires; replays reuse the keys; 15 passed. next: ship behind a flag.',
-    'summary: the nightly ingest slowed after a merge that swapped a vectorised call in normalize_rows for a python loop (71 percent of time). restored the vectorised path: sample run 4.1 s, was 58 s. a benchmark now fails the build above 8 s, because review missed the loop. user approved shipping.',
+    'summary: parser tests failed because the lexer returned bytes where the parser expects str; fixed in lexer.py, 44 passed. input now streams through a chunk iterator with a carry buffer for split tokens: peak memory 38 MB, was 1.2 GB. test_split_token added for chunk sizes 1, 2 and 7; 47 passed.',
+    'summary: the webhook handler dropped events when the ledger was slow. added backoff with jitter, at most five attempts, and an idempotency key so no event applies twice; 12 passed. after five failures an event goes to the dead letter queue with its error and an alert fires; replays reuse the keys; 15 passed.',
+    'summary: the nightly ingest slowed after a merge swapped a vectorised call in normalize_rows for a python loop (71 percent of time). restored the vectorised path: sample run 4.1 s, was 58 s. review missed it because the diff was large; a benchmark now fails the build above 8 s. user: ship it.',
   ];
-  const centers=[20,60,100], W0=36, LIM=23, MEM=FR-4;
+  const centers=[20,60,100], W0=36, LIM=24, MEM=FR-4;
   T.forEach((turns,f)=>{
     const c0=centers[f]-W0/2; let r=0;
     for(const t of turns){ if(r>=LIM) break; r+=g.flow(r,c0,LIM,c0+W0,t,.56); }
     // the trigger
     const lab=' context limit ', dash='- '.repeat(W0).slice(0,W0), at=Math.floor((W0-lab.length)/2);
     g.text(LIM,c0,dash.slice(0,at)+lab+dash.slice(at+lab.length),.84);
-    // older turns rewritten as a summary, narrowing into memory; the top width is chosen so the text ends on the last row
-    const words=S[f].split(' '), rows=MEM-LIM-2;
-    const lay=(W)=>{ const out=[]; let wi=0;
-      for(let i=0;i<rows&&wi<words.length;i++){ const u=i/(rows-1), w=Math.max(6,Math.round((W-(W-6)*u)/2)*2); let line='';
-        while(wi<words.length&&(line?line.length+1:0)+words[wi].length<=w){ line+=(line?' ':'')+words[wi]; wi++; }
-        if(!line){ line=words[wi]; wi++; } out.push(line); }
-      return wi>=words.length?out:null; };
-    let best=null; for(let W=12;W<=W0;W+=2){ const o=lay(W); if(o){ best=o; break; } }
-    const L2=best||[]; L2.forEach((line,i)=>{ const u=i/Math.max(1,L2.length-1), lp=Math.floor((W0-line.length)/2); g.text(MEM-1-L2.length+i,c0+lp,line,.66+.18*u); });
+    // older turns rewritten as a summary, poured through one fixed funnel into memory
+    const words=S[f].split(' '), F0=LIM+1, FN=MEM-F0; let wi=0;
+    for(let i=0;i<FN;i++){
+      const u=i/(FN-1), ow=Math.round((32-22*u)/2)*2, lw=centers[f]-ow/2, rw=centers[f]+ow/2-1;
+      g.put(F0+i,lw,'\\',.84); g.put(F0+i,rw,'/',.84);
+      let line=''; const w=ow-4;
+      while(wi<words.length&&(line?line.length+1:0)+words[wi].length<=w){ line+=(line?' ':'')+words[wi]; wi++; }
+      if(line) g.text(F0+i,lw+Math.floor((ow-line.length)/2),line,.66+.18*u);
+    }
+    if(wi<words.length) console.warn('summary overflow',f);
     const mw=8, mc=centers[f]-mw/2;
     g.fill(MEM,mc,FR,mc+mw,' ',.95,1);
     g.text(MEM+1,mc+1,'MEMORY',.95,1);
@@ -395,8 +396,8 @@ EMBLEM['decision-trees-from-scratch']=function(g){
     {r0:0,r1:FR,c0:0,c1:a,t:.16,rule:'petal_length <= 2.45 -> 0',chip:' setosa [50, 0, 0] ',cr:8,cc:6},
     {r0:b+1,r1:FR,c0:a+2,c1:c,t:.4,rule:'length > 2.45 & width <= 1.75 & length <= 4.95 -> 1',chip:' versicolor [0, 47, 1] ',cr:FR-3,cc:a+4},
     {r0:b+1,r1:FR,c0:c+2,c1:COLS,t:.95,rule:'length > 4.95 & width <= 1.75 -> 2',chip:' virginica [0, 2, 4] ',cr:FR-3,cc:c+4},
-    {r0:0,r1:b,c0:a+2,c1:d,t:.95,rule:'width > 1.75 & length <= 4.85 -> 2',chip:' virginica [0, 1, 2] ',cr:1,cc:a+4},
-    {r0:0,r1:b,c0:d+2,c1:COLS,t:.95,rule:'width > 1.75 & length > 4.85 -> 2',chip:' virginica [0, 0, 43] ',cr:1,cc:d+4},
+    {r0:0,r1:b,c0:a+2,c1:d,t:.95,rule:'width > 1.75 & length <= 4.85 -> 2',chip:' virginica [0, 1, 2] ',cr:5,cc:a+4},
+    {r0:0,r1:b,c0:d+2,c1:COLS,t:.95,rule:'width > 1.75 & length > 4.85 -> 2',chip:' virginica [0, 0, 43] ',cr:5,cc:d+4},
   ];
   for(const L of leaves) g.stream(L.r0,L.c0,L.r1,L.c1,L.rule+'  ·  ',L.t);
   // splits are paper gaps; the root split is selected
@@ -476,7 +477,8 @@ EMBLEM['charlie-language-room']=function(g){
     for(let c=x0;c<=x1;c++){ if(roof[c-x0]>=rr) continue; const q=g.get(rr,c); if(q.t>=.86) continue; g.put(rr,c,lab[k%lab.length],.62+.22*(rr-top)/(base-top)); k++; }
   }
   // axis
-  for(let c=x0;c<=x1;c++) g.put(base,c,(c-x0)%Math.round((x1-x0)/12)===0?'+':'-',.8);
+  for(let c=x0;c<=x1;c++) g.put(base,c,'-',.8);
+  for(let k=0;k<=12;k++) g.put(base,col(2**k),'+',.8);
   [1,4,16,64,256,1024,4096].forEach(I=>{ const s=String(I); g.text(base+1,Math.min(114-s.length,Math.max(6,col(I)-Math.floor(s.length/2))),s,.7); });
   g.text(base+2,x1-24,'FLOP / byte  (log2)',.62);
   g.text(8,6,'TFLOP/s',.62);
@@ -547,7 +549,7 @@ EMBLEM['charlie-sound-room']=function(g){
   for(let c=0;c<COLS;c++) g.put(mid,c,'-',.3);
   turn('can you move my dentist appointment to friday?',2,61,0);
   turn('sure. friday at ten is free. shall i book it?',67,118,1);
-  g.text(49,6,' USER  0.00-2.36 s ',.95); g.text(30,61,'240 ms',.7); g.text(49,67,' AGENT  2.60-4.64 s ',.95,1);
+  g.text(49,6,' USER  0.00-2.36 s ',.95); g.text(30,61,'240ms',.7); g.text(49,67,' AGENT  2.60-4.64 s ',.95,1);
   return {cap:['reply','= tts(llm(asr(mic)))   # user turn · 240 ms · agent turn · 40 ms per column']};
 };
 
@@ -707,7 +709,7 @@ print(p.round(3))    # a seven, like the one on the front`.split('\n');
   const g=new Grid();
   const lines=code.filter(ln=>ln!=='');
   lines.slice(0,FR-1).forEach((ln,i)=>{
-    const row=i+1, hot=ln.includes('# a seven');
+    const row=i+3, hot=ln.includes('# a seven');
     const txt=String(i+1).padStart(3,' ')+'  '+ln;
     g.fill(row,3,row+1,Math.min(COLS,5+txt.length),' ',-1);
     g.text(row,4,txt.slice(0,5),.34);
@@ -715,7 +717,7 @@ print(p.round(3))    # a seven, like the one on the front`.split('\n');
   });
   const M=6, back=document.createElement('div'); back.className='back';
   back.innerHTML=`<div class="field">${g.html()}</div>
-   <div class="cap" style="left:${M*CW}px;top:${(52.5*CH).toFixed(1)}px"><b>$</b> python mnist_from_scratch.py<br>epoch 9  loss 0.087  acc 0.976<br>[[0.    0.    0.    0.001 0.    0.    0.    0.998 0.    0.   ]]</div>
+   <div class="cap" style="left:${M*CW}px;top:${(52.5*CH).toFixed(1)}px"><b>$</b> python mnist_from_scratch.py | tail -2<br>epoch 9  loss 0.087  acc 0.976<br>[[0.    0.    0.    0.001 0.    0.    0.    0.998 0.    0.   ]]</div>
    <div class="bk" style="left:${M*CW}px;top:${(58*CH).toFixed(1)}px;width:420px;font-size:13px;line-height:1.55;font-variation-settings:'wdth' 87.5,'wght' 500">
      <div style="font-variation-settings:'wdth' 100,'wght' 800;letter-spacing:.08em;font-size:11px;margin-bottom:8px">ON THE COVER</div>
      MNIST test image 0, a handwritten seven, printed the way the network reads it: one hex byte of ink per pixel (rows 3 to 27 of 28). Beside it, the softmax that the program above returned for it after ten epochs. Every number on this cover is that program's input or its output.

@@ -222,7 +222,7 @@ uniform vec3 uPaper; uniform vec3 uKeyPos; uniform float uKeyPow; uniform float 
 uniform vec3 uSpotDir; uniform vec2 uSpotCone;
 uniform vec3 uGlowPos; uniform float uGlow; uniform float uGlowRad;
 uniform float uFill; uniform float uBoxLum; uniform vec2 uBoxSize; uniform float uEnvDark;
-uniform vec4 uPan[4]; uniform vec2 uPanS[4];
+uniform vec4 uPan[4]; uniform vec2 uPanS[4]; uniform vec4 uCardL;
 uniform vec4 uBound; uniform vec3 uBMin, uBMax; uniform float uWallZ, uCoveR; uniform float uExpo; uniform float uVig;
 
 struct Mat { vec3 alb; float rough; float metal; float coat; float wrap; };
@@ -328,7 +328,7 @@ vec3 shadeObj(vec3 p, vec3 rd){
   float up=0.5+0.5*n.y;
   vec3 amb=uFill*(mix(uPaper*0.9+0.08, vec3(1.0), up)*(0.55+0.45*up));
   vec3 bounce=uPaper*ka*0.35*clamp(-n.y*0.8+0.2,0.,1.);
-  vec3 dif=m.alb*(ka*diff*sh + (amb+bounce)*ao);
+  vec3 dif=m.alb*(ka*diff*sh + (amb+bounce)*ao + uCardL.w*max(dot(n,uCardL.xyz),0.)*ao);
   vec3 F0=mix(vec3(0.04),m.alb,m.metal);
   float nv=max(dot(n,-rd),0.);
   vec3 F=F0+(1.-F0)*pow(1.-nv,5.)*(1.-m.rough*0.7);
@@ -530,15 +530,16 @@ const NN_L=[4,5,2], NN_X=[-0.82,0,0.82], NN_BT=0.04;
 const nnY=(n,j)=>0.98+(j-(n-1)/2)*0.34;
 const nnHash=(a,b,c)=>{ const s=Math.sin(a*12.9898+b*78.233+c*37.719)*43758.5453; return s-Math.floor(s); };
 let NN_PINS='', NN_TH=['',''];
-NN_L.forEach((n,l)=>{ let code=''; for(let j=0;j<n;j++) code+=`    d=sdCapsule(p,vec3(${(NN_X[l]-NN_BT-0.035).toFixed(3)},${nnY(n,j).toFixed(3)},0.),vec3(${(NN_X[l]+NN_BT+0.035).toFixed(3)},${nnY(n,j).toFixed(3)},0.),0.017); if(d<r.x) r=vec2(d,2.);\n`;
-  NN_PINS+=`  if(abs(p.x-(${NN_X[l].toFixed(3)}))<0.14+r.x){\n${code}  }\n`; });
+const NN_Z=-0.31; // pin heads stand proud of the boards' front edges; the threads run between them
+NN_L.forEach((n,l)=>{ let code=''; for(let j=0;j<n;j++) code+=`    d=sdCapsule(p,vec3(${NN_X[l].toFixed(3)},${nnY(n,j).toFixed(3)},-0.24),vec3(${NN_X[l].toFixed(3)},${nnY(n,j).toFixed(3)},${NN_Z}),0.017); if(d<r.x) r=vec2(d,2.);\n`;
+  NN_PINS+=`  if(abs(p.x-(${NN_X[l].toFixed(3)}))<0.06+r.x){\n${code}  }\n`; });
 for(let l=0;l<2;l++) for(let a=0;a<NN_L[l];a++) for(let b=0;b<NN_L[l+1];b++){
   const rr=0.0055+0.0075*nnHash(l,a,b);
-  NN_TH[l]+=`    t=min(t,sdCapsule(p,vec3(${(NN_X[l]+NN_BT+0.03).toFixed(3)},${nnY(NN_L[l],a).toFixed(3)},0.),vec3(${(NN_X[l+1]-NN_BT-0.03).toFixed(3)},${nnY(NN_L[l+1],b).toFixed(3)},0.),${rr.toFixed(4)}));\n`; }
+  NN_TH[l]+=`    t=min(t,sdCapsule(p,vec3(${NN_X[l].toFixed(3)},${nnY(NN_L[l],a).toFixed(3)},${NN_Z}),vec3(${NN_X[l+1].toFixed(3)},${nnY(NN_L[l+1],b).toFixed(3)},${NN_Z}),${rr.toFixed(4)}));\n`; }
 book({ slug:'neural-networks-from-scratch', key:0,
   title:'Neural Networks<span class="sub">from Scratch</span>',
   obj:'Three layers, fully connected in thread; each thread’s thickness is its weight', med:'Oak, brass pins, black linen', dim:'33 capsules · 7 hours',
-  cam:{ look:[0,0.98,0], dist:15, el:9, yaw:30, frame:[0.5,0.6] }, bound:[0,0.98,0,1.6], box:[[-0.9,0,-0.3],[0.9,1.92,0.3]], steps:140,
+  cam:{ look:[0,0.98,0], dist:15, el:9, yaw:20, frame:[0.5,0.6] }, bound:[0,0.98,0,1.6], box:[[-0.9,0,-0.36],[0.9,1.92,0.3]], steps:140,
   light:{ keyPos:[-7.5,10,-6.5], glow:0.5, glowRad:7, glowPos:[3,3,5] },
   glsl:`
 vec2 scene(vec3 p){
@@ -548,10 +549,10 @@ vec2 scene(vec3 p){
   d=min(d,sdRBox(p-vec3(${NN_X[2]},0.96,0.),vec3(${NN_BT},0.96,0.26),0.012));
   vec2 r=vec2(d,1.);
 ${NN_PINS}  float t=1e9;
-  if(abs(p.z)<0.03+r.x){
-    if(p.x<0.02 && p.x>-0.8){
+  if(abs(p.z-(${NN_Z}))<0.03+r.x){
+    if(p.x<0.02 && p.x>-0.84){
 ${NN_TH[0]}    }
-    if(p.x>-0.02 && p.x<0.8){
+    if(p.x>-0.02 && p.x<0.84){
 ${NN_TH[1]}    }
   }
   if(t<r.x) r=vec2(t,3.);
@@ -572,7 +573,7 @@ book({ slug:'build-llms-from-scratch', key:1,
   title:'Build Large Language<br>Models (LLMs)<span class="sub">from Scratch</span>', size:'s2',
   obj:'Column of twelve identical blocks', med:'Stoneware, oxblood glaze', dim:'20 capsules · 6 hours',
   cam:{ look:[0,1.585,0], dist:19.5, el:6, yaw:-8, frame:[0.5,0.605] }, bound:[0,1.6,0,1.7], box:[[-0.29,0,-0.29],[0.29,3.18,0.29]], steps:150,
-  light:{ keyPos:[-8,8,-5], fill:0.34 },
+  light:{ keyPos:[-8,8,-5], fill:0.3, card:[1,-0.1,-0.5,0.35] },
   glsl:`
 const float HM=0.264; const float WW=0.2; const float WN=0.1; const float RB=0.011;
 vec2 scene(vec3 p){
@@ -588,8 +589,8 @@ vec2 scene(vec3 p){
 Mat material(float id, vec3 p, vec3 n){
   Mat m; float g=fbm(p*vec3(5.,22.,5.));
   float yy=mod(p.y,HM)/HM; float waist=smoothstep(0.35,0.0,min(yy,1.-yy));
-  m.alb=mix(vec3(0.20,0.026,0.021),vec3(0.085,0.009,0.008),waist*0.75+g*0.25);
-  m.rough=0.05+0.04*g; m.metal=0.; m.coat=1.; m.wrap=0.1; return m;
+  m.alb=mix(vec3(0.20,0.026,0.021),vec3(0.11,0.012,0.01),waist*0.7+g*0.25);
+  m.rough=0.24+0.05*g; m.metal=0.; m.coat=0.45; m.wrap=0.1; return m;
 }`});
 
 /* ============ PI VS HERMES VS CODEX ============ */
@@ -994,6 +995,7 @@ function renderBook(b, canvas, RW, offX){
   const pans=(k.panels||[]).slice(0,4); const PD=new Float32Array(16), PS=new Float32Array(8);
   pans.forEach((p,i)=>{ const l=Math.hypot(p[0],p[1],p[2]); PD.set([p[0]/l,p[1]/l,p[2]/l,p[3]],i*4); PS.set([p[4],p[5]],i*2); });
   gl.uniform4fv(U('uPan'),PD); gl.uniform2fv(U('uPanS'),PS);
+  const cd=k.card||[1,-0.1,-0.5,0]; const cl=Math.hypot(cd[0],cd[1],cd[2]); gl.uniform4f(U('uCardL'),cd[0]/cl,cd[1]/cl,cd[2]/cl,cd[3]);
   gl.uniform4fv(U('uBound'),bc);
   const bb=b.box||[[bc[0]-bc[3],Math.max(0,bc[1]-bc[3]),bc[2]-bc[3]],[bc[0]+bc[3],bc[1]+bc[3],bc[2]+bc[3]]];
   gl.uniform3fv(U('uBMin'),bb[0]); gl.uniform3fv(U('uBMax'),bb[1]); gl.uniform1f(U('uWallZ'),b.wallZ||5); gl.uniform1f(U('uCoveR'),b.coveR||2.6);

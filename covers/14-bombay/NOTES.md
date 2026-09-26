@@ -130,7 +130,7 @@ I checked all nine must-fix claims against the 2x renders before changing anythi
 **Must-fix (all done)**
 1. *Script collisions.* mixLine now spaces on the script's **ink** (canvas `actualBoundingBoxLeft/Right`, plus keyline and
    shadow), not on its advance width. After that, the gap is 0.2H script↔block and 0.24H block↔block. Pi's `and` is at k 1.25, base 0.8.
-   I re-checked all seven lines at 2x and none touch. I also moved the script's keyline to a separate layer instead of `paint-order`,
+   After the proof check, a block word's right edge also includes its keyline and block shadow, and the script↔block gap is at least 10px, so every connective (Pi's `and` included) clears its neighbours by 10px or more ink-to-ink. I also moved the script's keyline to a separate layer instead of `paint-order`,
    which Chrome's PDF ignores.
 2. *SQL join.* Key cells now carry a pip-counted key id, and wires connect equal ids only. Each table has one partnerless row
    (ids 5 and 6), struck and knocked back with no wire.
@@ -159,3 +159,11 @@ I checked all nine must-fix claims against the 2x renders before changing anythi
    now start at 58.
 
 Nothing declined.
+
+**Proof check (revision 1b):**
+- Pi's `and` now clears both neighbours by 10px or more.
+- The decode belt carries four tokens, all on the belt and clear of the frame.
+- The DeiT teacher arrow now climbs 14px left of the student block.
+- On the wrap, the mini stamps show the numeral only, and the level names are set beside them in 12px Anek.
+- The spine stamp is centred between the rules at 0.42 scale.
+- The spine imprint now ends more than 50px from the trim.

@@ -401,7 +401,7 @@ EMBLEMS['mathematical-foundations-for-ml'] = (g) => {
   polyline(g, pts, 2, { wt: 800 });
   pts.forEach(([x, y], i) => { if (i > 5) return; tileT(g, colOf(x) - 1, rowOf(y), 3, 1, 2, String(i), { inset: .5 }); });
   const [mx, my] = P(0, 0); tileT(g, colOf(mx) - 2, rowOf(my), 4, 1, 2, 'x*', { inset: .5 });
-  g.clear(6, 31, 24, 2); g.text(6, 31, 'f(x) = ½ xᵀHx', 2, 0, 700); g.text(6, 32, 'x := x - η grad f(x)', 2, 0, 500);
+  g.clear(6, 31, 24, 2); g.text(6, 31, 'f(x) = ½ x^T H x', 2, 0, 700); g.text(6, 32, 'x := x - η grad f(x)', 2, 0, 500);
 };
 
 /* Build Decision Trees from Scratch — the classic iris tree, splits and leaves as tiles, elbow connectors */
@@ -457,7 +457,7 @@ EMBLEMS['transformers-from-scratch'] = (g) => {
       g.clear(lc - 1, lr, 5, 1); g.text(lc, lr, lab, w[j] >= .3 ? 2 : 1, 0, 700); } }
   toks.forEach((t, j) => tileT(g, pos[j].c, rT, pos[j].w, 3, j === q ? 2 : j === 1 ? 1 : 3, t));
   g.text(pos[q].c, rT + 3, '^ query', 2, 0, 700);
-  g.text(6, rT + 3, 'softmax(QKᵀ/ sqrt d) V', 1, 0, 500);
+  g.text(6, rT + 3, 'softmax(QK^T / sqrt d) V', 1, 0, 500);
 };
 
 /* ---------------------------------------------------------------- VISION */

@@ -49,9 +49,9 @@ body{
 .imprint{display:flex;align-items:center;gap:10px;font-family:'Archivo';font-weight:800;font-stretch:125%;font-size:13px;letter-spacing:.17em;text-transform:uppercase}
 .imprint svg{width:23px;height:23px;flex:none}
 .contents{font-family:'IBM Plex Mono',monospace;font-weight:500;font-size:12.5px;letter-spacing:.05em;text-transform:uppercase}
-.stamp{position:absolute;z-index:3;right:40px;top:312px;transform:rotate(-6deg);border:3px solid #E5533A;color:#E5533A;padding:7px 14px 6px;border-radius:4px;
+.stamp{position:absolute;z-index:3;right:40px;top:302px;transform:rotate(-6deg);border:3px solid #E5533A;color:#E5533A;padding:7px 14px 6px;border-radius:4px;
   font-family:'Archivo';font-weight:900;font-stretch:125%;font-size:15px;letter-spacing:.16em;line-height:1.15;text-align:center;text-transform:uppercase}
-.stamp small{display:block;font-family:'IBM Plex Mono';font-weight:600;font-size:10.5px;letter-spacing:.12em}
+.stamp small{display:table;margin:1px auto 0;padding:1px 6px 0;background:var(--card);font-family:'IBM Plex Mono';font-weight:600;font-size:10.5px;letter-spacing:.12em}
 
 @media print{ .cover,.face,.wrap,.sheet{box-shadow:none !important} body{background:none} }
 /* ================= PAGE ================= */
@@ -288,6 +288,7 @@ class Sprue{
   pin(x,y,r=4.2){ this.det.push({k:'ring',x,y,r}); return this; }
   text(x,y,s,o={}){ this.det.push(Object.assign({k:'t',x,y,s},o)); return this; }
   groove(d,w=1.4){ this.det.push({k:'g',d,w}); return this; }
+  glyph(d,w=2.8){ this.det.push({k:'gl',d,w}); return this; }
   relief(svg,clipD){ this.det.push({k:'r',svg,clipD}); return this; }
   tag(x,y,n,w){ w = w || (String(n).length>1?18:13); this.rect(x-w/2,y-6.5,w,13,2); this.text(x,y+3.3,String(n),{size:8.5,wt:800}); return this; }
   plate(x,y,label,w,h=17,size=11){ w=w||label.length*8+14; this.rect(x-w/2,y-h/2,w,h,2.5); this.text(x,y+size*.36,label,{size,wt:900,wd:112}); return this; }
@@ -319,6 +320,7 @@ class Sprue{
       if(d.k==='ring') out.push(`<circle cx="${f(d.x)}" cy="${f(d.y)}" r="${f(d.r)}" fill="none" stroke="${T.lo}" stroke-width="1.4"/><path d="M${f(d.x-d.r*.7)} ${f(d.y+d.r*.7)}A${d.r} ${d.r} 0 0 0 ${f(d.x+d.r*.7)} ${f(d.y-d.r*.7)}" fill="none" stroke="${T.hi}" stroke-width="1" transform="translate(.9 .9)"/>`);
       else if(d.k==='dot') out.push(`<circle cx="${f(d.x)}" cy="${f(d.y)}" r="${f(d.r)}" fill="${T.lo}"/>`);
       else if(d.k==='g') out.push(`<path d="${d.d}" fill="none" stroke="${T.hi}" stroke-width="${d.w}" transform="translate(.8 .8)" stroke-linecap="round" stroke-linejoin="round"/><path d="${d.d}" fill="none" stroke="${T.lo}" stroke-width="${d.w}" stroke-linecap="round" stroke-linejoin="round"/>`);
+      else if(d.k==='gl') out.push(`<path d="${d.d}" fill="none" stroke="${T.hi}" stroke-width="${d.w}" transform="translate(.8 .8)" stroke-linecap="round" stroke-linejoin="round"/><path d="${d.d}" fill="none" stroke="${T.txt}" stroke-width="${d.w}" stroke-linecap="round" stroke-linejoin="round"/>`);
       else if(d.k==='r'){
         const cid=`${id}r${j}`; defs.push(`<clipPath id="${cid}"><path d="${d.clipD}"/></clipPath>`);
         out.push(`<g clip-path="url(#${cid})">${d.svg(T)}</g>`);
@@ -570,7 +572,7 @@ EMBLEMS['decision-trees-from-scratch'] = (S,b) => {
   }
   S.inject(root.x,14,14);
   S.text(root.x-13,root.y+4.5,'x',{size:13,wt:800,it:true}); S.text(root.x+13,root.y+4.5,'t',{size:13,wt:800,it:true});
-  S.groove(`M${root.x+4} ${root.y-6}L${root.x-4} ${root.y-2}L${root.x+4} ${root.y+2}M${root.x-4} ${root.y+6}H${root.x+4}`,1.9);
+  S.glyph(`M${root.x+4} ${root.y-6}L${root.x-4} ${root.y-2}L${root.x+4} ${root.y+2}M${root.x-4} ${root.y+6}H${root.x+4}`,2.7);
 };
 
 /* R Masterclass — least squares, moulded: the fitted line is the runner
@@ -633,12 +635,12 @@ EMBLEMS['deit-from-scratch'] = (S,b) => {
   const cx0=36+tw/2, dx=36+(tw+tg)+tw/2;
   // CLS → class head ; DIST → distillation head
   S.runner([[cx0,ty+th],[cx0,376],[228,376]],5);
-  S.runner([[dx,ty+th],[dx,414],[493,414],[493,396]],5);
+  S.runner([[dx,ty+th],[dx,348],[493,348],[493,358]],5);
   S.rect(228,358,168,36,4); S.text(312,380,'CLASS HEAD',{size:10.5,wt:900,wd:125,ls:.12});
   S.rect(420,358,146,36,4); S.text(493,380,'DISTILL HEAD',{size:10.5,wt:900,wd:112,ls:.08});
   // the teacher's prediction is the target that supervises the distillation head
   S.runner([[624,tcy],[624,376],[566,376]],6);
-  S.plate(596,376,'TARGET',50,17,9.5);
+  S.rect(567,367.5,56,17,2.5); S.text(595,379,'TARGET',{size:8.5,wt:900,wd:100,ls:.06});
 };
 
 /* Charlie I · Language Room — inference: tokens arrive one at a time and
@@ -743,34 +745,37 @@ EMBLEMS['charlie-reasoning-room'] = (S,b) => {
    One arm link is the only hardware. */
 EMBLEMS['modern-robot-learning'] = (S,b) => {
   baseFrame(S,b);
-  const P=[[262,366],[420,372],[420,120],[540,100]];
+  // the demonstrated trajectory: one convex bend from the policy to the grasp
+  const P=[[262,356],[450,356],[536,330],[530,150]];
   const bz=t=>{ const u=1-t; return [0,1].map(i=>u*u*u*P[0][i]+3*u*u*t*P[1][i]+3*u*t*t*P[2][i]+t*t*t*P[3][i]); };
   const dbz=t=>{ const u=1-t; return [0,1].map(i=>3*u*u*(P[1][i]-P[0][i])+6*u*t*(P[2][i]-P[1][i])+3*t*t*(P[3][i]-P[2][i])); };
   let tp=''; for(let i=0;i<=40;i++){ const [x,y]=bz(i/40); tp+=(i?'L':'M')+f(x)+' '+f(y); }
   S.rod(tp,11);
-  // action chunks, tangent to the path, offset to its outer side
-  const arrow=[[-24,-8],[10,-8],[10,-15],[26,0],[10,15],[10,8],[-24,8]];
-  const smp=[]; let acc=0, prev=bz(0); for(let i=0;i<=400;i++){ const q=bz(i/400); acc+=Math.hypot(q[0]-prev[0],q[1]-prev[1]); smp.push([i/400,acc]); prev=q; }
-  const tAt=len=>{ const e=smp.find(v=>v[1]>=len); return e?e[0]:1; };
-  for(let k=0;k<8;k++){
-    const t=tAt(acc*(.06+k*.125)), [x,y]=bz(t), [dx,dy]=dbz(t), L=Math.hypot(dx,dy), nx=dy/L, ny=-dx/L, a=Math.atan2(dy,dx);
-    const ox=x+nx*64, oy=y+ny*64;
-    S.gate(x,y,ox,oy,3.4); S.part(poly(tr(arrow,ox,oy,a)));
-    S.plate(x+nx*30,y+ny*30,`a_${k+1}`,28,17,11);
-  }
+  // action chunks on the convex side, spaced by arc length along that offset curve (≥ 60 px apart)
+  const OFF=56, arrow=[[-24,-8],[10,-8],[10,-15],[26,0],[10,15],[10,8],[-24,8]];
+  const pts=[]; let acc=0;
+  for(let i=0;i<=800;i++){ const t=i/800, [x,y]=bz(t), [dx,dy]=dbz(t), L=Math.hypot(dx,dy), nx=-dy/L, ny=dx/L, q={x,y,nx,ny,a:Math.atan2(dy,dx),ox:x+nx*OFF,oy:y+ny*OFF};
+    if(i){ const r=pts[i-1]; acc+=Math.hypot(q.ox-r.ox,q.oy-r.oy); } q.s=acc; pts.push(q); }
+  const at=s=>pts.find(q=>q.s>=s)||pts[pts.length-1];
+  const C=[...Array(8)].map((_,k)=>at(acc*(.06+.88*k/7)));
+  C.forEach((q,k)=>{
+    S.gate(q.x,q.y,q.ox,q.oy,3.4); S.part(poly(tr(arrow,q.ox,q.oy,q.a)));
+    const px=q.x+q.nx*27, py=q.y+q.ny*27; S.rect(px-14,py-10.5,28,21,2.5); S.text(px,py+2.2,`a_${k+1}`,{size:11,wt:900,wd:112});
+  });
+  { const q=at(acc*.5), px=q.x-q.nx*36, py=q.y-q.ny*36; S.gate(q.x,q.y,px,py,3.4); S.plate(px,py,'DEMO',46,17,10); }
   // observation → policy
-  S.gate(6,300,34,300,4); S.rect(50,252,26,14,3); S.part(rr(34,262,84,66,8)+circ(76,295,19)+circ(76,295,10),'evenodd');
-  S.gate(118,366,140,366,4); S.gate(76,328,76,366,4); S.runner([[76,366],[140,366]],6);
-  S.rect(140,340,122,52,6);
-  S.groove('M152 356H176M157 356C157 368 156 374 153 380M170 356V376C170 380 173 381 177 379',2.2);
-  S.text(218,372,'(a | o)',{size:15,wt:700,it:true});
-  // the goal: gripper jaws
+  S.gate(6,290,34,290,4); S.rect(50,242,26,14,3); S.part(rr(34,252,84,66,8)+circ(76,285,19)+circ(76,285,10),'evenodd');
+  S.gate(76,318,76,356,4); S.runner([[76,356],[140,356]],6);
+  S.rect(140,330,122,52,6);
+  S.glyph('M152 346H176M157 346C157 358 156 364 153 370M170 346V366C170 370 173 371 177 369',2.8);
+  S.text(181,362,'(a | o)',{size:15,wt:700,it:true,anchor:'start'});
+  // the goal: gripper jaws, fingers along the approach
   const jaw=[[0,0],[62,0],[82,12],[90,34],[78,36],[70,20],[58,16],[0,16]];
-  S.runner([[540,100],[560,100]],6); S.runner([[560,58],[560,142]],6); S.gate(560,6,560,58,4);
-  S.gate(560,64,566,64,3.4); S.part(poly(tr(jaw,564,54,0,.78))); S.gate(560,136,566,136,3.4); S.part(poly(tr(jaw.map(([x,y])=>[x,-y]),564,146,0,.78)));
+  S.runner([[488,150],[572,150]],6);
+  S.gate(494,150,494,140,3.6); S.part(poly(tr(jaw,480,140,-Math.PI/2,.78)));
+  S.gate(566,150,566,140,3.6); S.part(poly(tr(jaw.map(([x,y])=>[x,-y]),580,140,-Math.PI/2,.78)));
   // one link of hardware
   S.gate(40,6,40,40,4); let ld=rr(34,40,236,40,20)+circ(54,60,8)+circ(250,60,8); for(let i=1;i<=3;i++) ld+=circ(54+i*49,60,4); S.part(ld,'evenodd');
-  { const [x,y]=bz(.5); S.plate(x,y,'DEMO',46,17,10); }
 };
 
 /* Convolutional Neural Networks Fundamentals — the input map, the 3×3

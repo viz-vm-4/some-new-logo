@@ -435,7 +435,7 @@ const DEVICES = {
     // the diagonal rule and the frame of the matrix
     const e = N*cell/2 + 8;
     s += `<path d="M${-e} ${-e}V${e}H${e}" fill="none" stroke="${WHT}" stroke-width="3"/>`;
-    s += `<path d="M${-e+8} ${-e-9}H${e}M${e+9} ${-e+8}V${e-4}" fill="none" stroke="${WHT}" stroke-width="1.6" stroke-dasharray="2 5"/>`;
+    s += `<path d="M${-e+8} ${-e-7}H${e-6}M${e+7} ${-e+8}V${e-6}" fill="none" stroke="${WHT}" stroke-width="1.6" stroke-dasharray="2 5"/>`;
     return s;
   },
 
@@ -455,20 +455,20 @@ const DEVICES = {
      a full window → older turns folded down → a summary block over the recent turns, with room freed below.
      It deliberately makes no claim about how Pi, Hermes or Codex each compacts; the three panels are stages, not products. */
   triptych(c){
-    const xs = [-78,0,78], w = 58, top = -104, bot = 92; let s = '';
+    const xs = [-68,0,68], w = 52, top = -92, bot = 80; let s = '';
     xs.forEach((x,k) => {
-      const x0 = x - w/2, lx0 = x0 + 11, lx1 = x0 + w - 11; let L = '';
+      const x0 = x - w/2, lx0 = x0 + 10, lx1 = x0 + w - 10; let L = '';
       s += `<rect x="${x0}" y="${top}" width="${w}" height="${bot-top}" rx="4" fill="none" stroke="${WHT}" stroke-width="4.5"/>`;
-      if (k === 0){ for (let y = top + 13; y <= bot - 9; y += 10) L += `M${lx0} ${y}H${lx1}`; s += `<path d="${L}" stroke="${WHT}" stroke-width="3.4"/>`; }
-      if (k === 1){ let Z = `M${lx0} ${top+13}`; for (let y = top + 13, i = 0; y < top + 92; y += 6.5, i++) Z += `L${i % 2 ? lx0 : lx1} ${f(y)}`;
-        s += `<path d="${Z}" fill="none" stroke="${WHT}" stroke-width="2.6" stroke-linejoin="miter"/>`;
-        for (let y = top + 104; y <= bot - 9; y += 10) L += `M${lx0} ${y}H${lx1}`; s += `<path d="${L}" stroke="${WHT}" stroke-width="3.4"/>`; }
-      if (k === 2){ s += `<rect x="${lx0}" y="${top+12}" width="${lx1-lx0}" height="30" fill="${WHT}"/>`;
-        for (let y = top + 54; y <= top + 104; y += 10) L += `M${lx0} ${y}H${lx1}`; s += `<path d="${L}" stroke="${WHT}" stroke-width="3.4"/>`;
-        s += `<path d="M${lx0} ${bot-12}H${lx1}" stroke="${WHT}" stroke-width="1.6" stroke-dasharray="3 4"/>`; }
+      if (k === 0){ for (let y = top + 12; y <= bot - 8; y += 9.5) L += `M${lx0} ${y}H${lx1}`; s += `<path d="${L}" stroke="${WHT}" stroke-width="3.2"/>`; }
+      if (k === 1){ let Z = `M${lx0} ${top+12}`; for (let y = top + 12, i = 0; y < top + 82; y += 6.2, i++) Z += `L${i % 2 ? lx0 : lx1} ${f(y)}`;
+        s += `<path d="${Z}" fill="none" stroke="${WHT}" stroke-width="2.4" stroke-linejoin="miter"/>`;
+        for (let y = top + 93; y <= bot - 8; y += 9.5) L += `M${lx0} ${y}H${lx1}`; s += `<path d="${L}" stroke="${WHT}" stroke-width="3.2"/>`; }
+      if (k === 2){ s += `<rect x="${lx0}" y="${top+11}" width="${lx1-lx0}" height="27" fill="${WHT}"/>`;
+        for (let y = top + 49; y <= top + 92; y += 9.5) L += `M${lx0} ${y}H${lx1}`; s += `<path d="${L}" stroke="${WHT}" stroke-width="3.2"/>`;
+        s += `<path d="M${lx0} ${bot-11}H${lx1}" stroke="${WHT}" stroke-width="1.6" stroke-dasharray="3 4"/>`; }
     });
-    [-39, 39].forEach(x => { s += `<path d="M${x-5} -12L${x+5} -4L${x-5} 4Z" fill="${WHT}"/>`; });
-    s += `<path d="M-112 ${bot+12}H112" stroke="${WHT}" stroke-width="6"/><path d="M-96 ${bot+23}H96" stroke="${WHT}" stroke-width="2.2"/>`;
+    [-34, 34].forEach(x => { s += `<path d="M${x-4.5} -11L${x+4.5} -4L${x-4.5} 3Z" fill="${WHT}"/>`; });
+    s += `<path d="M-92 ${bot+11}H92" stroke="${WHT}" stroke-width="6"/><path d="M-78 ${bot+21}H78" stroke="${WHT}" stroke-width="2.2"/>`;
     return s;
   },
 
@@ -512,18 +512,18 @@ const DEVICES = {
   reason(c){
     const base = [0, 124];
     const ends = [[-88, 12, 0], [-62, -42, 1], [-28, -16, 0], [8, -80, 2], [46, -50, 1], [86, -2, 0]];
-    let thin = '', steps = '', out = '', bold = '';
+    let thin = '', steps = '', out = '', bold = '', boldKO = '';
     ends.forEach(([x, y, k]) => {
       const L = Math.hypot(x - base[0], y - base[1]), n = Math.floor(L / 30);
       const d = `M${base[0]} ${base[1]}L${x} ${y}`;
-      if (k === 2) bold = d; else thin += d;
+      if (k === 2){ const u = [(x-base[0])/L, (y-base[1])/L]; bold = d; boldKO = `M${f(base[0] + u[0]*48)} ${f(base[1] + u[1]*48)}L${x} ${y}`; } else thin += d;
       for (let j = 1; j < n; j++){ const t = j / n; steps += `<circle cx="${f(base[0] + (x-base[0])*t)}" cy="${f(base[1] + (y-base[1])*t)}" r="${k === 2 ? 4.6 : 3.4}" fill="${WHT}"/>`; }
       out += k === 0 ? `<circle cx="${x}" cy="${y}" r="10" fill="${BLK}"/><circle cx="${x}" cy="${y}" r="6.5" fill="none" stroke="${WHT}" stroke-width="2.6"/>`
            : k === 1 ? `<circle cx="${x}" cy="${y}" r="10.5" fill="${BLK}"/><circle cx="${x}" cy="${y}" r="7.5" fill="${WHT}"/>`
            : `<circle cx="${x}" cy="${y}" r="13" fill="${BLK}"/><circle cx="${x}" cy="${y}" r="9" fill="${WHT}"/><circle cx="${x}" cy="${y}" r="15.5" fill="none" stroke="${WHT}" stroke-width="2"/>`;
     });
     return `<path d="${thin}" stroke="${WHT}" stroke-width="2.4" stroke-linecap="round"/>${steps}
-      <path d="${bold}" stroke="${BLK}" stroke-width="13" stroke-linecap="round"/><path d="${bold}" stroke="${WHT}" stroke-width="5.5" stroke-linecap="round"/>
+      <path d="${boldKO}" stroke="${BLK}" stroke-width="11" stroke-linecap="round"/><path d="${bold}" stroke="${WHT}" stroke-width="5.5" stroke-linecap="round"/>
       ${out}<rect x="-11" y="${base[1]-7}" width="22" height="14" fill="${WHT}"/>`;
   },
 
@@ -556,7 +556,7 @@ const DEVICES = {
     s += `<g clip-path="url(#${c.id}L)"><path d="${rows}" stroke="${WHT}" stroke-width="3.4"/></g><g clip-path="url(#${c.id}R)"><path d="${rows}" stroke="${WHT}" stroke-width="3.4"/></g>`;
     s += `<path d="M${-X-14} ${-Y}V${Y}M${X+14} ${-Y}V${Y}" stroke="${WHT}" stroke-width="2.4"/>`;
     s += `<circle r="12" fill="${BLK}"/><circle r="7" fill="${WHT}"/>`;
-    return s;
+    return `<g transform="scale(.93)">${s}</g>`;
   },
 
   /* DeiT — sixteen image patches plus the two extra tokens: class (solid) and distillation (open),
@@ -573,8 +573,8 @@ const DEVICES = {
 
   /* Decision Trees — a trained tree: square splits, round leaves in two classes. */
   dtree(c){
-    const nodes = { r:[0,-96,'s'], a:[-62,-38,'s'], b:[62,-38,'s'], aa:[-92,22,'f'], ab:[-32,22,'s'], ba:[34,22,'o'], bb:[92,22,'s'],
-      aba:[-50,82,'o'], abb:[-14,82,'f'], bba:[74,82,'f'], bbb:[110,82,'o'] };
+    const nodes = { r:[-9,-96,'s'], a:[-71,-38,'s'], b:[53,-38,'s'], aa:[-101,20,'f'], ab:[-41,20,'s'], ba:[25,20,'o'], bb:[83,20,'s'],
+      aba:[-59,74,'o'], abb:[-23,74,'f'], bba:[65,74,'f'], bbb:[101,74,'o'] };
     const kids = { r:['a','b'], a:['aa','ab'], b:['ba','bb'], ab:['aba','abb'], bb:['bba','bbb'] };
     let d = '', s = '';
     for (const p in kids){ const [px,py] = nodes[p], [ax,ay] = nodes[kids[p][0]], [bx] = nodes[kids[p][1]], my = (py+ay)/2;
