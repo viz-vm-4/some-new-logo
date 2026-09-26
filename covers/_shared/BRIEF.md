@@ -67,6 +67,9 @@ principle, invent your own vocabulary.
   extra element with class `wrap` (not `.cover`) on the page.
 
 ## Process
+- Thumbnail check: `node tools/contact.js covers/<your-folder>/renders` writes
+  `renders/_contact-180.png`, every cover at 180px on a 1× screen. Read it. If a title
+  doesn't read there, fix it.
 - Look at your renders (open the PNG/JPGs with the Read tool — you can see images). Judge them
   at full size AND imagine them at 180px wide in a grid of 50. Be the harshest critic in the
   room. Iterate at least 2–3 rounds; kill weak ideas. Typography details matter: kerning of big

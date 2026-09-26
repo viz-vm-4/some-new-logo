@@ -1,0 +1,692 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Halcyon — Vizuara Books cover system</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&display=block" rel="stylesheet">
+<style>
+:root{
+  --paper:#F2EEE4; --ink:#1C1B19; --red:#C9352B;
+  --beg:#EEC232;  --beg2:#D6A81D;
+  --int:#4C9C6C;  --int2:#387F57;
+  --adv:#28398A;  --adv2:#1C2A69;
+  --page:#E4DED2;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--page);color:var(--ink);font-family:'Schibsted Grotesk',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+
+/* ───────────── COVER SYSTEM (.vz = any cover face) ───────────── */
+.vz{position:relative;width:720px;height:888px;overflow:hidden;background:var(--paper);color:var(--ink);flex:none}
+.vz .house{position:absolute;left:48px;right:48px;top:30px;height:24px;display:flex;align-items:center;gap:12px}
+.vz .house .device{width:44px;height:22px;display:block}
+.vz .house .imprint{font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;line-height:1}
+.vz .house .catno{margin-left:auto;font-size:13px;font-weight:600;letter-spacing:.06em;line-height:1;font-variant-numeric:tabular-nums}
+.vz .rule{position:absolute;left:48px;right:48px;top:70px;height:2px;background:var(--ink)}
+.vz .tblock{position:absolute;left:48px;right:48px;top:96px}
+.vz .volno{position:absolute;right:0;top:-6px;font-size:112px;font-weight:500;letter-spacing:-.02em;line-height:1}
+.vz .kicker{font-size:14px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;margin:0 0 18px}
+.vz h1{margin:0;font-weight:500;letter-spacing:-.028em;line-height:.98;font-size:var(--ts,64px);font-kerning:normal}
+.vz h1 span{display:block;white-space:nowrap;width:max-content}
+.vz .sub{margin:18px 0 0;font-size:22px;line-height:1.22;font-weight:400;letter-spacing:-.01em;max-width:600px}
+.vz .sub.big{font-size:30px;line-height:1.12;letter-spacing:-.018em;margin-top:16px}
+.vz .band{position:absolute;left:0;right:0;top:336px;height:36px;background:var(--ink);color:var(--paper);display:flex;align-items:center;padding:0 48px;gap:12px;font-size:12px;font-weight:600;letter-spacing:.18em;text-transform:uppercase}
+.vz .band .lvl{display:flex;gap:4px}
+.vz .band .lvl i{display:block;width:16px;height:8px;border-radius:4px;border:2px solid var(--paper)}
+.vz .band .lvl i.on{background:var(--paper)}
+.vz .band .meta{margin-left:auto}
+.vz .field{position:absolute;left:0;top:372px;width:720px;height:516px}
+.vz .field svg{display:block;width:720px;height:516px}
+.vz.beginner .field{background:var(--beg)}
+.vz.intermediate .field{background:var(--int)}
+.vz.advanced .field{background:var(--adv)}
+
+/* ───────────── PRESENTATION ───────────── */
+.page{max-width:1600px;margin:0 auto;padding:64px 32px 140px}
+.mast{display:flex;align-items:center;gap:14px;font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;padding-bottom:16px;border-bottom:2px solid var(--ink)}
+.mast .device{width:52px;height:26px}
+.mast span:last-child{margin-left:auto;letter-spacing:.08em}
+.intro{display:grid;grid-template-columns:1fr 1fr;gap:64px;margin:56px 0 72px}
+.intro h1{font-size:168px;font-weight:500;letter-spacing:-.05em;line-height:.86;margin:0 0 26px}
+.intro .tag{font-size:30px;line-height:1.15;letter-spacing:-.015em;margin:0;max-width:560px}
+.intro p{font-size:18px;line-height:1.55;margin:0 0 16px;max-width:660px}
+.intro p:first-child{font-size:22px;line-height:1.45}
+
+.sys{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);margin-bottom:24px}
+.sys > div{padding:22px 24px 26px;border-right:2px solid var(--ink)}
+.sys > div:first-child{padding-left:0}
+.sys > div:last-child{border-right:0;padding-right:0}
+.sys h3,h2.sec{font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;margin:0 0 16px}
+.sys p{font-size:14px;line-height:1.5;margin:10px 0 0}
+.sw{display:flex;align-items:center;gap:12px;margin:0 0 8px;font-size:13px}
+.sw i{width:40px;height:26px;display:block;flex:none}
+.sw b{font-weight:600;min-width:112px}
+.sw code{font-family:inherit;font-variant-numeric:tabular-nums;letter-spacing:.04em}
+.lv{display:grid;grid-template-columns:auto auto 1fr;align-items:center;gap:12px;margin:0 0 10px;font-size:14px;font-weight:600;line-height:1.25}
+.lv span.nm small{display:block;font-weight:400;font-size:13px;letter-spacing:.02em}
+.lv .pill{display:flex;gap:4px;background:var(--ink);padding:7px 9px;border-radius:2px}
+.lv .pill i{display:block;width:16px;height:8px;border-radius:4px;border:2px solid var(--paper)}
+.lv .pill i.on{background:var(--paper)}
+.lv .chip{width:54px;height:26px}
+.specimen{font-size:64px;font-weight:500;letter-spacing:-.035em;line-height:1}
+.specimen small{display:block;font-size:14px;letter-spacing:.02em;font-weight:400;margin-top:10px;line-height:1.5}
+.dev-big{display:flex;align-items:center;gap:18px}
+.dev-big svg{width:150px;height:75px}
+
+.anat{display:grid;grid-template-columns:auto 1fr;gap:36px;align-items:center;margin:48px 0 16px}
+.anat .mini{position:relative;width:240px;height:296px;background:var(--paper);box-shadow:0 1px 0 rgba(0,0,0,.2)}
+.anat ol{margin:0;padding:0;list-style:none;counter-reset:a;columns:2;column-gap:48px}
+.anat li{counter-increment:a;font-size:15px;line-height:1.5;margin:0 0 12px;break-inside:avoid;padding-left:36px;position:relative}
+.anat li::before{content:counter(a);position:absolute;left:0;top:1px;width:22px;height:22px;border-radius:11px;background:var(--ink);color:var(--paper);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+
+h2.sec{margin:88px 0 8px;padding-top:14px;border-top:2px solid var(--ink);display:flex;gap:24px;align-items:baseline}
+h2.sec em{font-style:normal;font-weight:400;letter-spacing:.02em;text-transform:none;font-size:16px}
+.covers{display:flex;flex-wrap:wrap;gap:48px 48px;margin-top:28px}
+.covers figure{margin:0;width:720px}
+.covers figcaption{font-size:14px;line-height:1.45;margin-top:14px;max-width:660px}
+.covers figcaption b{font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:12px;display:block;margin-bottom:3px}
+
+/* shelf of spines */
+.shelf{margin-top:28px;display:flex;flex-direction:column;gap:0}
+.shelf .row{display:flex;gap:3px;align-items:flex-end;padding:0 12px;border-bottom:14px solid #6d6457}
+.sp{width:54px;height:520px;position:relative;background:var(--paper);overflow:hidden;flex:none;box-shadow:inset -2px 0 0 rgba(0,0,0,.08)}
+.sp .n{position:absolute;top:12px;left:0;right:0;text-align:center;font-size:11px;font-weight:700;letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.sp .t{position:absolute;top:40px;left:0;width:54px;height:326px;writing-mode:vertical-rl;display:flex;align-items:center;justify-content:flex-start;font-size:13px;font-weight:600;letter-spacing:-.005em;line-height:1.05;white-space:nowrap}
+.sp .b{position:absolute;left:0;right:0;top:376px;height:18px;background:var(--ink);display:flex;align-items:center;justify-content:center;gap:2px}
+.sp .b i{display:block;width:6px;height:6px;border-radius:3px;border:1.5px solid var(--paper)}
+.sp .b i.on{background:var(--paper)}
+.sp .f{position:absolute;left:0;right:0;top:394px;bottom:0;display:flex;align-items:flex-end;justify-content:center;padding-bottom:16px}
+.sp .f svg{width:38px;height:19px}
+.sp.beginner .f{background:var(--beg)} .sp.intermediate .f{background:var(--int)} .sp.advanced .f{background:var(--adv)}
+.sp.soon .f{background-image:repeating-linear-gradient(135deg,transparent 0 7px,rgba(242,238,228,.28) 7px 10px)}
+
+/* print wrap */
+.wrap{display:flex;width:1498px;height:888px;margin-top:28px;box-shadow:0 2px 0 rgba(0,0,0,.15)}
+.wrap .back{position:relative;width:720px;height:888px}
+.wrap .spine{position:relative;width:58px;height:888px;background:var(--paper);border-left:1px dashed rgba(28,27,25,.35);border-right:1px dashed rgba(28,27,25,.35)}
+.back .blurb{position:absolute;left:48px;right:48px;top:96px}
+.back .blurb h4{margin:0 0 18px;font-size:34px;line-height:1.02;font-weight:500;letter-spacing:-.025em}
+.back .blurb p{margin:0 0 12px;font-size:17px;line-height:1.42;max-width:600px}
+.back .also{position:absolute;left:48px;right:48px;top:392px;color:var(--ink)}
+.back .also h5{font-size:12px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;margin:0 0 14px}
+.back .also ol{margin:0;padding:0;list-style:none;columns:2;column-gap:32px}
+.back .also li{font-size:15px;line-height:1.35;margin:0 0 9px;break-inside:avoid;display:flex;gap:10px}
+.back .also li span{font-weight:700;font-variant-numeric:tabular-nums;min-width:22px}
+.back .colophon{position:absolute;left:48px;right:210px;bottom:40px;font-size:13px;line-height:1.45}
+.back .code{position:absolute;right:48px;bottom:40px;width:140px;height:84px;background:var(--paper);display:flex;align-items:center;justify-content:center;font-size:10px;letter-spacing:.2em;text-transform:uppercase;font-weight:700;border:2px solid var(--ink)}
+.spine .sn{position:absolute;top:30px;left:0;right:0;text-align:center;font-size:13px;font-weight:700}
+.spine .st{position:absolute;top:66px;left:0;width:58px;height:262px;writing-mode:vertical-rl;display:flex;align-items:center;font-size:18px;font-weight:500;letter-spacing:-.01em;white-space:nowrap}
+.spine .sb{position:absolute;left:0;right:0;top:336px;height:36px;background:var(--ink)}
+.spine .sf{position:absolute;left:0;right:0;top:372px;bottom:0;display:flex;align-items:flex-end;justify-content:center;padding-bottom:30px;background:var(--beg)}
+.spine .sf svg{width:42px;height:21px}
+.spine .si{position:absolute;top:388px;left:0;width:58px;height:300px;writing-mode:vertical-rl;display:flex;align-items:center;font-size:12px;font-weight:700;letter-spacing:.2em;text-transform:uppercase}
+.note{font-size:14px;line-height:1.5;margin-top:14px;max-width:900px}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="mast"><span id="mastdev"></span><span>Vizuara Books</span><span>Cover system · Direction 03</span></div>
+
+  <section class="intro">
+    <div>
+      <h1>Halcyon</h1>
+      <p class="tag">A paperback modernism for a library of machine learning.</p>
+    </div>
+    <div>
+      <p>Halcyon takes its method from the post-war Penguin and Pelican paperbacks — Tschichold's horizontal grid, Marber's fixed title band, Facetti's abstract science covers — and applies it to a library about machines that learn.</p>
+      <p>Every cover is the same three bands: a paper band where the title is the hero, a black rule that carries the level and the length of the book, and a field of flat colour holding one abstract composition drawn from the book's own mechanism: a neuron, a causal-attention mask, a five-dimensional device mesh. The field's colour is the level, the way Penguin's green meant crime, so a shelf of Vizuara books sorts itself from across the room.</p>
+      <p>Everything is drawn in code with five inks, no raster images, and a publisher's device of its own: a kingfisher (the halcyon) in a capsule, because Vizuara teaches in capsules.</p>
+    </div>
+  </section>
+
+  <section class="sys">
+    <div>
+      <h3>Inks</h3>
+      <div class="sw"><i style="background:#F2EEE4;outline:1.5px solid #1C1B19;outline-offset:-1.5px"></i><b>Paper</b><code>#F2EEE4</code></div>
+      <div class="sw"><i style="background:#1C1B19"></i><b>Ink</b><code>#1C1B19</code></div>
+      <div class="sw"><i style="background:#C9352B"></i><b>Signal red</b><code>#C9352B</code></div>
+      <p>Red is the house accent. It marks the idea in every emblem — the minimum, the next token, the question — and nothing else.</p>
+    </div>
+    <div>
+      <h3>Level</h3>
+      <div class="lv"><span class="pill"><i class="on"></i><i></i><i></i></span><i class="chip" style="background:#EEC232"></i><span class="nm">Beginner<small>Chrome #EEC232</small></span></div>
+      <div class="lv"><span class="pill"><i class="on"></i><i class="on"></i><i></i></span><i class="chip" style="background:#4C9C6C"></i><span class="nm">Intermediate<small>Viridian #4C9C6C</small></span></div>
+      <div class="lv"><span class="pill"><i class="on"></i><i class="on"></i><i class="on"></i></span><i class="chip" style="background:#28398A"></i><span class="nm">Advanced<small>Ultramarine #28398A</small></span></div>
+      <p>Coded three ways: field colour, filled capsules, the word. The colours step light → mid → dark, so level still reads in greyscale. Each has one deeper shade for tone-on-tone.</p>
+    </div>
+    <div>
+      <h3>Type</h3>
+      <div class="specimen">Schibsted<br>Grotesk<small>One family, from Google Fonts. Titles 500, tracked tight (−2.8%), flush left, set by hand line by line and never broken on a short word. Labels 600–700 in spaced capitals.</small></div>
+    </div>
+    <div>
+      <h3>Device</h3>
+      <div class="dev-big" id="bigdev"></div>
+      <p>A kingfisher — the halcyon — built from four shapes (a half-disc, a disc, two triangles) inside a capsule. It signs every cover at 44 px, small enough never to compete with the title.</p>
+    </div>
+  </section>
+
+  <section class="anat">
+    <div class="mini" id="mini"></div>
+    <ol>
+      <li><b>Imprint line.</b> Device, "Vizuara Books", catalogue number — the signature, 13 px, same place on every book.</li>
+      <li><b>Title band.</b> Paper, 336 px deep. Title at 60–92 px, hand-broken; optional subtitle or series line. The same depth on every book, so titles hang from one line across the shelf.</li>
+      <li><b>Level rule.</b> A 36 px black band: level capsules and word on the left, capsules and hours on the right ("Forthcoming" for books not yet out).</li>
+      <li><b>Emblem field.</b> 720 × 516, flat level colour, one composition drawn from the subject in five inks. Compositions may bleed; nothing critical within 24 px of trim.</li>
+      <li><b>Sub-series.</b> Charlie and the Intelligence Factory keeps the grid and adds a shared set: factory roof, conveyor, and a volume numeral. The lit pane in the roof is the volume.</li>
+      <li><b>Forthcoming.</b> Unpublished books print as a proof: keylines only, one element inked in red.</li>
+    </ol>
+  </section>
+
+  <h2 class="sec">The core six <em>— the books the library leads with</em></h2>
+  <div class="covers" id="core"></div>
+
+  <h2 class="sec">Charlie and the Intelligence Factory <em>— a four-volume sub-series inside the system</em></h2>
+  <div class="covers" id="charlie"></div>
+
+  <h2 class="sec">Range <em>— short titles, a long one, a colon, a forthcoming book</em></h2>
+  <div class="covers" id="range"></div>
+
+  <h2 class="sec">On the shelf <em>— all 52 titles by spine, as they would sort by level</em></h2>
+  <div class="shelf" id="shelf"></div>
+  <p class="note">Spines repeat the cover's bands at 44 px: number, title, level rule, level colour, device. Hatched feet are forthcoming books. Unlike the covers, the shelf is sorted by level, so the colour runs in blocks.</p>
+
+  <h2 class="sec">Print wrap <em>— back, spine and front for No. 03, at trim</em></h2>
+  <div id="wrapholder"></div>
+</div>
+
+<script>
+/* ============================================================
+   HALCYON — a paperback modernism for Vizuara Books
+   ============================================================ */
+const PAL = {
+  paper:'#F2EEE4', ink:'#1C1B19', red:'#C9352B',
+  beginner:     { g:'#EEC232', g2:'#D6A81D' },
+  intermediate: { g:'#4C9C6C', g2:'#387F57' },
+  advanced:     { g:'#28398A', g2:'#1C2A69' },
+};
+function roles(level){
+  const L = PAL[level];
+  const dark = level==='advanced';
+  return { g:L.g, g2:L.g2, red:PAL.red, paper:PAL.paper, ink:PAL.ink,
+           a: dark?PAL.paper:PAL.ink, b: dark?PAL.ink:PAL.paper };
+}
+const W=720, H=516;
+// seeded rng
+function rng(seed){ let h=2166136261; for(const ch of seed){ h^=ch.charCodeAt(0); h=Math.imul(h,16777619);}
+  return function(){ h+=0x6D2B79F5; let t=h; t=Math.imul(t^t>>>15,t|1); t^=t+Math.imul(t^t>>>7,t|61); return ((t^t>>>14)>>>0)/4294967296; }; }
+const f1 = n => Math.round(n*10)/10;
+const R = (x,y,w,h,fill,extra='') => `<rect x="${f1(x)}" y="${f1(y)}" width="${f1(w)}" height="${f1(h)}" fill="${fill}" ${extra}/>`;
+const C = (cx,cy,r,fill,extra='') => `<circle cx="${f1(cx)}" cy="${f1(cy)}" r="${f1(r)}" fill="${fill}" ${extra}/>`;
+const P = (d,fill,extra='') => `<path d="${d}" fill="${fill}" ${extra}/>`;
+const Ln = (x1,y1,x2,y2,stroke,w,extra='') => `<line x1="${f1(x1)}" y1="${f1(y1)}" x2="${f1(x2)}" y2="${f1(y2)}" stroke="${stroke}" stroke-width="${w}" ${extra}/>`;
+const poly = (pts,fill,extra='') => `<polygon points="${pts.map(p=>f1(p[0])+','+f1(p[1])).join(' ')}" fill="${fill}" ${extra}/>`;
+
+/* ---------- the device: a kingfisher in a capsule ---------- */
+function device(fg, bg){
+  return `<svg class="device" viewBox="0 0 64 32" aria-label="Vizuara Books device: a kingfisher in a capsule">
+    <rect x="0" y="0" width="64" height="32" rx="16" fill="${bg}"/>
+    <path d="M12 17 A14 14 0 0 0 40 17 Z" fill="${fg}"/>
+    <path d="M13.5 17 L5 12 L8 20 Z" fill="${fg}"/>
+    <circle cx="39" cy="12.4" r="8.4" fill="${fg}"/>
+    <path d="M44.5 9 L61 13.2 L44.5 16.4 Z" fill="${fg}"/>
+    <circle cx="40.8" cy="10.8" r="2" fill="${bg}"/>
+  </svg>`;
+}
+
+/* ============================================================
+   EMBLEMS — one abstract composition per book, 720 × 480
+   ============================================================ */
+const ART = {};
+
+/* AI Context Engineering — context is what surrounds the question. The layers
+   nest in the order a model reads them — system prompt, tools, retrieved
+   documents, conversation history — each one weighted above the next, and the
+   question, in red, comes last. */
+ART['ai-context-engineering'] = (c) => {
+  let s='';
+  const sizes=[476,372,280,196,112], x0=W/2, fills=[c.ink,c.g2,c.paper,c.g,c.red];
+  let top=22;
+  const boxes=[];
+  sizes.forEach((sz,i)=>{
+    if(i>0){ const d=sizes[i-1]-sz; top=boxes[i-1].y+d*.74; }
+    boxes.push({x:x0-sz/2,y:top,s:sz});
+  });
+  boxes.forEach((b,i)=>{
+    s+=R(b.x,b.y,b.s,b.s,fills[i]);
+    if(i===3){ // history: lines of conversation
+      for(let y=b.y+12;y<b.y+b.s-6;y+=13) s+=R(b.x,y,b.s,5,c.ink);
+    }
+  });
+  return s;
+};
+
+/* Mathematical Foundations — three forms on one plinth: the identity matrix
+   (linear algebra), a convex bowl holding its minimum (calculus and
+   optimisation), and the normal curve with its central 68% (probability). */
+ART['mathematical-foundations-for-ml'] = (c) => {
+  let s='';
+  const G=432;
+  s+=R(0,G,W,H-G,c.ink);
+  // 1 · identity matrix
+  const mx=40, ms=212, my=G-ms;
+  s+=R(mx,my,ms,ms,c.ink);
+  const n=4, cell=ms/n;
+  for(let i=0;i<n;i++) for(let j=0;j<n;j++){
+    const cx=mx+cell*(j+.5), cy=my+cell*(i+.5);
+    s+= i===j ? C(cx,cy,17,c.red) : C(cx,cy,5.5,c.paper);
+  }
+  // 2 · the bowl
+  const bx=268, bw=196, top=G-300, depth=182;
+  s+=P(`M${bx} ${top} Q ${bx+bw/2} ${top+2*depth} ${bx+bw} ${top} L ${bx+bw} ${G} L ${bx} ${G} Z`, c.paper);
+  s+=C(bx+bw/2, top+depth-21, 21, c.red);
+  // 3 · the normal curve, as the histogram that approximates it
+  const nx=470, nb=9, bw2=24, bg=3, nh=300, mu=nx+(nb*(bw2+bg)-bg)/2;
+  for(let i=0;i<nb;i++){ const z=(i-(nb-1)/2)*.62; const h=nh*Math.exp(-z*z/2); s+=R(nx+i*(bw2+bg),G-h,bw2,h, i===(nb-1)/2?c.red:c.ink); }
+  return s;
+};
+
+/* Neural Networks from Scratch — the unit everything is built from: one
+   neuron. Inputs arrive at the thickness of their weights (ink positive,
+   paper negative), are summed, squashed by the sigmoid, and sent on. */
+ART['neural-networks-from-scratch'] = (c, rnd) => {
+  let s='';
+  const cx=430, cy=262, r=138;
+  const ys=[18,92,170,250,330,410,494], ws=[.55,-.9,.3,1,-.45,.75,-.25];
+  ys.forEach((y0,i)=>{
+    const w=ws[i], t=6+Math.abs(w)*34, t2=t*.22;
+    s+=poly([[-10,y0-t/2],[-10,y0+t/2],[cx,cy+t2/2],[cx,cy-t2/2]], w>0?c.ink:c.paper);
+  });
+  s+=R(cx,cy-24,W-cx+10,48,c.red);
+  s+=C(cx,cy,r,c.ink);
+  // sigmoid inside the neuron
+  let d=''; for(let x=-96;x<=96;x+=2){ const y=-74*(2/(1+Math.exp(-x/22))-1); d+=(x===-96?'M':'L')+f1(cx+x)+' '+f1(cy+y); }
+  s+=`<path d="${d}" fill="none" stroke="${c.paper}" stroke-width="16" stroke-linecap="round"/>`;
+  return s;
+};
+
+/* Build LLMs from Scratch — causal self-attention: each token (a row) may look
+   only backwards. Dot area = attention weight; note the heavy first column
+   (the attention sink). The last row, in red, is the model choosing the next
+   token. */
+ART['build-llms-from-scratch'] = (c, rnd) => {
+  let s='';
+  const N=12, cw=56, ch=41, ox=W/2-(N-1)*cw/2, oy=H/2-(N-1)*ch/2;
+  for(let i=0;i<N;i++){
+    let logits=[]; for(let j=0;j<=i;j++){ let l=rnd()*(i===N-1?2.6:1.7); if(j===0) l+=1.7; if(j===i) l+=1.2; if(j===i-1) l+=.5; logits.push(l); }
+    const m=Math.max(...logits), ex=logits.map(v=>Math.exp(v-m)), sum=ex.reduce((a,b)=>a+b,0);
+    for(let j=0;j<N;j++){
+      const x=ox+j*cw, y=oy+i*ch;
+      if(j>i){ s+=C(x,y,3,c.g2); continue; }
+      const p=ex[j]/sum, rr=Math.max(i===N-1?7:3.5, Math.sqrt(p)*(i===N-1?34:27));
+      s+=C(x,y,rr, i===N-1?c.red:(j===i?c.ink:c.paper));
+    }
+  }
+  return s;
+};
+
+/* 5D Parallelism — the device mesh as a hypercube. Five axes of parallelism
+   (data, tensor, pipeline, context, expert), two ranks each: 32 GPUs at the
+   corners of a 5-cube, projected into the plane along five directions 36° apart.
+   Every edge is a link along one axis. */
+ART['5d-parallelism'] = (c) => {
+  let s='';
+  const Rr=84, cx=W/2, cy=H/2+30;
+  const v=[0,1,2,3,4].map(k=>[Rr*Math.cos(Math.PI*k/5-Math.PI/2), Rr*Math.sin(Math.PI*k/5-Math.PI/2)]);
+  const pts=[];
+  for(let m=0;m<32;m++){ let x=cx,y=cy; for(let k=0;k<5;k++){ const e=(m>>k&1)?1:-1; x+=e*v[k][0]; y+=e*v[k][1]; } pts.push([x,y]); }
+  // outer decagon (the zonotope) as a mass
+  const hull=[]; for(let k=0;k<10;k++){ let x=cx,y=cy; const a=k*Math.PI/5; for(let j=0;j<5;j++){ const dot=v[j][0]*Math.cos(a)+v[j][1]*Math.sin(a); const e=dot>=0?1:-1; x+=e*v[j][0]; y+=e*v[j][1]; } hull.push([x,y]); }
+  s+=poly(hull,c.g2);
+  const cols=[c.paper,c.paper,c.paper,c.paper,c.red];
+  for(let k=0;k<5;k++) for(let m=0;m<32;m++) if(!(m>>k&1)){ const a=pts[m], b=pts[m|1<<k]; s+=Ln(a[0],a[1],b[0],b[1], cols[k], k===4?5:3, 'stroke-linecap="round"'); }
+  pts.forEach(p=>{ s+=C(p[0],p[1],8,c.ink)+C(p[0],p[1],4,c.paper); });
+  return s;
+};
+
+/* Pi vs Hermes vs Codex — three agents, three ways of compacting an endless
+   context (the stripes, falling from above) into something that fits in
+   memory (the solid glyph each one keeps). */
+ART['pi-vs-hermes-vs-codex'] = (c) => {
+  let s='';
+  const cols=[132,360,588], cw=164, stop=346;
+  const rhythms=[
+    (y)=>{ const t=y/stop; return [5, Math.max(2,15-13*t)]; },
+    (y)=>{ return y<210 ? [5,10] : [stop-y, 0]; },
+    (y)=>{ const t=y/stop; return t<.4?[5,10]:(t<.7?[16,8]:[30,8]); },
+  ];
+  cols.forEach((x,i)=>{ let y=-2; while(y<stop){ const [h,g]=rhythms[i](y); const hh=Math.min(h,stop-y); s+=R(x-cw/2,y,cw,hh,c.a); y+=hh+g; if(g===0) break; } });
+  const gy=366, gs=128;
+  s+=C(cols[0],gy+gs/2,gs/2,c.red);
+  s+=poly([[cols[1],gy],[cols[1]+gs*.58,gy+gs],[cols[1]-gs*.58,gy+gs]],c.red);
+  s+=R(cols[2]-gs/2,gy,gs,gs,c.red);
+  s+=R(0,H-10,W,10,c.ink);
+  return s;
+};
+
+/* ---------- CHARLIE AND THE INTELLIGENCE FACTORY (sub-series) ----------
+   Every room shares the same factory: a four-bay north-light roof (one bay per
+   book — this book's pane is lit red) and a conveyor on the floor. Only what
+   the room makes changes. */
+function factory(c, no, inner){
+  let s='';
+  const n=4, tw=W/n, base=86, top=14, glass=22;
+  for(let i=0;i<n;i++){ const x=i*tw;
+    s+=poly([[x,base],[x+tw-glass,top],[x+tw-glass,base]],c.ink);
+    s+=R(x+tw-glass,top,glass,base-top, i===no-1?c.red:c.paper);
+  }
+  s+=R(0,base,W,14,c.ink);
+  s+=inner;
+  // conveyor
+  const by=448;
+  s+=R(-10,by,W+20,44,c.ink,'rx="0"');
+  for(let x=26;x<W;x+=56) s+=C(x,by+22,12,c.g2)+C(x,by+22,4,c.paper);
+  return s;
+}
+ART['charlie-language-room'] = (c) => {        // the model: prompt in at the top, one token at a time out onto the belt
+  let s='';
+  // prompt tokens dropping into the hopper
+  [[168,112,46,-12],[226,122,30,8],[276,110,40,16]].forEach(([x,y,w,a])=>{ s+=R(x-w/2,y-13,w,26,c.paper,`transform="rotate(${a} ${x} ${y})"`); });
+  s+=poly([[120,150],[340,150],[290,196],[170,196]],c.ink);
+  // the machine: a stack of identical layers
+  const mx=150, mw=160, my=196; s+=R(mx,my,mw,448-my,c.ink);
+  for(let k=0;k<6;k++) s+=R(mx+22,my+30+k*36,mw-44,10,c.paper);
+  // output tokens on the belt, newest (red) nearest the machine
+  let x=mx+mw+14; [44,70,36,58,84,40,66].forEach((w,k)=>{ if(x+w>W+40) return; s+=R(x,448-38,w,38,k===0?c.red:c.paper); x+=w+10; });
+  return factory(c,1,s);
+};
+ART['charlie-vision-room'] = (c) => {          // an image cut into patches, flattened onto the belt
+  let s=''; const n=4, ps=64, pg=8, gx=52, gy=124, D=n*ps+(n-1)*pg;
+  s+=`<defs><clipPath id="vdisc"><circle cx="${gx+D*.56}" cy="${gy+D*.52}" r="${D*.40}"/></clipPath></defs>`;
+  const patches=[];
+  for(let i=0;i<n;i++) for(let j=0;j<n;j++){ const x=gx+j*(ps+pg), y=gy+i*(ps+pg); patches.push([x,y]); s+=R(x,y,ps,ps,c.paper); }
+  s+=`<g clip-path="url(#vdisc)">`+patches.map(([x,y])=>R(x,y,ps,ps,c.ink)).join('')+`</g>`;
+  // the same patches, in reading order, on the belt — the class token leads, in red
+  const ss=40, sg=6; let x=W-12-(8*ss+7*sg), y=448-10-ss;
+  s+=R(x,y,ss,ss,c.red); x+=ss+sg;
+  const seqc=[[0,0],[0,1],[1,0],[1,1],[0,1],[1,0],[1,1]];
+  for(let k=0;k<7;k++){ s+=R(x,y,ss,ss,c.paper); x+=ss+sg; }
+  // travel: patches descending to the belt
+  [[420,206],[488,262],[556,318]].forEach(([px,py],k)=>{ s+=R(px,py,ss,ss,c.paper); });
+  return factory(c,2,s);
+};
+ART['charlie-sound-room'] = (c) => {           // a conversation: you speak (paper), the agent answers (red)
+  let s=''; const cy=270, n=44, bw=8, gap=6, x0=W/2-(n*(bw+gap)-gap)/2;
+  const env=(k)=>{ if(k<19){ const t=k/18; return Math.sin(Math.PI*t)*(0.55+0.45*Math.sin(t*11)); } if(k<24) return 0.05; const t=(k-24)/19; return Math.sin(Math.PI*t)*(0.6+0.4*Math.cos(t*9)); };
+  const rn=rng('sound');
+  for(let k=0;k<n;k++){ const e=env(k); if(e<.1) continue; const h=Math.max(10, e*(270)*(0.7+0.3*rn())); s+=R(x0+k*(bw+gap),cy-h/2,bw,h, k<24?c.paper:c.red, `rx="${bw/2}"`); }
+  let x=34; for(let k=0;k<11;k++){ s+=R(x,448-8-22,40,22,c.paper); x+=62; }
+  return factory(c,3,s);
+};
+ART['charlie-reasoning-room'] = (c) => {       // search over chains of thought; reward picks a path
+  let s=''; const root=[360,448], levels=3, dy=[0,92,88,84], spread=[0,352,176,88];
+  const nodes=[[root]];
+  for(let l=1;l<=levels;l++){ const cur=[]; nodes[l-1].forEach(p=>{ cur.push([p[0]-spread[l]/2,p[1]-dy[l]]); cur.push([p[0]+spread[l]/2,p[1]-dy[l]]); }); nodes.push(cur); }
+  const best=[0,1,2,5];
+  for(let l=1;l<=levels;l++) nodes[l].forEach((p,i)=>{ const par=nodes[l-1][i>>1]; const on=best[l]===i && best[l-1]===(i>>1);
+    s+=Ln(par[0],par[1],p[0],p[1], on?c.red:c.paper, on?14:7, 'stroke-linecap="round"'); });
+  const rew=[14,22,10,30,18,36,12,20];
+  nodes[levels].forEach((p,i)=>{ const r=rew[i]; s+=C(p[0],p[1]-r+4,r, i===best[levels]?c.red:c.paper); });
+  for(let l=1;l<levels;l++) nodes[l].forEach((p,i)=>{ s+=C(p[0],p[1],11, best[l]===i?c.red:c.paper); });
+  return factory(c,4,s);
+};
+
+/* Build Decision Trees from Scratch — a tree of splits hung as a mobile: every
+   bar is a threshold, every weight a leaf; colour is the predicted class. */
+ART['decision-trees-from-scratch'] = (c) => {
+  let s='';
+  const bar=(x1,x2,y)=>R(x1,y-5,x2-x1,10,c.ink,'rx="5"');
+  const str=(x,y1,y2)=>R(x-1.5,y1,3,y2-y1,c.ink);
+  s+=str(360,-4,56);
+  s+=bar(128,600,56);
+  // left subtree
+  s+=str(128,56,200)+bar(56,258,200);
+  s+=str(56,200,300)+C(56,340,40,c.ink);
+  s+=str(258,200,340)+bar(196,318,340);
+  s+=str(196,340,420)+R(170,420,52,52,c.red);
+  s+=str(318,340,408)+C(318,430,22,c.ink);
+  // right subtree
+  s+=str(600,56,170)+bar(456,652,170);
+  s+=str(456,170,300)+R(410,300,92,92,c.red);
+  s+=str(652,170,300)+bar(598,676,300);
+  s+=str(598,300,386)+C(598,410,24,c.ink);
+  s+=str(676,300,376)+R(652,376,48,48,c.red);
+  return s;
+};
+
+/* RAG in Production — the corpus as a shelf; the retriever lifts out the few
+   passages that answer the question. */
+ART['rag-in-production'] = (c) => {
+  let s='';
+  const y=468, rn=rng('rag-books'), lift=[3,9,14]; let x=-14, k=0;
+  while(x<W){ const w=26+Math.floor(rn()*22), h=176+Math.floor(rn()*56); const lifted=lift.includes(k);
+    const pick=Math.floor(rn()*5), col=[c.g2,c.paper,c.ink,c.g2,c.paper][pick];
+    const lab = col===c.paper?c.ink:c.paper;
+    const by = lifted? y-h-150 : y-h, bc = lifted? c.red : col, lc = lifted? c.paper : lab;
+    s+=R(x,by,w,h,bc);
+    s+=R(x,by+h*.16,w,10,lc); s+=R(x,by+h*.16+16,w,4,lc);
+    s+=R(x,by+h-22,w,4,lc);
+    x+=w+4; k++; }
+  s+=R(-10,y,W+20,18,c.ink);
+  return s;
+};
+
+/* Transformers — multi-head attention as an arc diagram: tokens on a line, each
+   head's attention drawn as arcs between the positions it links. */
+ART['transformers-from-scratch'] = (c) => {
+  let s='';
+  const n=12, x0=52, x1=668, y=452, dx=(x1-x0)/(n-1), X=i=>x0+i*dx;
+  const arc=(i,j,col,w)=>{ const a=X(i), b=X(j); return `<path d="M${f1(a)} ${y} A ${f1((b-a)/2)} ${f1((b-a)/2)} 0 0 1 ${f1(b)} ${y}" fill="none" stroke="${col}" stroke-width="${w}"/>`; };
+  // head 1 — previous token
+  for(let i=0;i<n-1;i++) s+=arc(i,i+1,c.paper,7);
+  // head 2 — back to the first token (the sink) and long range
+  [[0,11],[0,8],[0,5],[2,9]].forEach(([i,j])=>s+=arc(i,j,c.ink,7));
+  // head 3 — the one that finds the matching earlier word
+  [[3,10],[1,6],[4,7]].forEach(([i,j])=>s+=arc(i,j,c.red,10));
+  for(let i=0;i<n;i++) s+=R(X(i)-12,y,24,34,c.ink);
+  return s;
+};
+
+/* Kernel Engineering (forthcoming) — work tiled from the grid down: blocks,
+   warps, threads. Shown as a printer's proof: keylines only, one tile inked. */
+ART['kernel-engineering'] = (c) => {
+  let s='';
+  const st=`fill="none" stroke="${c.paper}" stroke-linejoin="miter"`;
+  const grid=(x,y,size,n,w)=>{ let g=`<rect x="${x}" y="${y}" width="${size}" height="${size}" ${st} stroke-width="${w}"/>`; for(let k=1;k<n;k++){ g+=Ln(x+k*size/n,y,x+k*size/n,y+size,c.paper,w)+Ln(x,y+k*size/n,x+size,y+k*size/n,c.paper,w);} return g; };
+  const X=150, Y=36, S=448;
+  s+=grid(X,Y,S,4,5);
+  const t=S/4, x2=X+2*t, y2=Y+1*t; s+=R(x2,y2,t,t,c.g2); s+=grid(x2,y2,t,4,3);
+  const t2=t/4, x3=x2+1*t2, y3=y2+2*t2; s+=R(x3,y3,t2,t2,c.red);
+  // the zoom: the inked tile, enlarged, bleeding off the right
+  return s;
+};
+
+/* DeiT — a Vision Transformer that learns from a teacher: image patches, a
+   class token (ink) and a distillation token (red), under the teacher's disc. */
+ART['deit-from-scratch'] = (c) => {
+  let s='';
+  // the teacher: a large network, drawn as a disc the student leans against
+  s+=C(628,262,232,c.ink);
+  const n=4, ps=62, pg=8, gx=98, gy=126, D=n*ps+(n-1)*pg;
+  // class token first (ink), patch tokens, distillation token last (red) — touching the teacher
+  s+=R(gx-22-36,gy,36,D,c.ink);
+  for(let i=0;i<n;i++) for(let j=0;j<n;j++) s+=R(gx+j*(ps+pg),gy+i*(ps+pg),ps,ps,c.paper);
+  s+=R(gx+D+22,gy,36,D,c.red);
+  return s;
+};
+
+/* SQL Masterclass — two tables and the join between them: where rows of one
+   meet rows of the other, the result is inked red. */
+ART['sql-masterclass'] = (c) => {
+  let s='';
+  const rh=40;
+  const table=(x,y,w,rows,fill,line,cols)=>{ let t=R(x,y,w,rows*rh,fill); t+=R(x,y,w,rh,line);
+    for(let r=2;r<rows;r++) t+=R(x,y+r*rh-2,w,4,line);
+    cols.forEach(f=>t+=R(x+w*f-2,y+rh,4,(rows-1)*rh,line)); return t; };
+  const A={x:48,y:56,w:352,rows:10}, B={x:304,y:136,w:368,rows:9};
+  s+=table(A.x,A.y,A.w,A.rows,c.paper,c.ink,[.34,.67]);
+  s+=table(B.x,B.y,B.w,B.rows,c.ink,c.paper,[.5]);
+  // the join: the overlap, in red, keeping the row rhythm
+  const ox=B.x, ow=A.x+A.w-B.x, oy=B.y, oh=A.y+A.rows*rh-B.y;
+  s+=R(ox,oy,ow,oh,c.red);
+  for(let y=oy+rh;y<oy+oh;y+=rh) s+=R(ox,y-2,ow,4,c.ink);
+  return s;
+};
+
+/* ============================================================
+   BOOKS
+   ============================================================ */
+const CATALOG = [
+ ['ai-context-engineering','AI Context Engineering','intermediate'],['mathematical-foundations-for-ml','Mathematical Foundations for Machine Learning','beginner'],
+ ['neural-networks-from-scratch','Neural Networks from Scratch','beginner'],['build-llms-from-scratch','Build Large Language Models (LLMs) from Scratch','intermediate'],
+ ['5d-parallelism','5D Parallelism for Large Model Training','advanced'],['pi-vs-hermes-vs-codex','Pi vs Hermes vs Codex: Context Compaction and Memory','advanced'],
+ ['deepseek-harness','DeepSeek Harness','advanced'],['how-to-host-kimi-k3','How to Host Kimi K3','advanced'],['machine-learning-fundamentals','Machine Learning Fundamentals','beginner'],
+ ['pretraining-mini-kimi-k3','Pretraining a Mini Kimi K3','advanced'],['prompt-engineering','Prompt Engineering','beginner'],['python-for-data-science','Python for Data Science','beginner'],
+ ['rag-in-production','RAG in Production','intermediate'],['decision-trees-from-scratch','Build Decision Trees from Scratch','beginner'],['deep-learning-fundamentals','Deep Learning Fundamentals','beginner'],
+ ['foundations-for-ai-ml','Foundations for AI & ML','beginner'],['generative-ai-fundamentals','Generative AI Fundamentals','beginner'],['git-github-masterclass','Git & GitHub Masterclass','beginner'],
+ ['modern-software-developer','The Modern Software Developer','beginner'],['r-masterclass','R Masterclass','beginner'],['sql-masterclass','SQL Masterclass','beginner'],
+ ['ai-agents-bootcamp','AI Agents Bootcamp','intermediate'],['claude-certified-architect','Claude Certified Architect (CCAF)','intermediate'],['cnn-fundamentals','Convolutional Neural Networks Fundamentals','intermediate'],
+ ['computer-vision-bootcamp','Computer Vision Bootcamp','intermediate'],['dsa-in-python','Data Structures & Algorithms in Python','intermediate'],['llm-finetuning','LLM Finetuning','intermediate'],
+ ['llm-production-deployment','LLM Production & Deployment','intermediate'],['memory-in-ai-systems','Memory in AI Systems','intermediate'],['mini-clawdbot','Build a Mini ClawdBot from Scratch','intermediate'],
+ ['ml-dl-mastery','Machine Learning & Deep Learning Mastery','intermediate'],['nlp-cv-mastery','NLP & Computer Vision Mastery','intermediate'],['reinforcement-learning','Reinforcement Learning','intermediate'],
+ ['transformers-from-scratch','Transformers: Theory, Intuition, and Building from Scratch','intermediate'],['vit-from-scratch','Build a Vision Transformer (ViT) from Scratch','intermediate'],
+ ['writing-papers','Writing Journal & Conference Papers','intermediate'],['deit-from-scratch','Build a Data-Efficient Image Transformer (DeiT) from Scratch','advanced'],
+ ['diffusion-lm-from-scratch','Build a Diffusion Language Model from Scratch','advanced'],['kimi-k3-from-scratch','Build Kimi K3 from Scratch','advanced'],['modern-robot-learning','Modern Robot Learning','advanced'],
+ ['nanovlm-from-scratch','Build a NanoVLM from Scratch','advanced'],['rlhf-from-scratch','RLHF from Scratch','advanced'],['sciml','Scientific Machine Learning (SciML)','advanced'],
+ ['transformers-vision-multimodal','Transformers for Vision & Multimodal LLMs','advanced'],['vla-world-models','Vision-Language-Action & World Models for Robotics','advanced'],
+ ['charlie-language-room','Charlie and the Language Room','advanced'],['charlie-vision-room','Charlie and the Vision Room','intermediate'],['charlie-sound-room','Charlie and the Sound Room','intermediate'],
+ ['charlie-reasoning-room','Charlie and the Reasoning Room','advanced'],['harness-engineering','Harness Engineering','advanced',1],['kernel-engineering','Kernel Engineering','advanced',1],
+ ['inference-engineering','Inference Engineering','advanced',1],
+];
+const NO = Object.fromEntries(CATALOG.map((b,i)=>[b[0],i+1]));
+
+const BOOKS = [
+  { slug:'ai-context-engineering', group:'core', level:'intermediate', capsules:43, hours:10, lines:['AI Context','Engineering'], ts:84,
+    cap:'Context is what surrounds the question. System prompt, tools, retrieved documents and history nest in the order a model reads them, each weighted above the next; the question, in red, comes last.' },
+  { slug:'mathematical-foundations-for-ml', group:'core', level:'beginner', capsules:43, hours:10, lines:['Mathematical','Foundations for','Machine Learning'], ts:66,
+    cap:'Three forms on one plinth: the identity matrix (linear algebra), a convex bowl holding its minimum (calculus), the histogram of a normal curve (probability).' },
+  { slug:'neural-networks-from-scratch', group:'core', level:'beginner', capsules:33, hours:7, lines:['Neural Networks','from Scratch'], ts:74,
+    cap:'One neuron. Inputs arrive at the thickness of their weights (ink positive, paper negative), are summed, squashed by a sigmoid, and sent on in red.' },
+  { slug:'build-llms-from-scratch', group:'core', level:'intermediate', capsules:20, hours:6, lines:['Build Large','Language Models','(LLMs) from Scratch'], ts:64,
+    cap:'A causal attention mask. Each row may only look back; dot area is attention weight; the heavy first column is the attention sink; the red row chooses the next token.' },
+  { slug:'5d-parallelism', group:'core', level:'advanced', capsules:40, hours:9, lines:['5D Parallelism for','Large Model Training'], ts:64,
+    sub:'Data, tensor, pipeline, context and expert parallelism',
+    cap:'Five axes of parallelism, two ranks each: 32 GPUs at the corners of a 5-cube, projected along five directions 36° apart. Every edge is a link along one axis; red is one of them.' },
+  { slug:'pi-vs-hermes-vs-codex', group:'core', level:'advanced', capsules:9, hours:1, lines:['Pi vs Hermes','vs Codex:'], ts:80, sub:'Context Compaction and Memory', subBig:true,
+    cap:'Three agents, three glyphs. The stripes are a long context falling in from above, compacted three different ways into the solid form each one keeps.' },
+
+  { slug:'charlie-language-room', group:'charlie', level:'advanced', capsules:22, hours:5, series:'I',
+    kicker:'Charlie and the Intelligence Factory', lines:['Charlie and the','Language Room'], ts:64, sub:'Inference Engineering',
+    cap:'The model as a machine: prompt tokens into the hopper, a stack of identical layers, and one token at a time out onto the belt, newest in red.' },
+  { slug:'charlie-vision-room', group:'charlie', level:'intermediate', capsules:20, hours:6, series:'II',
+    kicker:'Charlie and the Intelligence Factory', lines:['Charlie and the','Vision Room'], ts:64, sub:'Vision Transformers',
+    cap:'An image cut into patches and laid on the belt in reading order, led by the class token in red.' },
+  { slug:'charlie-sound-room', group:'charlie', level:'intermediate', capsules:20, hours:6, series:'III',
+    kicker:'Charlie and the Intelligence Factory', lines:['Charlie and the','Sound Room'], ts:64, sub:'Voice Agents',
+    cap:'A spoken exchange: you talk (paper), a pause, the agent answers (red). Audio frames ride the belt.' },
+  { slug:'charlie-reasoning-room', group:'charlie', level:'advanced', capsules:21, hours:6, series:'IV',
+    kicker:'Charlie and the Intelligence Factory', lines:['Charlie and the','Reasoning Room'], ts:64, sub:'Reinforcement Learning, from bandits to reasoning models',
+    cap:'A search over reasoning paths. Leaf size is reward; the red path is the one reinforcement learning keeps.' },
+
+  { slug:'decision-trees-from-scratch', group:'range', level:'beginner', capsules:23, hours:5, lines:['Build Decision Trees','from Scratch'], ts:66,
+    cap:'A decision tree hung as a mobile: every bar is a split, every weight a leaf. Class is coded twice — ink discs and red squares — so it survives greyscale.' },
+  { slug:'rag-in-production', group:'range', level:'intermediate', capsules:42, hours:10, lines:['RAG in','Production'], ts:92,
+    cap:'The corpus as a shelf. Retrieval lifts out the three passages that answer the question.' },
+  { slug:'transformers-from-scratch', group:'range', level:'intermediate', capsules:20, hours:5, lines:['Transformers:'], ts:92, sub:'Theory, Intuition, and Building from Scratch', subBig:true,
+    cap:'Multi-head attention as an arc diagram: one head links each token to the one before, one reaches back to the start, one (red) finds matching words.' },
+  { slug:'deit-from-scratch', group:'range', level:'advanced', capsules:42, hours:10, lines:['Build a Data-Efficient','Image Transformer','(DeiT) from Scratch'], ts:60,
+    cap:'The token sequence of a DeiT: a class token (ink) first, the image patches, and a distillation token (red) last — the one that leans on the teacher network, the black disc.' },
+  { slug:'sql-masterclass', group:'range', level:'beginner', capsules:36, hours:8, lines:['SQL','Masterclass'], ts:92,
+    cap:'Two tables and the join between them: where the rows of one meet the rows of the other, the result is inked red.' },
+  { slug:'kernel-engineering', group:'range', level:'advanced', soon:true, lines:['Kernel','Engineering'], ts:84, sub:'From silicon to speculative decoding —<br>GPU kernels for modern LLMs.',
+    cap:'Work tiled from grid to block to warp. Forthcoming, so it is printed as a proof: keylines only, one tile inked.' },
+];
+BOOKS.forEach(b=>b.no=NO[b.slug]);
+
+const LEVEL_N = {beginner:1,intermediate:2,advanced:3};
+const pills = (lv) => [1,2,3].map(i=>`<i class="${i<=LEVEL_N[lv]?'on':''}"></i>`).join('');
+function coverInner(b){
+  const c=roles(b.level), rnd=rng(b.slug);
+  const art = ART[b.slug] ? ART[b.slug](c,rnd) : '';
+  const meta = b.soon ? 'Forthcoming' : `${b.capsules} capsules · ${b.hours} ${b.hours===1?'hour':'hours'}`;
+  return `<div class="house">${device(PAL.paper, PAL.ink)}<span class="imprint">Vizuara Books</span><span class="catno">No. ${String(b.no).padStart(2,'0')}</span></div>
+    <div class="rule"></div>
+    <div class="tblock" style="--ts:${b.ts}px">
+      ${b.kicker?`<div class="kicker">${b.kicker}</div>`:''}
+      ${b.series?`<div class="volno">${b.series}</div>`:''}
+      <h1>${b.lines.map(l=>`<span>${l}</span>`).join('')}</h1>
+      ${b.sub?`<p class="sub${b.subBig?' big':''}">${b.sub}</p>`:''}
+    </div>
+    <div class="band"><span class="lvl">${pills(b.level)}</span><span>${b.level}</span><span class="meta">${meta}</span></div>
+    <div class="field"><svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">${art.replace(/id="vdisc"/g,`id="vdisc-${b.slug}"`).replace(/url\(#vdisc\)/g,`url(#vdisc-${b.slug})`)}</svg></div>`;
+}
+const coverHTML = (b) => `<div class="cover vz ${b.level}" data-slug="${b.slug}">${coverInner(b)}</div>`;
+['core','charlie','range'].forEach(g=>{
+  document.getElementById(g).innerHTML = BOOKS.filter(b=>b.group===g).map(b=>
+    `<figure>${coverHTML(b)}<figcaption><b>No. ${String(b.no).padStart(2,'0')} · ${b.level}</b>${b.cap}</figcaption></figure>`).join('');
+});
+
+/* devices on the page */
+document.getElementById('mastdev').innerHTML = device(PAL.paper, PAL.ink);
+document.getElementById('bigdev').innerHTML = device(PAL.paper, PAL.ink) + device(PAL.ink, PAL.beginner.g);
+
+/* anatomy miniature (a diagram, not a cover: drawn at one-third) */
+document.getElementById('mini').innerHTML = `<svg viewBox="0 0 720 888" width="240" height="296">
+  <rect width="720" height="888" fill="${PAL.paper}"/>
+  <rect x="48" y="30" width="44" height="22" rx="11" fill="${PAL.ink}"/><rect x="104" y="36" width="140" height="10" fill="${PAL.ink}"/><rect x="620" y="36" width="52" height="10" fill="${PAL.ink}"/>
+  <rect x="48" y="70" width="624" height="3" fill="${PAL.ink}"/>
+  <rect x="48" y="104" width="420" height="58" fill="#cfc8b8"/><rect x="48" y="176" width="520" height="58" fill="#cfc8b8"/>
+  <rect x="0" y="336" width="720" height="36" fill="${PAL.ink}"/>
+  <rect x="0" y="372" width="720" height="516" fill="${PAL.intermediate.g}"/>
+  <circle cx="360" cy="630" r="150" fill="${PAL.intermediate.g2}"/>
+  ${[[680,41,1],[680,200,2],[680,354,3],[680,760,4]].map(([x,y,n])=>`<circle cx="${x}" cy="${y}" r="30" fill="${PAL.red}"/><text x="${x}" y="${y+13}" font-size="38" font-weight="700" text-anchor="middle" fill="${PAL.paper}" font-family="Schibsted Grotesk">${n}</text>`).join('')}
+</svg>`;
+
+/* the shelf: every title, by spine, sorted by level */
+{
+  const order={beginner:0,intermediate:1,advanced:2};
+  const all=CATALOG.map((b,i)=>({slug:b[0],title:b[1],level:b[2],soon:!!b[3],no:i+1})).sort((a,b)=>order[a.level]-order[b.level]||a.no-b.no);
+  const sp=b=>`<div class="sp ${b.level}${b.soon?' soon':''}"><div class="n">${String(b.no).padStart(2,'0')}</div><div class="t"><span>${b.title}</span></div><div class="b">${pills(b.level)}</div><div class="f">${device(PAL.paper,PAL.ink)}</div></div>`;
+  const half=Math.ceil(all.length/2);
+  document.getElementById('shelf').innerHTML = `<div class="row">${all.slice(0,half).map(sp).join('')}</div><div class="row">${all.slice(half).map(sp).join('')}</div>`;
+}
+
+/* print wrap for No. 03 */
+{
+  const b=BOOKS.find(x=>x.slug==='neural-networks-from-scratch');
+  const also=CATALOG.map((x,i)=>({t:x[1],l:x[2],no:i+1})).filter(x=>x.l==='beginner' && x.no!==b.no);
+  document.getElementById('wrapholder').innerHTML = `<div class="wrap">
+    <div class="back vz beginner">
+      <div class="house">${device(PAL.paper, PAL.ink)}<span class="imprint">Vizuara Books</span><span class="catno">No. 03</span></div>
+      <div class="rule"></div>
+      <div class="blurb"><h4>Neural Networks from Scratch</h4>
+        <p>A beginner's book in thirty-three capsules — short lessons, about seven hours in all. Free to read at books.vizuara.ai.</p>
+        <p><b>The cover</b> shows a single neuron: inputs arrive at the thickness of their weights (ink positive, paper negative), are summed, pass through a sigmoid, and leave as one red signal.</p></div>
+      <div class="band"><span class="lvl">${pills('beginner')}</span><span>Beginner</span><span class="meta">Also in yellow</span></div>
+      <div class="field" style="padding:0">
+        <div class="also" style="top:32px"><h5>The beginner shelf</h5><ol>${also.map(x=>`<li><span>${String(x.no).padStart(2,'0')}</span>${x.t}</li>`).join('')}</ol></div>
+        <div class="colophon">Cover and emblem drawn in code, in five inks: paper, ink, signal red, chrome and its shade. Set in Schibsted Grotesk.</div>
+        <div class="code">Barcode</div>
+      </div>
+    </div>
+    <div class="spine"><div class="sn">03</div><div class="st">Neural Networks from Scratch</div><div class="sb"></div><div class="sf"><span></span>${device(PAL.paper,PAL.ink)}</div></div>
+    <div class="vz beginner front">${coverInner(b)}</div>
+  </div>`;
+}
+
+// fit: never let a title line run past the right margin; never let a spine title overflow
+document.fonts.ready.then(()=>{
+  document.querySelectorAll('.vz h1').forEach(h=>{
+    const max=624; let size=parseFloat(getComputedStyle(h).fontSize);
+    const widest=()=>Math.max(...[...h.children].map(s=>s.getBoundingClientRect().width));
+    let guard=0; while(widest()>max && guard++<40){ size-=1; h.style.fontSize=size+'px'; }
+  });
+  document.querySelectorAll('.sp .t').forEach(t=>{
+    let size=13, span=t.firstElementChild, guard=0;
+    while(span.getBoundingClientRect().height>318 && guard++<10){ size-=.5; t.style.fontSize=size+'px'; }
+  });
+});
+</script>
+</body>
+</html>

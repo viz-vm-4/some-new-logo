@@ -1,2 +1,4 @@
 tools/.netcache/
 node_modules/
+# 2x PNG renders are large and reproducible: node tools/render.js covers/<dir>/index.html
+covers/*/renders/*.png
