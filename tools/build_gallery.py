@@ -31,6 +31,24 @@ def palette(notes: str) -> list:
     return seen[:7]
 
 
+GROUPS = {
+    "First wave": "Ten designers, each given a different starting direction and told to push it wherever their taste went.",
+    "Indian series": "Five designers, each rooted in one specific Indian tradition: its structure and craft, not its clichés.",
+    "Second wave": "New directions, plus a second and third wildcard. Two designers independently arrived at model kits.",
+    "Open brief": "This designer was told only who Vizuara is and that the current covers are disliked. Everything else was its own call, and it was not reviewed or revised.",
+}
+
+
+def group_of(num: int) -> str:
+    if num <= 10:
+        return "First wave"
+    if num <= 15:
+        return "Indian series"
+    if num == 22:
+        return "Open brief"
+    return "Second wave"
+
+
 directions = []
 for d in sorted(p for p in ROOT.iterdir() if p.is_dir() and re.match(r"\d\d-", p.name)):
     renders = d / "renders"
@@ -43,6 +61,7 @@ for d in sorted(p for p in ROOT.iterdir() if p.is_dir() and re.match(r"\d\d-", p
     directions.append({
         "id": d.name,
         "num": d.name[:2],
+        "group": group_of(int(d.name[:2])),
         "name": m.get("name") or notes_name(notes, d.name),
         "pitch": m.get("pitch", ""),
         "palette": m.get("palette") or palette(notes),
@@ -50,6 +69,8 @@ for d in sorted(p for p in ROOT.iterdir() if p.is_dir() and re.match(r"\d\d-", p
         "covers": [{"slug": s, "src": f"{d.name}/renders/{s}.jpg"} for s in slugs],
         "wraps": [f"{d.name}/renders/{p.name}" for p in sorted(renders.glob("_wrap*.jpg"))] if renders.exists() else [],
     })
+
+directions.sort(key=lambda x: (x["group"] == "Open brief", x["id"]))
 
 before = [{"slug": p.stem, "src": f"_shared/before/{p.name}"}
           for p in sorted((ROOT / "_shared/before").iterdir())]
@@ -60,6 +81,7 @@ data = {
     "core": books["core_set"],
     "directions": directions,
     "before": before,
+    "groups": GROUPS,
 }
 
 template = (Path(__file__).parent / "gallery_template.html").read_text()

@@ -561,7 +561,7 @@ function stampField(B, lv, rand, id, W=720, x0=0){
   // the printer starts from the border: a whole row of blocks sits on the kinar,
   // the partial row falls at the top edge where trim and bleed take it
   const oy=KINAR_Y-Math.ceil(FIELD_H/BH)*BH;
-  const cMin=Math.floor((-BW-ox)/BW), cMax=Math.ceil((W-ox)/BW), rows=Math.ceil(FIELD_H/BH)+1;
+  const cMin=Math.floor((-BW-ox)/BW), cMax=Math.ceil((W-ox)/BW)+1, rows=Math.ceil(FIELD_H/BH)+1;
   let defs='', out='';
   // Ajrakh's own device: on a dyed ground every accent shape is first reserved in
   // kora a little larger than itself, so the colour sits in a white keyline and

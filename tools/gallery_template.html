@@ -63,6 +63,11 @@
   .jump a { text-decoration: none; color: var(--ink-2); }
   .jump a:hover { color: var(--ink); text-decoration: underline; }
   .jump b { font: 500 11px var(--mono); margin-right: 5px; color: var(--ink-2); }
+  .jump .grp { flex-basis: 100%; font: 500 11px/1.2 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); margin-top: 8px; }
+  .jump .grp:first-child { margin-top: 0; }
+  .group-head { margin: 64px 0 -24px; padding-top: 18px; border-top: 2px solid var(--ink); display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: baseline; }
+  .group-head h2 { font: 800 clamp(20px, 2.4vw, 28px)/1.1 var(--display); letter-spacing: -.02em; margin: 0; }
+  .group-head p { margin: 0; color: var(--ink-2); font-size: 14px; max-width: 70ch; }
 
   /* Current covers strip */
   .before { display: grid; grid-template-columns: minmax(0, 220px) minmax(0, 1fr); gap: 24px; padding-block: 36px; border-bottom: 1px solid var(--rule); align-items: start; }
@@ -84,7 +89,9 @@
   .open:hover { opacity: .7; }
 
   /* Proof grid with printer's crop marks */
-  .grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(var(--w), 100%), var(--w))); gap: 30px 26px; justify-content: start; }
+  .grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(var(--w), 100%), 1fr)); gap: 30px 26px; }
+  /* thumbnail size is a legibility test, so it stays at exactly 180px */
+  :root[data-size="180"] .grid { grid-template-columns: repeat(auto-fill, minmax(min(180px, 100%), 180px)); justify-content: start; }
   .proof { margin: 0; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
   .crop { --m: 11px; --c: var(--mark); padding: var(--m); display: block; width: 100%; border: 0; cursor: zoom-in; background-color: transparent;
     background-image:
@@ -152,7 +159,7 @@
     <div>
       <p class="eyebrow">Proof set · 26 September 2026 · trim 7.5 × 9.25 in</p>
       <h1>Vizuara cover proofs</h1>
-      <p class="lede">Ten designers each built a complete cover system for Vizuara Books, working independently from one brief. Every cover is drawn in code (HTML and SVG, no AI images), so it stays sharp at any print size and exports to a PDF at exact trim. Look through each direction, or pick one book and compare all ten versions side by side.</p>
+      <p class="lede">Twenty-three designers each built a complete cover system for Vizuara Books from one brief, then an independent art director reviewed every direction and each designer revised. One designer was given no brief at all. Every cover is drawn in code (HTML, SVG and WebGL, no AI images), so it stays sharp at any print size and exports to a PDF at exact trim. Browse by direction, or pick one book and compare every version side by side.</p>
     </div>
     <dl class="facts" id="facts"></dl>
   </header>
@@ -241,14 +248,22 @@ function proof(item, i, caption, sub) {
 
 function renderByDirection() {
   current = [];
-  const jump = `<div class="jump">${DATA.directions.map((d) => `<a href="#d-${esc(d.id)}"><b>${esc(d.num)}</b>${esc(d.name)}</a>`).join("")}</div>`;
+  let lastGroup = null;
+  const jump = `<div class="jump">${DATA.directions.map((d) => {
+    const head = d.group !== lastGroup ? `<span class="grp">${esc(d.group)}</span>` : "";
+    lastGroup = d.group;
+    return head + `<a href="#d-${esc(d.id)}"><b>${esc(d.num)}</b>${esc(d.name)}</a>`;
+  }).join("")}</div>`;
+  lastGroup = null;
   const sections = DATA.directions.map((d) => {
+    const gh = d.group !== lastGroup ? `<div class="group-head"><h2>${esc(d.group)}</h2>${DATA.groups[d.group] ? `<p>${esc(DATA.groups[d.group])}</p>` : ""}</div>` : "";
+    lastGroup = d.group;
     const items = d.covers.map((c) => {
       const i = current.push({ ...c, dir: d, caption: bookTitle(c.slug), sub: bookLevel(c.slug) }) - 1;
       return proof(c, i, bookTitle(c.slug), bookLevel(c.slug));
     }).join("");
     const sw = d.palette.length ? `<div class="swatches" aria-label="Palette">${d.palette.map((h) => `<span style="background:${esc(h)}" title="${esc(h)}"></span>`).join("")}</div>` : "";
-    return `<section class="dir" id="d-${esc(d.id)}" aria-labelledby="h-${esc(d.id)}">
+    return gh + `<section class="dir" id="d-${esc(d.id)}" aria-labelledby="h-${esc(d.id)}">
       <header class="dir-head">
         <span class="num">${esc(d.num)}</span>
         <div><h2 id="h-${esc(d.id)}">${esc(d.name)}</h2>${d.pitch ? `<p class="pitch">${esc(d.pitch)}</p>` : ""}</div>
