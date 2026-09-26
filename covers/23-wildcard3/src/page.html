@@ -48,7 +48,7 @@
     margin: 0; font-weight: 600; line-height: .99; letter-spacing: -0.018em;
     font-variation-settings: 'opsz' 72; font-variant-numeric: lining-nums;
   }
-  .cover .title span { display: block; white-space: nowrap; }
+  .cover .title span { display: block; width: max-content; white-space: nowrap; }
   .cover .sub {
     margin: 14px 0 0; font-style: italic; font-weight: 400; font-size: 25px; line-height: 1.18; max-width: 600px;
     font-variation-settings: 'opsz' 36;
@@ -80,9 +80,9 @@
   .mast .pitch em { font-style: italic; }
   .cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin: 40px 0 56px; }
   .cols p { font-size: 17.5px; line-height: 1.5; margin: 0 0 12px; }
-  .cols h3, .sec h2 { font-size: 13px; letter-spacing: .22em; text-transform: uppercase; font-weight: 700; margin: 0 0 14px; }
+  .cols h3, .sec > h2 { font-size: 13px; letter-spacing: .22em; text-transform: uppercase; font-weight: 700; margin: 0 0 14px; }
   .sec { margin: 0 0 64px; }
-  .sec h2 { border-top: 2px solid var(--sable); padding-top: 12px; }
+  .sec > h2 { border-top: 2px solid var(--sable); padding-top: 12px; }
   .tinctures { display: grid; grid-template-columns: repeat(7, 1fr); gap: 16px; }
   .tinc .sw { height: 120px; border: 2.5px solid var(--sable); position: relative; overflow: hidden; }
   .tinc .sw svg { position: absolute; right: 0; bottom: 0; width: 44%; height: 44%; border-left: 2.5px solid var(--sable); border-top: 2.5px solid var(--sable); background: #fff; }

@@ -68,24 +68,38 @@ beneath. The stamp gets hotter and darker with difficulty: **1 Beginner = Chrome
 
 | Book | Label caption | Derivation |
 |---|---|---|
-| AI Context Engineering | The Context Window | An overflowing pile of candidate context (system, tools, memory, docs, history) and the curated window it is packed into, with a token-budget gauge. |
+| AI Context Engineering | The Context Window | One framed window packed with system, tools, memory, documents, history and query. Two slips that did not fit lie across the top, and a token-budget gauge is built into the frame. |
 | Mathematical Foundations for ML | The Gradient | A ball on a loss curve, its tangent (the derivative), and shrinking descent steps to the flagged minimum. |
-| Neural Networks from Scratch | The Multilayer Perceptron | A 3-4-4-2 MLP. Weights are line weight, and each hidden unit carries its activation curve. |
+| Neural Networks from Scratch | The Artificial Neuron | One neuron, opened up: three input wires whose thickness is their weight, a Σ summing drum, a bias knob, the sigmoid window and one output. It's the first thing you build from scratch. |
 | Build LLMs from Scratch | The Causal Mask | The lower-triangular attention mask. Each token attends to itself and the past, and the "future" cells are struck out. |
 | 5D Parallelism | The Device Mesh | Two pipeline stages, each split 2×2 by data × tensor. The two further axes (expert, context) run off as dashed arrows. |
-| Pi vs Hermes vs Codex | The Compaction Press | A long message history, a screw press squeezing it into a dense block, and the block filed into a memory drawer. |
-| Charlie I · Language Room | The Decode Loop | A machine stamps tokens out one at a time onto a belt, and each new token is fed back in (autoregressive decoding). |
-| Charlie II · Vision Room | The Patch Grid | A picture cut into a 4×4 grid of patches and read off as a sequence behind a class token (ViT). |
-| Charlie III · Sound Room | The Voice Loop | A waveform, then a harmonic-stack spectrogram, then a street horn-speaker that answers (voice agent in and out). |
+| Pi vs Hermes vs Codex | The Compaction Press | A history too tall for the panel runs off its top. The screw press turns it into a 96×34 brick of the same stripes, squeezed thin. The press's bed is a drawer, which is where compacted memory is kept. |
+| Charlie I · Language Room | The Decode Loop | A machine stamps tokens out one at a time onto a belt. The newest (red) token at the outlet is fed straight back into the hopper (autoregressive decoding). |
+| Charlie II · Vision Room | The Patch Grid | One picture cut into a 4×4 grid of patches, with a red class token at the head of the sequence (ViT). |
+| Charlie III · Sound Room | The Voice Loop | A ring runs listen (mic) → transcript → reply → speak (a street horn aimed back at the mic) → listen. A red gate on the ring marks where a user can barge in. |
 | Charlie IV · Reasoning Room | The Multi-Armed Bandit | Three one-armed machines, each with its believed value, and the arm being pulled (explore/exploit). |
-| DeiT from Scratch | The Distillation Token | A convnet teacher's prediction is matched by the extra DIST token, which rides through the student beside CLS. |
-| RAG in Production | The Card Catalogue | A query goes to the index drawer, the top-3 cards rise, and query plus cards go on together as the prompt. |
-| VLA & World Models for Robotics | The Arm and its World Model | A camera sees, an instruction is read, the arm acts, and a dashed ghost arm is the world model's predicted next state. |
-| SQL Masterclass | The Inner Join | Two tables matched row to row on a shared key column, under the ⋈ symbol. |
-| Kernel Engineering (coming soon) | The Tiled Matmul | A row-block of A and a column-block of B are staged through on-chip SRAM to fill one tile of C. The "Coming soon" sash is a removable label strip. |
+| DeiT from Scratch | The Distillation Token | A transformer student carries one extra token (DIST, red) beside the class token. Only DIST's output is taught by the convnet teacher's prediction (one dashed arrow). |
+| RAG in Production | The Card Catalogue | One card-catalogue drawer (the index), with the three best-matching cards pulled up out of it (top-k). |
+| VLA & World Models for Robotics | The Arm and its World Model | One arm grasps the block it was told to pick up (the instruction is a tag on its base). Three dashed outlines of block and gripper (t+1, t+2, t+3) show the world model's predicted rollout. |
+| SQL Masterclass | The Inner Join | Two tables whose key cells carry pip-counted ids, wired only where the ids match. Each table has one row with no partner: it is struck out, knocked back and left unwired. That is what makes the join *inner*. |
+| Kernel Engineering (coming soon) | The Tiled Matmul | One row-block of A and one column-block of B are all that is needed to fill one tile of C, and the k-loop arrow walks the row. The "Coming soon" sash is a removable label strip. |
 
-**Sub-series:** *Charlie and the Intelligence Factory* uses a Coal board, a fixed `CHARLIE and the` lockup,
-the room name as hero, a series line with the book number, and a room colour on the label (red, firozi, blue, green).
+**Sub-series:** *Charlie and the Intelligence Factory* uses a Coal board, a fixed `CHARLIE and the` lockup, the room
+name as hero, and a room colour on the label (red, firozi, blue, green). A small yellow `BOOK I OF IV` cartouche sits on the
+label's left shoulder, opposite the stamp, and the foot carries `THE INTELLIGENCE FACTORY`. Titles start at 58px like every
+other cover, so title tops line up across the shelf.
+
+## The emblem rule (the label grammar)
+
+A Sivakasi label shows **one object**, and so does every Vizuara label:
+
+1. **One object**, drawn from the book's own mechanism, covering at least half the picture panel, with the rays converging on it.
+2. **At most one arrow and at most two tags.** The one exception is an object whose named parts *are* the subject: the device mesh's five axes.
+3. **No pipelines.** Never draw A → B → C as a row of small things. If a process has stages, draw the machine that does it
+   (the press, the decode machine, the voice ring).
+4. Flat enamel inks only (at most five per label), a 3px coal keyline, no gradients. Nothing important goes in the top-right 60×30px of
+   the panel, because the stamp sits there.
+5. Don't repeat a motif on the same shelf. The slip pile now belongs to the compaction press alone.
 
 **Print wrap:** *AI Context Engineering* at 7.5in + 0.67in spine + 7.5in. The back is painted as a rate board that
 keys all seven shelves and the three stamps, so every book teaches the reader how to read the rest of the shelf.
@@ -103,8 +117,45 @@ the same way. **Ek Type** (Anek) should be credited in the colophon.
 
 1. Extend Board Block: `&`, `·`, `%`, `?`, lowercase for mixed-case acronyms, and a **Devanagari display
    companion** drawn with a Devanagari lettering artist, so the imprint and spine could be fully bilingual.
-2. Draw emblems for the remaining ~35 titles to the same rules (one object, one idea, 3px keyline, ≤5 inks).
+2. Draw emblems for the remaining ~35 titles to the label grammar above. Deep Learning Fundamentals can take the stacked-layer network that the neuron replaced.
 3. Spec the tins as five spot inks (Pantone matches for the enamels) so that yellow, red and coal print as solids, not CMYK builds.
 4. Proof the inline at 7.5in and at postcard size. On the thinnest strokes (under ~7.5px) the inline is dropped automatically; confirm that threshold on press.
 5. Confirm the Devanagari spelling with Vizuara (Hindi-style **विज़ुआरा** with nukta is used; a Marathi rendering
    would likely be **व्हिझुआरा**).
+
+## Review response (art-director review, revision 1)
+
+I checked all nine must-fix claims against the 2x renders before changing anything, and all nine held.
+
+**Must-fix (all done)**
+1. *Script collisions.* mixLine now spaces on the script's **ink** (canvas `actualBoundingBoxLeft/Right`, plus keyline and
+   shadow), not on its advance width. After that, the gap is 0.2H script↔block and 0.24H block↔block. Pi's `and` is at k 1.25, base 0.8.
+   I re-checked all seven lines at 2x and none touch. I also moved the script's keyline to a separate layer instead of `paint-order`,
+   which Chrome's PDF ignores.
+2. *SQL join.* Key cells now carry a pip-counted key id, and wires connect equal ids only. Each table has one partnerless row
+   (ids 5 and 6), struck and knocked back with no wire.
+3. *Press expands its input.* The history is now a column running off the top of the panel. The press output is a 96×34 brick of the
+   same stripes. Instead of a separate cabinet, the press bed is the drawer, so there is still one object.
+4. *Decode loop.* The arc now starts at the newest (red) token at the outlet and drops into the hopper. The tag reads `FED BACK`.
+5. *Sound-room harmonics and horn.* Solved by replacing the emblem (see improvement 3), so no spectrogram remains and nothing touches the frame.
+6. *Gradient flag.* The pole stands at (cx, f(cx)) and the last step ends at cx.
+7. *Kernel A label.* The SRAM chip and its curves are gone. The A/B/C labels are drawn last on paper tags, clear of every path, with no halo.
+8. *DeiT acronym.* The tag text went from 0.4H to 0.46H, and the tag moved to the end of the TRANSFORMER line, so the text is now about 35px (it was 18px).
+   The LLMs tag grew with it.
+9. *Stamp words.* All three level words are 10.5px Anek wdth 75 / 800 with 0.6 tracking. The stamp widened from 84 to 94px so
+   INTERMEDIATE fits the field.
+
+**Improvements**
+1. *Emblem grammar.* Taken, and written up as "The emblem rule" above. I rebuilt the context window, press, card catalogue, decode loop,
+   patch grid, voice, distillation, arm and tiled matmul as single objects. There are two partial keeps. The **device mesh**
+   keeps its five axis tags, because they are the object's parts. The **distillation** emblem keeps teacher and student as two
+   things, because distillation *is* a relation between two models; it is held to one arrow.
+2. *LLMs line break.* Taken: `BUILD` / `LARGE LANGUAGE` / `MODELS (LLMs)` / `from SCRATCH`.
+3. *Voice ring.* Taken, with mic, transcript, reply and horn on a directional ring and a red barge-in gate.
+4. *VLA.* Taken. The camera is gone, there is one solid arm, a t+1…t+3 outline rollout, the instruction sits on the base, and one PREDICTED tag. The arm now
+   reaches from the right so the rollout rises clear of it.
+5. *Single neuron.* Taken. The MLP graph is kept in reserve for Deep Learning Fundamentals.
+6. *Charlie repetition.* Taken. I dropped the top series line and replaced it with a `BOOK n OF IV` cartouche on the label shoulder, and the titles
+   now start at 58.
+
+Nothing declined.

@@ -397,8 +397,8 @@ EMBLEM['decision-trees-from-scratch']=function(g){
   const col=pl=>Math.round((pl-.95)/6.1*COLS), row=pw=>Math.round((FR-1)-(pw-.05)/2.55*(FR-1));
   const a=col(2.45), b=row(1.75), c=col(4.95), d=col(4.85);
   const leaves=[
-    {r0:0,r1:FR,c0:0,c1:a,t:.16,rule:'petal_length <= 2.45 -> 0',chip:' setosa [50, 0, 0] ',cr:FR-3,cc:3},
-    {r0:b+1,r1:FR,c0:a+2,c1:c,t:.5,rule:'length > 2.45 & width <= 1.75 & length <= 4.95 -> 1',chip:' versicolor [0, 47, 1] ',cr:FR-3,cc:a+4},
+    {r0:0,r1:FR,c0:0,c1:a,t:.16,rule:'petal_length <= 2.45 -> 0',chip:' setosa [50, 0, 0] ',cr:8,cc:6},
+    {r0:b+1,r1:FR,c0:a+2,c1:c,t:.4,rule:'length > 2.45 & width <= 1.75 & length <= 4.95 -> 1',chip:' versicolor [0, 47, 1] ',cr:FR-3,cc:a+4},
     {r0:b+1,r1:FR,c0:c+2,c1:COLS,t:.95,rule:'length > 4.95 & width <= 1.75 -> 2',chip:' virginica [0, 2, 4] ',cr:FR-3,cc:c+4},
     {r0:0,r1:b,c0:a+2,c1:d,t:.95,rule:'width > 1.75 & length <= 4.85 -> 2',chip:' virginica [0, 1, 2] ',cr:1,cc:a+4},
     {r0:0,r1:b,c0:d+2,c1:COLS,t:.95,rule:'width > 1.75 & length > 4.85 -> 2',chip:' virginica [0, 0, 43] ',cr:1,cc:d+4},
@@ -413,7 +413,7 @@ EMBLEM['decision-trees-from-scratch']=function(g){
   const {X,y}=DATA.iris;
   X.forEach(([pl,pw],i)=>{ const rr=row(pw), cc=col(pl), q=g.get(rr,cc); if(!q) return;
     const inDark=q.t>=.86&&!q.s;
-    g.put(rr,cc,String(y[i]),inDark?.8:.95); });
+    g.put(rr,cc,String(y[i]),inDark?.84:.95); g.put(rr,cc+1,' ',inDark?.84:.95); });
   // labels: split thresholds and leaf counts, as export_text / tree_.value print them
   g.text(3,a+3,' petal_length <= 2.45 ',.95,1);
   g.text(b,a+4,' petal_width <= 1.75 ',.62);

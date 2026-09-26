@@ -553,27 +553,24 @@ book({ slug:'build-llms-from-scratch', key:1,
   title:'Build Large Language Models<span class="sub">(LLMs) from Scratch</span>', size:'s1',
   obj:'Column of twelve identical blocks', med:'Stoneware, oxblood glaze', dim:'20 capsules · 6 hours',
   cam:{ look:[0,2.0,0], dist:22.5, el:6, yaw:-8, frame:[0.64,0.58] }, bound:[0,2.0,0,2.1], box:[[-0.36,0,-0.36],[0.36,3.97,0.36]], steps:150,
-  light:{ keyPos:[-8,8,-5] },
+  light:{ keyPos:[-8,8,-5], fill:0.3 },
   glsl:`
-const float HM=0.33; const float WW=0.25; const float WN=0.125;
+const float HM=0.33; const float WW=0.25; const float WN=0.125; const float RB=0.014;
 vec2 scene(vec3 p){
   p.xz=rot(0.62)*p.xz;
   float id=clamp(floor(p.y/HM),0.,11.);
   float y=p.y-(id+0.5)*HM;
-  float w=mix(WW,WN,abs(y)/(0.5*HM));
+  float w=mix(WW,WN,abs(y)/(0.5*HM))-RB;
   float s=(WW-WN)/(0.5*HM);
-  float d=max(max(abs(p.x),abs(p.z))-w, abs(p.y-6.*HM)-6.*HM)/sqrt(1.+s*s);
-  d=max(d,max(abs(p.x),abs(p.z))-WW);
-  return vec2(d*0.9,1.);
+  float d=max(max(abs(p.x),abs(p.z))-w, abs(p.y-6.*HM)-6.*HM+RB)/sqrt(1.+s*s);
+  d=max(d,max(abs(p.x),abs(p.z))-WW+RB);
+  return vec2(d*0.9-RB,1.);
 }
 Mat material(float id, vec3 p, vec3 n){
-  Mat m; float f=fbm(p*vec3(3.,9.,3.)); float g=fbm(p*18.);
-  vec3 deep=vec3(0.16,0.015,0.015), bright=vec3(0.42,0.045,0.035);
-  float pool=smoothstep(0.35,0.75,f);
-  m.alb=mix(bright,deep,pool)*(0.92+0.1*g);
-  float up=abs(n.y);
-  m.alb=mix(m.alb,vec3(0.55,0.34,0.24),(1.-up)*0.0);
-  m.rough=0.05+0.04*g; m.metal=0.; m.coat=1.; m.wrap=0.05; return m;
+  Mat m; float g=fbm(p*vec3(5.,22.,5.));
+  float yy=mod(p.y,HM)/HM; float waist=smoothstep(0.35,0.0,min(yy,1.-yy));
+  m.alb=mix(vec3(0.40,0.045,0.035),vec3(0.2,0.02,0.02),waist*0.7+g*0.25);
+  m.rough=0.06+0.04*g; m.metal=0.; m.coat=1.; m.wrap=0.1; return m;
 }`});
 
 /* ============ PI VS HERMES VS CODEX ============ */
@@ -589,6 +586,7 @@ float stackD(vec3 p, float th, out float isCap){
   float bul=(0.105-th)*0.35;
   float yy=clamp(floor(p.y/th),0.,8.);
   vec3 q=p; q.y-=(yy+0.5)*th;
+  q.xz+=(vec2(fract(sin(yy*12.9+th*91.)*437.5),fract(sin(yy*7.3+th*53.)*917.1))-0.5)*0.028;
   float d=sdRBox(q,vec3(0.4+bul,th*0.5-0.002,0.4+bul),min(0.02,th*0.3));
   vec3 c=p; c.y-=h+0.16;
   float dc=sdRBox(c,vec3(0.43,0.16,0.43),0.025);
@@ -610,7 +608,8 @@ Mat material(float id, vec3 p, vec3 n){
   Mat m;
   if(id>1.5){ float g=noise(p*95.); float g2=noise(p*31.+7.); float sp=smoothstep(0.62,0.7,g)*0.55+smoothstep(0.7,0.78,g2)*0.35;
     m.alb=vec3(0.70,0.69,0.67)*(1.-sp)+vec3(0.08)*sp; m.rough=0.35; m.metal=0.; m.coat=0.5; m.wrap=0.; }
-  else { float f=fbm(p*vec3(6.,30.,6.)); float g=noise(p*80.); m.alb=vec3(0.60,0.34,0.075)*(0.8+0.35*f)*(0.95+0.08*g); m.rough=0.3; m.metal=0.; m.coat=0.35; m.wrap=0.7; }
+  else { float f=fbm(p*vec3(5.,12.,5.)); float g=noise(p*80.); float pl=fract(sin(floor(p.y*28.)*17.1)*311.7);
+    m.alb=vec3(0.58,0.30,0.06)*(0.78+0.3*f)*(0.88+0.2*pl)*(0.96+0.06*g); m.rough=0.35; m.metal=0.; m.coat=0.3; m.wrap=0.8; }
   return m;
 }`});
 

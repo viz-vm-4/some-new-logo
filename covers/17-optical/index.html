@@ -102,7 +102,7 @@ body{font-family:'Archivo',system-ui,sans-serif;-webkit-font-smoothing:antialias
       <h3>Type — Archivo, one family, width axis</h3>
       <div class="typespec">
         <div class="big">Aa Rr<br>5D</div>
-        <div class="small">Titles: Archivo ExtraBold 800, width 100, tracking −28, set 72/58/50 px by length.<br>Captions &amp; imprint: Archivo 650–700 at width 112–125, tracked caps.<br>Colour only ever lives inside the field, and only where the concept is.</div>
+        <div class="small">Titles: Archivo ExtraBold 800, width 100, tracking −28, word-space +40, set 72/58/50 px by length, hand-broken, hanging punctuation.<br>Captions &amp; imprint: Archivo 650–700 at width 112–125, tracked caps.<br>Colour only ever lives inside the field, and only where the concept is.</div>
       </div>
       <div class="levels" id="levels"></div>
     </div>
@@ -623,7 +623,7 @@ function buildWrap(slug) {
       <div class="cap" style="position:absolute;left:48px;right:48px;top:562px;height:16px;display:flex;justify-content:space-between;align-items:center;font-size:11.5px;font-weight:650;letter-spacing:.15em;text-transform:uppercase;font-stretch:112%"><span>AI Context Engineering</span><span>${bk.level} · ${bk.cap} capsules · ${bk.hrs} hours</span></div>
       <p class="blurb">Forty-three short capsules on deciding what a language model gets to see: what goes into its context window, in what order, and what is left out.</p>
       <p class="colophon"><b>On the cover</b>Every Vizuara cover is one field of lines bent by the book’s idea. Here the context window acts as a lens: every line of the stream survives, but the relevant slice is magnified into the window while everything else is compressed around it.</p>
-      <div class="foot" style="position:absolute;left:48px;right:48px;bottom:36px;display:flex;align-items:center;justify-content:space-between"><span class="imprint" style="display:flex;align-items:center;gap:11px;font-size:13px;font-weight:700;letter-spacing:.22em;font-stretch:125%">${mark()}VIZUARA<i style="font-style:normal;font-weight:400">BOOKS</i></span><span style="font-size:11.5px;font-weight:600;letter-spacing:.15em;font-stretch:112%">BOOKS.VIZUARA.AI</span></div>
+      <div class="foot" style="position:absolute;left:48px;right:48px;bottom:30px;display:flex;align-items:center;justify-content:space-between"><span class="imprint" style="display:flex;align-items:center;gap:11px;font-size:13px;font-weight:700;letter-spacing:.22em;font-stretch:125%">${mark()}VIZUARA<i style="font-style:normal;font-weight:400">BOOKS</i></span><span style="font-size:11.5px;font-weight:600;letter-spacing:.15em;font-stretch:112%">BOOKS.VIZUARA.AI</span></div>
     </div>
     <div class="spine"><span class="st">AI Context Engineering</span>${mark(18)}</div>
     ${face.replace(/^<div class="face">/, '<div class="face">')}

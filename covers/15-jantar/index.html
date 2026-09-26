@@ -75,7 +75,7 @@ figure{margin:0}
 .wrap .back{position:absolute;left:40px;top:40px;width:560px}
 .wrap .back .kicker{display:flex;align-items:center;gap:12px;font-size:14px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;margin-bottom:28px}
 .wrap .back .kicker b{font-weight:700}
-.wrap .back p{font-family:'Tiro Devanagari Hindi',serif;font-size:21px;line-height:1.45;margin:0 0 14px}
+.wrap .back p{font-family:'Tiro Devanagari Hindi',serif;font-size:21px;line-height:1.45;margin:0 0 14px;text-wrap:pretty}
 .wrap .back p.lead{font-family:'Anek Latin',sans-serif;font-weight:600;font-stretch:80%;font-size:36px;line-height:1.05;margin-bottom:22px;text-wrap:balance}
 .wrap .back p.note{font-size:16px;line-height:1.45;border-top:1.5px solid currentColor;padding-top:12px;margin-top:22px;max-width:470px}
 .wrap .spine{position:absolute;top:0;height:888px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:26px 0 30px}
@@ -631,12 +631,13 @@ figure{margin:0}
   SCENES.aperture = (hr) => {
     const cam = CAM({ az: 0, s: 1, ox: 360 });
     const S = new Scene(); ground(S, hr, cam); S.E = frame(cam, -14);
-    const y0 = 420, t = 44, X0 = -330, X1 = 380, Hh = 350, wx0 = -30, wx1 = 110, wz0 = 130, wz1 = 270;
+    const y0 = 420, t = 44, X0 = -330, X1 = 380, Hh = 308, wx0 = -30, wx1 = 110, wz0 = 132, wz1 = 264;
     const st = hr.stone;
-    S.box(X0, y0, 0, wx0, y0 + t, Hh, { mat: st });
-    S.box(wx1, y0, 0, X1, y0 + t, Hh, { mat: st });
-    S.box(wx0, y0, 0, wx1, y0 + t, wz0, { mat: st });
-    S.box(wx0, y0, wz1, wx1, y0 + t, Hh, { mat: st });
+    // courses of 22: horizontal joints hide the seams between the four blocks of the wall
+    S.box(X0, y0, 0, X1, y0 + t, wz0, { mat: st });
+    S.box(X0, y0, wz1, X1, y0 + t, Hh, { mat: st });
+    S.box(X0, y0, wz0, wx0, y0 + t, wz1, { mat: st });
+    S.box(wx1, y0, wz0, X1, y0 + t, wz1, { mat: st });
     S.box(X0 - 4, y0 - 4, Hh, X1 + 4, y0 + t + 4, Hh + 8, { mat: hr.marble });
     for (let i = 0; i < 20; i++) { const x = -360 + i * 36; S.box(x, 212, 0, x + 24, 236, 24, { mat: hr.marble }); }
     return { S, cam, L: sunRel(cam, -62, 36) };

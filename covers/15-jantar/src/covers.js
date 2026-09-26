@@ -159,12 +159,13 @@
   SCENES.aperture = (hr) => {
     const cam = CAM({ az: 0, s: 1, ox: 360 });
     const S = new Scene(); ground(S, hr, cam); S.E = frame(cam, -14);
-    const y0 = 420, t = 44, X0 = -330, X1 = 380, Hh = 350, wx0 = -30, wx1 = 110, wz0 = 130, wz1 = 270;
+    const y0 = 420, t = 44, X0 = -330, X1 = 380, Hh = 308, wx0 = -30, wx1 = 110, wz0 = 132, wz1 = 264;
     const st = hr.stone;
-    S.box(X0, y0, 0, wx0, y0 + t, Hh, { mat: st });
-    S.box(wx1, y0, 0, X1, y0 + t, Hh, { mat: st });
-    S.box(wx0, y0, 0, wx1, y0 + t, wz0, { mat: st });
-    S.box(wx0, y0, wz1, wx1, y0 + t, Hh, { mat: st });
+    // courses of 22: horizontal joints hide the seams between the four blocks of the wall
+    S.box(X0, y0, 0, X1, y0 + t, wz0, { mat: st });
+    S.box(X0, y0, wz1, X1, y0 + t, Hh, { mat: st });
+    S.box(X0, y0, wz0, wx0, y0 + t, wz1, { mat: st });
+    S.box(wx1, y0, wz0, X1, y0 + t, wz1, { mat: st });
     S.box(X0 - 4, y0 - 4, Hh, X1 + 4, y0 + t + 4, Hh + 8, { mat: hr.marble });
     for (let i = 0; i < 20; i++) { const x = -360 + i * 36; S.box(x, 212, 0, x + 24, 236, 24, { mat: hr.marble }); }
     return { S, cam, L: sunRel(cam, -62, 36) };

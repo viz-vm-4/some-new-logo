@@ -74,5 +74,9 @@
   "08-clothbound": {
     "name": "Buckram",
     "pitch": "Every book is designed as a real case-bound hardcover: a deep bookcloth, one foil (gold, copper, palladium or black pigment) and one blind die. The title is blocked in Cormorant capitals, and a sunk roundel holds a device from the book's mechanism (a causal attention matrix, the 5-cube in Petrie projection, ⋈ for SQL). A blind-pressed band repeats the subject as pattern. Level is read from the binding itself: quarter-bound, half-bound or full cloth."
+  },
+  "12-blockprint": {
+    "name": "Chhaap",
+    "pitch": "Every book is a length of block-printed cotton. Each title gets one carved block built from its mechanism (a causal mask, a GPipe schedule, a tiled matmul), stamped into an Ajrakh-style field by a seeded hand with off-register passes and ink voids. The metaphor is literal: stamping one block across cloth with a stride is a convolution. Level is the number of dye baths: raw kora, madder, indigo. The Charlie books are woven instead, as Patan Patola double ikat."
   }
 }

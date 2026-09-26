@@ -90,6 +90,10 @@ small, top left, next to "VIZUARA BOOKS", and never louder than the title.
   that waits on the page, such as `document.fonts.ready` or a screenshot, queues until the last canvas is
   painted. This keeps it independent of the harness's navigation timeout, even on software GL
   (SwiftShader). Expect roughly 5 s per cover on SwiftShader under load.
+- The print pass reloads the page once per cover and hides everything except that cover. If the same
+  browser rendered the full page within the last 20 minutes, the page waits for that isolation and paints
+  only the one cover left visible. If nothing isolates a cover within 4 s it renders everything, so a cover
+  is never left blank. This takes the `--pdf` run from about 16 full renders down to 2.
 - One shared GL context renders every book, then copies into a 2D canvas per cover, so there is no
   WebGL context limit.
 - If WebGL2 is missing, the covers fall back to flat paper in the level colour with all the typography.
