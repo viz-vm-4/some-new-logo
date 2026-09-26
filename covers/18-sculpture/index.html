@@ -208,7 +208,7 @@ const W = 2250, H = 2775;
 const PRELUDE = `#version 300 es
 precision highp float;
 out vec4 fragColor;
-uniform vec2 uRes; uniform vec3 uRo, uTa; uniform float uFocal; uniform vec2 uShift;
+uniform vec2 uRes; uniform vec2 uCov; uniform float uOff; uniform vec3 uRo, uTa; uniform float uFocal; uniform vec2 uShift;
 uniform vec3 uPaper; uniform vec3 uKeyPos; uniform float uKeyPow; uniform float uKeySoft;
 uniform vec3 uSpotDir; uniform vec2 uSpotCone;
 uniform vec3 uGlowPos; uniform float uGlow; uniform float uGlowRad;
@@ -347,7 +347,7 @@ vec3 shadeBackdrop(vec3 p, vec3 n){
 vec3 tone(vec3 x){ vec3 a=min(x,vec3(0.62)); vec3 b=0.62+0.38*(1.-exp(-(max(x-0.62,0.))/0.38)); return mix(a,b,step(0.62,x)); }
 
 void main(){
-  vec2 uv=(gl_FragCoord.xy-0.5*uRes)/uRes.y+uShift;
+  vec2 uv=(gl_FragCoord.xy-vec2(uOff,0.)-0.5*uCov)/uCov.y+uShift;
   vec3 ro=uRo; vec3 fw=normalize(uTa-ro); vec3 rt=normalize(cross(vec3(0,1,0),fw)); vec3 up=cross(fw,rt);
   vec3 rd=normalize(uv.x*rt+uv.y*up+uFocal*fw);
   vec3 nb; float tb=traceBackdrop(ro,rd,nb);
@@ -809,11 +809,9 @@ Mat material(float id, vec3 p, vec3 n){
 }`});
 
 /* ------------------------------------------------------------------ */
-function buildCover(b, idx){
-  const fig=document.createElement('figure'); fig.className='plate';
-  const c=document.createElement('div'); c.className='cover k'+b.key+(b.series?' has-series':''); c.dataset.slug=b.slug;
+function coverInner(b){
   const lv=['Beginner','Intermediate','Advanced'][b.key];
-  c.innerHTML=`<canvas width="${W}" height="${H}"></canvas><div class="t">
+  return `<div class="t">
     <div class="imprint"><svg viewBox="0 0 26 38"><use href="#vmark"/></svg>Vizuara Books</div>
     <div class="catno">No.&thinsp;${b.no}</div>
     <div class="head">
@@ -824,10 +822,39 @@ function buildCover(b, idx){
     <div class="label"><p class="obj">${b.obj}</p><p class="med">${b.med}</p><p class="dim">${b.dim}</p></div>
     <div class="level"><div class="scale"><i class="${b.key==0?'on':''}"></i><i class="${b.key==1?'on':''}"></i><i class="${b.key==2?'on':''}"></i></div><span>${lv}</span></div>
   </div>`;
+}
+function buildCover(b){
+  const fig=document.createElement('figure'); fig.className='plate';
+  const c=document.createElement('div'); c.className='cover k'+b.key; c.dataset.slug=b.slug;
+  c.innerHTML=`<canvas width="${W}" height="${H}"></canvas>`+coverInner(b);
   fig.appendChild(c);
   const cap=document.createElement('figcaption'); cap.innerHTML=`<span>${b.slug}</span><span>${['Beginner','Intermediate','Advanced'][b.key]} · ${b.dim}</span>`; fig.appendChild(cap);
   document.getElementById('shelf-'+(b.group||'range')).appendChild(fig);
   return c.querySelector('canvas');
+}
+const WRAP={ slug:'ai-context-engineering', css:1498, spineAt:720, frontAt:778 };
+function buildWrap(b){
+  const RW=Math.round(WRAP.css*W/720);
+  const fig=document.getElementById('wrapfig');
+  const w=document.createElement('div'); w.className='wrap k'+b.key; w.dataset.wrap=b.slug;
+  const lv=['Beginner','Intermediate','Advanced'][b.key];
+  w.innerHTML=`<canvas width="${RW}" height="${H}"></canvas>
+    <div class="back">
+      <div class="bi"><svg viewBox="0 0 26 38"><use href="#vmark"/></svg>Vizuara Books</div>
+      <div class="entry">
+        <p class="k">No.&thinsp;${b.no} &nbsp;·&nbsp; ${lv} &nbsp;·&nbsp; ${b.dim}</p>
+        <h3>AI Context Engineering</h3>
+        <p>Context engineering is the craft of deciding what goes into a model's window, in what order, and what stays out.</p>
+        <p><i>On the cover:</i> a travertine window, packed block by block with slate, marble, sandstone and terracotta. Each block is fitted to the next, some room is left at the top, and one block did not make it in.</p>
+        <p><i>The catalogue:</i> every Vizuara book is a single object, made in code and photographed on seamless paper. The paper gives the level: chalk for beginner, stone for intermediate, soot for advanced.</p>
+      </div>
+      <div class="foot"><div class="url">books.vizuara.ai</div><div class="bar">ISBN · barcode</div></div>
+    </div>
+    <div class="spine"><div class="sn">${b.no}</div><div class="st">AI Context Engineering</div><svg viewBox="0 0 26 38"><use href="#vmark"/></svg></div>
+    <div class="front">${coverInner(b)}</div>`;
+  fig.appendChild(w);
+  const cap=document.createElement('figcaption'); cap.textContent='Full wrap · 15.6 × 9.25 in · back 7.5 in, spine 0.6 in, front 7.5 in · one render, 4681 × 2775 px'; fig.appendChild(cap);
+  return { canvas:w.querySelector('canvas'), RW, offX:Math.round(WRAP.frontAt*W/720) };
 }
 
 let GL=null, glCanvas=null, VBO=null;
@@ -848,7 +875,9 @@ function camFrom(c){
   const asp=W/H; const shift=[(0.5-c.frame[0])*asp, c.frame[1]-0.5];
   return {ro, ta:t, focal:c.focal||3.2, shift};
 }
-function renderBook(b, canvas){
+function renderBook(b, canvas, RW, offX){
+  RW=RW||W; offX=offX||0;
+  if(glCanvas.width!==RW){ glCanvas.width=RW; }
   const gl=GL; const k=Object.assign({},KEYS[b.key],b.light||{});
   const fs=PRELUDE+`#define STEPS ${b.steps||140}\n#define SSTEPS ${b.ssteps||40}\n#define STEPK ${b.stepk||0.9}\n`+b.glsl+MAIN;
   const pr=gl.createProgram();
@@ -860,7 +889,7 @@ function renderBook(b, canvas){
   const loc=gl.getAttribLocation(pr,'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
   const U=(n)=>gl.getUniformLocation(pr,n);
   const cam=camFrom(b.cam);
-  gl.uniform2f(U('uRes'),W,H);
+  gl.uniform2f(U('uRes'),RW,H); gl.uniform2f(U('uCov'),W,H); gl.uniform1f(U('uOff'),offX);
   gl.uniform3fv(U('uRo'),cam.ro); gl.uniform3fv(U('uTa'),cam.ta); gl.uniform1f(U('uFocal'),cam.focal); gl.uniform2fv(U('uShift'),cam.shift);
   gl.uniform3fv(U('uPaper'),srgb2lin(k.paper));
   gl.uniform3fv(U('uKeyPos'),k.keyPos); gl.uniform1f(U('uKeyPow'),k.keyPow); gl.uniform1f(U('uKeySoft'),k.keySoft);
@@ -878,21 +907,33 @@ function renderBook(b, canvas){
   const bb=b.box||[[bc[0]-bc[3],Math.max(0,bc[1]-bc[3]),bc[2]-bc[3]],[bc[0]+bc[3],bc[1]+bc[3],bc[2]+bc[3]]];
   gl.uniform3fv(U('uBMin'),bb[0]); gl.uniform3fv(U('uBMax'),bb[1]); gl.uniform1f(U('uWallZ'),b.wallZ||5); gl.uniform1f(U('uCoveR'),b.coveR||2.6);
   gl.uniform1f(U('uExpo'),k.expo); gl.uniform1f(U('uVig'),k.vig);
-  gl.viewport(0,0,W,H); gl.enable(gl.SCISSOR_TEST);
+  gl.viewport(0,0,RW,H); gl.enable(gl.SCISSOR_TEST);
   const T=480; const px=new Uint8Array(4);
-  for(let y=0;y<H;y+=T) for(let x=0;x<W;x+=T){ gl.scissor(x,y,T,T); gl.drawArrays(gl.TRIANGLES,0,3); gl.readPixels(x,y,1,1,gl.RGBA,gl.UNSIGNED_BYTE,px); }
+  for(let y=0;y<H;y+=T) for(let x=0;x<RW;x+=T){ gl.scissor(x,y,T,T); gl.drawArrays(gl.TRIANGLES,0,3); gl.readPixels(x,y,1,1,gl.RGBA,gl.UNSIGNED_BYTE,px); }
   gl.disable(gl.SCISSOR_TEST);
   const ctx=canvas.getContext('2d'); ctx.drawImage(glCanvas,0,0);
   gl.deleteProgram(pr); gl.deleteShader(vs); gl.deleteShader(f);
 }
 
+const GROUP={ 'ai-context-engineering':'core','mathematical-foundations-for-ml':'core','neural-networks-from-scratch':'core','build-llms-from-scratch':'core','5d-parallelism':'core','pi-vs-hermes-vs-codex':'core',
+  'prompt-engineering':'range','rag-in-production':'range','deit-from-scratch':'range','kernel-engineering':'range',
+  'charlie-language-room':'charlie','charlie-vision-room':'charlie','charlie-sound-room':'charlie','charlie-reasoning-room':'charlie' };
+const SHOW=['ai-context-engineering','mathematical-foundations-for-ml','neural-networks-from-scratch','build-llms-from-scratch','5d-parallelism','pi-vs-hermes-vs-codex',
+  'prompt-engineering','rag-in-production','deit-from-scratch','kernel-engineering',
+  'charlie-language-room','charlie-vision-room','charlie-sound-room','charlie-reasoning-room'];
+BOOKS.forEach(b=>b.group=GROUP[b.slug]);
+BOOKS.sort((a,b)=>SHOW.indexOf(a.slug)-SHOW.indexOf(b.slug));
+const ONLY=window.ONLY||null;
+const LIST=ONLY?BOOKS.filter(b=>ONLY.includes(b.slug)):BOOKS;
+const CANVASES=LIST.map(b=>buildCover(b));
+const WRAPT=(!ONLY||ONLY.includes('wrap'))?buildWrap(BOOKS.find(b=>b.slug===WRAP.slug)):null;
+try{ ['430 78px Newsreader','italic 400 20px Newsreader','600 12px "Instrument Sans"'].forEach(f=>document.fonts.load(f)); }catch(e){}
+
 function renderAll(){
-  const only=window.ONLY||null;
-  const list=only?BOOKS.filter(b=>only.includes(b.slug)):BOOKS;
-  const canvases=list.map((b,i)=>buildCover(b,i));
   try{ initGL(); }catch(e){ console.error('WebGL unavailable',e); return; }
   const times=[];
-  list.forEach((b,i)=>{ const t0=performance.now(); try{ renderBook(b,canvases[i]); }catch(e){ console.error('render fail '+b.slug+': '+e.message); } times.push(b.slug+':'+Math.round(performance.now()-t0)); });
+  LIST.forEach((b,i)=>{ const t0=performance.now(); try{ renderBook(b,CANVASES[i]); }catch(e){ console.error('render fail '+b.slug+': '+e.message); } times.push(b.slug+':'+Math.round(performance.now()-t0)); });
+  if(WRAPT){ const t0=performance.now(); try{ renderBook(BOOKS.find(b=>b.slug===WRAP.slug),WRAPT.canvas,WRAPT.RW,WRAPT.offX); }catch(e){ console.error('wrap fail '+e.message); } times.push('wrap:'+Math.round(performance.now()-t0)); }
   console.log('TIMES '+times.join(' '));
   window.RENDER_TIMES=times;
 }
