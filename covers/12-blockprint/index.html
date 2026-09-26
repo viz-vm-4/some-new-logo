@@ -250,7 +250,8 @@ const BLOCKS = {
     accent+=`<polyline points="0,45 60,75 120,45" fill="none" stroke="currentColor" stroke-width="4.2"/>`;
     accent+=`<polyline points="0,105 60,15 120,105" fill="none" stroke="currentColor" stroke-width="4.2"/>`;
     for(const x of [0,60]) for(const y of ys){ main+=C(x,y,9); ground+=C(x,y,3.6); }
-    return {w:120,h:120,layers:{line,accent,main,ground},order:['line','accent','main','ground']};
+    // the fine mesh is inked more densely: a 1.6px printed line should hold solid
+    return {w:120,h:120,voids:{line:.84},layers:{line,accent,main,ground},order:['line','accent','main','ground']};
   },
 
   /* Build LLMs from Scratch — the causal attention mask. Lower triangle: tokens
@@ -302,16 +303,17 @@ const BLOCKS = {
                evicted oldest turn drops out below as a dot */
   compaction(){
     let main='',accent='';
-    const cellH=3.9, pitch=5.1, col=(x,y0,base,turns,drop)=>{
-      const b=y0+36;
-      for(let k=0;k<base;k++) accent+=R(x,b-cellH-k*pitch,8,cellH);
-      for(let k=0;k<turns;k++) main+=R(x,b-cellH-(base+k)*pitch,8,cellH);
-      if(drop) main+=C(x+4,b+2.4,1.1);
+    const cellH=5.2, pitch=6.9, cw=10.5, pc=14, col=(x,y0,base,turns,drop)=>{
+      const b=y0+56;
+      for(let k=0;k<base;k++) accent+=R(x,b-cellH-k*pitch,cw,cellH);
+      for(let k=0;k<turns;k++) main+=R(x,b-cellH-(base+k)*pitch,cw,cellH);
+      if(drop) main+=C(x+cw/2,b+3.6,1.6);
     };
-    for(let c=0;c<28;c++) col(c*10+1,0,1,c%7,false);
-    let c=0; for(let base=1;base<=7;base++) for(let n=0;n<=7-base;n++,c++) col(c*10+1,40,base,n,false);
-    for(let c=0;c<28;c++) col(c*10+1,80,0,Math.min(7,c+1),c>=7);
-    return {w:280,h:120,scale:1.25,layers:{main,accent},order:['main','accent']};
+    const N=28;
+    for(let c=0;c<N;c++) col(c*pc+1,0,1,c%7,false);                               // summarise and reset
+    let c=0; for(let base=1;base<=7;base++) for(let n=0;n<=7-base;n++,c++) col(c*pc+1,62,base,n,false); // accumulating memory
+    for(let c=0;c<N;c++) col(c*pc+1,124,0,Math.min(7,c+1),c>=7);                  // rolling window
+    return {w:N*pc,h:186,scale:1,layers:{main,accent},order:['main','accent']};
   },
 
   /* CNN Fundamentals — the block IS the kernel: a 5x5 Laplacian-of-Gaussian
@@ -467,7 +469,14 @@ const IKAT = {
     function set(x,y,v){ if(x>=0&&y>=0&&x<W&&y<H) g[y][x]=v; }
     for(let cy=0;cy<CH;cy++)for(let cx=0;cx<CW;cx++){
       const ox=cx*6, oy=cy*6-2, k=key(cx,cy);
-      if(wall.has(k)){ for(let y=0;y<5;y++)for(let x=0;x<5;x++)set(ox+x,oy+y,2); continue; }
+      if(wall.has(k)){   // walls: madder, joined to neighbouring walls into solid bars (big enough to hold in greyscale)
+        const W_=wall.has(key(cx-1,cy)), E_=wall.has(key(cx+1,cy)), N_=wall.has(key(cx,cy-1)), S_=wall.has(key(cx,cy+1));
+        for(let y=-1;y<6;y++)for(let x=-1;x<6;x++){
+          if((x===5&&!E_)||(y===5&&!S_)) continue;
+          if(x===-1||y===-1) continue;
+          set(ox+x,oy+y,2);
+        }
+        continue; }
       if(dist[k]===0){ for(let y=0;y<5;y++)for(let x=0;x<5;x++)set(ox+x,oy+y,(x%4===0||y%4===0)?4:(x===2&&y===2?4:0)); continue; }
       let best='r',bd=1e9;
       for(const [dx,dy,d] of [[1,0,'r'],[-1,0,'l'],[0,1,'d'],[0,-1,'u']]){const kk=key(cx+dx,cy+dy); if(kk in dist && dist[kk]<bd){bd=dist[kk];best=d;}}
@@ -559,27 +568,24 @@ function stampField(B, lv, rand, id, W=720, x0=0){
   // kora a little larger than itself, so the colour sits in a white keyline and
   // still reads in greyscale print.
   const dyed = lv.ground!==P.kora, keyed = dyed ? (B.keyline||['accent']) : [];
-  const order=[], layers={...B.layers};
-  B.order.forEach(role=>{
-    if(keyed.includes(role)){
-      layers[role+'K']=B.layers[role].replace(/stroke-width="([\d.]+)"/g,(m,w)=>`stroke-width="${(+w+3.4).toFixed(2)}"`);
-      order.push(role+'K');
-    }
-    order.push(role);
-  });
-  order.forEach((role,li)=>{
-    const reserve=role.endsWith('K');
-    defs+=`<g id="${id}-${role}" fill="currentColor" stroke="currentColor" stroke-width="${reserve?3.4:0}" stroke-linejoin="round">${layers[role]}</g>`;
-    defs+=inkFilter(`${id}-ink-${role}`, (hash(id)%500)+li*31, role==='line'?2.2:2.8, role==='ground'?.78:.68);
+  const colOf = (role)=> role==='ground'?lv.ground: role==='kora'?P.kora: role==='haldi'?P.haldi: lv[role];
+  B.order.forEach((role,li)=>{
+    const keyline = keyed.includes(role);
+    defs+=`<g id="${id}-${role}" fill="currentColor" stroke="currentColor" stroke-width="0">${B.layers[role]}</g>`;
+    if(keyline) defs+=`<g id="${id}-${role}K" fill="${P.kora}" stroke="${P.kora}" stroke-width="3.4" stroke-linejoin="round">${
+      B.layers[role].replace(/stroke-width="([\d.]+)"/g,(m,w)=>`stroke-width="${(+w+3.4).toFixed(2)}"`).replace(/currentColor/g,P.kora)}</g>`;
+    defs+=inkFilter(`${id}-ink-${role}`, (hash(id)%500)+li*31, role==='line'?2.2:2.8, (B.voids&&B.voids[role]) || (role==='ground'?.78:.68));
     let g='', n=0;
     for(let r=-1;r<rows;r++)for(let c=cMin;c<cMax;c++){
       const x=ox+c*BW, y=oy+r*BH;
       const dx=(rand()-.5)*2.2, dy=(rand()-.5)*2.2, rot=(rand()-.5)*.8;   // the printer's hand
       const op=[1,.94,.88][n++%3]-rand()*.04;                               // re-ink every third impression
-      g+=`<use href="#${id}-${role}" transform="translate(${f(x+dx)} ${f(y+dy)}) rotate(${f(rot)} ${BW/2} ${BH/2}) scale(${k}) ${B.arr?B.arr(c,r):''}" opacity="${f(op)}"/>`;
+      const tf=`translate(${f(x+dx)} ${f(y+dy)}) rotate(${f(rot)} ${BW/2} ${BH/2}) scale(${k}) ${B.arr?B.arr(c,r):''}`;
+      // the kora reserve and its colour are one registered pass through the same block
+      if(keyline) g+=`<use href="#${id}-${role}K" transform="${tf}"/>`;
+      g+=`<use href="#${id}-${role}" transform="${tf}" opacity="${f(op)}"/>`;
     }
-    const col = reserve?P.kora: role==='ground'?lv.ground: role==='kora'?P.kora: role==='haldi'?P.haldi: lv[role];
-    out+=`<g color="${col}" filter="url(#${id}-ink-${role})">${g}</g>`;
+    out+=`<g color="${colOf(role)}" filter="url(#${id}-ink-${role})">${g}</g>`;
   });
   return {defs,out};
 }

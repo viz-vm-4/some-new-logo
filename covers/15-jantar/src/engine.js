@@ -31,7 +31,7 @@
   class Scene {
     constructor() { this.faces = []; this.nsolid = 0; this.overlays = []; this.E = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]; }
     // local frame -> world
-    W(x, y, z) { const E = this.E; return [x * E[0][0] + y * E[1][0] + z * E[2][0], x * E[0][1] + y * E[1][1] + z * E[2][1], x * E[0][2] + y * E[1][2] + z * E[2][2]]; }
+    W(x, y, z) { const E = this.E, O = this.O || [0, 0, 0]; return [O[0] + x * E[0][0] + y * E[1][0] + z * E[2][0], O[1] + x * E[0][1] + y * E[1][1] + z * E[2][1], O[2] + x * E[0][2] + y * E[1][2] + z * E[2][2]]; }
     // faces: array of point arrays; normals oriented outward from the solid's centroid
     solid(faces, o = {}) {
       const id = this.nsolid++;

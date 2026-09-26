@@ -31,7 +31,7 @@ body{font-family:"Instrument Sans",system-ui,sans-serif;-webkit-font-smoothing:a
   font-variant-numeric:tabular-nums}
 .head{position:absolute;left:40px;right:40px;top:80px}
 .series{margin:0 0 14px 4px;font:600 11.5px/1.2 "Instrument Sans";letter-spacing:.2em;text-transform:uppercase}
-.tag{margin:18px 60px 0 3px;font:italic 400 22px/1.28 "Newsreader";letter-spacing:.003em}
+.tag{margin:18px 60px 0 3px;font:italic 400 22px/1.28 "Newsreader";letter-spacing:.003em;text-wrap:balance}
 .tag.small{font-size:20px}
 
 h2.title{margin:0;
@@ -41,7 +41,8 @@ h2.title .sub{display:block;font-style:italic;font-weight:360;font-size:.56em;li
 h2.title.s1{font-size:70px}
 h2.title.s2{font-size:62px}
 
-.label{position:absolute;left:44px;bottom:40px;width:430px}
+.label{position:absolute;left:44px;bottom:40px;width:468px}
+.label .med{text-wrap:balance}
 .label .obj{font:italic 400 19px/1.2 "Newsreader";margin:0 0 7px;letter-spacing:.003em}
 .label .med,.label .dim{font:500 11.5px/1.5 "Instrument Sans";letter-spacing:.12em;text-transform:uppercase;margin:0}
 
@@ -166,7 +167,7 @@ footer.colophon b{font:600 11px/1 "Instrument Sans";letter-spacing:.18em;text-tr
         <dl class="labelspec">
           <dt>Object</dt><dd>What the sculpture is, in plain words: <i>Cube with a mouth. Column of twelve identical blocks.</i></dd>
           <dt>Medium</dt><dd>Plaster, terracotta, travertine, oxblood glaze, beeswax, marble. The colour on the shelf comes from the material, never from a brand accent.</dd>
-          <dt>Dimensions</dt><dd>The book's true size: capsules × hours. Forthcoming titles are shown as white plaster maquettes, with the metal still to be cast.</dd>
+          <dt>Dimensions</dt><dd>The book's true size: capsules × hours. A forthcoming title reads <i>Forthcoming</i>, and its object is shown unfinished: raw plaster, the steel armature still showing, graphite pointing marks, a paper tag tied on.</dd>
         </dl>
       </section>
       <section>
@@ -183,11 +184,11 @@ footer.colophon b{font:600 11px/1 "Instrument Sans";letter-spacing:.18em;text-tr
   <div class="shelf" id="shelf-core"></div>
 
   <div class="sec"><h2>Range</h2><span>Short title · long title · forthcoming</span></div>
-  <p class="secnote">The same rules stretch from a two-word title to a three-line one. A forthcoming book gets the plaster maquette of its object, so the catalogue can announce a book before its cover is "cast".</p>
+  <p class="secnote">The same rules stretch from a two-word title to a three-line one. A forthcoming book gets the sculptor's working maquette of its object: raw plaster, steel armature, pointing marks and a tied tag. The catalogue can announce a book before its cover is "cast".</p>
   <div class="shelf" id="shelf-range"></div>
 
   <div class="sec"><h2>Charlie and the Intelligence Factory</h2><span>Sub-series · I–IV</span></div>
-  <p class="secnote">Four rooms, one cube. The sub-series keeps a single object — a porcelain cube, the "room" — and changes only the one opening cut into its face: a mouth for Language, an eye for Vision, an ear for Sound, a stair for Reasoning. The cuts are gilded inside, a nod to the golden ticket. The paper still follows each book's level.</p>
+  <p class="secnote">Four rooms, one cube. The sub-series keeps a single object — a porcelain cube, the "room" — and changes only the one opening cut into its face: a mouth for Language, sixteen patch-windows for Vision (Transformers), a stepped ear for Sound, a six-step stair for Reasoning. The cuts are gilded inside, a nod to the golden ticket. The paper still follows each book's level.</p>
   <div class="shelf" id="shelf-charlie"></div>
 
   <div class="sec"><h2>Print wrap</h2><span>Back · spine · front, one continuous photograph</span></div>
@@ -379,11 +380,13 @@ void main(){
 const KEYS = {
   0:{ paper:'#E9E5DC', keyPos:[-7,10,-7], keyPow:230, keySoft:5, spot:null, glow:.30, glowRad:6, fill:.32, boxLum:3.0, boxSize:[.7,.55], envDark:.35, expo:1.0, vig:.35,
       panels:[[-0.2,1,0.3, 1.1, 1.0,0.8],[1,0.15,-0.3, 0.7, 0.35,0.8],[-0.8,0.2,0.6, 0.5, 0.3,0.9]] },
-  1:{ paper:'#AAA59C', keyPos:[-7,9,-6],  keyPow:230, keySoft:6, spot:null, glow:.28, glowRad:5, fill:.22, boxLum:2.8, boxSize:[.65,.5], envDark:.14, expo:1.0, vig:.45,
+  1:{ paper:'#949088', keyPos:[-7,9,-6],  keyPow:230, keySoft:6, spot:null, glow:.28, glowRad:5, fill:.22, boxLum:2.8, boxSize:[.65,.5], envDark:.14, expo:1.0, vig:.45,
       panels:[[-0.2,1,0.3, 0.8, 0.9,0.7],[1,0.15,-0.3, 0.4, 0.35,0.8],[0.7,0.25,0.7, 0.6, 0.12,0.9]] },
   2:{ paper:'#46423E', keyPos:[-8,7,-3.5],  keyPow:135, keySoft:7, spot:[.88,.975], glow:.55, glowRad:2.8, fill:.03, boxLum:3.6, boxSize:[.6,.45], envDark:.012, expo:1.0, vig:.6,
       panels:[[-0.1,1,0.2, 0.55, 0.7,0.5],[0.75,0.3,0.6, 1.6, 0.10,1.0],[-0.8,0.3,0.5, 0.9, 0.10,1.0],[1,0.1,-0.4, 0.18, 0.4,0.8]] },
 };
+/* rendered wall luminance (0–255) each paper key must hit at title height */
+const KEY_WALL={0:234,1:155,2:55};
 const srgb2lin = (h)=>[1,3,5].map(i=>Math.pow(parseInt(h.substr(i,2),16)/255,2.2));
 
 /* ------------------------------------------------------------------ */
@@ -482,7 +485,7 @@ CTX_ROWS.forEach(([y,h,bs])=>{ CTX_CODE+=`  if(abs(p.y-${y.toFixed(3)})-${h.toFi
   CTX_CODE+='  }\n'; });
 book({ slug:'ai-context-engineering', key:1,
   title:'AI Context<br>Engineering',
-  obj:'Window, packed by hand; one block left out', med:'Travertine, slate, marble, terracotta', dim:'43 capsules · 10 hours',
+  obj:'Window, packed by hand; one block left out', med:'Travertine, slate, marble, sandstone, terracotta, serpentine', dim:'43 capsules · 10 hours',
   cam:{ look:[0.3,1.15,0], dist:17, el:9, yaw:-16, frame:[0.5,0.64] }, bound:[0.3,1.2,0,2.25], box:[[-1.05,0,-0.62],[2.1,2.43,0.25]], steps:130,
   light:{ keyPos:[-8,8,-6] },
   glsl:`
@@ -521,41 +524,57 @@ Mat material(float id, vec3 p, vec3 n){
 }`});
 
 /* ============ NEURAL NETWORKS FROM SCRATCH ============ */
+/* A string construction: three oak boards are the layers, brass pins the neurons,
+   black linen threads every weight between adjacent layers (thickness = weight). */
+const NN_L=[4,5,2], NN_X=[-0.82,0,0.82], NN_BT=0.04;
+const nnY=(n,j)=>0.98+(j-(n-1)/2)*0.34;
+const nnHash=(a,b,c)=>{ const s=Math.sin(a*12.9898+b*78.233+c*37.719)*43758.5453; return s-Math.floor(s); };
+let NN_PINS='', NN_TH=['',''];
+NN_L.forEach((n,l)=>{ let code=''; for(let j=0;j<n;j++) code+=`    d=sdCapsule(p,vec3(${(NN_X[l]-NN_BT-0.035).toFixed(3)},${nnY(n,j).toFixed(3)},0.),vec3(${(NN_X[l]+NN_BT+0.035).toFixed(3)},${nnY(n,j).toFixed(3)},0.),0.017); if(d<r.x) r=vec2(d,2.);\n`;
+  NN_PINS+=`  if(abs(p.x-(${NN_X[l].toFixed(3)}))<0.14+r.x){\n${code}  }\n`; });
+for(let l=0;l<2;l++) for(let a=0;a<NN_L[l];a++) for(let b=0;b<NN_L[l+1];b++){
+  const rr=0.0055+0.0075*nnHash(l,a,b);
+  NN_TH[l]+=`    t=min(t,sdCapsule(p,vec3(${(NN_X[l]+NN_BT+0.03).toFixed(3)},${nnY(NN_L[l],a).toFixed(3)},0.),vec3(${(NN_X[l+1]-NN_BT-0.03).toFixed(3)},${nnY(NN_L[l+1],b).toFixed(3)},0.),${rr.toFixed(4)}));\n`; }
 book({ slug:'neural-networks-from-scratch', key:0,
   title:'Neural Networks<span class="sub">from Scratch</span>',
-  obj:'Three layers, fully connected, modelled by hand', med:'Terracotta', dim:'33 capsules · 7 hours',
-  cam:{ look:[0,1.25,0], dist:17.5, el:10, yaw:-10, frame:[0.52,0.6] }, bound:[0,1.3,0,1.75], box:[[-0.95,0,-0.95],[0.95,2.66,0.95]], steps:140,
-  light:{ keyPos:[-10,7,-3], keyPow:220 },
+  obj:'Three layers, fully connected in thread; each thread’s thickness is its weight', med:'Oak, brass pins, black linen', dim:'33 capsules · 7 hours',
+  cam:{ look:[0,0.98,0], dist:15, el:9, yaw:30, frame:[0.5,0.6] }, bound:[0,0.98,0,1.6], box:[[-0.9,0,-0.3],[0.9,1.92,0.3]], steps:140,
+  light:{ keyPos:[-9,7.5,-4], keyPow:230 },
   glsl:`
-const float R0=0.19; const float R1=0.17; const float R2=0.22; const float RR=0.031;
-vec3 n0(int i){ float a=float(i)*1.5708+0.785; return vec3(0.82*cos(a),R0,0.82*sin(a)); }
-vec3 n1(int i){ float a=float(i)*1.5708; return vec3(0.62*cos(a),1.32,0.62*sin(a)); }
-const vec3 N2=vec3(0.,2.42,0.);
 vec2 scene(vec3 p){
-  p.xz=rot(0.3)*p.xz;
   float d=1e9;
-  for(int i=0;i<4;i++){ d=min(d,length(p-n0(i))-R0); d=min(d,length(p-n1(i))-R1); }
-  d=min(d,length(p-N2)-R2);
-  float rd=1e9;
-  if(p.y<1.55){ for(int i=0;i<4;i++) for(int j=0;j<4;j++) rd=min(rd,sdCapsule(p,n0(i),n1(j),RR)); }
-  if(p.y>1.1){ for(int j=0;j<4;j++) rd=min(rd,sdCapsule(p,n1(j),N2,RR)); }
-  d=smin(d,rd,0.05);
-  return vec2(d,1.);
+  d=min(d,sdRBox(p-vec3(${NN_X[0]},0.96,0.),vec3(${NN_BT},0.96,0.26),0.012));
+  d=min(d,sdRBox(p-vec3(${NN_X[1]},0.96,0.),vec3(${NN_BT},0.96,0.26),0.012));
+  d=min(d,sdRBox(p-vec3(${NN_X[2]},0.96,0.),vec3(${NN_BT},0.96,0.26),0.012));
+  vec2 r=vec2(d,1.);
+${NN_PINS}  float t=1e9;
+  if(abs(p.z)<0.03+r.x){
+    if(p.x<0.02 && p.x>-0.8){
+${NN_TH[0]}    }
+    if(p.x>-0.02 && p.x<0.8){
+${NN_TH[1]}    }
+  }
+  if(t<r.x) r=vec2(t,3.);
+  return r;
 }
 Mat material(float id, vec3 p, vec3 n){
-  Mat m; float f=fbm(p*5.); float g=noise(p*70.);
-  m.alb=vec3(0.50,0.18,0.085)*(0.8+0.34*f)*(0.94+0.1*g);
-  m.rough=0.8; m.metal=0.; m.coat=0.; m.wrap=0.25; return m;
+  Mat m; m.metal=0.; m.coat=0.; m.wrap=0.1;
+  if(id<1.5){ float w=fbm(p*vec3(8.,1.5,8.)); float rings=0.5+0.5*sin(p.z*70.+p.x*20.+w*8.);
+    float fine=noise(p*vec3(140.,4.,140.));
+    m.alb=vec3(0.52,0.36,0.21)*(0.8+0.2*rings)*(0.9+0.14*fine); m.rough=0.7; }
+  else if(id<2.5){ m.alb=vec3(0.86,0.66,0.36); m.rough=0.28; m.metal=1.; m.wrap=0.; }
+  else { float g=noise(p*vec3(400.,400.,400.)); m.alb=vec3(0.028,0.026,0.024)*(0.9+0.2*g); m.rough=0.95; m.wrap=0.3; }
+  return m;
 }`});
 
 /* ============ BUILD LLMS FROM SCRATCH ============ */
 book({ slug:'build-llms-from-scratch', key:1,
-  title:'Build Large Language Models<span class="sub">(LLMs) from Scratch</span>', size:'s1',
+  title:'Build Large Language<br>Models (LLMs)<span class="sub">from Scratch</span>', size:'s2',
   obj:'Column of twelve identical blocks', med:'Stoneware, oxblood glaze', dim:'20 capsules · 6 hours',
-  cam:{ look:[0,2.0,0], dist:22.5, el:6, yaw:-8, frame:[0.64,0.58] }, bound:[0,2.0,0,2.1], box:[[-0.36,0,-0.36],[0.36,3.97,0.36]], steps:150,
-  light:{ keyPos:[-8,8,-5], fill:0.3 },
+  cam:{ look:[0,1.585,0], dist:19.5, el:6, yaw:-8, frame:[0.5,0.605] }, bound:[0,1.6,0,1.7], box:[[-0.29,0,-0.29],[0.29,3.18,0.29]], steps:150,
+  light:{ keyPos:[-8,8,-5], fill:0.34 },
   glsl:`
-const float HM=0.33; const float WW=0.25; const float WN=0.125; const float RB=0.014;
+const float HM=0.264; const float WW=0.2; const float WN=0.1; const float RB=0.011;
 vec2 scene(vec3 p){
   p.xz=rot(0.62)*p.xz;
   float id=clamp(floor(p.y/HM),0.,11.);
@@ -569,8 +588,8 @@ vec2 scene(vec3 p){
 Mat material(float id, vec3 p, vec3 n){
   Mat m; float g=fbm(p*vec3(5.,22.,5.));
   float yy=mod(p.y,HM)/HM; float waist=smoothstep(0.35,0.0,min(yy,1.-yy));
-  m.alb=mix(vec3(0.40,0.045,0.035),vec3(0.2,0.02,0.02),waist*0.7+g*0.25);
-  m.rough=0.06+0.04*g; m.metal=0.; m.coat=1.; m.wrap=0.1; return m;
+  m.alb=mix(vec3(0.20,0.026,0.021),vec3(0.085,0.009,0.008),waist*0.75+g*0.25);
+  m.rough=0.05+0.04*g; m.metal=0.; m.coat=1.; m.wrap=0.1; return m;
 }`});
 
 /* ============ PI VS HERMES VS CODEX ============ */
@@ -614,31 +633,50 @@ Mat material(float id, vec3 p, vec3 n){
 }`});
 
 /* ============ PROMPT ENGINEERING ============ */
+/* A cylinder seal (the prompt) and the frieze it rolls into a clay slab (the continuation):
+   the carved motif repeats with period 2πr, and the output is shaped by it throughout. */
 book({ slug:'prompt-engineering', key:0,
   title:'Prompt<br>Engineering',
-  obj:'Slab, raised by a wedge', med:'Slate and red lacquer', dim:'31 capsules · 7 hours',
-  cam:{ look:[0,0.4,0], dist:15.5, el:13, yaw:-20, frame:[0.5,0.64] }, bound:[0,0.4,0,1.85], box:[[-1.4,0,-0.8],[1.4,0.85,0.8]], steps:130,
-  light:{ keyPos:[-8,9,-6] },
+  obj:'Cylinder seal, and the frieze it rolls into clay', med:'Lapis lazuli, terracotta', dim:'31 capsules · 7 hours',
+  cam:{ look:[0.2,0.2,0], dist:17.5, el:25, yaw:16, frame:[0.5,0.645] }, bound:[0.2,0.2,0,1.75], box:[[-1.2,0,-0.52],[1.65,0.46,0.52]], steps:140,
+  light:{ keyPos:[-7,5.5,-6.5] },
   glsl:`
-const float TA=0.19;
+const float R=0.13; const float P=0.81681; const float TOP=0.18; const float XS=-0.62; const float XE=1.5;
+float motif(float u, float z){
+  float k=12.566371/P; float A=0.085;
+  float c=cos(k*u);
+  float dw=abs(z-A*sin(k*u))/sqrt(1.+A*A*k*k*c*c)-0.017;
+  float db=abs(abs(z)-0.18)-0.012;
+  float d1=length(vec2(mod(u-P*0.125+P*0.25,P*0.5)-P*0.25,z+0.13))-0.027;
+  float d2=length(vec2(mod(u-P*0.375+P*0.25,P*0.5)-P*0.25,z-0.13))-0.027;
+  return min(min(dw,db),min(d1,d2));
+}
 vec2 scene(vec3 p){
-  // slab pivots on its left lower edge at x=-1.35
-  vec3 q=p-vec3(-1.35,0.,0.); q.xy=rot(TA)*q.xy; q-=vec3(1.35,0.16,0.);
-  float ds=sdRBox(q,vec3(1.35,0.16,0.72),0.015);
-  float tl=sin(TA)/cos(TA);
-  float xe=1.05, xs=0.3; float hh=(xe+1.35)*tl-0.004;
-  float sl=hh/(xe-xs);
-  vec3 w=p;
-  float dw=max(max(-w.y, w.x-xe), (w.y-(w.x-xs)*sl)/sqrt(1.+sl*sl));
-  dw=max(dw,abs(w.z-0.05)-0.2);
-  vec2 r=vec2(ds,1.); if(dw<r.x) r=vec2(dw,2.);
+  float slab=sdRBox(p-vec3(0.225,TOP*0.5,0.),vec3(1.375,TOP*0.5,0.46),0.03);
+  float band=max(max(XS-p.x,p.x-XE),abs(p.z)-0.215);
+  float rec=max(band,(TOP-0.024)-p.y);
+  float cut=max(rec,-motif(p.x-XS,p.z));
+  slab=max(slab,-cut);
+  vec2 r=vec2(slab,1.);
+  vec3 s=p-vec3(-0.84,TOP+R,0.03); s.xz=rot(0.1)*s.xz;
+  float cyl=sdCylZ(s,0.23,R);
+  if(cyl<0.08){
+    float gro=max(motif(atan(s.y,s.x)*R,s.z),(R-0.015)-length(s.xy));
+    cyl=max(cyl,-gro);
+    cyl=max(cyl,-(length(s.xy)-0.03));
+  }
+  if(cyl<r.x) r=vec2(cyl,2.);
   return r;
 }
 Mat material(float id, vec3 p, vec3 n){
-  Mat m; m.metal=0.; m.wrap=0.;
-  if(id<1.5){ float f=fbm(p*vec3(3.,14.,3.)); float g=fbm(p*25.);
-    m.alb=vec3(0.085,0.09,0.10)*(0.8+0.35*f)*(0.92+0.12*g); m.rough=0.55; m.coat=0.3; }
-  else { m.alb=vec3(0.62,0.07,0.045); m.rough=0.12; m.coat=1.; }
+  Mat m; m.metal=0.;
+  if(id<1.5){ float f=fbm(p*6.); float g=noise(p*90.);
+    float inb=step(XS,p.x)*step(p.x,XE)*step(abs(p.z),0.215);
+    m.alb=vec3(0.44,0.17,0.08)*(0.84+0.26*f)*(0.94+0.1*g); m.rough=mix(0.85,0.55,inb); m.coat=inb*0.2; m.wrap=0.2; }
+  else { float f=fbm(p*14.); float fleck=smoothstep(0.86,0.9,noise(p*150.)); float calc=smoothstep(0.62,0.75,fbm(p*9.+3.));
+    m.alb=mix(vec3(0.03,0.05,0.23)*(0.8+0.4*f),vec3(0.55,0.58,0.62),calc*0.35);
+    m.rough=0.22; m.coat=0.7; m.wrap=0.;
+    if(fleck>0.5){ m.alb=vec3(0.9,0.72,0.35); m.metal=1.; m.rough=0.3; } }
   return m;
 }`});
 
@@ -714,14 +752,16 @@ vec2 scene(vec3 p){ vec3 q=cubeP(p);
 }`+CHARLIE_MAT });
 book({ slug:'charlie-vision-room', key:1, series:'Charlie and the Intelligence Factory · II',
   title:'Charlie and the<br>Vision Room', tag:'Vision — Vision Transformers',
-  obj:'Room II: a cube with an eye', med:'Porcelain, gilded interior', dim:'20 capsules · 6 hours',
-  cam:CHARLIE_CAM, light:CHARLIE_LIGHT, bound:[0,0.72,0,1.35], box:[[-1.0,0,-1.0],[1.0,1.46,1.0]], steps:120,
+  obj:'Room II: a cube that sees in sixteen patches', med:'Porcelain, gilded interior', dim:'20 capsules · 6 hours',
+  cam:CHARLIE_CAM, light:CHARLIE_LIGHT, bound:[0,0.72,0,1.35], box:[[-1.0,0,-1.0],[1.0,1.46,1.0]], steps:130,
   glsl: CUBE+`
 vec2 scene(vec3 p){ vec3 q=cubeP(p);
   float d=sdRBox(q,vec3(S),0.03);
-  float hole=length(q.xy-vec2(0.,0.02))-0.32;
-  float dd=smax(d,-hole,0.02);
-  return vec2(dd, abs(hole)<0.006?2.:1.);
+  const float PT=0.19;
+  vec2 c=clamp(floor(q.xy/PT+2.),0.,3.); vec2 lc=q.xy-(c-2.+0.5)*PT;
+  float holes=max(sdBox2(lc,vec2(0.05))-0.008, abs(q.z)-1.0);
+  float dd=max(d,-holes);
+  return vec2(dd, abs(holes)<0.008?2.:1.);
 }`+CHARLIE_MAT });
 book({ slug:'charlie-sound-room', key:1, series:'Charlie and the Intelligence Factory · III',
   title:'Charlie and the<br>Sound Room', tag:'Audio — Voice Agents',
@@ -730,39 +770,41 @@ book({ slug:'charlie-sound-room', key:1, series:'Charlie and the Intelligence Fa
   glsl: CUBE+`
 vec2 scene(vec3 p){ vec3 q=cubeP(p);
   float d=sdRBox(q,vec3(S),0.03);
-  float r=length(q.xy);
-  // stepped horn: 5 terraces, each 0.07 wide, 0.09 deep, from the front face z=-S
-  float k=clamp(floor((0.46-r)/0.075),-1.,5.);
-  float depth=(k+1.)*0.085;
-  float horn=max(r-0.46, (q.z+S)-depth);
-  horn=max(horn,-(q.z+S)+(-0.2));
-  // make it a proper cavity: inside radius and in front of depth
-  float cav=max(r-0.46,-1.);
-  float dd=max(d,-horn);
-  return vec2(dd, abs(horn)<0.008?2.:1.);
+  float r=length(q.xy); float w=q.z+S;
+  float cav=1e9;
+  for(int k=0;k<6;k++){ float fk=float(k); cav=min(cav,max(max(r-(0.46-0.075*fk),w-0.085*(fk+1.)),-w-0.5)); }
+  float dd=max(d,-cav);
+  return vec2(dd, abs(cav)<0.008?2.:1.);
 }`+CHARLIE_MAT });
 book({ slug:'charlie-reasoning-room', key:2, series:'Charlie and the Intelligence Factory · IV',
   title:'Charlie and the<br>Reasoning Room', tag:'Reason — Reinforcement Learning, from bandits to reasoning models', tagSmall:true,
-  obj:'Room IV: a cube with a stair', med:'Porcelain, gilded treads', dim:'21 capsules · 6 hours',
+  obj:'Room IV: a cube with a stair, six steps up', med:'Porcelain, gilded treads', dim:'21 capsules · 6 hours',
   cam:CHARLIE_CAM, light:CHARLIE_LIGHT, bound:[0,0.72,0,1.35], box:[[-1.0,0,-1.0],[1.0,1.46,1.0]], steps:130,
   glsl: CUBE+`
 vec2 scene(vec3 p){ vec3 q=cubeP(p);
   float d=sdRBox(q,vec3(S),0.03);
-  float st=1e9;
-  for(int k=0;k<5;k++){ float fk=float(k); float cx=-0.4+0.2*fk; float top=-0.44+0.176*(fk+1.);
-    st=min(st,sdBox2(q.xy-vec2(cx,0.5*(top-0.46)),vec2(0.1+(k==4?0.:0.001),0.5*(top+0.46)))); }
-  float rec=max(st,abs(q.z+S)-0.13);
-  float dd=max(d,-rec);
-  return vec2(dd, abs(rec)<0.008?2.:1.);
+  float w=q.z+S;
+  const float RUN=0.13, RISE=0.13, X0=-0.42, Y0=-0.47, HC=0.3;
+  float cut=1e9, tr=1e9;
+  for(int k=0;k<6;k++){ float fk=float(k); float xa=X0+fk*RUN, xb=xa+RUN, yt=Y0+fk*RISE;
+    cut=min(cut,max(max(xa-q.x,q.x-xb),yt-q.y));
+    if(q.x>xa-0.004 && q.x<xb+0.004) tr=min(tr,abs(q.y-yt)); }
+  cut=max(cut,(q.y-(Y0+HC+(q.x-X0)))*0.7071);
+  cut=max(cut,max(w-0.3,-w-0.5));
+  float dd=max(d,-cut);
+  return vec2(dd, (tr<0.008 && w>-0.01 && w<0.305)?2.:1.);
 }`+CHARLIE_MAT });
 
 /* ============ KERNEL ENGINEERING (forthcoming) ============ */
+/* Forthcoming rule: the object is shown as the sculptor's maquette — raw plaster,
+   the steel armature left showing, graphite pointing marks, a tied paper tag. */
 book({ slug:'kernel-engineering', key:2, forthcoming:true,
   title:'Kernel<br>Engineering', tag:'From silicon to speculative decoding — GPU kernels for modern LLMs.',
-  obj:'Maquette for a tiled block, one tile lifted', med:'Plaster maquette · to be cast in silicon bronze', dim:'Forthcoming',
-  cam:{ look:[0,0.35,0], dist:13, el:25, yaw:-20, frame:[0.5,0.64] }, bound:[0,0.35,0,1.75], box:[[-1.05,0,-1.05],[1.05,0.95,1.05]], steps:130,
+  obj:'Maquette for a tiled block, one tile lifted', med:'Plaster on a steel armature · to be cast in silicon bronze', dim:'Forthcoming',
+  cam:{ look:[0,0.45,0], dist:14, el:22, yaw:-20, frame:[0.5,0.62] }, bound:[0,0.5,0,1.75], box:[[-1.05,0,-1.05],[1.05,1.12,1.05]], steps:140,
   glsl:`
 const float TS=0.36; const float TH=0.3;
+const vec3 RA=vec3(0.5,0.,0.5); const vec3 TC=vec3(-0.25,0.45,-0.28);
 vec2 scene(vec3 p){
   p.xz=rot(0.3)*p.xz;
   vec3 q=p-vec3(0.,TH*0.5,0.);
@@ -773,44 +815,74 @@ vec2 scene(vec3 p){
   vec2 hid=vec2(2.,1.); vec2 hc=(hid-2.+0.5)*TS;
   float hole=sdBox(q-vec3(hc.x,0.1,hc.y),vec3(0.5*TS-0.008,TH*0.5,0.5*TS-0.008));
   d=max(d,-hole);
-  vec3 t=p-vec3(-0.25,TH+TH*0.5,-0.28); t.xz=rot(-0.45)*t.xz;
+  vec3 t=p-TC; t.xz=rot(-0.45)*t.xz;
   float tile=sdRBox(t,vec3(0.5*TS-0.01,TH*0.5,0.5*TS-0.01),0.012);
-  return vec2(min(d,tile),1.);
+  vec2 r=vec2(min(d,tile),1.);
+  // armature: one rod rising from the block corner, one through the lifted tile
+  float rod=min(sdCapsule(p,RA+vec3(0,0.05,0),RA+vec3(0,1.02,0),0.018), sdCapsule(p,TC+vec3(0,-0.1,0),TC+vec3(0.,0.36,0.),0.016));
+  rod=min(rod,sdCapsule(p,RA+vec3(0,1.02,0),RA+vec3(-0.12,1.07,0.02),0.018));
+  if(rod<r.x) r=vec2(rod,2.);
+  // tag tied to the rod
+  vec3 k=p-(RA+vec3(0.035,0.8,-0.05)); k.xz=rot(0.9)*k.xz; k.xy=rot(-0.18)*k.xy;
+  float tag=sdRBox(k,vec3(0.075,0.05,0.003),0.002);
+  tag=max(tag,-(length(k.xy-vec2(-0.052,0.022))-0.009));
+  if(tag<r.x) r=vec2(tag,3.);
+  float str=sdCapsule(p,RA+vec3(0.,0.86,0.),RA+vec3(0.0,0.84,-0.06),0.0035);
+  str=min(str,sdCapsule(p,RA+vec3(0.,0.86,0.),RA+vec3(-0.035,0.838,-0.03),0.0035));
+  if(str<r.x) r=vec2(str,4.);
+  return r;
 }
 Mat material(float id, vec3 p, vec3 n){
-  Mat m; float f=fbm(p*14.); float pits=smoothstep(0.8,0.88,noise(p*70.));
-  m.alb=vec3(0.88,0.87,0.84)*(0.95+0.06*f)*(1.-0.18*pits); m.rough=0.9; m.metal=0.; m.coat=0.; m.wrap=0.35; return m;
+  Mat m; m.metal=0.; m.coat=0.; m.wrap=0.;
+  vec3 q=p; q.xz=rot(0.3)*q.xz;
+  if(id<1.5){ float f=fbm(p*14.); float pits=smoothstep(0.8,0.88,noise(p*70.));
+    m.alb=vec3(0.88,0.87,0.84)*(0.95+0.06*f)*(1.-0.18*pits); m.rough=0.9; m.wrap=0.35;
+    vec3 an=abs(n); vec2 uv=an.y>0.7?q.xz:(an.x>an.z?q.zy:q.xy);
+    vec2 cell=floor((uv+0.09)/0.18); vec2 cl=mod(uv+0.09,0.18)-0.09;
+    float h=hash2(cell*1.37+vec2(an.y>0.7?3.:0.,an.x>an.z?7.:1.));
+    float cr=min(max(abs(cl.x)-0.026,abs(cl.y)-0.0032),max(abs(cl.y)-0.026,abs(cl.x)-0.0032));
+    float mark=(h>0.5)?1.-smoothstep(0.,0.0025,cr):0.;
+    m.alb=mix(m.alb,vec3(0.2,0.2,0.21),mark*0.85); }
+  else if(id<2.5){ float f=fbm(p*30.); m.alb=vec3(0.26,0.14,0.08)*(0.7+0.6*f); m.rough=0.75; m.metal=0.5; }
+  else if(id<3.5){ vec3 k=p-(RA+vec3(0.035,0.8,-0.05)); k.xz=rot(0.9)*k.xz; k.xy=rot(-0.18)*k.xy;
+    float ink=(1.-smoothstep(0.003,0.005,abs(k.y+0.004+0.004*sin(k.x*90.))))*step(abs(k.x+0.005),0.045);
+    ink=max(ink,(1.-smoothstep(0.003,0.005,abs(k.y+0.024)))*step(abs(k.x+0.02),0.03));
+    m.alb=mix(vec3(0.78,0.66,0.44),vec3(0.08,0.07,0.09),ink); m.rough=0.9; m.wrap=0.3; }
+  else { m.alb=vec3(0.7,0.66,0.58); m.rough=0.9; }
+  return m;
 }`});
 
 /* ============ DEIT FROM SCRATCH ============ */
+/* DeiT's input sequence is [CLS, DIST, patch_1 … patch_16]: the two tokens lead the row. */
 book({ slug:'deit-from-scratch', key:2,
   title:'Build a Data-<br>Efficient Image<br>Transformer (DeiT)<span class="sub">from Scratch</span>', size:'s1',
-  obj:'One image as sixteen patches, led by a distillation token', med:'Limestone, iron-oxide ink, gilt bronze', dim:'42 capsules · 10 hours',
-  cam:{ look:[0.,0.3,0], dist:16, el:13, yaw:-50, frame:[0.5,0.72] }, bound:[0.,0.3,0,2.1], box:[[-1.75,0,-0.3],[1.75,0.68,0.3]], steps:130,
-  light:{ keyPos:[6,8,-7], keyPow:140 },
+  obj:'One image as sixteen patches, led by a class token and a distillation token', med:'Limestone, iron-oxide ink, plaster, gilt bronze', dim:'42 capsules · 10 hours',
+  cam:{ look:[0.,0.3,0], dist:16.5, el:13, yaw:25, frame:[0.5,0.72] }, bound:[0.,0.3,0,2.1], box:[[-1.8,0,-0.3],[1.7,0.66,0.3]], steps:130,
+  light:{ keyPos:[-8,7,-4.5], keyPow:140 },
   glsl:`
-const float SP=0.21; const float HT=0.28;
+const float SP=0.2; const float HT=0.28;
 vec2 scene(vec3 p){
-  float x=p.x+1.7;
-  float i=clamp(floor(x/SP+0.5),0.,16.);
+  float x=p.x+1.75;
+  float i=clamp(floor(x/SP+0.5),0.,17.);
   vec3 q=vec3(x-i*SP,p.y-HT,p.z);
-  float tall=i>15.5?0.05:0.;
+  float tall=i<1.5?0.045:0.;
   q.y-=tall;
   float d=sdRBox(q,vec3(0.03,HT+tall,HT),0.01);
-  return vec2(d, i>15.5?40.:1.+i);
+  return vec2(d, i<0.5?41.:(i<1.5?40.:i-1.));
 }
 Mat material(float id, vec3 p, vec3 n){
   Mat m;
-  if(id>30.){ m.alb=vec3(0.98,0.76,0.38); m.rough=0.2; m.metal=1.; m.coat=0.; m.wrap=0.; return m; }
+  if(id>40.5){ float f=fbm(p*14.); m.alb=vec3(0.87,0.86,0.83)*(0.95+0.06*f); m.rough=0.9; m.metal=0.; m.coat=0.; m.wrap=0.35; return m; }
+  if(id>39.5){ m.alb=vec3(0.98,0.76,0.38); m.rough=0.22; m.metal=1.; m.coat=0.; m.wrap=0.; return m; }
   float i=floor(id-0.5);
   float r=floor(i/4.), c=mod(i,4.);
-  vec2 f=vec2((p.z/HT+1.)*0.5, (p.y-0.0)/(2.*HT));
+  vec2 f=vec2((p.z/HT+1.)*0.5, p.y/(2.*HT));
   vec2 uv=vec2((c+f.x)/4., (3.-r+f.y)/4.);
   float disc=length(uv-vec2(0.5))-0.33;
   float ink=(1.-smoothstep(-0.004,0.004,disc))*step(0.5,abs(n.x));
   float fb=fbm(p*9.); float pits=smoothstep(0.82,0.9,noise(p*60.));
   m.alb=vec3(0.80,0.77,0.70)*(0.9+0.14*fb)*(1.-0.2*pits);
-  m.alb=mix(m.alb,vec3(0.50,0.13,0.07)*(0.9+0.2*fb),ink*0.92);
+  m.alb=mix(m.alb,vec3(0.041,0.010,0.006)*(0.9+0.2*fb),ink*0.95);
   m.rough=0.85; m.metal=0.; m.coat=0.; m.wrap=0.3;
   return m;
 }`});
@@ -824,7 +896,7 @@ function coverInner(b){
     <div class="head">
       ${b.series?`<p class="series">${b.series}</p>`:''}
       <h2 class="title ${b.size||''}">${b.title}</h2>
-      ${b.tag?`<p class="tag${b.tagSmall?' small':''}">${b.tag}</p>`:''}
+      ${b.tag?`<p class="tag${b.tagSmall?' small':''}">${b.tag.replace(/ (\S+)$/,'&nbsp;$1')}</p>`:''}
     </div>
     <div class="label"><p class="obj">${b.obj}</p><p class="med">${b.med}</p><p class="dim">${b.dim}</p></div>
     <div class="level"><div class="scale"><i class="${b.key==0?'on':''}"></i><i class="${b.key==1?'on':''}"></i><i class="${b.key==2?'on':''}"></i></div><span>${lv}</span></div>
@@ -857,7 +929,7 @@ function buildWrap(b){
         <p class="k">No.&thinsp;${b.no} &nbsp;·&nbsp; ${lv} &nbsp;·&nbsp; ${b.dim}</p>
         <h3>AI Context Engineering</h3>
         <p>Context engineering is the craft of deciding what goes into a model's window, in what order, and what stays out.</p>
-        <p><i>On the cover:</i> a travertine window, packed block by block with slate, marble, sandstone and terracotta. Each block is fitted to the next, some room is left at the top, and one block did not make it in.</p>
+        <p><i>On the cover:</i> a travertine window, packed block by block with slate, marble, sandstone, terracotta and serpentine. Each block is fitted to the next, some room is left at the top, and one block did not make it in.</p>
         <p><i>The catalogue:</i> every Vizuara book is a single object, made in code and photographed on seamless paper. The paper gives the level: chalk for beginner, stone for intermediate, soot for advanced.</p>
       </div>
       <div class="foot"><div class="url">books.vizuara.ai</div><div class="bar">ISBN · barcode</div></div>
@@ -924,6 +996,13 @@ function renderBook(b, canvas, RW, offX){
   const T=480; const px=new Uint8Array(4);
   for(let y=0;y<H;y+=T) for(let x=0;x<RW;x+=T){ gl.scissor(x,y,T,T); gl.drawArrays(gl.TRIANGLES,0,3); gl.readPixels(x,y,1,1,gl.RGBA,gl.UNSIGNED_BYTE,px); }
   gl.disable(gl.SCISSOR_TEST);
+  if(RW===W){ // paper-key check: the wall at title height, top right (CSS 660,300), must match the level's value
+    const px=new Uint8Array(4*36); gl.readPixels(Math.round(660*W/720)-3,H-Math.round(300*H/888)-3,6,6,gl.RGBA,gl.UNSIGNED_BYTE,px);
+    let v=0; for(let i=0;i<36;i++) v+=0.299*px[i*4]+0.587*px[i*4+1]+0.114*px[i*4+2]; v/=36;
+    const tgt=KEY_WALL[b.key]; b.wall=Math.round(v);
+    if(Math.abs(v-tgt)>8) console.error(`WALL CHECK FAILED ${b.slug}: wall ${v.toFixed(0)} vs ${['chalk','stone','soot'][b.key]} ${tgt} ±8`);
+    else console.log(`wall ok ${b.slug}: ${v.toFixed(0)} (${tgt})`);
+  }
   const ctx=canvas.getContext('2d'); ctx.drawImage(glCanvas,0,0);
   gl.deleteProgram(pr); gl.deleteShader(vs); gl.deleteShader(f);
 }
@@ -960,15 +1039,32 @@ function renderAll(){
   if(WRAPT && !WRAP_DONE){ WRAP_DONE=true; const t0=performance.now(); try{ renderBook(BOOKS.find(b=>b.slug===WRAP.slug),WRAPT.canvas,WRAPT.RW,WRAPT.offX); }catch(e){ console.error('wrap fail '+e.message); } times.push('wrap:'+Math.round(performance.now()-t0)); }
   console.log('TIMES '+times.join(' '));
   window.RENDER_TIMES=times;
-  try{ localStorage.setItem(FLAG,String(Date.now())); }catch(e){}
+  if(!ONLY){ try{ localStorage.setItem(FLAG,String(Date.now())); }catch(e){} }
 }
-/* Print passes reload the page once per cover and hide everything but that cover.
-   If this browser rendered the full page a few minutes ago, wait for that isolation
-   and paint only the cover that is left visible; if nothing isolates a cover within
-   a few seconds, fall back to rendering everything (so a cover is never left blank). */
+/* Three ways to paint, all from the live shaders — nothing is ever cached, so nothing can be stale:
+   · a person (no WebDriver): covers are painted one per task, top to bottom, so the page stays
+     responsive and every cover is always rendered in full;
+   · an automated capture (navigator.webdriver): everything is painted synchronously right after
+     load, so a screenshot or fonts.ready issued by the tool queues until the last canvas is done;
+   · the print pass of the same automated session: tools/render.js reloads the page once per cover
+     inside a browser context that has just completed a full render, then hides every other cover.
+     Only then (WebDriver + a full render flagged in this context within 10 minutes) does the page
+     wait for that isolation and paint just the cover left visible. If no single cover is isolated
+     within 4 s it paints everything, so a cover can never be left blank. */
 const FLAG='maquette-full-render';
-function recentlyRendered(){ try{ const t=+localStorage.getItem(FLAG); return !!t && Date.now()-t<20*60*1000; }catch(e){ return false; } }
+function recentlyRendered(){ try{ const t=+localStorage.getItem(FLAG); return !!t && Date.now()-t<10*60*1000; }catch(e){ return false; } }
+function renderProgressive(){
+  try{ initGL(); }catch(e){ console.error('WebGL unavailable',e); return; }
+  let i=0;
+  const step=()=>{
+    if(i<LIST.length){ renderOne(i++); setTimeout(step,0); return; }
+    if(WRAPT && !WRAP_DONE){ WRAP_DONE=true; try{ renderBook(BOOKS.find(b=>b.slug===WRAP.slug),WRAPT.canvas,WRAPT.RW,WRAPT.offX); }catch(e){ console.error('wrap fail '+e.message); } }
+  };
+  step();
+}
 function start(){
+  const auto=navigator.webdriver===true;
+  if(!auto){ renderProgressive(); return; }
   if(ONLY || !recentlyRendered()){ renderAll(); return; }
   let timer=null;
   const mo=new MutationObserver(()=>{
@@ -979,9 +1075,6 @@ function start(){
   mo.observe(document.body,{subtree:true,attributes:true,attributeFilter:['style','class']});
   timer=setTimeout(()=>{ mo.disconnect(); renderAll(); },4000);
 }
-/* Start after the load event: the page (type, layout) is live at once and the
-   raymarcher then fills each canvas synchronously; anything that waits on the
-   page (fonts.ready, a screenshot) queues until the last canvas is painted. */
 if(document.readyState==='complete') setTimeout(start,0); else addEventListener('load',()=>setTimeout(start,0));
 </script>
 </body>

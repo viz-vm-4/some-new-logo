@@ -61,7 +61,7 @@ figure{margin:0}
 .title{margin:0;font-weight:600;font-stretch:80%;font-size:68px;line-height:.97;letter-spacing:-.004em;color:var(--ink);text-wrap:balance}
 .cover .series{display:flex;align-items:center;gap:12px;margin:0 0 16px;font-size:14px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--ink)}
 .cover .series .no{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:26px;padding:0 6px;border:1.5px solid currentColor;font-family:'Tiro Devanagari Hindi',serif;font-size:16px;letter-spacing:.04em;font-weight:400}
-.cover .sub{margin:14px 0 0;max-width:520px;font-family:'Tiro Devanagari Hindi',serif;font-style:italic;font-size:21px;line-height:1.25;color:var(--ink)}
+.cover .sub{margin:14px 0 0;max-width:560px;text-wrap:balance;font-family:'Tiro Devanagari Hindi',serif;font-style:italic;font-size:21px;line-height:1.25;color:var(--ink)}
 .band{position:absolute;left:40px;right:40px;bottom:30px;color:#F4EADC}
 .row{display:flex;justify-content:space-between;align-items:center}
 .r1{font-size:17px;letter-spacing:.16em;text-transform:uppercase;font-weight:500}
@@ -180,7 +180,7 @@ figure{margin:0}
   class Scene {
     constructor() { this.faces = []; this.nsolid = 0; this.overlays = []; this.E = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]; }
     // local frame -> world
-    W(x, y, z) { const E = this.E; return [x * E[0][0] + y * E[1][0] + z * E[2][0], x * E[0][1] + y * E[1][1] + z * E[2][1], x * E[0][2] + y * E[1][2] + z * E[2][2]]; }
+    W(x, y, z) { const E = this.E, O = this.O || [0, 0, 0]; return [O[0] + x * E[0][0] + y * E[1][0] + z * E[2][0], O[1] + x * E[0][1] + y * E[1][1] + z * E[2][1], O[2] + x * E[0][2] + y * E[1][2] + z * E[2][2]]; }
     // faces: array of point arrays; normals oriented outward from the solid's centroid
     solid(faces, o = {}) {
       const id = this.nsolid++;
@@ -485,7 +485,7 @@ figure{margin:0}
   const CUTLINE = '#F4EADC';          // marble line drawn along every section cut
 
   // ---------- the three hours ----------
-  const STONE = { hi: '#F8D2B6', lo: '#E08763', sh: '#8A3124', shUp: '#99392B', g: 0.9, course: 22 };
+  const STONE = { hi: '#F1BF9C', lo: '#DD8460', sh: '#8A3124', shUp: '#99392B', g: 0.9, course: 22 };
   const HOURS = {
     beginner: {
       label: 'Beginner', hour: 'Morning', n: 1, light: [32, 54],
@@ -570,7 +570,7 @@ figure{margin:0}
 
   // Samrat Yantra — the right triangle as instrument. Gnomon points north (away), quadrants as wings.
   SCENES.samrat = (hr) => {
-    const cam = CAM({ az: 14, s: 0.86, ox: 372 });
+    const cam = CAM({ az: 36, s: 0.68, ox: 286 });
     const S = new Scene(); ground(S, hr, cam);
     const phi = 27, tp = tanD(phi), cp = Math.cos(phi * D), sp = Math.sin(phi * D);
     const y0 = 60, Lg = 820, Hg = Lg * tp, w = 64, par = 11;
@@ -652,7 +652,7 @@ figure{margin:0}
         S.box(A.a0, y + m * run, zb, A.a0 + pd, y + m * run + 12, zb + h, { mat: hr.stone });
       }
     }
-    return { S, cam, L: sunRel(cam, 118, 50) };
+    return { S, cam, L: sunRel(cam, 28, 40) };
   };
 
   // A wall with one window — the context window. Sun behind the wall; light falls through onto a row of tokens.
@@ -667,7 +667,10 @@ figure{margin:0}
     S.box(X0, y0, wz0, wx0, y0 + t, wz1, { mat: st });
     S.box(wx1, y0, wz0, X1, y0 + t, wz1, { mat: st });
     S.box(X0 - 4, y0 - 4, Hh, X1 + 4, y0 + t + 4, Hh + 8, { mat: hr.marble });
-    for (let i = 0; i < 20; i++) { const x = -360 + i * 36; S.box(x, 212, 0, x + 24, 236, 24, { mat: hr.marble }); }
+    // the token row: pitch and phase set so that exactly four tokens stand wholly in the light
+    // (tops lit for x in [-87, 37] at this sun); a token is marble in light, sandstone in shade
+    const tok = { hi: hr.marble.hi, lo: hr.marble.lo, sh: hr.stone.sh, shUp: hr.stone.shUp };
+    for (let k = -9; k <= 10; k++) { const x = -85 + 33 * k; S.box(x, 168, 0, x + 22, 190, 22, { mat: tok }); }
     return { S, cam, L: sunRel(cam, -62, 36) };
   };
 
@@ -684,13 +687,35 @@ figure{margin:0}
     return { S, cam, L: sunRel(cam, 26, 40), extra };
   };
 
-  // Field of gnomons — one instrument, replicated
+  // Field of gnomons, split five ways: rows replicate the instrument (data); each gnomon is cut
+  // crosswise into stages (pipeline) and lengthwise into two leaves (tensor); one row carries
+  // differently shaped instruments (experts); a marble sequence line under every row is broken
+  // into equal lengths, one per column (sequence / context).
   SCENES.field = (hr) => {
     const cam = CAM({ az: 0, s: 0.92, ox: 400 });
     const S = new Scene(); ground(S, hr, cam); S.E = frame(cam, -22);
+    const L0 = 104, H0 = 96, T = 36, gap = 10, leafGap = 7, stages = 3;
+    const wedge = (x, y, len, ht, thick) => {
+      // one gnomon: `stages` crosswise segments x 2 lengthwise leaves
+      const seg = (len - (stages - 1) * gap) / stages, lt = (thick - leafGap) / 2;
+      for (let k = 0; k < stages; k++) {
+        const xa = x + k * (seg + gap), xb = xa + seg;
+        const za = ht * (1 - (xa - x) / len), zb = ht * (1 - (xb - x) / len);
+        for (const yy of [y, y + lt + leafGap]) {
+          const base = [S.W(xa, yy, 0), S.W(xb, yy, 0), S.W(xb, yy, zb), S.W(xa, yy, za)];
+          S.extrude(base, mul(S.E[1], lt), { mat: hr.stone });
+        }
+      }
+    };
+    const experts = [[104, 96], [80, 132], [128, 70], [96, 112], [116, 84]];
     for (let r = 0; r < 5; r++) for (let c = 0; c < 5; c++) {
-      const x = -420 + c * 150, y = 150 + r * 150;
-      S.extrude([S.W(x, y, 0), S.W(x + 104, y, 0), S.W(x, y, 96)], mul(S.E[1], 34), { mat: hr.stone });
+      const x = -420 + c * 150, y = 215 + r * 145;
+      const [len, ht] = r === 2 ? experts[c] : [L0, H0];
+      wedge(x, y, len, ht, T);
+    }
+    for (let r = 0; r < 5; r++) for (let c = 0; c < 5; c++) {
+      const y = 215 + r * 145 - 28, x = -440 + c * 150;
+      S.box(x, y, 0, x + 136, y + 7, 1.5, { mat: hr.marble, cast: false });
     }
     return { S, cam };
   };
@@ -813,88 +838,128 @@ figure{margin:0}
     wallY(-180, Y0, yl - t / 2, H[2]); wallY(-130, yl + t / 2, Y1, H[2]); wallY(150, Y0, yr - t / 2, H[2]); wallY(100, yr + t / 2, Y1, H[2]);
     // leaves: one block per cell, two classes
     const cells = [[X0, -180, Y0, yl, 1], [-180, xr, Y0, yl, 0], [X0, -130, yl, Y1, 0], [-130, xr, yl, Y1, 1], [xr, 150, Y0, yr, 0], [150, X1, Y0, yr, 1], [xr, 100, yr, Y1, 1], [100, X1, yr, Y1, 0]];
-    for (const [a, b, cc, d, k] of cells) { const x = (a + b) / 2, y = (cc + d) / 2, r = 24; S.box(x - r, y - r, 0, x + r, y + r, 2 * r, { mat: k ? hr.marble : hr.stone }); }
+    for (const [a, b, cc, d, k] of cells) { const x = (a + b) / 2, y = (cc + d) / 2, r = 24; S.box(x - r, y - r, 0, x + r, y + r, 2 * r, { mat: k ? hr.marble : { flat: hr.cut.flat, sh: '#3E1210', shUp: '#3E1210' } }); }
     return { S, cam, L: sunRel(cam, 22, 44) };
   };
 
-  // Three ways to fold the same climb — a straight flight, a switchback, a spiral
+  // Three ways to fold the same climb: a switchback, a helix and a stair wound round a square core.
+  // Same height, same footprint, same marble cap: three folds side by side, not a ranking.
   SCENES.folds = (hr) => {
-    const cam = CAM({ az: 0, s: 1.22, ox: 372 });
-    const S = new Scene(); ground(S, hr, cam); S.E = frame(cam, -16);
-    const H = 270, n = 18, rs = H / n, th = 12;
-    // straight flight
-    const sx0 = -380, run = 14, sy0 = 150, sy1 = 196;
-    for (let i = 0; i < n; i++) S.box(sx0 + i * run, sy0, 0, sx0 + (i + 1) * run, sy1, (i + 1) * rs, { mat: hr.stone });
-    S.box(sx0 + n * run - 0.01, sy0, 0, sx0 + n * run + 24, sy1, H, { mat: hr.stone });
-    // switchback: spine wall with flights alternating on either side
-    const bx0 = -70, bx1 = 20, by0 = 130, by1 = 230, ym = (by0 + by1) / 2, sp = 8;
-    S.box(bx0 + 22, ym - sp / 2, 0, bx1 - 22, ym + sp / 2, H, { mat: hr.stone });
-    const per = 6, fl = n / per, frun = (bx1 - bx0 - 44) / per;
-    for (let f = 0; f < fl; f++) {
-      const dir = f % 2 ? -1 : 1, ya = f % 2 ? ym + sp / 2 : by0, yb = f % 2 ? by1 : ym - sp / 2, zb = f * per * rs;
-      for (let k = 0; k < per; k++) {
-        const z = (f * per + k + 1) * rs; const xs = dir > 0 ? bx0 + 22 + k * frun : bx1 - 22 - (k + 1) * frun;
-        S.box(xs, ya, zb, xs + frun, yb, z, { mat: hr.stone });
+    const cam = CAM({ az: 0, s: 0.98, ox: 360 });
+    const S = new Scene(); ground(S, hr, cam); S.E = frame(cam, 0);
+    const H = 270, n = 18, rs = H / n, F = 150, yc = 200, st = hr.stone, SP = 212;
+    const cap = (cx, cy, w) => S.box(cx - w / 2, cy - w / 2, H, cx + w / 2, cy + w / 2, H + 5, { mat: hr.marble });
+    const tread = (pts2, z, th) => S.extrude(pts2.map(([x, y]) => S.W(x, y, z - th)), [0, 0, th], { mat: st });
+    const place = (x, turn) => { S.E = frame(cam, turn); S.O = add(mul(cam.rh, x), mul(cam.f, yc)); };
+    // 1 · switchback: two lanes and an open well, half-landings at the ends, four corner posts
+    place(-SP, -32);
+    { const cx = 0, yc = 0, x0 = cx - F / 2, x1 = cx + F / 2, y0 = yc - F / 2, y1 = yc + F / 2, lw = 22, per = 6, frun = (F - 2 * lw) / per;
+      for (const [px, py] of [[x0, y0], [x1 - 10, y0], [x0, y1 - 10], [x1 - 10, y1 - 10]]) S.box(px, py, 0, px + 10, py + 10, H, { mat: st });
+      for (let f = 0; f < n / per; f++) {
+        const dir = f % 2 ? -1 : 1, ya = f % 2 ? y1 - 60 : y0, yb = f % 2 ? y1 : y0 + 60, zb = f * per * rs;
+        for (let k = 0; k < per; k++) {
+          const z = zb + (k + 1) * rs, xa = dir > 0 ? x0 + lw + k * frun : x1 - lw - (k + 1) * frun;
+          S.box(xa, ya, Math.max(0, z - 26), xa + frun, yb, z, { mat: st });
+        }
+        const zl = (f + 1) * per * rs, xl = dir > 0 ? x1 - lw : x0;
+        S.box(xl, y0, zl - 14, xl + lw, y1, zl, { mat: st });
       }
-      const zl = (f + 1) * per * rs, xl = dir > 0 ? bx1 - 22 : bx0;
-      S.box(xl, by0, zb, xl + 22, by1, zl, { mat: hr.stone });
+      cap(x1 - lw / 2, yc, lw + 6);
     }
-    // spiral: central column and wedge treads
-    const cx = 170, cy = 180, r0 = 12, r1 = 66, seg = 16;
-    const colPts = []; for (let i = 0; i < 16; i++) { const a = i / 16 * 2 * Math.PI; colPts.push(S.W(cx + r0 * Math.cos(a), cy + r0 * Math.sin(a), 0)); }
-    S.extrude(colPts, [0, 0, H + 18], { mat: hr.stone });
-    for (let k = 0; k < n; k++) {
-      const a0 = -Math.PI / 2 + k * 2 * Math.PI / seg, a1 = a0 + 2 * Math.PI / seg, z = (k + 1) * rs;
-      const q = [S.W(cx + r0 * Math.cos(a0), cy + r0 * Math.sin(a0), z - th), S.W(cx + r1 * Math.cos(a0), cy + r1 * Math.sin(a0), z - th), S.W(cx + r1 * Math.cos(a1), cy + r1 * Math.sin(a1), z - th), S.W(cx + r0 * Math.cos(a1), cy + r0 * Math.sin(a1), z - th)];
-      S.extrude(q, [0, 0, th], { mat: hr.stone });
+    // 2 · helix: a column carried to the top landing, wedge treads overlapping about 30% in plan
+    place(0, 0);
+    { const cx = 0, yc = 0, r0 = 16, r1 = 74, stepA = 25 * D, span = 36 * D;
+      const col = []; for (let i = 0; i < 20; i++) { const a = i / 20 * 2 * Math.PI; col.push(S.W(cx + r0 * Math.cos(a), yc + r0 * Math.sin(a), 0)); }
+      S.extrude(col, [0, 0, H], { mat: st });
+      for (let k = 0; k < n; k++) {
+        const a0 = Math.PI * 0.35 + k * stepA, a1 = a0 + span, z = (k + 1) * rs, pts = [];
+        for (let j = 0; j <= 3; j++) { const a = a0 + (a1 - a0) * j / 3; pts.push([cx + r1 * Math.cos(a), yc + r1 * Math.sin(a)]); }
+        pts.push([cx + r0 * Math.cos(a1), yc + r0 * Math.sin(a1)], [cx + r0 * Math.cos(a0), yc + r0 * Math.sin(a0)]);
+        tread(pts, z, 18);
+      }
+      const aT = Math.PI * 0.35 + n * stepA, top = [];
+      for (let j = 0; j <= 6; j++) { const a = aT + (100 * D) * j / 6; top.push([cx + r1 * Math.cos(a), yc + r1 * Math.sin(a)]); }
+      top.push([cx, yc]); tread(top, H, 14);
+      cap(cx, yc, 36);
     }
-    // the common height: a marble datum line on all three
-    return { S, cam };
+    // 3 · stair wound round a square core: four flights per turn, corner landings, cantilevered
+    place(SP, -38);
+    { const cx = 0, yc = 0, c = 25, w = 50, per = 4, run = (2 * c) / per;
+      S.box(cx - c, yc - c, 0, cx + c, yc + c, H, { mat: st });
+      let z = 0, k = 0;
+      const sides = [[1, 0], [0, 1], [-1, 0], [0, -1]];
+      for (let f = 0; k < n; f++) {
+        const [dx, dy] = sides[f % 4];
+        for (let j = 0; j < per && k < n; j++, k++) {
+          z += rs; const t0 = -c + j * run, t1 = t0 + run;
+          let r;
+          if (dx === 1) r = [cx + t0, yc - c - w, cx + t1, yc - c];          // front side, rising to +x
+          else if (dy === 1) r = [cx + c, yc + t0, cx + c + w, yc + t1];      // right side, rising to +y
+          else if (dx === -1) r = [cx - t1, yc + c, cx - t0, yc + c + w];     // back side, rising to -x
+          else r = [cx - c - w, yc - t1, cx - c, yc - t0];                    // left side, rising to -y
+          S.box(r[0], r[1], z - 22, r[2], r[3], z, { mat: st });
+        }
+        const corners = [[cx + c, yc - c - w], [cx + c, yc + c], [cx - c - w, yc + c], [cx - c - w, yc - c - w]];
+        const [lx, ly] = corners[f % 4];
+        S.box(lx, ly, z - 16, lx + w, ly + w, z, { mat: st });
+      }
+      cap(cx, yc, 2 * c);
+    }
+    S.E = frame(cam, 0); S.O = [0, 0, 0];
+    // a dashed datum at the common height
+    const extra = (cam) => svgLine(cam, add(mul(cam.rh, -SP - 110), add(mul(cam.f, yc), [0, 0, H + 5])), add(mul(cam.rh, SP + 110), add(mul(cam.f, yc), [0, 0, H + 5])), `stroke="${hr.marble.hi}" stroke-width="1.2" stroke-dasharray="6 5" stroke-opacity=".85"`);
+    return { S, cam, L: sunRel(cam, -18, 26), extra };
   };
 
   // Charlie and the Intelligence Factory — each room of the factory is one tall chamber, cut open by
   // the section plane (the poché frame is the sub-series mark); the roof is pierced in a pattern
   // that belongs to the room, and the sun draws that pattern on the chamber's back wall.
   function roomScene(hr, o) {
-    const cam = CAM({ az: 0, s: 0.86, ox: 360, el: 16 });
-    const S = new Scene(); S.E = frame(cam, 0); ground(S, hr, cam);
-    const cm = cutOr(S, hr, hr.stone);
-    const X = 176, T = 40, Y1 = 280, Hr = 420, R = Hr + 16;
+    const cam = CAM({ az: 0, s: 0.8, ox: 372, el: 26 });
+    const S = new Scene(); ground(S, hr, cam);
+    const b = 30; S.E = frame(cam, b); S.O = add(mul(cam.f, 150), mul(cam.rh, -20));
+    const X = 170, T = 34, Y1 = 300, Hr = 380, R = Hr + 30;
+    const onCut = (pts) => pts.every(p => Math.abs(dot(sub(p, S.O), S.E[1])) < 1e-6);
+    const cm = (n, pts) => (dot(n, S.E[1]) < -0.99 && onCut(pts)) ? hr.cut : hr.stone;
+    // three walls; the near wall is cut away and its section drawn in poché
     S.box(-X - T, 0, 0, -X, Y1 + T, R, { mat: cm });
     S.box(X, 0, 0, X + T, Y1 + T, R, { mat: cm });
-    S.box(-X, Y1, 0, X, Y1 + T, Hr, { mat: cm });
-    // the cut-away front wall still casts its shadow (drawing convention for a lit section)
-    S.box(-X - T, -T, 0.5, X + T, 0, R, { mat: hr.stone, hide: true, noTrim: true });
+    S.box(-X, Y1, 0, X, Y1 + T, R, { mat: cm });
+    // roof slab between the walls, pierced in the room's own pattern
     const holes = o.holes || [];
-    const xs = [-X, X], ys = [0, Y1 + T];
-    for (const [a, b, c, d] of holes) xs.push(a, b), ys.push(c, d);
-    const ux = [...new Set(xs)].sort((a, b) => a - b), uy = [...new Set(ys)].sort((a, b) => a - b);
+    const xs = [-X, X], ys = [0, Y1];
+    for (const [a, bb, c, d] of holes) xs.push(a, bb), ys.push(c, d);
+    const ux = [...new Set(xs)].sort((a, c) => a - c), uy = [...new Set(ys)].sort((a, c) => a - c);
     for (let i = 0; i < ux.length - 1; i++) for (let j = 0; j < uy.length - 1; j++) {
       const cx = (ux[i] + ux[i + 1]) / 2, cy = (uy[j] + uy[j + 1]) / 2;
-      if (holes.some(([a, b, c, d]) => cx > a && cx < b && cy > c && cy < d)) continue;
+      if (holes.some(([a, bb, c, d]) => cx > a && cx < bb && cy > c && cy < d)) continue;
       S.box(ux[i], uy[j], Hr, ux[i + 1], uy[j + 1], R, { mat: cm });
     }
-    const cap = (n, pts) => (dot(n, S.E[1]) < -0.99 && pts.every(p => Math.abs(dot(p, S.E[1])) < 1e-6)) ? hr.cut : hr.marble;
-    S.box(-X - T - 3, 0, R, X + T + 3, 9, R + 5, { mat: cap });
+    // marble coping on the three standing walls
+    S.box(-X - T - 3, 0, R, -X + 3, Y1 + T + 3, R + 6, { mat: (n, pts) => (dot(n, S.E[1]) < -0.99 && onCut(pts)) ? hr.cut : hr.marble });
+    S.box(X - 3, 0, R, X + T + 3, Y1 + T + 3, R + 6, { mat: (n, pts) => (dot(n, S.E[1]) < -0.99 && onCut(pts)) ? hr.cut : hr.marble });
+    S.box(-X + 3, Y1 - 3, R, X - 3, Y1 + T + 3, R + 6, { mat: hr.marble });
     if (o.inside) o.inside(S, { X, Y1, Hr });
-    return { S, cam, L: sunRel(cam, o.theta == null ? 90 : o.theta, o.alt || 54) };
+    const al = (o.alt || 52) * D, sx = o.sx == null ? 0.3 : o.sx;
+    const L = nrm(add(add(mul(S.E[0], sx), mul(S.E[1], -Math.cos(al))), [0, 0, Math.sin(al)]));
+    const Sx = S.E, So = S.O; S.E = frame(cam, 0); S.O = [0, 0, 0];
+    return { S, cam, L };
   }
   SCENES.roomLanguage = (hr) => roomScene(hr, {
-    holes: Array.from({ length: 7 }, (_, i) => [-150 + i * 46, -150 + i * 46 + 16, 70, 215]),
+    holes: Array.from({ length: 7 }, (_, i) => [-142 + i * 44, -142 + i * 44 + 14, 40, 170]),
   });
   SCENES.roomVision = (hr) => roomScene(hr, {
-    holes: (() => { const h = []; for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) h.push([-138 + i * 74, -138 + i * 74 + 44, 70 + j * 40, 70 + j * 40 + 26]); return h; })(),
+    holes: (() => { const h = []; for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) h.push([-130 + i * 70, -130 + i * 70 + 40, 30 + j * 56, 30 + j * 56 + 40]); return h; })(),
   });
   SCENES.roomSound = (hr) => roomScene(hr, {
-    holes: (() => { const amp = [30, 80, 140, 100, 180, 70, 130, 60, 110, 40]; return amp.map((a, i) => [-160 + i * 33, -160 + i * 33 + 13, 140 - a / 2.4, 140 + a / 2.4]); })(),
+    holes: (() => { const amp = [30, 80, 140, 100, 180, 70, 130, 60, 110, 40]; return amp.map((a, i) => [-150 + i * 32, -150 + i * 32 + 12, 110 - a / 2.2, 110 + a / 2.2]); })(),
   });
   SCENES.roomReason = (hr) => roomScene(hr, {
-    holes: [[40, 150, 150, 250]],
+    holes: [[40, 150, 40, 120]],
     inside: (S, r) => {
-      const n = 10, run = 30, rise = 30;
-      for (let i = 0; i < n; i++) S.box(-176 + i * run, 150, 0, -176 + (i + 1) * run, 280, (i + 1) * rise, { mat: hr.stone });
+      const n = 11, run = 28, rise = 30;
+      for (let i = 0; i < n; i++) S.box(-170 + i * run, 170, 0, -170 + (i + 1) * run, 300, (i + 1) * rise, { mat: hr.stone });
     },
-    theta: 70, alt: 56,
   });
 
   // ---------- books ----------
@@ -903,15 +968,15 @@ figure{margin:0}
     { slug: 'neural-networks-from-scratch', title: ['Neural Networks', 'from Scratch'], level: 'beginner', capsules: 33, hours: 7, scene: 'baori', fig: 'After Chand Baori' },
     { slug: 'ai-context-engineering', title: ['AI Context', 'Engineering'], level: 'intermediate', capsules: 43, hours: 10, scene: 'aperture', fig: 'A wall with one window' },
     { slug: 'build-llms-from-scratch', title: ['Build Large Language', 'Models (LLMs)', 'from Scratch'], level: 'intermediate', capsules: 20, hours: 6, scene: 'stair', fig: 'Each step rests on all before it' },
-    { slug: '5d-parallelism', title: ['5D Parallelism for', 'Large Model Training'], level: 'advanced', capsules: 40, hours: 9, scene: 'field', fig: 'One instrument, replicated' },
+    { slug: '5d-parallelism', title: ['5D Parallelism for', 'Large Model Training'], level: 'advanced', capsules: 40, hours: 9, scene: 'field', fig: 'One instrument, split five ways' },
     { slug: 'pi-vs-hermes-vs-codex', title: ['Pi vs Hermes vs Codex:', 'Context Compaction', 'and Memory'], level: 'advanced', capsules: 9, hours: 1, scene: 'folds', fig: 'Three ways to fold one climb' },
     { slug: 'transformers-from-scratch', title: ['Transformers:', 'Theory, Intuition, and', 'Building from Scratch'], level: 'intermediate', capsules: 20, hours: 5, scene: 'jaiprakash', fig: 'After the Jai Prakash Yantra, Jaipur' },
     { slug: 'decision-trees-from-scratch', title: ['Build Decision Trees', 'from Scratch'], level: 'beginner', capsules: 23, hours: 5, scene: 'partition', fig: 'A court split by ever-lower walls' },
     { slug: 'charlie-language-room', series: 'Charlie and the Intelligence Factory', no: 'I', title: ['Charlie and the', 'Language Room'], sub: 'Language — Inference Engineering', level: 'advanced', capsules: 22, hours: 5, scene: 'roomLanguage', fig: 'Room I · light in a sequence' },
     { slug: 'charlie-vision-room', series: 'Charlie and the Intelligence Factory', no: 'II', title: ['Charlie and the', 'Vision Room'], sub: 'Vision — Vision Transformers', level: 'intermediate', capsules: 20, hours: 6, scene: 'roomVision', fig: 'Room II · light in patches' },
     { slug: 'charlie-sound-room', series: 'Charlie and the Intelligence Factory', no: 'III', title: ['Charlie and the', 'Sound Room'], sub: 'Audio — Voice Agents', level: 'intermediate', capsules: 20, hours: 6, scene: 'roomSound', fig: 'Room III · light as a waveform' },
-    { slug: 'charlie-reasoning-room', series: 'Charlie and the Intelligence Factory', no: 'IV', title: ['Charlie and the', 'Reasoning Room'], sub: 'Reason — Reinforcement Learning, from bandits to reasoning models', level: 'advanced', capsules: 21, hours: 6, scene: 'roomReason', fig: 'Room IV · a climb toward the light' },
-    { slug: 'kernel-engineering', title: ['Kernel', 'Engineering'], sub: 'From silicon to speculative decoding — GPU kernels for modern LLMs.', level: 'advanced', soon: true, scene: 'jali', fig: 'A jali, five rows laid' },
+    { slug: 'charlie-reasoning-room', series: 'Charlie and the Intelligence Factory', no: 'IV', title: ['Charlie and the', 'Reasoning Room'], sub: 'Reason — Reinforcement Learning,<br>from bandits to reasoning models', level: 'advanced', capsules: 21, hours: 6, scene: 'roomReason', fig: 'Room IV · a climb toward the light' },
+    { slug: 'kernel-engineering', title: ['Kernel', 'Engineering'], sub: 'From silicon to speculative decoding —<br>GPU kernels for modern LLMs', level: 'advanced', soon: true, scene: 'jali', fig: 'A jali, five rows laid' },
   ];
 
   // ---------- marks ----------
