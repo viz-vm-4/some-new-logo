@@ -476,10 +476,11 @@ ARMS['pi-vs-hermes-vs-codex'] = (slug) => {
 ARMS['5d-parallelism'] = () => {
   const subs = [];
   subs.push(rightOfPts(200, 'plain'));                                                    // data
-  for (const x of [100, 300]) subs.push(rightOfPts(x, 'indented', { p: 30, a: 12, origin: 0 })); // tensor
+  for (const x of [100, 300]) subs.push(rightOfPts(x, 'indented', { p: 30, a: 12, origin: 7.5 })); // tensor (teeth cross each fess line mid-edge, never at a tip)
   subs.push(below(240, 'embattled', { p: 50, a: 12, origin: -12.5 }));                   // pipeline
   for (const y of [120, 360]) subs.push(below(y, 'wavy', { p: 50, a: 12, origin: -12.5 })); // context
-  for (const y of [60, 180, 300, 420]) subs.push(below(y, 'dovetailed', { p: 50, a: 11, origin: 0 })); // expert
+  // expert; the lowest line is set half a period over so a tenon, not a gap, meets each flank in the point
+  for (const y of [60, 180, 300, 420]) subs.push(below(y, 'dovetailed', { p: 50, a: 11, origin: y === 420 ? 25 : 0 }));
   const d = subs.map(pathOf).join('');
   return `<rect width="400" height="480" fill="${T.or}"/><path d="${d}" fill="${T.sable}" fill-rule="evenodd"/>` +
     `<path d="${d}" fill="none" stroke="${S}" stroke-width="3"/>`;
@@ -573,7 +574,7 @@ ARMS['kernel-engineering'] = () => {
 /* The Intelligence Factory — four rooms, four sons differenced by cadency */
 ARMS['charlie-language-room'] = () => {
   // prefill (the prompt, read in one pass) then decode, one token at a time
-  let out = `<rect width="400" height="480" fill="${T.gules}"/>` + factoryChief(T.or) + label(200, 48, 150, T.gules);
+  let out = `<rect width="400" height="480" fill="${T.gules}"/>` + factoryChief(T.or) + label(200, 42, 126, T.gules);
   const y = 268;
   out += billet(96, y, 132, 58, T.argent);
   [206, 268].forEach((x) => { out += roundel(x, y, 26, T.argent); });
