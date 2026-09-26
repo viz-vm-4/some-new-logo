@@ -402,6 +402,18 @@ function isoBox(P, pr, x0, y0, z0, x1, y1, z1, o = {}) {
   return { top, L, Rt };
 }
 
+/* ---------- roundel: the flat, lettered node of a plate, for tokens, tree nodes and vertices (spheres are kept for physical things) ---------- */
+function roundel(P, x, y, r, o = {}) {
+  P.fill('g', circ(x, y, r + 2.2));
+  if (o.hot) P.fill('h', circ(x, y, r));
+  else for (let yy = y - r + 2.2; yy < y + r - 1; yy += 2.5) {
+    const hw = Math.sqrt(Math.max(0, r * r - (yy - y) ** 2)) - 1.2, t = (yy - (y - r)) / (2 * r);
+    if (hw > 1) P.fill('i', ribbon([[x - hw, yy], [x + hw, yy]], [lerp(0.6, 1.2, t), lerp(0.6, 1.2, t)]));
+  }
+  P.line('si', o.ring || 1.5, circ(x, y, r));
+  if (o.letter) P.text(x, y + r * 0.4, o.letter, 'fig', 'middle', `style="font-size:${f1(r * 1.15)}px"`, false);
+}
+
 /* ---------- stipple: dots whose density follows a tone field ---------- */
 function stipple(P, cls, x0, y0, x1, y1, dens, o = {}) {
   const R = rng(o.seed || 7), rad = o.r || 0.75, step = o.step || 2.2;
@@ -762,7 +774,7 @@ FIG['decision-trees-from-scratch'] = (P) => {
     leaf(n.p[0], n.p[1], ang, n.leaf);
   }
   for (const [k, n] of Object.entries(nodes)) if (n.split) {
-    sphere(P, n.p[0], n.p[1], 11 - depth[k] * 1.2, { spacing: 2.4, cross: false });
+    roundel(P, n.p[0], n.p[1], 10.5 - depth[k] * 1.1);
     const right = n.p[0] > 300 || k === 'r';
     P.text(n.p[0] + (right ? 18 : -18), n.p[1] + 5, n.split, 'fig', right ? 'start' : 'end');
   }
@@ -910,7 +922,7 @@ FIG['transformers-from-scratch'] = (P) => {
   // the sequence rod and its tokens
   rod(P, [[X(0) - 34, base], [X(n - 1) + 34, base]], 6, 6, { halo: 3 });
   for (let i = 0; i < n; i++) {
-    sphere(P, X(i), base, 14, { spacing: 2.4 });
+    roundel(P, X(i), base, 13, { hot: i === n - 1, ring: 1.7 });
   }
   // Fig. 2 — the same weights as a matrix, set beneath like a keystone
   const cs = 15, X0 = 360 - n * cs / 2, Y0 = 612;
@@ -939,151 +951,136 @@ FIG['transformers-from-scratch'] = (P) => {
 /* Pi vs Hermes vs Codex — one triple spiral: three agents' histories wound together, each older turn sealed into a smaller chamber */
 FIG['pi-vs-hermes-vs-codex'] = (P) => {
   const cx = 356, cy = 512, R = 232, b = 0.155, beta = TAU * b / 3, Th = 0, rot = -1.05;
-  const dths = [0.44, 0.58, 0.74];
+  // one cadence for all three: the figure compares structure only, never ratios
+  const dth = 0.55;
   const names = ['PI', 'HERMES', 'CODEX'];
   const rr = (th, s) => R * Math.exp(b * (th - Th) - s * beta);
   const pt = (i, th, s) => { const r = rr(th, s), a = th + TAU * i / 3 + rot; return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; };
-  const thMin = -Math.log(R / 1.5) / b;
-  // body
-  const disc = sample((t) => { const th = lerp(Th, Th - TAU / 3, t); return pt(0, th, 0); }, 60)
-    .concat(sample((t) => { const th = lerp(Th, Th - TAU / 3, t); return pt(2, th, 0); }, 60))
-    .concat(sample((t) => { const th = lerp(Th, Th - TAU / 3, t); return pt(1, th, 0); }, 60));
+  const rStop = 17, thStop = -Math.log(R / rStop) / b;
+  const live = (th) => th > Th - dth;
+  // each arm keeps its own engraving convention the whole way in, so each can be followed to the centre
+  const style = [
+    { NL: 7, w: 1.0, dash: 0 },      // Pi: continuous laminae
+    { NL: 6, w: 1.25, dash: 7 },     // Hermes: laminae broken into short dashes
+    { NL: 4, w: 1.7, dash: 0 },      // Codex: fewer, heavier laminae
+  ];
   P.fill('g', circ(cx, cy, R + 6));
   for (let i = 0; i < 3; i++) {
-    const dth = dths[i];
-    const live = (th) => th > Th - dth;
-    // laminae running along the channel: the same count across, so they crowd together as the channel narrows
-    const NL = 7;
-    for (let q = 1; q < NL; q++) {
-      const s = q / NL;
-      const pts = sample((t) => pt(i, lerp(Th, thMin, t), s), 900);
-      const ths = sample((t) => lerp(Th, thMin, t), 900);
-      swell(P, 'i', pts, (k) => { const th = ths[k]; if (live(th)) return 0; const age = clamp((Th - th) / 14); const r = rr(th, s); const q = pts[k]; const dome = clamp(0.5 + 0.5 * ((q[0] - cx) * 0.55 + (q[1] - cy) * 0.72) / R); return r < 9 ? 0 : lerp(0.6, 1.8, age) * clamp(r / 26, 0.55, 1) * lerp(0.7, 1.35, dome); }, { taper: 1 });
+    const st = style[i];
+    for (let q = 1; q < st.NL; q++) {
+      const s = q / st.NL, N = 900;
+      const ths = sample((t) => lerp(Th, thStop, t), N);
+      const pts = ths.map((th) => pt(i, th, s));
+      swell(P, 'i', pts, (k) => {
+        const th = ths[k]; if (live(th)) return 0;
+        const chW = rr(th, 0) * (1 - Math.exp(-beta)), spacing = chW / st.NL;
+        if (spacing < 1.5 || (spacing < 2.6 && q % 2)) return 0;           // thin out, never let the centre clog
+        if (st.dash && Math.floor(k / st.dash) % 2) return 0;
+        const age = clamp((Th - th) / (Th - thStop)), q2 = pts[k];
+        const dome = clamp(0.5 + 0.5 * ((q2[0] - cx) * 0.55 + (q2[1] - cy) * 0.72) / R);
+        return st.w * lerp(0.7, 1.5, age) * clamp(rr(th, s) / 26, 0.6, 1) * lerp(0.75, 1.3, dome);
+      }, { taper: 1 });
       swell(P, 'h', pts, (k) => live(ths[k]) ? 1.25 : 0, { taper: 0.5 });
     }
     // septa, bowed toward the mouth
-    for (let th = Th - dth; rr(th, 0) > 6; th -= dth) {
+    for (let th = Th - dth; rr(th, 0) > rStop + 4; th -= dth) {
       const pts = sample((s) => pt(i, th + Math.sin(s * Math.PI) * dth * 0.22, s), 14);
-      const w = clamp(rr(th, 0.5) * 0.022, 0.7, 2.6);
-      swell(P, 'i', pts, () => w, { taper: 1 });
+      swell(P, 'i', pts, () => clamp(rr(th, 0.5) * 0.022, 0.8, 2.6), { taper: 1 });
     }
-    // memory: a thread down the middle of the channel
-    const mem = sample((t) => pt(i, lerp(Th - 0.08, thMin * 0.8, t), 0.5), 700);
-    const mw = sample((t) => clamp(rr(lerp(Th - 0.08, thMin * 0.8, t), 0.5) * 0.028, 0.9, 4.6), 700);
+    // memory: a thread down the middle of the channel, all the way to the first turn
+    const mem = sample((t) => pt(i, lerp(Th - 0.08, thStop, t), 0.5), 700);
+    const mw = sample((t) => clamp(rr(lerp(Th - 0.08, thStop, t), 0.5) * 0.028, 1.0, 4.6), 700);
     P.fill('i', ribbon(mem, mw.map((w) => w + 2.2)));
     P.fill('h', ribbon(mem, mw.map((w) => Math.max(MINH, w - 0.3))));
     // wall
-    const wall = sample((t) => pt(i, lerp(Th, thMin, t), 0), 900);
-    const ww = sample((t) => clamp(rr(lerp(Th, thMin, t), 0) * 0.02, 0.7, 4.4), 900);
-    P.fill('i', ribbon(wall, ww));
-    // mouth
+    const wall = sample((t) => pt(i, lerp(Th, thStop, t), 0), 900);
+    P.fill('i', ribbon(wall, wall.map((_, k) => clamp(rr(lerp(Th, thStop, k / 900), 0) * 0.02, 0.8, 4.4))));
     swell(P, 'i', sample((s) => pt(i, Th, s), 10), () => 3.2, { taper: 1 });
-    // name at the mouth, set just ahead of the opening
     const m = pt(i, Th, 0.5), m2 = pt(i, Th + 0.02, 0.5);
     const tx = m2[0] - m[0], ty = m2[1] - m[1], tl = Math.hypot(tx, ty);
     const lx = m[0] + tx / tl * 22, ly = m[1] + ty / tl * 22;
     P.text(lx, ly + 4, names[i], 'labs', tx / tl > 0.3 ? 'start' : tx / tl < -0.3 ? 'end' : 'middle');
   }
-  P.fill('i', circ(cx, cy, 3.2));
+  // the first turn, where all three begin: a clean roundel instead of a clogged vortex
+  P.fill('g', circ(cx, cy, rStop + 1)); P.line('si', 1.4, circ(cx, cy, rStop - 2)); P.fill('i', circ(cx, cy, 3));
   // lettered parts
-  const lv = pt(0, Th - dths[0] * 0.5, 0.3); label(P, lv[0], lv[1], lv[0] - 30, lv[1] - 62, 'a');
-  const sp = pt(1, Th - dths[1] * 2, 0.2); label(P, sp[0], sp[1], 650, sp[1] - 20, 'b');
+  const lv = pt(0, Th - dth * 0.5, 0.3); label(P, lv[0], lv[1], lv[0] - 30, lv[1] - 62, 'a');
+  const sp = pt(1, Th - dth * 2, 0.2); label(P, sp[0], sp[1], 650, sp[1] - 20, 'b');
   const old = pt(1, Th - 6.8, 0.3); label(P, old[0], old[1], 650, 560, 'c');
-  const mm = pt(2, Th - dths[2] * 1.6, 0.5); label(P, mm[0], mm[1], 70, mm[1] + 30, 'd');
+  const mm = pt(2, Th - dth * 1.6, 0.5); label(P, mm[0], mm[1], 70, mm[1] + 30, 'd');
 };
 
-/* Harness Engineering — an armillary: the model at the centre, held by the rings of the harness */
+/* Harness Engineering — Watt's centrifugal governor: the classic layer that turns a raw engine into a self-regulating machine */
+function cylV(P, cx, y0, y1, r, o = {}) { // an upright engraved cylinder, lit from the upper left
+  const k = o.k ?? 0.28;
+  P.fill('g', poly([[cx - r, y0]].concat(sample((t) => [cx - r * Math.cos(t * Math.PI), y1 + r * k * Math.sin(t * Math.PI)], 30)).concat([[cx + r, y0]])));
+  for (let x = -r + 1.6; x < r; x += o.sp || 2.6) {
+    const th = Math.acos(clamp(-x / r, -1, 1)), b = clamp(0.55 + 0.5 * Math.cos(th - 0.8));
+    const yo = r * k * Math.sin(th), t = tone(b, { W: 2.2, Wh: 1.1, k0: 0.7, h0: 0.86, thin: true });
+    if (t.c) P.fill(t.c, ribbon([[cx + x, y0 + yo + 1], [cx + x, y1 + yo - 1]], [t.w, t.w]));
+  }
+  const top = sample((t) => [cx + r * Math.cos(t * TAU), y0 + r * k * Math.sin(t * TAU)], 60);
+  P.fill('g', poly(top));
+  for (let yy = y0 - r * k + 2; yy < y0 + r * k - 1; yy += 2.8) { const hw = r * Math.sqrt(Math.max(0, 1 - ((yy - y0) / (r * k)) ** 2)) - 1.5; if (hw > 2) P.fill('h', ribbon([[cx - hw, yy], [cx + hw * 0.4, yy]], [0.9, 0.9])); }
+  swell(P, 'i', top.concat([top[0]]), () => 1.1, { taper: 1 });
+  P.fill('i', ribbon([[cx - r, y0], [cx - r, y1]], [1.1, 1.1])); P.fill('i', ribbon([[cx + r, y0], [cx + r, y1]], [2, 2]));
+  swell(P, 'i', sample((t) => [cx - r * Math.cos(t * Math.PI), y1 + r * k * Math.sin(t * Math.PI)], 30), (i) => 1.2 + 1.2 * i / 30, { taper: 1 });
+}
 FIG['harness-engineering'] = (P) => {
-  const cx = 350, cy = 488, Rs = 58, SC = 0.9;
-  const VIEW = M3.rot(0.0, -0.32);
-  const nMer = V.norm([0.2, 0, 1]);
-  const A = V.norm(V.add(V.mul(V.norm(V.cross([0, 1, 0], nMer)), -0.42), [0, -1, 0])); // polar axis, in the meridian plane
-  const rotAbout = (v, ax, ang) => { const c = Math.cos(ang), s = Math.sin(ang); return V.add(V.add(V.mul(v, c), V.mul(V.cross(ax, v), s)), V.mul(ax, V.dot(ax, v) * (1 - c))); };
-  const nEcl = V.norm(rotAbout(A, V.norm(V.cross(A, [0, 0, 1])), 0.41));
-  const rings = [
-    { n: nMer, R: 196, w: 17, off: 0, kind: 'meridian', tick: 3 },
-    { n: [0, 1, 0], R: 196, w: 22, off: 0, kind: 'horizon', tick: 4 },
-    { n: A, R: 150, w: 13, off: 0, kind: 'equator', tick: 2 },
-    { n: nEcl, R: 150, w: 20, off: 0, kind: 'loop', tick: 2 },
-    { n: A, R: 150 * Math.cos(0.72), w: 9, off: 150 * Math.sin(0.72), kind: 'memory', tick: 3 },
-    { n: A, R: 150 * Math.cos(0.72), w: 9, off: -150 * Math.sin(0.72), kind: 'memory', tick: 3 },
-  ];
-  const segs = [];
-  rings.forEach((rd) => {
-    const n = V.norm(rd.n);
-    const u = V.norm(V.cross(n, Math.abs(n[1]) > 0.9 ? [0, 0, 1] : [0, 1, 0])), w = V.cross(n, u);
-    const c0 = V.mul(n, rd.off);
-    const N = 200;
-    const P3 = (t, r) => M3.mv(VIEW, V.mul(V.add(c0, V.add(V.mul(u, r * Math.cos(t)), V.mul(w, r * Math.sin(t)))), SC));
-    rd.P3 = P3; rd.nv = M3.mv(VIEW, n);
-    for (let k = 0; k < N; k++) {
-      const t0 = k / N * TAU, t1 = (k + 1.08) / N * TAU;
-      const a0 = P3(t0, rd.R - rd.w / 2), a1 = P3(t1, rd.R - rd.w / 2), b0 = P3(t0, rd.R + rd.w / 2), b1 = P3(t1, rd.R + rd.w / 2);
-      const z = (a0[2] + b0[2]) / 2;
-      segs.push({ z, draw: () => {
-        const S = (p) => [cx + p[0], cy + p[1]];
-        P.fill('g', poly([S(a0), S(b0), S(b1), S(a1)]));
-        const facing = Math.abs(V.dot(rd.nv, LIGHT));
-        const bright = clamp((z > 0 ? 0.35 : 0.12) + 0.55 * facing + 0.25 * Math.cos(t0 - 2.4));
-        // engraved band: fine lines along the band, heavier where it turns from the light
-        for (const f of [0.3, 0.5, 0.7]) {
-          const p0 = S(P3(t0, rd.R - rd.w / 2 + rd.w * f)), p1 = S(P3(t1, rd.R - rd.w / 2 + rd.w * f));
-          const wd = 1.7 * (1 - bright);
-          if (wd > 0.35) P.fill('i', ribbon([p0, p1], [Math.max(MINW, wd), Math.max(MINW, wd)]));
-          else if (bright > 0.8 && f === 0.5) P.fill('h', ribbon([p0, p1], [1, 1]));
-        }
-        if (k % rd.tick === 0) P.fill('i', ribbon([S(b0), S(P3(t0, rd.R + rd.w / 2 - rd.w * (k % (rd.tick * 5) === 0 ? 0.62 : 0.3)))], [0.8, 0.8]));
-        P.fill('i', ribbon([S(a0), S(a1)], [1.0, 1.0]));
-        P.fill('i', ribbon([S(b0), S(b1)], [z > 0 ? 1.7 : 1.1, z > 0 ? 1.7 : 1.1]));
-      } });
-    }
-  });
-  // polar axis
-  const axisSegs = 30;
-  for (let k = 0; k < axisSegs; k++) {
-    const t0 = lerp(-1.18, 1.18, k / axisSegs), t1 = lerp(-1.18, 1.18, (k + 1.05) / axisSegs);
-    const p0 = M3.mv(VIEW, V.mul(A, 196 * SC * t0)), p1 = M3.mv(VIEW, V.mul(A, 196 * SC * t1));
-    if (Math.hypot(p0[0], p0[1]) < Rs + 8 || Math.hypot(p1[0], p1[1]) < Rs + 8) continue;
-    segs.push({ z: (p0[2] + p1[2]) / 2 + 0.5, draw: () => rod(P, [[cx + p0[0], cy + p0[1]], [cx + p1[0], cy + p1[1]]], 5, 5, { halo: 2 }) });
-  }
-  segs.push({ z: 0, draw: () => sphere(P, cx, cy, Rs, { spacing: 3 }) });
-  // stand
-  const stand = () => {
-    const mb = M3.mv(VIEW, [0, 196 * SC, 0]);
-    rod(P, [[cx, cy + mb[1]], [cx, 738]], 12, 18, { halo: 3 });
-    sphere(P, cx, 722, 12, { spacing: 2.4, cross: false });
-    const yb = 748, rw = 92, rk = 0.26;
-    const top = sample((t) => [cx + rw * Math.cos(t * TAU), yb + rw * rk * Math.sin(t * TAU)], 80);
-    P.fill('g', poly(sample((t) => [cx - rw * Math.cos(t * Math.PI), yb + 12 + rw * rk * Math.sin(t * Math.PI)], 40).concat(sample((t) => [cx + rw * Math.cos(t * Math.PI), yb - rw * rk * Math.sin(t * Math.PI)], 40))));
-    for (let x = -rw + 2; x < rw; x += 2.6) { const th = Math.acos(clamp(-x / rw, -1, 1)); const b2 = clamp(0.55 + 0.5 * Math.cos(th - 0.8)); const wd = 2.2 * (1 - b2); if (wd > 0.4) P.fill('i', ribbon([[cx + x, yb + rw * rk * Math.sin(th)], [cx + x, yb + 12 + rw * rk * Math.sin(th)]], [Math.max(MINW, wd), Math.max(MINW, wd)])); }
-    P.fill('g', poly(top));
-    swell(P, 'i', top.concat([top[0]]), (i) => 1.1 + 0.8 * sstep(0, 1, Math.sin(i / 80 * TAU)), { taper: 1 });
-    swell(P, 'i', sample((t) => [cx - rw * Math.cos(t * Math.PI), yb + 12 + rw * rk * Math.sin(t * Math.PI)], 40), (i) => 1.3 + i / 40 * 1.4, { taper: 1 });
-    P.fill('i', ribbon([[cx - rw, yb], [cx - rw, yb + 12]], [1.2, 1.2])); P.fill('i', ribbon([[cx + rw, yb], [cx + rw, yb + 12]], [2, 2]));
-    rod(P, [[cx, 748], [cx, 736]], 22, 20, { halo: 0 });
-  };
-  stand();
-  segs.sort((a, b) => a.z - b.z).forEach((s) => s.draw());
-  // tools, mounted on the equator where it faces us
-  const eq = rings[2];
-  const beads = [];
-  for (let q = 0; q < 7; q++) { const p = eq.P3(q / 7 * TAU + 0.2, eq.R + eq.w / 2 + 7); if (p[2] > 10) beads.push([cx + p[0], cy + p[1]]); }
-  beads.forEach(([x, y]) => sphere(P, x, y, 8.5, { spacing: 2.3, cross: false }));
-  // the loop: arrowheads riding the ecliptic
-  const lp = rings[3];
-  for (const t of [0.3, 1.3, 2.3, 3.3, 4.3, 5.3]) {
-    const p = lp.P3(t, lp.R), p2 = lp.P3(t + 0.04, lp.R);
-    if (p[2] < 20) continue;
-    const ang = Math.atan2(p2[1] - p[1], p2[0] - p[0]);
-    P.fill('g', circ(cx + p[0], cy + p[1], 8)); arrowHead(P, cx + p[0] + Math.cos(ang) * 5, cy + p[1] + Math.sin(ang) * 5, ang, 11);
-  }
-  const front = (rd, pick) => { let best = null; for (let t = 0; t < TAU; t += 0.02) { const p = rd.P3(t, rd.R); if (p[2] > 0 && (!best || pick(p, best))) best = p; } return [cx + best[0], cy + best[1]]; };
-  label(P, cx - 20, cy - 16, 206, 316, 'a');
-  const lb = front(lp, (p, q) => p[0] > q[0]); label(P, lb[0], lb[1], 640, 470, 'b');
-  if (beads.length) { const bb = beads.reduce((a, c) => (c[0] > a[0] ? c : a)); label(P, bb[0] + 6, bb[1] + 4, 640, 590, 'c'); }
-  const mm = front(rings[4], (p, q) => p[0] < q[0]); label(P, mm[0], mm[1], 76, 420, 'd');
-  const hz = front(rings[1], (p, q) => p[0] < q[0]); label(P, hz[0], hz[1] + 6, 76, 600, 'e');
-  const mr = front(rings[0], (p, q) => p[1] < q[1]); label(P, mr[0] + 60, mr[1] + 12, 520, 304, 'f');
+  const pr = OB(0.45, -0.3), X = 330;
+  const pivot = [X, 330], armL = 178, ang = 0.66;
+  const ball = (s) => [X + s * armL * Math.sin(ang), pivot[1] + armL * Math.cos(ang)];
+  const along = (s, t) => [lerp(pivot[0], ball(s)[0], t), lerp(pivot[1], ball(s)[1], t)];
+  const sleeveY = 560;
+  // e — the frame: base plate and pedestal, the ground the machine is bolted to
+  obBox(P, pr, 150, 736, 560, 760, 0, 64, { rw: 1.8, fw: 1.1, fsp: 2.6, tw: 0.9, tcls: 'i', tsp: 3.4, ow: 1.3 });
+  // the steam pipe with its throttle valve, standing at the right
+  cylV(P, 612, 404, 736, 13, { k: 0.3 });
+  cylV(P, 612, 456, 470, 21, { k: 0.3 });
+  cylV(P, 612, 530, 544, 21, { k: 0.3 });
+  sphere(P, 612, 500, 27, { spacing: 2.6 });
+  // pedestal and gear housing
+  cylV(P, X, 640, 736, 30, { k: 0.3 });
+  obBox(P, pr, X - 40, 604, X + 40, 646, 0, 36, { rw: 1.8, fw: 0.8, fsp: 2.8, tw: 1, tsp: 3.4, ow: 1.3 });
+  // a — the engine's shaft: the raw power the governor rides on
+  rod(P, [[76, 624], [X - 40, 624]], 11, 11, { halo: 3 });
+  { const px = 128, py = 624, rx = 15, ry = 64;
+    const disc = sample((t) => [px + rx * Math.cos(t * TAU), py + ry * Math.sin(t * TAU)], 90);
+    P.fill('g', poly(disc));
+    for (let y = py - ry + 3; y < py + ry; y += 2.8) { const hw = rx * Math.sqrt(Math.max(0, 1 - ((y - py) / ry) ** 2)) - 1; if (hw > 1) P.fill(y < py - 20 ? 'h' : 'i', ribbon([[px - hw, y], [px + hw, y]], [y < py - 20 ? 1 : 0.8, 1])); }
+    swell(P, 'i', disc.concat([disc[0]]), (i) => 1.4 + 1.8 * sstep(0, 1, Math.cos(i / 90 * TAU)), { taper: 1 });
+    const rim = sample((t) => [px + (rx + 7) * Math.cos(t * TAU), py + (ry + 4) * Math.sin(t * TAU)], 90);
+    swell(P, 'i', rim.concat([rim[0]]), (i) => 1.2 + 2.2 * sstep(0, 1, Math.cos(i / 90 * TAU)), { taper: 1 });
+    sphere(P, px + 4, py, 9, { spacing: 2.2, cross: false }); }
+  // the spindle
+  rod(P, [[X, 604], [X, pivot[1] - 6]], 10, 9, { halo: 3 });
+  // d — the stop collar: how far the loop may move
+  cylV(P, X, 604 - 16, 604 - 6, 20, { k: 0.3 });
+  P.fill('i', poly([[X + 16, 592], [X + 26, 592], [X + 26, 598], [X + 16, 598]]));
+  // b — the flyballs: the loop that watches the speed and acts on it
+  const links = [-1, 1].map((sg) => [[X + sg * 12, sleeveY - 4], along(sg, 0.52)]);
+  links.forEach(([p0, p1]) => rod(P, [p0, p1], 5, 5, { halo: 2.5 }));
+  cylV(P, X, sleeveY - 16, sleeveY + 12, 17, { k: 0.3 });
+  [-1, 1].forEach((sg) => rod(P, [pivot, ball(sg)], 8, 7, { halo: 3 }));
+  links.forEach(([, p1]) => sphere(P, p1[0], p1[1], 5.5, { spacing: 2, cross: false }));
+  [-1, 1].forEach((sg) => { const bb = ball(sg); sphere(P, bb[0], bb[1], 36, { spacing: 2.6 }); });
+  cylV(P, X, pivot[1] - 10, pivot[1] + 10, 13, { k: 0.3 });
+  sphere(P, X, pivot[1] - 22, 9, { spacing: 2.2, cross: false });
+  // c — the linkage to the throttle: a bell crank from the sleeve, a rod to the valve
+  cylV(P, 468, 580, 736, 7, { k: 0.3 });
+  const crankPivot = [468, 572], crankA = [X + 18, sleeveY - 2], crankB = [498, 486];
+  rod(P, [crankA, crankPivot], 6, 6, { halo: 2.5 });
+  rod(P, [crankPivot, crankB], 6, 6, { halo: 2.5 });
+  sphere(P, crankPivot[0], crankPivot[1], 7, { spacing: 2.2, cross: false });
+  rod(P, [crankB, [594, 486]], 5, 5, { halo: 2.5 });
+  sphere(P, crankB[0], crankB[1], 5.5, { spacing: 2, cross: false });
+  rod(P, [[594, 486], [612, 500]], 6, 6, { halo: 2 });
+  // labels
+  label(P, 128, 560, 84, 470, 'a');
+  const bb = ball(1); label(P, bb[0] + 22, bb[1] - 24, 640, 340, 'b');
+  label(P, 548, 486, 560, 430, 'c');
+  label(P, X - 18, 596, 196, 520, 'd');
+  label(P, 176, 752, 84, 700, 'e');
 };
 
 /* ---------- oblique projection shared by the Charlie machines: front faces true, depth recedes up and to the right ---------- */
@@ -1190,20 +1187,20 @@ FIG['charlie-language-room'] = (P) => {
 /* Charlie II — the Vision Room: an image cast by a lens, cut into patches, read as a sentence */
 FIG['charlie-vision-room'] = (P) => {
   const pr = OB(0.45, -0.3);
-  const benchY = 712, axisY = 616, lx = 306, lr = 78, sx = 512, W = 168;
+  const benchY = 712, axisY = 616, lx = 280, lr = 78, sx = 460, W = 200; // a square screen: ViT patches are P × P
   // bench
-  obBox(P, pr, 70, benchY, 650, benchY + 20, 0, 70, { rw: 1.8, fw: 1.1, fsp: 2.6, tw: 0.9, tcls: 'i', tsp: 3.4, ow: 1.3 });
+  obBox(P, pr, 40, benchY, 668, benchY + 20, 0, 60, { rw: 1.8, fw: 1.1, fsp: 2.6, tw: 0.9, tcls: 'i', tsp: 3.4, ow: 1.3 });
   // backdrop behind the subject: a board ruled in diagonals
-  const bd = [[72, 520], [206, 520], [206, benchY], [72, benchY]];
+  const bd = [[42, 520], [176, 520], [176, benchY], [42, benchY]];
   P.fill('g', poly(bd));
-  for (let k = -40; k < 240; k += 7) { const a = [72 + k, 520], b2 = [72 + k - 192, benchY]; const pts = [a, b2].map(([x, y]) => [x, y]); const c0 = clampSeg(pts[0], pts[1], 72, 206); if (c0) P.fill('i', ribbon(c0, [0.8, 0.8])); }
+  for (let k = -40; k < 240; k += 7) { const a = [42 + k, 520], b2 = [42 + k - 192, benchY]; const c0 = clampSeg(a, b2, 42, 176); if (c0) P.fill('i', ribbon(c0, [0.8, 0.8])); }
   P.line('si', 1.3, poly(bd));
   // a — the subject: a sphere resting on a cube
-  obBox(P, pr, 102, benchY - 76, 178, benchY, 6, 60, { rw: 1.8, fw: 0.8, fsp: 3, tw: 1, tsp: 3.4, ow: 1.2 });
-  const sc = pr(140, benchY - 76 - 38, 33);
+  obBox(P, pr, 72, benchY - 76, 148, benchY, 6, 50, { rw: 1.8, fw: 0.8, fsp: 3, tw: 1, tsp: 3.4, ow: 1.2 });
+  const sc = pr(110, benchY - 76 - 38, 28);
   sphere(P, sc[0], sc[1], 38, { spacing: 2.8 });
-  const objTop = [140, sc[1] - 38], objBot = [140, benchY];
-  const m = (sx - lx) / (lx - 140);
+  const objTop = [110, sc[1] - 38], objBot = [110, benchY];
+  const m = (sx - lx) / (lx - 110);
   const img = (p) => [sx, axisY - (p[1] - axisY) * m];
   // rays through the lens, meeting on the screen
   for (const p of [objTop, objBot]) for (const dy of [-50, 0, 50]) {
@@ -1220,11 +1217,11 @@ FIG['charlie-vision-room'] = (P) => {
   swell(P, 'i', ring.concat([ring[0]]), (i) => 2 + 2 * sstep(0, 1, Math.cos(i / 120 * TAU)), { taper: 1 });
   // c — the screen, standing on the bench, with the inverted image
   const iTop = img(objBot)[1], iBot = img(objTop)[1];
-  const Y0 = Math.min(iTop - 10, benchY - 250), H = benchY - 2 - Y0, n = 4;
+  const H = W, Y0 = benchY - 2 - H, n = 4;
   obBox(P, pr, sx, Y0, sx + W, Y0 + H, 0, 8, { rw: 1.6, fw: 0, tw: 0, ow: 1.4 });
   const drawImage = (P2) => {
     // the backdrop, inverted: diagonals in the other sense
-    for (let k = -H; k < W + H; k += 7 * m) { const a = [sx + k, Y0], b2 = [sx + k + H * 1.4, Y0 + H]; const c0 = clampSeg(a, b2, sx, sx + W); if (c0) P2.fill('i', ribbon(c0, [0.8, 0.8])); }
+    for (let k = -1.6 * H; k < W + H; k += 7 * m) { const a = [sx + k, Y0], b2 = [sx + k + H * 1.4, Y0 + H]; const c0 = clampSeg(a, b2, sx, sx + W); if (c0) P2.fill('i', ribbon(c0, [0.8, 0.8])); }
     // the bench top, now above
     P2.fill('g', poly([[sx, Y0], [sx + W, Y0], [sx + W, iTop], [sx, iTop]]));
     for (let y = Y0 + 2.5; y < iTop - 1; y += 3) P2.fill('i', ribbon([[sx, y], [sx + W, y]], [1.3, 1.3]));
@@ -1254,7 +1251,7 @@ FIG['charlie-vision-room'] = (P) => {
     P.text(tx + tw / 2, ty + th + 16, String(k + 1), 'labs', 'middle');
   }
   P.text(sx0, rowY - 12, 'Fig. 2', 'fig', 'start');
-  label(P, 118, benchY - 40, 60, 560, 'a');
+  label(P, 88, benchY - 40, 60, 480, 'a');
   label(P, lx - 8, axisY - 44, 250, 470, 'b');
   label(P, sx + W - 14, Y0 + 14, 650, Y0 - 30, 'c');
   label(P, sx0 + 11 * (tw + gap) + tw / 2, rowY + th + 26, sx0 + 11 * (tw + gap) + tw / 2 + 36, rowY + th + 66, 'd');
@@ -1372,25 +1369,39 @@ FIG['charlie-reasoning-room'] = (P) => {
   // cabinet of the bandit
   obBox(P, pr, 120, baseY, 600, baseY + 84, 0, 70, { rw: 1.8, fw: 0, tw: 1, tsp: 3.6, ow: 1.4 });
   for (let y = baseY + 3; y < baseY + 84; y += 3.2) P.fill('i', ribbon([[122, y], [598, y]], [0.65, 0.65]));
-  // reward distributions, one per arm, as engraved hills standing on the cabinet's top edge
-  const means = [0.35, 0.52, 0.7, 0.3, 0.46], sds = [0.16, 0.12, 0.1, 0.2, 0.18];
+  // reward distributions on ONE shared scale: each arm a violin standing on the cabinet, its mean ticked
+  const means = [0.34, 0.52, 0.74, 0.28, 0.46], sds = [0.12, 0.11, 0.12, 0.13, 0.12];
+  const y0 = baseY - 6, yR = (r) => y0 - r * 140;
+  // the ruled reward scale, and faint guides across all five arms
+  const sx = 112;
+  P.line('si', 1.4, seg([sx, yR(0)], [sx, yR(1)]));
+  for (let k = 0; k <= 4; k++) {
+    const yy = yR(k / 4);
+    P.line('si', k % 2 ? 0.9 : 1.3, seg([sx - (k % 2 ? 5 : 8), yy], [sx, yy]));
+    if (k) P.line('si', 0.7, seg([sx + 8, yy], [604, yy]), 'stroke-dasharray="1 5"');
+  }
+  P.text(sx - 12, yR(0) + 4, '0', 'labs', 'end'); P.text(sx - 12, yR(1) + 4, '1', 'labs', 'end');
+  P.raw(`<text class="labs" transform="translate(${sx - 16} ${f1(yR(0.5))}) rotate(-90)" text-anchor="middle">REWARD</text>`);
   let rootX = 0, peakY = 0;
   for (let k = 0; k < arms; k++) {
-    const x = ax0 + k * adx, y0 = baseY - 6;
+    const x = ax0 + k * adx, mu = means[k], sd = sds[k], hot = k === best;
     bevel(P, x - 32, baseY + 14, x + 32, baseY + 64, 3);
-    const hill = sample((t) => { const u = t; const g = Math.exp(-((u - means[k]) ** 2) / (2 * sds[k] ** 2)); return [x - 38 + 76 * u, y0 - 70 * g * (0.14 / sds[k]) ** 0.5]; }, 60);
-    const shape = hill.concat([[x + 38, y0], [x - 38, y0]]);
+    const lo = Math.max(0, mu - 2.7 * sd), hi = Math.min(1, mu + 2.7 * sd);
+    const wv = (r) => 25 * Math.exp(-((r - mu) ** 2) / (2 * sd * sd));
+    const right = sample((t) => { const r = lerp(lo, hi, t); return [x + wv(r), yR(r)]; }, 50);
+    const shape = right.concat(right.slice().reverse().map(([xx, yy]) => [2 * x - xx, yy]));
     P.fill('g', poly(shape));
-    for (let xx = x - 36; xx < x + 38; xx += 2.6) {
-      const u = (xx - (x - 38)) / 76, g = Math.exp(-((u - means[k]) ** 2) / (2 * sds[k] ** 2)), top = y0 - 70 * g * (0.14 / sds[k]) ** 0.5;
-      if (y0 - top > 2) P.fill(k === best ? 'h' : 'i', ribbon([[xx, top + 1], [xx, y0 - 1]], [k === best ? 1.2 : 0.9, k === best ? 1.2 : 0.9]));
+    for (let yy = yR(hi) + 1.5; yy < yR(lo); yy += 2.6) {
+      const r = (y0 - yy) / 140, w = wv(r) - 1;
+      if (w > 1) P.fill(hot ? 'h' : 'i', ribbon([[x - w, yy], [x + w, yy]], [hot ? 1.2 : 0.9, hot ? 1.2 : 0.9]));
     }
-    swell(P, 'i', hill, () => 1.5, { taper: 1 });
-    if (k === best) { const pk = hill.reduce((a, b) => (b[1] < a[1] ? b : a)); rootX = pk[0]; peakY = pk[1]; }
-    P.line('si', 1.2, seg([x - 40, y0], [x + 40, y0]));
+    P.line('si', 1.4, poly(shape));
+    // mean tick
+    P.fill('i', ribbon([[x - 34, yR(mu)], [x + 34, yR(mu)]], [2, 2]));
+    if (hot) { rootX = x; peakY = yR(mu); P.line('si', 1.1, seg([sx + 2, yR(mu)], [x - 36, yR(mu)]), 'stroke-dasharray="3 3"'); }
     // the lever: pivot on the cabinet's face, arm up and out; the best one pulled down
     const pv = [x + 26, baseY + 40];
-    const ang = k === best ? 0.5 : -1.05;
+    const ang = hot ? 0.5 : -1.05;
     const tip = [pv[0] + 58 * Math.cos(ang), pv[1] + 58 * Math.sin(ang)];
     rod(P, [pv, tip], 5, 4, { halo: 2.5 });
     sphere(P, tip[0], tip[1], 8.5, { spacing: 2.3, cross: false });
@@ -1404,11 +1415,11 @@ FIG['charlie-reasoning-room'] = (P) => {
   ], hot: 1 };
   const leaves = []; const walk = (nd, d) => { nd.d = d; if (!nd.k) leaves.push(nd); else nd.k.forEach((c) => walk(c, d + 1)); }; walk(T, 0);
   leaves.forEach((nd, i) => { nd.x = 124 + i * (472 / (leaves.length - 1)); });
-  const place = (nd) => { if (nd.k) { nd.k.forEach(place); nd.x = nd.k.reduce((a, c) => a + c.x, 0) / nd.k.length; } nd.y = 548 - nd.d * 66; };
+  const place = (nd) => { if (nd.k) { nd.k.forEach(place); nd.x = nd.k.reduce((a, c) => a + c.x, 0) / nd.k.length; } nd.y = 488 - nd.d * 55; };
   place(T);
   const shift = rootX - T.x; const all = []; const collect = (nd) => { nd.x += shift; all.push(nd); nd.k?.forEach(collect); }; collect(T);
   all.forEach((nd) => { nd.x = clamp(nd.x, 96, 624); });
-  rod(P, [[rootX, peakY + 4], [T.x, T.y]], 6, 6, { halo: 3 });
+  { const st = [[rootX, peakY], [T.x, T.y]]; P.fill('g', ribbon(st, [13, 13])); P.fill('i', ribbon(st, [9.4, 9.4])); P.fill('h', ribbon(st, [6, 6])); }
   const edge = (a, b) => {
     const pts = sample(bez([a.x, a.y], [a.x, a.y - 30], [b.x, b.y + 30], [b.x, b.y]), 30);
     const w = Math.max(2.4, 6.2 - a.d * 1.2);
@@ -1416,14 +1427,14 @@ FIG['charlie-reasoning-room'] = (P) => {
     else rod(P, pts, w, w * 0.85, { halo: 3 });
   };
   all.forEach((a) => a.k?.forEach((b) => edge(a, b)));
-  all.forEach((nd) => { sphere(P, nd.x, nd.y, (nd.hot ? 10.5 : 8.5) - nd.d * 0.9, { spacing: 2.3, cross: false }); });
+  all.forEach((nd) => { roundel(P, nd.x, nd.y, (nd.hot ? 9.5 : 8) - nd.d * 0.7, { hot: nd.hot }); });
   const ans = all.find((nd) => nd.hot && !nd.k);
   P.line('si', 1.5, circ(ans.x, ans.y, 16)); P.line('si', 0.9, circ(ans.x, ans.y, 21.5));
   // labels
-  label(P, ax0 + 26 + 58 * Math.cos(-1.05), baseY + 40 + 58 * Math.sin(-1.05) - 6, 84, 606, 'a');
-  label(P, ax0 - 10, baseY - 30, 84, 540, 'b');
-  label(P, ax0 + best * adx + 26 + 58 * Math.cos(0.5) + 6, baseY + 40 + 58 * Math.sin(0.5) + 4, 650, 770, 'c');
-  const dn = all.find((nd) => nd.d === 2 && !nd.hot && nd.x < 300); label(P, dn.x - 9, dn.y, 84, dn.y - 24, 'd');
+  label(P, ax0 + 3 * adx + 26 + 58 * Math.cos(-1.05) + 6, baseY + 40 + 58 * Math.sin(-1.05) + 2, 650, 770, 'a');
+  label(P, ax0 - 20, yR(means[0]) - 16, 84, 548, 'b');
+  label(P, ax0 + best * adx + 26 + 58 * Math.cos(0.5) + 6, baseY + 40 + 58 * Math.sin(0.5) + 4, 470, 780, 'c');
+  const dn = all.find((nd) => nd.d === 2 && !nd.hot && nd.x < 300); label(P, dn.x - 9, dn.y, 84, dn.y - 30, 'd');
   label(P, ans.x + 16, ans.y - 10, ans.x + 70, ans.y - 30, 'e');
 };
 
@@ -1498,14 +1509,14 @@ const BOOKS = [
     cap: '<b>Fig. 1.</b> A decoder-only model, raised as a column. <b>a</b> tokens; <b>b</b> embedding; <b>c</b> a transformer block, one of N; <b>d</b> the residual stream they are threaded on; <b>e</b> output head; <b>f</b> next-token distribution.' },
   { slug: '5d-parallelism', level: 'advanced', lines: ['5D Parallelism', 'for Large Model', 'Training'], dy: 8, meta: '40 capsules · 9 hours',
     cap: '<b>Fig. 1.</b> A device mesh of 2 × 2 × 2 × 2 × 2, projected out of five dimensions. From the nearest device, one rod along each axis: <b>a</b> data; <b>b</b> tensor; <b>c</b> pipeline; <b>d</b> sequence; <b>e</b> expert.' },
-  { slug: 'pi-vs-hermes-vs-codex', level: 'advanced', lines: ['Pi vs Hermes vs Codex'], size: 56, sub: 'Context Compaction and Memory', meta: '9 capsules · 1 hour',
-    cap: '<b>Fig. 1.</b> Three agents’ histories wound as one spiral, each older span sealed into a smaller chamber. <b>a</b> the live context; <b>b</b> a compaction; <b>c</b> the compacted past; <b>d</b> memory, the thread through it all.' },
+  { slug: 'pi-vs-hermes-vs-codex', level: 'advanced', lines: ['Pi vs Hermes vs Codex'], size: 56, dy: -30, sub: 'Context Compaction and Memory', meta: '9 capsules · 1 hour',
+    cap: '<b>Fig. 1.</b> Three agents’ histories wound as one spiral, each engraved in its own manner; older spans are sealed into smaller chambers. <b>a</b> live context; <b>b</b> a compaction; <b>c</b> the compacted past; <b>d</b> memory.' },
   { slug: 'decision-trees-from-scratch', level: 'beginner', lines: ['Build Decision Trees', 'from Scratch'], meta: '23 capsules · 5 hours',
     cap: '<b>Fig. 1.</b> A decision tree, pressed. <b>a</b> the root split; <b>b</b> a leaf of class A, pale; <b>c</b> a leaf of class B, dark. <b>Fig. 2.</b> The plane, partitioned by the same four splits.' },
   { slug: 'transformers-from-scratch', level: 'intermediate', lines: ['Transformers'], sub: 'Theory, Intuition, and Building from Scratch', meta: '20 capsules · 5 hours',
     cap: '<b>Fig. 1.</b> One causal attention head over nine tokens, each arch weighted by softmax(QK<sup>T</sup>/√d). <b>a</b> tokens; <b>b</b> the last query, in white; <b>c</b> the attention sink. <b>Fig. 2.</b> The weights as a matrix; <b>d</b> its diagonal.' },
-  { slug: 'harness-engineering', level: 'advanced', lines: ['Harness', 'Engineering'], sub: 'Build the layer that turns<br>a model into an agent.', soon: true,
-    cap: '<b>Fig. 1.</b> The harness, as an armillary. <b>a</b> the model; <b>b</b> the agent loop; <b>c</b> tools, mounted; <b>d</b> memory; <b>e</b> the horizon of the sandbox; <b>f</b> the frame of permissions that holds it all.' },
+  { slug: 'harness-engineering', level: 'advanced', dy: -22, lines: ['Harness', 'Engineering'], sub: 'Build the layer that turns<br>a model into an agent.', soon: true,
+    cap: '<b>Fig. 1.</b> The harness as a governor, which lets an engine regulate itself. <b>a</b> the model’s shaft; <b>b</b> the loop, observing and acting; <b>c</b> tools, the linkage; <b>d</b> permissions, the stop collar; <b>e</b> the sandbox, its frame.' },
   { slug: 'charlie-language-room', level: 'advanced', series: 'I', lines: ['Charlie and the', 'Language Room'], size: 56, sub: 'Language — Inference Engineering', meta: '22 capsules · 5 hours',
     cap: '<b>Fig. 1.</b> The key–value cache, kept in pages like a card catalogue. <b>a</b> the cabinet, GPU memory; <b>b</b> a page, drawn out; <b>c</b> one card per token, its keys and values; <b>d</b> a free page; <b>e</b> the page table.' },
   { slug: 'charlie-vision-room', level: 'intermediate', series: 'II', lines: ['Charlie and the', 'Vision Room'], size: 56, sub: 'Vision — Vision Transformers', meta: '20 capsules · 6 hours',
@@ -1513,7 +1524,7 @@ const BOOKS = [
   { slug: 'charlie-sound-room', level: 'intermediate', series: 'III', lines: ['Charlie and the', 'Sound Room'], size: 56, sub: 'Audio — Voice Agents', meta: '20 capsules · 6 hours',
     cap: '<b>Fig. 1.</b> A phonautograph: a voice traced through soot on a turning drum. <b>a</b> the horn; <b>b</b> the membrane; <b>c</b> the stylus; <b>d</b> the drum and its trace. <b>Fig. 2.</b> The trace unrolled, <b>e</b> cut into frames.' },
   { slug: 'charlie-reasoning-room', level: 'advanced', series: 'IV', lines: ['Charlie and the', 'Reasoning Room'], size: 56, sub: 'Reason — Reinforcement Learning,<br>from bandits to reasoning models', meta: '21 capsules · 6 hours',
-    cap: '<b>Fig. 1.</b> From bandits to reasoning. <b>a</b> the arms of a bandit; <b>b</b> each arm’s distribution of reward; <b>c</b> the arm pulled; <b>d</b> a tree of reasoning steps grown from it; <b>e</b> the path that reward reinforced.' },
+    cap: '<b>Fig. 1.</b> From bandits to reasoning. <b>a</b> a bandit’s arms; <b>b</b> each arm’s reward on one scale, its mean ticked; <b>c</b> the arm with the highest mean, pulled; <b>d</b> a tree of reasoning grown from it; <b>e</b> the path reward reinforced.' },
 ];
 
 const LEVEL = { beginner: 1, intermediate: 2, advanced: 3 };
@@ -1553,7 +1564,7 @@ const NOTES = {
   'pi-vs-hermes-vs-codex': 'A three-armed logarithmic spiral. Each agent’s history winds inward, with older spans sealed into ever smaller chambers, and a pale thread (memory) runs through all of them. The figure compares structure; it makes no claim about any one agent’s ratios.',
   'decision-trees-from-scratch': 'A binary tree pressed like a herbarium sheet, with its split conditions at the nodes and the leaves coloured by class. Fig. 2 shows the same four splits partitioning the plane.',
   'transformers-from-scratch': 'One causal attention head. Arches run from each query back to the keys it weighs, their width set by the softmax weight, and the last query is drawn in white. Below, the same weights appear as a Hinton diagram.',
-  'harness-engineering': 'The harness as an armillary sphere: the model at the centre, the rings of the agent loop, tools and memory around it, all held by the frame and horizon of permissions and sandbox. As a coming-soon title it carries “In preparation” at the foot.',
+  'harness-engineering': 'Watt’s centrifugal governor, the nineteenth-century layer that turned a raw engine into a self-regulating machine. The engine’s shaft is the model, the flyballs are the loop that observes and acts, the linkage to the throttle is the tools, the stop collar is the permissions and the frame is the sandbox. As a coming-soon title it carries “In preparation” at the foot.',
   'charlie-language-room': 'Inference engineering’s paged KV cache as a library card catalogue. Drawers are pages, each card holds one token’s keys and values, some pages are free, and the ledger on top is the page table.',
   'charlie-vision-room': 'A lens casts an image, the screen cuts it four by four, and the patches are read off as a numbered sentence: patch embedding as a piece of Victorian optics.',
   'charlie-sound-room': 'Scott’s phonautograph (1857): horn, membrane, stylus and a sooted drum record a voice as a trace. Fig. 2 unrolls the trace and cuts it into frames, as a speech model does.',

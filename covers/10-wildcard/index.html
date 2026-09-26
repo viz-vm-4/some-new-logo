@@ -49,7 +49,7 @@ body{
 .imprint{display:flex;align-items:center;gap:10px;font-family:'Archivo';font-weight:800;font-stretch:125%;font-size:13px;letter-spacing:.17em;text-transform:uppercase}
 .imprint svg{width:23px;height:23px;flex:none}
 .contents{font-family:'IBM Plex Mono',monospace;font-weight:500;font-size:12.5px;letter-spacing:.05em;text-transform:uppercase}
-.stamp{position:absolute;right:52px;top:292px;transform:rotate(-6deg);border:3px solid #E5533A;color:#E5533A;padding:7px 14px 6px;border-radius:4px;
+.stamp{position:absolute;right:40px;top:312px;transform:rotate(-6deg);border:3px solid #E5533A;color:#E5533A;padding:7px 14px 6px;border-radius:4px;
   font-family:'Archivo';font-weight:900;font-stretch:125%;font-size:15px;letter-spacing:.16em;line-height:1.15;text-align:center;text-transform:uppercase}
 .stamp small{display:block;font-family:'IBM Plex Mono';font-weight:600;font-size:10.5px;letter-spacing:.12em}
 
@@ -85,6 +85,15 @@ h3.k{font-family:'IBM Plex Mono';font-weight:600;font-size:12px;letter-spacing:.
 .wrapbox{display:flex;justify-content:center;margin-top:40px;overflow-x:auto}
 .thumbs{display:flex;flex-wrap:wrap;gap:22px 18px;margin-top:34px;background:#F4F1EA;padding:28px;border-radius:4px}
 .thumbs img{width:180px;height:222px;display:block;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+
+/* ================= MATRIX ================= */
+.matrix{display:grid;grid-template-columns:150px repeat(4,1fr);gap:8px;margin-top:28px;background:#F4F1EA;padding:22px;border-radius:4px;color:#151515}
+.matrix .h{font-family:'IBM Plex Mono';font-weight:600;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;align-self:end;padding-bottom:4px}
+.matrix .r{font-family:'IBM Plex Mono';font-weight:600;font-size:12px;align-self:center;line-height:1.35}
+.matrix .c{position:relative;height:74px;border-radius:3px;overflow:hidden}
+.matrix .c svg{position:absolute;left:10px;top:10px;width:150px;height:54px;overflow:visible}
+.matrix .c span{position:absolute;right:9px;bottom:7px;font-family:'IBM Plex Mono';font-weight:600;font-size:11px;letter-spacing:.02em}
+.matrix .c.off{opacity:.18}
 
 /* ================= SHELF ================= */
 .spines{display:flex;justify-content:center;margin-top:36px;padding:0 0 14px;border-bottom:14px solid #6B5A45;box-shadow:0 22px 30px -18px rgba(0,0,0,.5)}
@@ -157,6 +166,12 @@ h3.k{font-family:'IBM Plex Mono';font-weight:600;font-size:12px;letter-spacing:.
   </header>
 
   <section class="section">
+    <h2>Card × plastic contrast floor</h2>
+    <p>This rule is built into the Sprue API. The moulded plastic and its card must differ by at least 35/255 in greyscale. When a pairing falls short, the plastic is re-moulded lighter or darker along its own hue and gets a heavier keyline, so every cover survives a greyscale proof. Pairings marked ● are adjusted.</p>
+    <div class="matrix" id="matrix"></div>
+  </section>
+
+  <section class="section">
     <h2>The core set</h2>
     <p>The six core books, each with its own subject moulded as a kit.</p>
     <div class="shelf" id="core"></div>
@@ -220,7 +235,28 @@ const PLASTIC = {
   lemon:      {base:'#F3D34E', name:'Lemon',         series:'Sound Room'},
   grape:      {base:'#A57DEB', name:'Grape',         series:'Reasoning Room'},
 };
-function tones(base){ const light = hx(base).reduce((a,v)=>a+v,0)/3 > 200; return light ? { base, edge:mix(base,'#2a2c30',.62), lo:mix(base,'#2a2c30',.34), hi:'#ffffff', txt:mix(base,'#2a2c30',.66) } : { base, edge:mix(base,'#000000',.42), lo:mix(base,'#000000',.27), hi:mix(base,'#ffffff',.55), txt:mix(base,'#000000',.5) }; }
+/* Contrast floor: plastic body and card must differ by ≥ 35/255 in greyscale.
+   If a pairing fails, the plastic is re-moulded lighter or darker along its own
+   hue (HSL lightness), and it gets a heavier, darker keyline. */
+const FLOOR=35;
+const luma = h => { const [r,g,b]=hx(h); return .299*r+.587*g+.114*b; };
+function rgb2hsl(h){ let [r,g,b]=hx(h).map(v=>v/255); const mx=Math.max(r,g,b), mn=Math.min(r,g,b); let H=0,S=0; const L=(mx+mn)/2; if(mx!==mn){ const d=mx-mn; S=L>.5?d/(2-mx-mn):d/(mx+mn); H= mx===r?(g-b)/d+(g<b?6:0) : mx===g?(b-r)/d+2 : (r-g)/d+4; H/=6; } return [H,S,L]; }
+function hsl2hex(H,S,L){ const q=L<.5?L*(1+S):L+S-L*S, p=2*L-q; const t=x=>{ x=(x+1)%1; return x<1/6?p+(q-p)*6*x : x<1/2?q : x<2/3?p+(q-p)*(2/3-x)*6 : p; }; return toHex([t(H+1/3),t(H),t(H-1/3)].map(v=>v*255)); }
+function fitPlastic(base,card){
+  const C=luma(card); if(Math.abs(luma(base)-C)>=FLOOR) return {base,fixed:false};
+  let [H,S,L]=rgb2hsl(base), dir = luma(base)>=C ? 1 : -1;
+  if(dir>0 && C+FLOOR>245) dir=-1; if(dir<0 && C-FLOOR<10) dir=1;
+  for(let i=0;i<200;i++){ L=Math.min(1,Math.max(0,L+dir*.004)); const c=hsl2hex(H,S,L); if(Math.abs(luma(c)-C)>=FLOOR) return {base:c,fixed:true}; }
+  return {base,fixed:true};
+}
+function tones(base0,card='#EEE8DC'){
+  const {base,fixed}=fitPlastic(base0,card);
+  const light = hx(base).reduce((a,v)=>a+v,0)/3 > 200;
+  const T = light ? { base, edge:mix(base,'#2a2c30',.62), lo:mix(base,'#2a2c30',.34), hi:'#ffffff', txt:mix(base,'#2a2c30',.66) }
+                  : { base, edge:mix(base,'#000000',.42), lo:mix(base,'#000000',.27), hi:mix(base,'#ffffff',.55), txt:mix(base,'#000000',.5) };
+  if(fixed){ T.edge=mix(base,'#1a1000',.66); T.ew=4; }
+  T.fixed=fixed; return T;
+}
 function clearTones(card){ return { base:mix(card,'#ffffff',.07), edge:mix(card,'#ffffff',.58), lo:mix(card,'#ffffff',.40), hi:mix(card,'#ffffff',.92), txt:mix(card,'#ffffff',.75) }; }
 
 /* ================================================================
@@ -266,7 +302,7 @@ class Sprue{
       out.push('</g>');
     }
     out.push(`<g stroke="${T.edge}" fill="${T.edge}">`);
-    for(const g of this.geo) out.push(g.k==='s' ? `<path d="${g.d}" fill="none" stroke-width="${f(g.w+2.6)}" stroke-linecap="round" stroke-linejoin="round"/>` : `<path d="${g.d}" fill-rule="${g.rule}" stroke-width="2.6" stroke-linejoin="round"/>`);
+    for(const g of this.geo) out.push(g.k==='s' ? `<path d="${g.d}" fill="none" stroke-width="${f(g.w+(T.ew||2.6))}" stroke-linecap="round" stroke-linejoin="round"/>` : `<path d="${g.d}" fill-rule="${g.rule}" stroke-width="${T.ew||2.6}" stroke-linejoin="round"/>`);
     out.push('</g>');
     out.push(`<g stroke="${T.base}" fill="none">`);
     for(const g of this.geo) if(g.k==='s') out.push(`<path d="${g.d}" ${sw(g)}/>`);
@@ -352,25 +388,20 @@ const EMBLEMS = {};
    number of slots; the parts are everything you could put in it. */
 EMBLEMS['ai-context-engineering'] = (S,b) => {
   baseFrame(S,b);
-  const segs=[['SYSTEM',.13],['TOOLS',.14],['MEMORY',.15],['DOCS',.25],['HISTORY',.21],['USER',.12]];
-  const tx=34, tw=580, ty=28, th=112, wall=9, end=14;
-  const inner=tw-2*end-wall*(segs.length-1);
-  let x=tx+end; const holes=[];
-  segs.forEach(([n,p])=>{ const w=inner*p; holes.push([x,w,n]); x+=w+wall; });
-  let d=rr(tx,ty,tw,th,7);
-  holes.forEach(([hx,w])=> d+=rr(hx,ty+27,w,60,3));
-  S.part(d,'evenodd');
-  let tk=''; for(let i=0;i<=40;i++){ const xx=tx+end+i*(tw-2*end)/40; tk+=`M${f(xx)} ${ty+th-4}V${ty+th-(i%10==0?16:10)}`; } S.groove(tk,1.3);
-  S.text(tx+end,ty+19,'CONTEXT WINDOW',{size:11,wt:800,wd:125,ls:.16,anchor:'start'});
-  S.text(tx+tw-end,ty+19,'0 ··· 128K TOKENS',{size:10.5,wt:600,mono:true,anchor:'end'});
-  S.runner([[6,172],[W-6,172]],8);
-  [110,324,540].forEach(xx=>S.gate(xx,ty+th,xx,172,4.5));
-  const h=58, wOf=n=>holes.find(o=>o[2]===n)[1]-6;
-  row(S,[['DOCS',wOf('DOCS')],['HISTORY',wOf('HISTORY')],['SYSTEM',wOf('SYSTEM')],['TOOLS',wOf('TOOLS')],['USER',wOf('USER')]],40,198,h,16,172);
-  S.runner([[6,288],[W-6,288]],7);
-  S.gate(170,198+h,170,288,3.6); S.gate(516,198+h,516,288,3.6);
-  row(S,[['MEMORY',wOf('MEMORY')],['DOCS',wOf('DOCS')],['HISTORY',wOf('HISTORY')],['DOCS',wOf('DOCS')]],40,314,h,16,288);
-  S.inject(W-58,288,13);
+  // the window is one socket with a fixed budget; parts are sized by their tokens
+  const tx=34, tw=580, ty=28, th=112, sx=48, sw=552, sy=ty+46, sh=48;
+  S.part(rr(tx,ty,tw,th,8)+rr(sx,sy,sw,sh,4),'evenodd');
+  let tk=''; for(let i=0;i<=32;i++){ const xx=sx+i*sw/32; tk+=`M${f(xx)} ${sy-4}V${sy-(i%8==0?15:9)}`; } S.groove(tk,1.3);
+  S.text(sx,ty+19,'CONTEXT WINDOW',{size:11,wt:900,wd:125,ls:.16,anchor:'start'});
+  S.text(sx+sw,ty+19,'128K',{size:11,wt:600,mono:true,anchor:'end'});
+  S.text(sx+2,sy+sh+15,'0',{size:9,wt:600,mono:true,anchor:'start'});
+  S.runner([[6,176],[W-6,176]],8);
+  [110,324,540].forEach(xx=>S.gate(xx,ty+th,xx,176,4.5));
+  // DOCS 250 + HISTORY 214 + SYSTEM 84 fill the window; MEMORY, TOOLS, USER are the overflow (≈1.5×)
+  const h=48;
+  row(S,[['DOCS',250],['HISTORY',214],['SYSTEM',84]],38,204,h,12,176);
+  S.runner([[6,292],[W-6,292]],7); S.gate(163,204+h,163,292,3.6); S.gate(478,204+h,478,292,3.6);
+  row(S,[['MEMORY',116],['TOOLS',104],['USER',60]],38,318,h,12,292);
 };
 
 /* Mathematical Foundations — an alphabet sprue of the notation itself. */
@@ -426,18 +457,26 @@ EMBLEMS['neural-networks-from-scratch'] = (S,b) => {
    twelve transformer blocks, five tokens and the one it predicts. */
 EMBLEMS['build-llms-from-scratch'] = (S,b) => {
   baseFrame(S,b);
-  const x0=38,y0=34,s=29,N=8,pts=[[x0,y0]];
+  // causal mask: 6×6, one column per token part below
+  const x0=40,y0=30,s=33,N=6,pts=[[x0,y0]];
   for(let i=0;i<N;i++){ pts.push([x0+(i+1)*s,y0+i*s]); pts.push([x0+(i+1)*s,y0+(i+1)*s]); }
   pts.push([x0,y0+N*s]);
-  S.gate(6,y0+N*s-30,x0,y0+N*s-30,4.5); S.gate(6,y0+N*s-150,x0,y0+N*s-150,4.5);
+  S.gate(6,y0+N*s-24,x0,y0+N*s-24,4.5); S.gate(6,y0+60,x0,y0+60,4.5);
   S.part(poly(pts));
   let gr=''; for(let i=1;i<N;i++){ gr+=`M${x0+5} ${y0+i*s}H${x0+i*s-5}M${x0+i*s} ${y0+i*s+5}V${y0+N*s-5}`; } S.groove(gr,1.3);
+  // token-embedding plate: one column per position, same pitch as the mask
+  const ey=y0+N*s+14, eh=40; S.gate(x0+s,y0+N*s,x0+s,ey,3.6); S.gate(x0+4*s,y0+N*s,x0+4*s,ey,3.6);
+  S.rect(x0,ey,N*s,eh,4);
+  let eg=''; for(let i=1;i<N;i++) eg+=`M${x0+i*s} ${ey+6}V${ey+eh-6}`; for(let r=1;r<4;r++) eg+=`M${x0+5} ${ey+r*eh/4}H${x0+N*s-5}`; S.groove(eg,1.2);
+  S.gate(x0+N*s/2,ey+eh,x0+N*s/2,300,4);
   S.runner([[6,300],[W-6,300]],8);
   S.runner([[298,6],[298,300]],8);
-  [60,180].forEach(xx=>S.gate(x0+xx,y0+N*s,x0+xx,300,4));
+  // twelve transformer blocks
   for(let i=0;i<12;i++){ const y=20+i*21; S.gate(298,y+7,330,y+7,3.4); S.gate(590,y+7,W-6,y+7,3.4); S.rect(328,y,262,14,3); S.text(342,y+10.5,String(i+1),{size:8,wt:800,anchor:'start'}); }
-  const toks=['to','be','or','not','to','?'];
-  toks.forEach((t,i)=>{ const x=40+i*98, y=330; S.gate(x+41,300,x+41,y,4); S.rect(x,y,82,54,5); S.text(x+41,y+36,t,{size:25,wt:700,it:t!=='?'}); });
+  // five context tokens and the one being predicted
+  const toks=['to','be','or','not','to'];
+  toks.forEach((t,i)=>{ const x=40+i*98, y=330; S.gate(x+41,300,x+41,y,4); S.rect(x,y,82,54,5); S.text(x+41,y+36,t,{size:25,wt:700,it:true}); });
+  const qx=40+5*98, qy=330; S.gate(qx+41,300,qx+41,qy,4); S.part(rr(qx,qy,82,54,5)+rr(qx+8,qy+8,66,38,3),'evenodd'); S.text(qx+41,qy+37,'?',{size:26,wt:800});
   S.inject(298,300,15);
 };
 
@@ -445,19 +484,23 @@ EMBLEMS['build-llms-from-scratch'] = (S,b) => {
    dimension of parallelism, and the plastic reaches 32 GPUs equally. */
 EMBLEMS['5d-parallelism'] = (S,b) => {
   baseFrame(S,b);
-  const cols=[...Array(8)].map((_,k)=>58+k*(532/7)), rows=[...Array(4)].map((_,j)=>58+j*109);
-  const cx=W/2, cy=(rows[0]+rows[3])/2, mid=(a,c)=>(a+c)/2;
-  const c5=[0,2,4,6].map(k=>mid(cols[k],cols[k+1])), c3=[mid(c5[0],c5[1]),mid(c5[2],c5[3])];
-  const r4=[mid(rows[0],rows[1]),mid(rows[2],rows[3])];
-  S.runner([[6,cy],[W-6,cy]],13);
-  c3.forEach(x=>S.runner([[x,r4[0]],[x,r4[1]]],10.5));
-  r4.forEach(y=>{ S.runner([[c5[0],y],[c5[1],y]],8.5); S.runner([[c5[2],y],[c5[3],y]],8.5); });
-  c5.forEach(x=>{ S.runner([[x,rows[0]],[x,rows[1]]],7); S.runner([[x,rows[2]],[x,rows[3]]],7); });
-  rows.forEach(y=>{ for(let k=0;k<8;k+=2) S.runner([[cols[k],y],[cols[k+1],y]],5.5); });
-  let rank=0;
-  rows.forEach(y=>cols.forEach(x=>{ S.part(chip(x,y,40)); S.text(x,y+4,String(rank++).padStart(2,'0'),{size:10.5,wt:600,mono:true}); }));
+  const cx=W/2, mid=(a,c)=>(a+c)/2;
+  const c5=[-228,-76,76,228].map(v=>cx+v), cols=[]; c5.forEach(c=>{ cols.push(c-44); cols.push(c+44); });
+  const rows=[50,160,282,392], cy=mid(rows[1],rows[2]);
+  const c3=[mid(c5[0],c5[1]),mid(c5[2],c5[3])], r4=[mid(rows[0],rows[1]),mid(rows[2],rows[3])];
+  S.runner([[6,cy],[W-6,cy]],13);                                                   // DP
+  c3.forEach(x=>S.runner([[x,r4[0]],[x,r4[1]]],10.5));                               // PP
+  r4.forEach(y=>{ S.runner([[c5[0],y],[c5[1],y]],8.5); S.runner([[c5[2],y],[c5[3],y]],8.5); }); // CP
+  c5.forEach(x=>{ S.runner([[x,rows[0]],[x,rows[1]]],7); S.runner([[x,rows[2]],[x,rows[3]]],7); }); // EP
+  rows.forEach(y=>{ for(let k=0;k<8;k+=2) S.runner([[cols[k],y],[cols[k+1],y]],5.5); });          // TP
+  // ranks in leaf order, so every group is a contiguous block: TP {2k,2k+1}, EP {4k..4k+3} …
+  rows.forEach((y,jr)=>cols.forEach((x,k)=>{
+    const rank=16*(k>=4)+8*(jr>=2)+4*((k%4)>=2)+2*(jr%2)+(k%2);
+    S.part(chip(x,y,40)); S.text(x,y+4,String(rank).padStart(2,'0'),{size:10.5,wt:600,mono:true});
+  }));
   S.inject(cx,cy,20);
-  S.plate(cx-86,cy,'DP',34,19); S.plate(c3[0],mid(cy,r4[1]),'PP',34,19); S.plate(mid(c5[2],c3[1]),r4[1],'CP',34,19); S.plate(c5[3],mid(rows[0],r4[0]),'EP',34,19); S.plate(mid(cols[4],cols[5]),rows[3],'TP',30,19);
+  S.plate(cx-86,cy,'DP',34,17); S.plate(c3[0],mid(rows[1]+24.5,cy-7.8),'PP',34,17); S.plate(mid(c5[2],c3[1]),r4[1],'CP',34,17);
+  S.plate(c5[3],mid(rows[0]+24.5,r4[0]-5.6),'EP',34,17); S.plate(mid(cols[4],cols[5]),rows[3],'TP',30,17);
 };
 function lolly(cx,cy,R,w,base){ const s=Math.sqrt(R*R-w*w); return `M${f(cx-w)} ${f(base)}V${f(cy+s)}A${R} ${R} 0 1 1 ${f(cx+w)} ${f(cy+s)}V${f(base)}Z`; }
 function chip(cx,cy,s){
@@ -478,34 +521,29 @@ function chip(cx,cy,s){
    9 parts. */
 EMBLEMS['pi-vs-hermes-vs-codex'] = (S,b) => {
   baseFrame(S,b);
-  const names=['PI','HERMES','CODEX'], ys=[34,166,298], h=62;
-  S.runner([[6,142],[W-6,142]],7); S.runner([[6,274],[W-6,274]],7);
-  ys.forEach((y,r)=>{
-    const ry = r===0?142:(r===1?142:274);
-    // history
-    const hx0=34, hw=316;
-    S.gate(hx0+60,ry,hx0+60,r===0?y+h:y,3.6); S.gate(hx0+250,ry,hx0+250,r===0?y+h:y,3.6);
-    S.rect(hx0,y,hw,h,5);
-    S.text(hx0+14,y+h/2+5,names[r],{size:14,wt:900,wd:125,ls:.06,anchor:'start'});
-    let g=''; const c0=hx0+122, n=12, cw=(hw-122-12)/n;
-    for(let i=0;i<=n;i++) g+=`M${f(c0+i*cw)} ${y+12}V${y+h-12}`;
-    g+=`M${c0} ${y+12}H${f(c0+n*cw)}M${c0} ${y+h-12}H${f(c0+n*cw)}`;
-    S.groove(g,1.4);
-    // compactor (a nozzle)
-    const nx=372; S.gate(nx+26,ry,nx+26,r===0?y+h-8:y+8,3.6);
-    S.part(poly([[nx,y],[nx+50,y+17],[nx+50,y+h-17],[nx,y+h]]));
-    S.groove(`M${nx+8} ${y+14}L${nx+42} ${y+24}M${nx+8} ${y+h/2}L${nx+42} ${y+h/2}M${nx+8} ${y+h-14}L${nx+42} ${y+h-24}`,1.5);
-    // compacted
-    const cx0=446, cwid=166;
-    S.gate(cx0+cwid/2,ry,cx0+cwid/2,r===0?y+h:y,3.6); S.gate(cx0+cwid,y+h/2,W-6,y+h/2,3.6);
-    S.rect(cx0,y+8,cwid,h-16,5);
-    let g2=`M${cx0+12} ${y+22}H${cx0+84}M${cx0+12} ${y+31}H${cx0+76}M${cx0+12} ${y+40}H${cx0+80}`;
-    for(let i=0;i<3;i++) g2+=`M${cx0+100+i*20} ${y+19}V${y+h-19}`;
-    g2+=`M${cx0+160} ${y+19}V${y+h-19}`;
-    S.groove(g2,1.6);
+  // one long history is the runner: 24 messages moulded along it
+  const hy=62, hx0=40, hx1=608, n=24;
+  S.gate(6,hy,hx0,hy,5); S.gate(hx1,hy,W-6,hy,5);
+  S.runner([[hx0,hy],[hx1,hy]],30);
+  let g=''; for(let i=1;i<n;i++){ const x=hx0+i*(hx1-hx0)/n; g+=`M${f(x)} ${hy-9}V${hy+9}`; } S.groove(g,1.5);
+  S.plate(hx0+44,hy+30,'HISTORY',74,17,10);
+  // three compactors (identical: the cover makes no claim about which is best)
+  const cols=[118,324,530], names=['PI','HERMES','CODEX'], ny=112;
+  cols.forEach((cx,k)=>{
+    S.runner([[cx,hy],[cx,ny+4]],7);
+    const fun=[[-80,0],[80,0],[80,18],[16,104],[16,124],[-16,124],[-16,104],[-80,18]].map(([x,y])=>[cx+x,ny+y]);
+    S.part(poly(fun));
+    S.text(cx,ny+13.5,names[k],{size:11.5,wt:900,wd:125,ls:.12});
+    S.groove(`M${cx-58} ${ny+26}L${cx-10} ${ny+86}M${cx+58} ${ny+26}L${cx+10} ${ny+86}M${cx} ${ny+28}V${ny+92}`,1.6);
+    // out come a summary (≈1/10 of the history) and a memory file
+    const ry=ny+146; S.runner([[cx,ny+124],[cx,ry]],6); S.runner([[cx-44,ry],[cx+44,ry]],6);
+    const sx=cx-44, sy=ry+22; S.gate(sx,ry,sx,sy,3.6); S.rect(sx-30,sy,60,40,4);
+    S.groove(`M${sx-20} ${sy+12}H${sx+20}M${sx-20} ${sy+20}H${sx+14}M${sx-20} ${sy+28}H${sx+18}`,1.6);
+    const mx=cx+44, my=ry+22, mw=66, mh=86, dog=16; S.gate(mx,ry,mx,my,3.6);
+    S.part(poly([[mx-mw/2,my],[mx+mw/2-dog,my],[mx+mw/2,my+dog],[mx+mw/2,my+mh],[mx-mw/2,my+mh]]));
+    S.groove(`M${mx+mw/2-dog} ${my+3}V${my+dog}H${mx+mw/2-3}M${mx-22} ${my+34}H${mx+22}M${mx-22} ${my+44}H${mx+16}M${mx-22} ${my+54}H${mx+20}`,1.5);
+    S.text(mx,my+mh-12,'MEMORY',{size:8.5,wt:900,wd:112,ls:.08});
   });
-  S.gate(6,34+31,34,34+31,3.6);
-  S.inject(W-54,274,13);
 };
 
 /* Build Decision Trees from Scratch — the runner is the tree. Plastic
@@ -562,7 +600,7 @@ EMBLEMS['kernel-engineering'] = (S,b) => {
   S.runner([[6,ry],[450,ry]],6); S.runner([[rx,6],[rx,FB]],6);
   for(let c=0;c<4;c++) for(let r=0;r<3;r++){ const x=Cx+c*st,y=By+r*st; S.gate(x+t/2,y+t,x+t/2,r===2?ry:y+st,3); S.rect(x,y,t,t,3); }
   for(let r=0;r<4;r++) for(let c=0;c<3;c++){ const x=Ax+c*st,y=Cy+r*st; S.gate(x+t,y+t/2,c===2?rx:x+st,y+t/2,3); S.rect(x,y,t,t,3); }
-  for(let r=0;r<4;r++) for(let c=0;c<4;c++){ const x=Cx+c*st,y=Cy+r*st; S.gate(c===0?rx:x-g,y+t/2,x,y+t/2,3); if(r===1&&c===2){ S.rect(x-4,y-4,t+8,t+8,4); S.text(x+t/2,y+t/2+5,'C₁₂',{size:13,wt:800}); } else S.rect(x,y,t,t,3); }
+  for(let r=0;r<4;r++) for(let c=0;c<4;c++){ const x=Cx+c*st,y=Cy+r*st; S.gate(c===0?rx:x-g,y+t/2,x,y+t/2,3); if(r===1&&c===2){ S.rect(x-4,y-4,t+8,t+8,4); S.text(x+t/2-1,y+t/2+4,'C_{12}',{size:15,wt:800}); } else S.rect(x,y,t,t,3); }
   // equation plate in the empty quadrant
   S.gate(rx,100,188,100,3.6); S.rect(34,48,154,104,6);
   S.text(111,108,'C = AB',{size:28,wt:800,it:true}); S.text(111,136,'TILED GEMM',{size:9.5,wt:800,wd:125,ls:.16});
@@ -583,21 +621,23 @@ EMBLEMS['deit-from-scratch'] = (S,b) => {
   const pw=3*t+2*g;
   S.relief(T=>`<circle cx="${px+pw*.72}" cy="${py+pw*.26}" r="22" fill="none" stroke="${T.edge}" stroke-width="8"/><path d="M${px-4} ${py+pw*.86}L${px+pw*.34} ${py+pw*.44}L${px+pw*.56} ${py+pw*.68}L${px+pw*.74} ${py+pw*.54}L${px+pw+4} ${py+pw*.92}V${py+pw+4}H${px-4}Z" fill="${T.edge}"/>`, clip);
   // teacher CNN: feature maps shrinking
-  const sizes=[104,80,58,38]; let x=292; const tcy=110;
+  const sizes=[104,80,58,38]; let x=280; const tcy=110;
   S.runner([[260,tcy],[W-6,tcy]],6);
-  sizes.forEach((s,i)=>{ S.rect(x,tcy-s/2,s,s,4); if(i===0) S.text(x+s/2,tcy+4,'CNN',{size:12,wt:900,wd:125,ls:.12}); x+=s+16; });
-  S.text(292,tcy+74,'TEACHER',{size:11,wt:900,wd:125,ls:.18,anchor:'start'});
-  // token row
-  S.runner([[6,256],[W-6,256]],7);
-  const labs=['CLS','DIST','1','2','3','4','5','6','7','8','9'], tw=46, tg=8, ty=280, th=58;
-  labs.forEach((l,i)=>{ const x=36+i*(tw+tg); S.gate(x+tw/2,256,x+tw/2,ty,3.4); S.rect(x,ty,tw,th,4); S.text(x+tw/2,ty+th/2+(l.length>1?4:6),l,{size:l.length>1?10.5:17,wt:800,wd:l.length>1?112:100}); });
-  // distillation: the teacher's runner feeds the DIST token
-  const dx=36+(tw+tg)+tw/2; S.runner([[W-40,tcy],[W-40,228],[dx,228],[dx,256]],6);
-  // two heads, straight under their tokens
-  S.gate(36+tw/2,ty+th,36+tw/2,378,3.4); S.gate(dx,ty+th,dx,378,3.4);
-  S.runner([[6,378],[W-6,378]],6);
-  S.rect(236,362,178,32,4); S.text(325,383,'CLASS HEAD',{size:10.5,wt:900,wd:125,ls:.12});
-  S.rect(434,362,178,32,4); S.text(523,383,'DISTILLATION HEAD',{size:10.5,wt:900,wd:125,ls:.1});
+  sizes.forEach((s,i)=>{ S.rect(x,tcy-s/2,s,s,4); if(i===0) S.text(x+s/2,tcy+4,'CNN',{size:12,wt:900,wd:125,ls:.12}); x+=s+14; });
+  S.text(280,tcy+74,'TEACHER',{size:11,wt:900,wd:125,ls:.18,anchor:'start'});
+  // token row: CLS and DIST are both learned tokens, fed like every patch
+  S.runner([[6,256],[600,256]],7);
+  const labs=['CLS','DIST','1','2','3','4','5','6','7','8','9'], tw=44, tg=7, ty=280, th=58;
+  labs.forEach((l,i)=>{ const x=36+i*(tw+tg); S.gate(x+tw/2,256,x+tw/2,ty,3.4); S.rect(x,ty,tw,th,4); S.text(x+tw/2,ty+th/2+(l.length>1?4:6),l,{size:l.length>1?10:17,wt:800,wd:l.length>1?100:100}); });
+  const cx0=36+tw/2, dx=36+(tw+tg)+tw/2;
+  // CLS → class head ; DIST → distillation head
+  S.runner([[cx0,ty+th],[cx0,376],[228,376]],5);
+  S.runner([[dx,ty+th],[dx,414],[500,414],[500,396]],5);
+  S.rect(228,358,168,36,4); S.text(312,380,'CLASS HEAD',{size:10.5,wt:900,wd:125,ls:.12});
+  S.rect(420,358,180,36,4); S.text(510,380,'DISTILL HEAD',{size:10.5,wt:900,wd:125,ls:.1});
+  // the teacher's prediction is the target that supervises the distillation head
+  S.runner([[624,tcy],[624,376],[600,376]],6);
+  S.plate(612,300,'TARGET',58,19,10);
 };
 
 /* Charlie I · Language Room — inference: tokens arrive one at a time and
@@ -619,9 +659,10 @@ EMBLEMS['charlie-language-room'] = (S,b) => {
     S.part(d); S.gate(x0+30,122,x0+30,sy,3.6);
     let g=''; colx.slice(0,5).forEach(([cx,cw],i)=>{ if(i) g+=`M${cx-gap/2} ${sy+8}V${sy+sh-8}`; }); S.groove(g,1.6);
     colx.slice(0,5).forEach(([cx,cw])=>{ S.text(cx+cw/2,sy+33,kv,{size:17,wt:800,it:true}); });
-    // new entry, not yet fused
-    S.gate(colx[5][0]-2,sy+sh/2,colx[4][0]+colx[4][1],sy+sh/2,3.4);
-    S.rect(colx[5][0]+4,sy,colx[5][1]-8,sh,5); S.text(colx[5][0]+colx[5][1]/2,sy+33,kv+'₆',{size:17,wt:800,it:true});
+    // position 6 is still pending: hollow, like the '?' it belongs to
+    const px=colx[5][0]+4, pw=colx[5][1]-8;
+    S.gate(px-2,sy+sh/2,colx[4][0]+colx[4][1],sy+sh/2,3.4);
+    S.part(rr(px,sy,pw,sh,5)+rr(px+8,sy+8,pw-16,sh-16,3),'evenodd'); S.text(px+pw/2,sy+33,kv+'_6',{size:17,wt:800,it:true});
   });
   // next-token distribution
   S.runner([[6,300],[W-6,300]],7);
@@ -695,31 +736,38 @@ EMBLEMS['charlie-reasoning-room'] = (S,b) => {
 };
 
 
-/* Modern Robot Learning — a robot-arm kit: base, two links, servo horns,
-   gripper jaws with their gear, and a demonstrated trajectory to learn from. */
+/* Modern Robot Learning — learning from demonstration: the demonstrated
+   trajectory is the runner; action chunks a1…a8 hang off it; a camera
+   observation feeds the policy at the start and the gripper waits at the goal.
+   One arm link is the only hardware. */
 EMBLEMS['modern-robot-learning'] = (S,b) => {
   baseFrame(S,b);
-  S.runner([[6,112],[W-6,112]],7); S.runner([[6,236],[W-6,236]],7); S.runner([[392,6],[392,FB]],7);
-  const link=(x,y,w,h,label)=>{ const r=h/2; let d=rr(x,y,w,h,r)+circ(x+r,y+r,r*.42)+circ(x+w-r,y+r,r*.42); for(let i=1;i<=3;i++) d+=circ(x+r+i*(w-2*r)/4,y+r,r*.2); S.part(d,'evenodd'); S.text(x+w/2,y+r+4,label,{size:10,wt:900,wd:125,ls:.14}); };
-  S.gate(80,56,80,112,3.6); S.gate(300,56,300,112,3.6); link(34,34,330,50,'');
-  S.gate(80,140,80,112,3.6); S.gate(250,140,250,112,3.6); link(34,142,264,44,'');
-  // base plate with bolt holes
-  const bx=128, by=336, br=78; let bd=circ(bx,by,br)+circ(bx,by,24); for(let k=0;k<6;k++){ const a=k*Math.PI/3; bd+=circ(bx+54*Math.cos(a),by+54*Math.sin(a),7); }
-  S.gate(bx,236,bx,by-br,4); S.gate(bx-br,by,6,by,4); S.part(bd,'evenodd');
-  // servo horns
-  [[268,300],[268,392],[340,346]].forEach(([x,y],i)=>{ S.gate(392,y,x+26,y,3.4); let d=circ(x,y,27)+circ(x,y,8); for(let k=0;k<4;k++){ const a=k*Math.PI/2+Math.PI/4; d+=circ(x+17*Math.cos(a),y+17*Math.sin(a),3.2); } S.part(d,'evenodd'); });
-  // gripper jaws (mirrored) + their drive gear
-  const jaw=[[0,0],[118,0],[150,14],[166,44],[150,48],[132,24],[112,20],[0,20]];
-  S.gate(452,112,452,40,3.4); S.part(poly(tr(jaw,410,26,0,.85)));
-  S.gate(452,112,452,186,3.4); S.part(poly(tr(jaw.map(([x,y])=>[x,-y]),410,202,0,.85)));
-  const gx=598, gy=166; let gd=''; const teeth=12; for(let k=0;k<teeth*2;k++){ const a=k*Math.PI/teeth, r=k%2?23:31; gd+=(k?'L':'M')+f(gx+r*Math.cos(a))+' '+f(gy+r*Math.sin(a)); } S.gate(gx,112,gx,gy-24,3.4); S.part(gd+'Z'+circ(gx,gy,7),'evenodd');
-  // demonstrated trajectory: a curved rod with waypoints
-  const P0=[430,410], P1=[470,260], P2=[610,300];
-  const q=t=>[(1-t)**2*P0[0]+2*(1-t)*t*P1[0]+t*t*P2[0],(1-t)**2*P0[1]+2*(1-t)*t*P1[1]+t*t*P2[1]];
-  let tp=''; for(let i=0;i<=24;i++){ const [x,y]=q(i/24); tp+=(i?'L':'M')+f(x)+' '+f(y); }
-  S.gate(392,400,P0[0],P0[1],3.4); S.rod(tp,6);
-  [0,.2,.4,.6,.8,1].forEach(t=>{ const [x,y]=q(t); S.disc(x,y,9); });
-  S.text(540,418,'DEMO',{size:10,wt:900,wd:125,ls:.18});
+  const P=[[262,366],[420,372],[420,120],[540,100]];
+  const bz=t=>{ const u=1-t; return [0,1].map(i=>u*u*u*P[0][i]+3*u*u*t*P[1][i]+3*u*t*t*P[2][i]+t*t*t*P[3][i]); };
+  const dbz=t=>{ const u=1-t; return [0,1].map(i=>3*u*u*(P[1][i]-P[0][i])+6*u*t*(P[2][i]-P[1][i])+3*t*t*(P[3][i]-P[2][i])); };
+  let tp=''; for(let i=0;i<=40;i++){ const [x,y]=bz(i/40); tp+=(i?'L':'M')+f(x)+' '+f(y); }
+  S.rod(tp,11);
+  // action chunks, tangent to the path, offset to its outer side
+  const arrow=[[-30,-9],[16,-9],[16,-17],[34,0],[16,17],[16,9],[-30,9]];
+  for(let k=0;k<8;k++){
+    const t=.07+k*.123, [x,y]=bz(t), [dx,dy]=dbz(t), L=Math.hypot(dx,dy), nx=dy/L, ny=-dx/L, a=Math.atan2(dy,dx);
+    const ox=x+nx*62, oy=y+ny*62;
+    S.gate(x,y,ox,oy,3.4); S.part(poly(tr(arrow,ox,oy,a)));
+    S.plate(x+nx*30,y+ny*30,`a_${k+1}`,28,17,11);
+  }
+  // observation → policy
+  S.gate(6,300,34,300,4); S.rect(50,252,26,14,3); S.part(rr(34,262,84,66,8)+circ(76,295,19)+circ(76,295,10),'evenodd');
+  S.gate(118,366,140,366,4); S.gate(76,328,76,366,4); S.runner([[76,366],[140,366]],6);
+  S.rect(140,340,122,52,6);
+  S.groove('M152 356H176M157 356C157 368 156 374 153 380M170 356V376C170 380 173 381 177 379',2.2);
+  S.text(218,372,'(a | o)',{size:15,wt:700,it:true});
+  // the goal: gripper jaws
+  const jaw=[[0,0],[62,0],[82,12],[90,34],[78,36],[70,20],[58,16],[0,16]];
+  S.runner([[540,100],[560,100]],6); S.runner([[560,58],[560,142]],6); S.gate(560,6,560,58,4);
+  S.gate(560,64,566,64,3.4); S.part(poly(tr(jaw,564,54,0,.78))); S.gate(560,136,566,136,3.4); S.part(poly(tr(jaw.map(([x,y])=>[x,-y]),564,146,0,.78)));
+  // one link of hardware
+  S.gate(40,6,40,40,4); let ld=rr(34,40,236,40,20)+circ(54,60,8)+circ(250,60,8); for(let i=1;i<=3;i++) ld+=circ(54+i*49,60,4); S.part(ld,'evenodd');
+  { const [x,y]=bz(.5); S.plate(x,y,'DEMO',46,17,10); }
 };
 
 /* Convolutional Neural Networks Fundamentals — the input map, the 3×3
@@ -746,8 +794,9 @@ EMBLEMS['cnn-fundamentals'] = (S,b) => {
   let og=''; for(let i=1;i<m;i++){ og+=`M${ox+i*c} ${oy+4}V${oy+m*c-4}M${ox+4} ${oy+i*c}H${ox+m*c-4}`; } S.groove(og,1.2);
   S.gate(ox+m*c/2,oy+m*c,ox+m*c/2,262,3.6); S.rect(ox+2*c+6,oy+m*c+28,c-12,c-12,2); S.gate(ox+2*c+c/2,oy+m*c+28+c-12,ox+2*c+c/2,262,2.6);
   // feature-map pyramid
-  const sizes=[132,104,80,60,44,32]; let x=34;
-  sizes.forEach((s,i)=>{ const y=424-s-8; S.gate(x+s/2,262,x+s/2,y,3.6); for(let k=2;k>=0;k--) S.rect(x+k*6,y-k*6,s,s,4); x+=s+30; });
+  // maps shrink while channels grow: 2 → 8 layers deep
+  const sizes=[120,94,72,54,40,30], depth=[2,3,4,5,6,8], d=4; let x=34;
+  sizes.forEach((s,i)=>{ const y=416-s; S.gate(x+s/2,262,x+s/2,y,3.6); for(let k=depth[i]-1;k>=0;k--) S.rect(x+k*d,y-k*d,s,s,3.5); x+=s+(depth[i]-1)*d+17; });
 };
 
 /* ================================================================
@@ -783,13 +832,13 @@ const BOOKS = [
   {slug:'kernel-engineering', lines:['Kernel','Engineering'], sub:'From silicon to speculative decoding —<br>GPU kernels for modern LLMs.', level:'advanced', fam:'systems', soon:true, set:'range',
    note:'Tiled GEMM: A-tiles and B-tiles meet in one C tile, with the HBM, SMEM and register hierarchy beside it. Shown as a clear test shot because the book is coming soon.'},
 
-  {slug:'charlie-language-room', lines:['Charlie and the','Language Room'], sub:'Book I · Language — Inference Engineering', level:'advanced', fam:'strawberry', capsules:22, hours:5, set:'factory', series:'I',
+  {slug:'charlie-language-room', lines:['Charlie and the','Language Room'], sub:'Language — Inference Engineering', level:'advanced', fam:'strawberry', capsules:22, hours:5, set:'factory', series:'I',
    note:'Generation, one token at a time. Every token leaves a K and a V in the cache, and the next token and its cache entries are still on the sprue.'},
-  {slug:'charlie-vision-room', lines:['Charlie and the','Vision Room'], sub:'Book II · Vision — Vision Transformers', level:'intermediate', fam:'mint', capsules:20, hours:6, set:'factory', series:'II',
+  {slug:'charlie-vision-room', lines:['Charlie and the','Vision Room'], sub:'Vision — Vision Transformers', level:'intermediate', fam:'mint', capsules:20, hours:6, set:'factory', series:'II',
    note:'An eye cut into sixteen patches, followed by the [CLS] token, the position embedding, the head and the answer.'},
-  {slug:'charlie-sound-room', lines:['Charlie and the','Sound Room'], sub:'Book III · Audio — Voice Agents', level:'intermediate', fam:'lemon', capsules:20, hours:6, set:'factory', series:'III',
+  {slug:'charlie-sound-room', lines:['Charlie and the','Sound Room'], sub:'Audio — Voice Agents', level:'intermediate', fam:'lemon', capsules:20, hours:6, set:'factory', series:'III',
    note:'A spoken phrase cut into 20 frames, one per capsule and numbered like parts.'},
-  {slug:'charlie-reasoning-room', lines:['Charlie and the','Reasoning Room'], sub:'Book IV · Reason — Reinforcement Learning,<br>from bandits to reasoning models', level:'advanced', fam:'grape', capsules:21, hours:6, set:'factory', series:'IV',
+  {slug:'charlie-reasoning-room', lines:['Charlie and the','Reasoning Room'], sub:'Reason — Reinforcement Learning,<br>from bandits to reasoning models', level:'advanced', fam:'grape', capsules:21, hours:6, set:'factory', series:'IV',
    note:'A policy moulded as arrows on a gridworld, and five bandit arms whose heights are their value estimates. 16 + 5 = 21 parts.'},
 ];
 
@@ -801,11 +850,11 @@ function coverHTML(b,cls='cover'){
   const factory = !!b.series;
   const card = factory ? CARD.factory : CARD[b.level];
   const P = PLASTIC[b.fam];
-  const T = b.soon ? clearTones(card.bg) : tones(P.base);
+  const T = b.soon ? clearTones(card.bg) : tones(P.base,card.bg);
   const S = new Sprue(); EMBLEMS[b.slug](S,b);
   const lv = LV[b.level];
   const pips = [1,2,3].map(i=>`<s class="${i<=lv?'on':''}"></s>`).join('');
-  const series = factory ? `Intelligence Factory · ${b.series}` : `${P.series} series`;
+  const series = factory ? `Charlie &amp; the Intelligence Factory · ${b.series}` : `${P.series} series`;
   return `<div class="${cls}" ${cls==='cover'?`data-slug="${b.slug}"`:''} style="--card:${card.bg};--ink:${card.ink}">
     <div class="top">
       <div class="kit"><b>VZ-${b.no}</b><span>${series}</span></div>
@@ -835,13 +884,13 @@ function miniSVG(build,T,card,ink){ const S=new Sprue(); const extra=build(S)||'
 const arrowInk = (x1,y1,x2,y2,ink) => { const a=Math.atan2(y2-y1,x2-x1), h=11; return `<g stroke="${ink}" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M${x1} ${y1}L${x2} ${y2}"/><path d="M${f(x2-h*Math.cos(a-.5))} ${f(y2-h*Math.sin(a-.5))}L${x2} ${y2}L${f(x2-h*Math.cos(a+.5))} ${f(y2-h*Math.sin(a+.5))}"/></g>`; };
 const STEPS = [
   ['Cut the text into tokens', (S,ink)=>{ S.rect(8,8,296,42,5); S.text(156,36,'to be or not to be',{size:19,wt:700,it:true}); ['to','be','or','not','to','be'].forEach((t,i)=>{ S.rect(8+i*50,100,42,40,4); S.text(29+i*50,126,t,{size:16,wt:700,it:true}); }); return arrowInk(156,60,156,90,ink); }],
-  ['Mask the future', (S,ink)=>{ const x0=10,y0=10,s=16,N=8,pts=[[x0,y0]]; for(let i=0;i<N;i++){ pts.push([x0+(i+1)*s,y0+i*s]); pts.push([x0+(i+1)*s,y0+(i+1)*s]); } pts.push([x0,y0+N*s]); S.part(poly(pts)); let g=''; for(let i=1;i<N;i++) g+=`M${x0+3} ${y0+i*s}H${x0+i*s-3}M${x0+i*s} ${y0+i*s+3}V${y0+N*s-3}`; S.groove(g,1.1); S.rect(180,10,128,128,4); let g2=''; for(let i=1;i<N;i++) g2+=`M${180+i*16} 15V133M185 ${10+i*16}H303`; S.groove(g2,1.1); return arrowInk(146,74,170,74,ink); }],
+  ['Mask the future', (S,ink)=>{ const N=6,s=21,gx=10,gy=12; S.rect(gx,gy,N*s,N*s,4); let g=''; for(let i=1;i<N;i++) g+=`M${gx+i*s} ${gy+4}V${gy+N*s-4}M${gx+4} ${gy+i*s}H${gx+N*s-4}`; S.groove(g,1.1); const x0=182,y0=12,pts=[[x0,y0]]; for(let i=0;i<N;i++){ pts.push([x0+(i+1)*s,y0+i*s]); pts.push([x0+(i+1)*s,y0+(i+1)*s]); } pts.push([x0,y0+N*s]); S.part(poly(pts)); let g2=''; for(let i=1;i<N;i++) g2+=`M${x0+3} ${y0+i*s}H${x0+i*s-3}M${x0+i*s} ${y0+i*s+3}V${y0+N*s-3}`; S.groove(g2,1.1); return arrowInk(146,75,172,75,ink); }],
   ['Stack the blocks', (S,ink)=>{ for(let i=0;i<6;i++){ S.rect(24+i*6,128-i*16,200,12,3); } S.rect(54,8,200,12,3); return arrowInk(154,28,154,46,ink)+`<text x="306" y="96" text-anchor="end" style="font:600 22px 'IBM Plex Mono'" fill="${ink}">×12</text>`; }],
   ['Predict the next token', (S,ink)=>{ ['to','be','or','not','to'].forEach((t,i)=>{ S.rect(i*46,46,38,40,4); S.text(19+i*46,72,t,{size:14,wt:700,it:true}); }); S.rect(254,36,54,60,5); S.text(281,74,'be',{size:22,wt:800,it:true}); return arrowInk(226,66,246,66,ink); }],
 ];
 function wrapHTML(b){
   b.no=kitNo(b.slug);
-  const card=CARD[b.level], P=PLASTIC[b.fam], T=tones(P.base), lv=LV[b.level];
+  const card=CARD[b.level], P=PLASTIC[b.fam], T=tones(P.base,card.bg), lv=LV[b.level];
   const pips=[1,2,3].map(i=>`<s class="${i<=lv?'on':''}"></s>`).join('');
   const steps=STEPS.map(([cap,fn],i)=>{ let extra=''; const svg=miniSVG(S=>{ extra=fn(S,card.ink); return extra; },T,card,card.ink); return `<div class="step"><div class="n"><b>${i+1}</b>${cap}</div>${svg}</div>`; }).join('');
   return `<div class="wrap" style="--card:${card.bg};--ink:${card.ink}">
@@ -927,6 +976,25 @@ function spineMini(c){
 }
 const FAMORDER=['foundations','language','vision','agents','systems','learning','strawberry','mint','lemon','grape'];
 document.getElementById('spines').innerHTML = CATALOG.slice().sort((a,b)=>FAMORDER.indexOf(a.f)-FAMORDER.indexOf(b.f) || LV[a.l]-LV[b.l] || (a.soon?1:0)-(b.soon?1:0) || kitNo(a.s).localeCompare(kitNo(b.s))).map(spineMini).join('');
+
+/* contrast matrix */
+(function(){
+  const rowsP=['foundations','language','vision','agents','systems','learning','strawberry','mint','lemon','grape'];
+  const colsC=['beginner','intermediate','advanced','factory'];
+  let h='<div></div>'+colsC.map(k=>`<div class="h">${CARD[k].name}</div>`).join('');
+  rowsP.forEach(pk=>{
+    const P=PLASTIC[pk], candy=['strawberry','mint','lemon','grape'].includes(pk);
+    h+=`<div class="r">${P.name}<br><span style="opacity:.6">${P.series}</span></div>`;
+    colsC.forEach(ck=>{
+      const card=CARD[ck], used = candy ? ck==='factory' : ck!=='factory';
+      const T=tones(P.base,card.bg), S=new Sprue();
+      S.runner([[4,27],[146,27]],7); S.gate(40,27,40,10,3.4); S.rect(18,-4,44,16,3); S.disc(104,27,20); S.rect(128,36,18,14,2.5);
+      const d=Math.round(Math.abs(luma(T.base)-luma(card.bg)));
+      h+=`<div class="c${used?'':' off'}" style="background:${card.bg};color:${card.ink}"><svg viewBox="0 -8 150 62">${S.render(T,card)}</svg><span>${T.fixed?'● ':''}Δ${d}</span></div>`;
+    });
+  });
+  document.getElementById('matrix').innerHTML=h;
+})();
 
 /* swatches */
 document.getElementById('sw-card').innerHTML = ['beginner','intermediate','advanced','factory'].map(k=>`<div><i style="background:${CARD[k].bg}"></i><b>${CARD[k].name}</b><br>${CARD[k].bg} · ${k==='factory'?'Charlie':k}</div>`).join('');

@@ -112,6 +112,7 @@
     display: "'Bricolage Grotesque', sans-serif",
     serif: "'Instrument Serif', serif",
     mono: "'DM Mono', monospace",
+    math: "'STIX Two Text', serif",   // Instrument Serif has no Greek: maths labels use STIX Two for the whole label
   };
   let measurer = null;
   function measure(str, st) {
@@ -148,15 +149,19 @@
   function layoutTitle(book, K) {
     const maxW = W - 2 * M - (book.titleInset || 0);
     const wdth = book.wdth || 88;
-    const base = { font: 'display', weight: 800, opsz: 96, wdth, ls: book.ls != null ? book.ls : -0.018 };
+    // tighter only at the wider widths: at wdth <= 86 riso ink spread would close pairs like 'nf', 'rc', 'Tr'
+    const base = { font: 'display', weight: 800, opsz: 96, wdth, ls: book.ls != null ? book.ls : (wdth >= 88 ? -0.018 : -0.008) };
     let widest = 0;
     for (const line of book.title) widest = Math.max(widest, measure(line, { ...base, size: 100 }));
     let size = Math.min(book.titleMax || 104, Math.floor(100 * maxW / widest));
     const lead = book.lead || 0.9;
     let y = book.titleTop || 88;
     let svg = '';
+    const boxes = [];   // glyph boxes of every line of type: art must not print into these
     if (book.kicker) {
-      svg += T(M, y + 20, book.kicker, { font: 'serif', italic: true, size: 30, fill: K });
+      const ks = { font: 'serif', italic: true, size: 30 };
+      svg += T(M, y + 20, book.kicker, { ...ks, fill: K });
+      boxes.push([M, y - 4, M + measure(book.kicker, ks), y + 28]);
       y += 44;
     }
     const cap = size * 0.7;
@@ -165,19 +170,27 @@
     book.title.forEach((line, i) => {
       if (i) y += size * lead;
       svg += T(M - size * 0.035, y, line, { ...base, size, fill: K });
-      lines.push({ y, w: measure(line, { ...base, size }) });
+      const w = measure(line, { ...base, size });
+      lines.push({ y, w });
+      boxes.push([M - size * 0.035, y - size * 0.76, M + w, y + size * 0.23]);
     });
+    const baseline = y;
     let bottom = y + size * 0.12;
     if (book.tail) {
       const ts = book.tailSize || Math.round(Math.max(34, Math.min(52, size * 0.52)));
       y += size * 0.2;
       book.tail.forEach((line) => {
         y += ts * 0.98;
-        svg += T(M, y, line, { font: 'serif', italic: true, size: ts, fill: K });
+        const st = { font: 'serif', italic: true, size: ts };
+        svg += T(M, y, line, { ...st, fill: K });
+        boxes.push([M, y - ts * 0.72, M + measure(line, st), y + ts * 0.26]);
       });
       bottom = y + ts * 0.25;
     }
-    return { svg, bottom, size, lines };
+    const right = Math.max(...boxes.map((b) => b[2]));
+    // hits(x, y, pad): is this point inside (or within pad of) any line of type?
+    const hits = (x, yy, pad = 10) => boxes.some((b) => x > b[0] - pad && x < b[2] + pad && yy > b[1] - pad && yy < b[3] + pad);
+    return { svg, bottom, size, lines, boxes, right, baseline, hits };
   }
 
   // ---------- chrome: level, stats, imprint, colophon ----------
@@ -187,12 +200,17 @@
     const r = s * 0.72, cx = x + s / 2, cy = y - s / 2;
     return `<path d="${polyD([[cx, cy - r], [cx + r, cy], [cx, cy + r], [cx - r, cy]])}"/>`;
   }
-  // The Vizuara press mark: a V pulled from two drums. Left arm = first flash ink, right arm = key ink.
+  // The Vizuara press mark: a V pulled from one drum in the two states a drum can print —
+  // the left arm as a halftone screen, the right arm solid. Always the key ink, so it never
+  // changes colour across the shelf and survives greyscale.
   function vMark(x, y, h) {
-    const w = h * 1.16, t = h * 0.36;
+    const w = h * 1.16, t = h * 0.38;
     const left = [[x, y - h], [x + t, y - h], [x + w / 2 + t * 0.5, y], [x + w / 2 - t * 0.5, y]];
     const right = [[x + w, y - h], [x + w - t, y - h], [x + w / 2 - t * 0.5, y], [x + w / 2 + t * 0.5, y]];
-    return { left: `<path d="${polyD(left)}"/>`, right: `<path d="${polyD(right)}"/>`, w };
+    const inPoly = (px, py, P) => { let c = false; for (let i = 0, j = P.length - 1; i < P.length; j = i++) { if (((P[i][1] > py) !== (P[j][1] > py)) && (px < (P[j][0] - P[i][0]) * (py - P[i][1]) / (P[j][1] - P[i][1]) + P[i][0])) c = !c; } return c; };
+    const cell = Math.max(2.4, h * 0.13);
+    const screen = halftone({ box: [x - 2, y - h - 2, x + w + 2, y + 2], cell, angle: 45, tone: (px, py) => inPoly(px, py, left) ? 0.62 : 0 });
+    return { left: `<path d="${screen}"/>`, right: `<path d="${polyD(right)}"/>`, leftPoly: left, w };
   }
 
   function chrome(book, K, flashes) {
@@ -203,12 +221,13 @@
     const ty = 56;
     key += levelMark(M, ty, lv.mark, 13);
     key += T(M + 22, ty, lv.label.toUpperCase(), mono);
-    let right = book.coming ? 'FORTHCOMING' : `${book.capsules} CAPSULES · ${book.hours} HRS`;
+    const pl = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+    let right = book.coming ? 'FORTHCOMING' : `${pl(book.capsules, 'CAPSULE', 'CAPSULES')} · ${pl(book.hours, 'HR', 'HRS')}`;
     key += T(W - M, ty, right, { ...mono, anchor: 'end' });
     // footer: imprint
     const fy = H - M + 2;
-    const v = vMark(M, fy, 22);
-    flash0 += v.left; key += v.right;
+    const v = vMark(M, fy, 23);
+    key += v.left + v.right;
     const wm = { font: 'display', weight: 800, size: 19, wdth: 100, opsz: 24, ls: 0.06 };
     key += T(M + v.w + 10, fy - 2, 'VIZUARA', wm);
     key += T(M + v.w + 10 + measure('VIZUARA', wm) + 8, fy - 2, 'BOOKS', { font: 'mono', weight: 400, size: 12.5, ls: 0.18 });

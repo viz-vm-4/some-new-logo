@@ -3,7 +3,6 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<script>document.documentElement.classList.add("js");</script>
 <title>Buckram — Vizuara Books</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -937,9 +936,14 @@ function renderCovers(){
 /* Build at once (so the covers always exist), then rebuild the moment the fonts have landed,
    since every title is measured and fitted with the real Cormorant metrics. */
 const FONT_SPECS = [`700 80px ${FACE}`, `600 italic 40px ${FACE}`, `700 14px ${FACE}`, `400 18px "EB Garamond"`];
-makeTextures(); render(); renderCovers();
-const fitted = FONT_SPECS.every(s => document.fonts.check(s));
-if (!fitted) Promise.all(FONT_SPECS.map(s => document.fonts.load(s))).catch(() => {}).then(() => document.fonts.ready).then(renderCovers);
+/* Build right after the document has parsed (keeps parsing fast), then refit the titles
+   if the fonts arrive later, since every title is measured with the real Cormorant metrics. */
+function start(){
+  makeTextures(); render(); renderCovers();
+  if (!FONT_SPECS.every(s => document.fonts.check(s)))
+    Promise.all(FONT_SPECS.map(s => document.fonts.load(s))).catch(() => {}).then(() => document.fonts.ready).then(renderCovers);
+}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => setTimeout(start, 0)); else setTimeout(start, 0);
 </script>
 </body>
 </html>

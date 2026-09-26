@@ -150,9 +150,9 @@ figcaption code{font-family:inherit;font-weight:400;opacity:1}
       <li><b><em>1</em>Grid</b>12 × 15 square modules of 44 px with 12 px gutters and 30 px margins. 720 × 888 divides exactly. Every element — type, figure, mark, rule — sits on it.</li>
       <li><b><em>2</em>Type</b>Archivo, nothing else. Bold for the title, flush left from the top-left corner, as large as the longest line allows: 68, 60, 50 or 46 px. Regular for data. Lines are broken by hand; no widows.</li>
       <li><b><em>3</em>Inks</b>Paper, Ink and Signal Red. The level decides which ink plays ground, which plays figure, and which is the signal.</li>
-      <li><b><em>4</em>Figure</b>One per book, built from squares, circles and bars on the module grid, standing on the colophon rule or bleeding off the edge. It is the mechanism of the book, not a picture of its topic.</li>
+      <li><b><em>4</em>Figure</b>One per book, built from squares, circles and bars on the module grid, standing on the colophon rule or bleeding off the edge. It is the mechanism of the book, not a picture of its topic. A grid of module squares is reserved for mechanisms that <i>are</i> matrices (attention, a device mesh, tiled GEMM, image patches); anything that is merely tabulated finds its own silhouette.</li>
       <li><b><em>5</em>Mark</b>The ribbon: a bookmark hanging from the top edge in column 12, its tail notched into a V. Its length is the level — one, two or three modules. On the spine it hangs the same way.</li>
-      <li><b><em>6</em>Colophon</b>Below a 4 px rule, three cells: imprint, level, length. Series books add a fourth. Nothing else is printed on the front.</li>
+      <li><b><em>6</em>Colophon</b>Below a 4 px rule, three cells: imprint, level, length. Series books add a fourth: the book number over the series name. Nothing else is printed on the front.</li>
     </ol>
   </section>
 
@@ -282,30 +282,31 @@ FIG.attention = () => {
   return s;
 };
 
-// 5D parallelism: 64 GPUs in a device mesh. Every gap width is one axis of parallelism.
+// 5D parallelism: 32 GPUs = 2^5, one binary split per axis. Every gap width is one axis:
+// across, TP (4) · CP (12) · DP (44); down, EP (12) · PP (44). One rank in red.
 FIG.mesh = () => {
-  let s=''; const gap=i=>i===3?44:(i%2===1?12:4);
-  const c=(492-84)/8, x0=X(3), y0=Y(5); const xs=[],ys=[]; let x=x0,y=y0;
-  for(let i=0;i<8;i++){xs.push(x);ys.push(y);x+=c+(i<7?gap(i):0);y+=c+(i<7?gap(i):0);}
-  for(let j=0;j<8;j++)for(let i=0;i<8;i++) s+=R(xs[i],ys[j],c,c,(i===5&&j===2)?'fs':'fk');
-  const mid=(a,i)=>a[i]+c+gap(i)/2;
-  const t=y0-20, l=x0-22;
-  [0,1,3].forEach(i=>{ s+=L(mid(xs,i),y0-12,mid(xs,i),y0-2,3,'sk'); s+=L(x0-12,mid(ys,i),x0-2,mid(ys,i),3,'sk'); });
-  s+=T(mid(xs,0),t,'TP','lab','text-anchor="middle"')+T(mid(xs,1),t,'CP','lab','text-anchor="middle"')+T(mid(xs,3),t,'DP','lab','text-anchor="middle"');
-  s+=T(l,mid(ys,0)+5,'TP','lab','text-anchor="end"')+T(l,mid(ys,1)+5,'EP','lab','text-anchor="end"')+T(l,mid(ys,3)+5,'PP','lab','text-anchor="end"');
+  let s=''; const gx=i=>i===3?44:(i%2===1?12:4), gy=j=>j===1?44:12;
+  const x0=X(1), W=X(11)+F-x0, cw=(W-84)/8, ch=90, H=4*ch+68, y0=Y(13)+F-H;
+  const xs=[],ys=[]; let x=x0,y=y0;
+  for(let i=0;i<8;i++){xs.push(x);x+=cw+(i<7?gx(i):0);} for(let j=0;j<4;j++){ys.push(y);y+=ch+(j<3?gy(j):0);}
+  for(let j=0;j<4;j++)for(let i=0;i<8;i++) s+=R(xs[i],ys[j],cw,ch,(i===5&&j===2)?'fs':'fk');
+  const mx=i=>xs[i]+cw+gx(i)/2, my=j=>ys[j]+ch+gy(j)/2;
+  [[0,'TP'],[1,'CP'],[3,'DP']].forEach(([i,t])=>{ s+=L(mx(i),y0-12,mx(i),y0-2,3,'sk')+T(mx(i),y0-20,t,'lab','text-anchor="middle"'); });
+  [[0,'EP'],[1,'PP']].forEach(([j,t])=>{ s+=L(x0-12,my(j),x0-2,my(j),3,'sk')+T(x0-20,my(j)+5,t,'lab','text-anchor="end"'); });
   return s;
 };
 
-// Linear algebra: a matrix maps the unit circle to an ellipse; its eigenvectors are the axes that do not turn.
+// Linear algebra: a matrix maps the unit circle (before, outline) to an ellipse (after, solid).
+// Its eigenvectors only stretch: v1 by λ1 = 1.95 out past the circle, v2 by λ2 = 0.52 inside it. Av = λv, in red.
 FIG.eigen = () => {
-  const cx=X(7)+6, cy=CY(9), u=P*2.1, th=-30, l1=1.95, l2=0.52;
-  const dx=Math.cos(th*RAD), dy=Math.sin(th*RAD);
-  let s=`<g clip-path="url(#${CLIP})">`;
-  s+=`<ellipse cx="${cx}" cy="${cy}" rx="${f2(u*l1)}" ry="${f2(u*l2)}" transform="rotate(${th} ${cx} ${cy})" class="fk"/>`;
+  const cx=X(6)+F/2+6, cy=CY(9), u=P*2.55, th=-30, l1=1.95, l2=0.52;
+  const d1=[Math.cos(th*RAD),Math.sin(th*RAD)], d2=[-d1[1],d1[0]];
+  let s=`<ellipse cx="${f2(cx)}" cy="${cy}" rx="${f2(u*l1)}" ry="${f2(u*l2)}" transform="rotate(${th} ${f2(cx)} ${cy})" class="fk"/>`;
   s+=C(cx,cy,u,'sk','stroke-width="7"');
-  s+=L(cx-dx*900,cy-dy*900,cx+dx*900,cy+dy*900,9,'ss');
-  s+=L(cx+dy*900,cy-dx*900,cx-dy*900,cy+dx*900,9,'ss');
-  return s+`</g>`;
+  const bar=(d,l)=>L(cx-d[0]*u*l,cy-d[1]*u*l,cx+d[0]*u*l,cy+d[1]*u*l,10,'ss','stroke-linecap="butt"');
+  s+=bar(d1,l1)+bar(d2,l2);
+  s+=C(cx,cy,9,'fs');
+  return s;
 };
 
 // Context engineering: outside, an undifferentiated field of information. Inside the window it is selected,
@@ -329,19 +330,17 @@ FIG.window = () => {
   return s;
 };
 
-// Compaction: one full context, then the shape each harness leaves behind. Signal = the summary.
+// Compaction: three context windows after compaction, standing on the rule (oldest at the bottom). The frame is the
+// full window; what remains is solid, the summary is signal — Pi summarises the old turns under the recent ones,
+// Hermes keeps head and tail around a summarised middle, Codex keeps only a handoff summary.
 FIG.compaction = () => {
-  let s=''; const n=12;
-  const rows=[['Full context','kkkkkkkkkkkk'],['Pi','skkkk.......'],['Hermes','kkskkk......'],['Codex','s...........']];
-  rows.forEach(([lab,pat],ri)=>{
-    const y=Y(6+ri*2);
-    s+=T(X(0),y-12,lab);
-    for(let i=0;i<n;i++){
-      const x=X(i), ch=pat[i];
-      if(ch==='k') s+=R(x,y,F,F,'fk');
-      else if(ch==='s') s+=R(x,y,F,F,'fs');
-      else s+=R(x+1.5,y+1.5,F-3,F-3,'sk','stroke-width="3"');
-    }
+  let s='';
+  const towers=[[2,'Pi','skkkk'],[6,'Hermes','kkskkk'],[10,'Codex','s']];
+  towers.forEach(([c,lab,pat])=>{
+    const xl=X(c)-G/2, xr=X(c+1)+F+G/2, yt=Y(5)-G/2, yb=Y(14);
+    s+=PL([[xl,yb],[xl,yt],[xr,yt],[xr,yb]],4,'sk','stroke-linejoin="miter"');
+    [...pat].forEach((ch,k)=>s+=R(X(c),Y(13-k),2*P-G,F,ch==='s'?'fs':'fk'));
+    s+=T(X(c),Y(5)+16,lab);
   });
   return s;
 };
@@ -362,23 +361,23 @@ FIG.branch = () => {
 };
 
 // ML fundamentals: every point of feature space gets a predicted class; learning is placing the boundary (signal).
+// The boundary runs at 45°, midway between the lattice diagonals, so it touches no point; three points sit clearly on the wrong side.
 FIG.boundary = () => {
-  let s=''; const a=-0.62, b=CY(9)+40, xm=360; // boundary: y = a*(x-xm) + b
-  const side=(x,y)=> y < a*(x-xm)+b;
-  const flip=new Set(['6,8','9,11','3,10']);
+  let s=''; const K=916;                         // boundary: x + y = K (screen coordinates)
+  const flip=new Set(['3,10','9,7','8,10']);
   for(let r=5;r<=13;r++)for(let c=0;c<=11;c++){
-    let up=side(CX(c),CY(r)); if(flip.has(c+','+r)) up=!up;
-    s+= up ? C(CX(c),CY(r),13,'fk') : C(CX(c),CY(r),11,'sk','stroke-width="5"');
+    let up=CX(c)+CY(r)<K; if(flip.has(c+','+r)) up=!up;
+    s+= up ? C(CX(c),CY(r),11.5,'fk') : C(CX(c),CY(r),10,'sk','stroke-width="5"');
   }
-  s+=`<g clip-path="url(#${CLIP})">`+L(0,a*(0-xm)+b,720,a*(720-xm)+b,12,'ss')+`</g>`;
+  s+=`<clipPath id="${CLIP}-b"><rect x="0" y="${Y(5)-G}" width="720" height="${Y(14)-G-Y(5)+G}"/></clipPath><g clip-path="url(#${CLIP}-b)">`+L(K-900,900,K,0,9,'ss')+`</g>`;
   return s;
 };
 
 // RAG: every chunk is a unit vector; retrieval ranks them by angle to the query (cosine similarity).
 // The query in signal; the top-4 retrieved chunks at full weight; the rest of the corpus thin.
 FIG.cosine = () => {
-  let s=''; const ox=X(0)+6, oy=Y(13)+F, R0=9.4*P, r=rng(4); const q=38;
-  const angs=[]; for(let i=0;i<30;i++) angs.push(3+r()*84);
+  let s=''; const ox=X(0)+16, oy=Y(13)+F-16, R0=9.4*P-16, r=rng(4); const q=38;
+  const angs=[]; while(angs.length<30){ const a=3+r()*84; if(Math.abs(a-q)>=2.5 && angs.every(b=>Math.abs(a-b)>=2)) angs.push(a); }
   const near=[...angs].sort((u,v)=>Math.abs(u-q)-Math.abs(v-q)).slice(0,4);
   const ray=(ang,w,cls,len=R0)=>L(ox,oy,ox+len*Math.cos(-ang*RAD),oy+len*Math.sin(-ang*RAD),w,cls,'stroke-linecap="butt"');
   s+=`<path d="M ${ox+R0} ${oy} A ${R0} ${R0} 0 0 0 ${ox} ${oy-R0}" class="sk" stroke-width="3"/>`;
@@ -393,7 +392,7 @@ FIG.cosine = () => {
 FIG.tree = () => {
   let s='', hot=''; const w=14;
   const N={root:[5,0,['A','B']],A:[2,1,['a1','C']],C:[3,2,['c1','c2']],B:[9,1,['D','b2']],D:[7,2,['d1','E']],E:[9,3,['e1','e2']],
-           a1:[1,2],c1:[2,3],c2:[4,3],b2:[11,2],d1:[5,3],e1:[8,4],e2:[10,4]};
+           a1:[1,2],c1:[2,3],c2:[4,3],b2:[11,2],d1:[6,3],e1:[8,4],e2:[10,4]};
   const path=new Set(['root','B','D','E','e2']);
   const pos=k=>[CX(N[k][0]),CY(5+2*N[k][1])];
   const J='stroke-linejoin="miter"';
@@ -420,32 +419,21 @@ FIG.gemm = () => {
   return s;
 };
 
-// VLA & world models: the arm acts now (solid); the world model imagines the pose that reaches the target (outline),
-// and the path the gripper will take to get there (dots).
-FIG.arm = () => {
-  let s='';
-  const base=[CX(2),Y(13)];
-  const L1=4.1*P, L2=3.7*P, L3=1.15*P;
-  const pose=(a1,a2,a3)=>{const j1=[base[0]+L1*Math.cos(a1*RAD),base[1]+L1*Math.sin(a1*RAD)];
-    const j2=[j1[0]+L2*Math.cos(a2*RAD),j1[1]+L2*Math.sin(a2*RAD)]; const j3=[j2[0]+L3*Math.cos(a3*RAD),j2[1]+L3*Math.sin(a3*RAD)]; return [base,j1,j2,j3];};
-  const draw=(p,solid)=>{ let o=''; const cls=solid?'fk':'sk', ex=solid?'':'stroke-width="4" stroke-linejoin="miter"';
-    o+=BAR(p[0],p[1],34,cls,ex)+BAR(p[1],p[2],26,cls,ex)+BAR(p[2],p[3],18,cls,ex);
-    const tip=p[3], d=[(p[3][0]-p[2][0])/L3,(p[3][1]-p[2][1])/L3], n=[-d[1],d[0]];
-    const g1=[tip[0]+n[0]*16,tip[1]+n[1]*16], g2=[tip[0]-n[0]*16,tip[1]-n[1]*16];
-    o+=BAR(g1,g2,8,cls,ex)+BAR(g1,[g1[0]+d[0]*22,g1[1]+d[1]*22],8,cls,ex)+BAR(g2,[g2[0]+d[0]*22,g2[1]+d[1]*22],8,cls,ex);
-    p.slice(1,3).forEach(q=>o+=C(q[0],q[1],solid?17:15,'fg sk',solid?'stroke-width="9"':'stroke-width="4"'));
-    return o;};
-  const A=pose(-86,-14,38), B=pose(-47,16,82);
-  const tipA=[A[3][0]+(A[3][0]-A[2][0])/L3*30, A[3][1]+(A[3][1]-A[2][1])/L3*30];
-  const tipB=[B[3][0]+(B[3][0]-B[2][0])/L3*30, B[3][1]+(B[3][1]-B[2][1])/L3*30];
-  // imagined trajectory of the gripper: a quadratic arc
-  const ctl=[tipB[0]+10,tipA[1]-40];
-  for(let t=0.12;t<0.93;t+=0.1){ const x=(1-t)*(1-t)*tipA[0]+2*(1-t)*t*ctl[0]+t*t*tipB[0], y=(1-t)*(1-t)*tipA[1]+2*(1-t)*t*ctl[1]+t*t*tipB[1]; s+=C(x,y,5,'fk'); }
-  s+=draw(B,false)+draw(A,true);
-  s+=R(X(1),Y(13),X(3)+F-X(1),F,'fk');
-  s+=R(tipB[0]-F/2,tipB[1]+2,F,F,'fs');
-  return s;
-};
+// VLA & world models: the arm as a kinematic schematic — joints on module centres, links only at 0°, 45° or 90°.
+// Solid is the pose now; the outline is the pose the world model imagines will reach the target (signal),
+// and the dots are the path it predicts the gripper will take.
+FIG.arm = () => { let s='';
+  const now=[[CX(2),CY(13)],[CX(2),CY(8)],[CX(5),CY(5)],[CX(7),CY(5)]];
+  const imag=[[CX(2),CY(13)],[CX(5),CY(10)],[CX(8),CY(10)],[CX(8),CY(12)-4]];
+  const W=[30,24,18];
+  const chain=(p,solid)=>{ let o=''; for(let i=0;i<3;i++) o+= solid? L(p[i][0],p[i][1],p[i+1][0],p[i+1][1],W[i],'sk','stroke-linecap="butt"')
+      : BAR(p[i],p[i+1],W[i],'sk','stroke-width="4" stroke-linejoin="miter"');
+    p.slice(1,3).forEach(q=>o+=C(q[0],q[1],solid?17:15,'fg sk',solid?'stroke-width="9"':'stroke-width="4"')); return o; };
+  let d=0; const pts=[[CX(7)+14,CY(5)],[CX(8),CY(5)],[CX(8),CY(9)-8]];
+  for(let i=0;i<pts.length-1;i++){ const [a,b]=[pts[i],pts[i+1]], len=Math.hypot(b[0]-a[0],b[1]-a[1]); for(;d<=len;d+=P/2){const t=d/len; s+=C(a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,5,'fk');} d-=len; }
+  s+=chain(imag,false)+chain(now,true);
+  s+=R(X(1),Y(13),3*P-G,F,'fk'); s+=R(X(8),Y(12)+8,F,F-8,'fs');
+  return s; };
 
 // SciML: the direction field of an ODE (a damped oscillator in phase space) and one solution curve through it.
 FIG.odefield = () => {
@@ -464,61 +452,67 @@ FIG.odefield = () => {
 };
 
 // Diffusion LM: a sentence is not written left to right — it emerges from masks, all positions at once.
-// Rows are denoising steps: masked positions hollow, tokens unmasked at that step in signal.
+// Rows are denoising steps 0–7 (top: all [MASK]). Each step unmasks a scheduled 1–2 tokens (signal), scattered
+// across the width; once revealed a token stays, so the finished sentence stands on the rule.
 FIG.unmask = () => {
-  let s=''; const n=12, T=8, r=rng(21), sw=3;
-  const t=[]; for(let i=0;i<n;i++) t.push(1+Math.floor(r()*(T-1)*0.999)); t[3]=1; t[9]=T-1; t[6]=T-1;
-  for(let row=0;row<T;row++) for(let i=0;i<n;i++){
+  let s=''; const t=[4,5,2,1,5,7,6,3,4,6,2,3], T=7;
+  for(let row=0;row<=T;row++) for(let i=0;i<12;i++){
     const x=X(i), y=Y(6+row);
     if(t[i]<row) s+=R(x,y,F,F,'fk');
     else if(t[i]===row) s+=R(x,y,F,F,'fs');
-    else s+=R(x+sw/2,y+sw/2,F-sw,F-sw,'sk',`stroke-width="${sw}"`);
+    else s+=R(x+F/2-4,y+F/2-4,8,8,'fk');
   }
   return s;
 };
 
 /* Charlie and the Intelligence Factory — every book is one room of the same floor plan.
-   The corridor runs at the same height through every cover; set the four side by side and it is continuous. */
+   The corridor runs at the same height through every cover; set the four side by side and it is continuous.
+   Walls are 12 px (one gutter); the floor stands one gutter above the colophon rule; nothing inside touches a wall. */
+const RY0=Y(5)-G, RY1=Y(14)-G, RX0=X(2)-G, RX1=X(11);          // room outer box: 130–646 × 298–802
 const ROOM = (doors, inner) => () => {
-  let s=''; const x0=X(2)-G, x1=X(11), y0=Y(5)-G, y1=Y(14), cy=CY(9), dt=Y(9), db=Y(9)+F;
-  s+=R(x0,y0,x1-x0,G,'fk'); s+=R(x0,y1-G,x1-x0,G,'fk');
-  const wall=(x,door)=>{ if(door){ s+=R(x,y0,G,dt-y0,'fk'); s+=R(x,db,G,y1-db,'fk'); } else s+=R(x,y0,G,y1-y0,'fk'); };
-  wall(x0,doors.includes('L')); wall(x1-G,doors.includes('R'));
-  if(doors.includes('L')) s+=R(0,cy-G/2,x0+G,G,'fk');
-  if(doors.includes('R')) s+=R(x1-G,cy-G/2,720-(x1-G),G,'fk');
+  let s=''; const cy=CY(9), dt=Y(9), db=Y(9)+F;
+  s+=R(RX0,RY0,RX1-RX0,G,'fk'); s+=R(RX0,RY1-G,RX1-RX0,G,'fk');
+  const wall=(x,door)=>{ if(door){ s+=R(x,RY0,G,dt-RY0,'fk'); s+=R(x,db,G,RY1-db,'fk'); } else s+=R(x,RY0,G,RY1-RY0,'fk'); };
+  wall(RX0,doors.includes('L')); wall(RX1-G,doors.includes('R'));
+  if(doors.includes('L')) s+=R(0,cy-G/2,RX0+G,G,'fk');
+  if(doors.includes('R')) s+=R(RX1-G,cy-G/2,720-(RX1-G),G,'fk');
   return s+inner();
 };
-const vwall=(c,r0,r1)=>R(X(c)-G,Y(r0)-G,G,Y(r1+1)-Y(r0)+G,'fk');
-const hwall=(r,c0,c1)=>R(X(c0)-G,Y(r)-G,X(c1+1)-X(c0)+G,G,'fk');
+const vwallPx=(c,y0,y1)=>R(X(c)-G,y0,G,y1-y0,'fk');             // wall in the gutter left of column c
+const hwallPx=(r,x0,x1)=>R(x0,Y(r)-G,x1-x0,G,'fk');             // wall in the gutter above row r
 // I · Language: the prompt is prefilled in one pass; the answer is decoded one token at a time, out through the door.
 FIG.roomLanguage = ROOM('R', () => { let s='';
   s+=R(X(3),Y(7),3*P-G,3*P-G,'fk');
   [6,7,8,9,10].forEach((c,i)=>s+=R(X(c),Y(9),F,F,i===4?'fs':'fk'));
   return s; });
-// II · Vision: the picture is cut into patches, the patches become tokens, and in the end pixels generate themselves.
+// II · Vision: the picture is cut into patches, the patches become tokens in the corridor,
+// and in the end pixels generate themselves. One patch is traced through all three.
 FIG.roomVision = ROOM('LR', () => { let s=''; const hot=[1,2], sw=3;
-  for(let r=0;r<4;r++)for(let c=0;c<4;c++) s+=R(X(3+c),Y(5)+r*P,F,F,(r===hot[0]&&c===hot[1])?'fs':'fk');
-  const h=P/2, x0=X(2)+ (9*P-G-16*h)/2 + (h-22)/2;
-  for(let i=0;i<16;i++) s+=R(x0+i*h,CY(9)-11,22,22,i===hot[0]*4+hot[1]?'fs':'fk');
-  for(let r=0;r<4;r++)for(let c=0;c<4;c++){ const x=X(6+c), y=Y(10)+r*P;
+  for(let r=0;r<3;r++)for(let c=0;c<3;c++) s+=R(X(3+c),Y(6+r),F,F,(r===hot[0]&&c===hot[1])?'fs':'fk');
+  for(let i=0;i<9;i++) s+=R(CX(2+i)-13,CY(9)-13,26,26,i===hot[0]*3+hot[1]?'fs':'fk');
+  for(let r=0;r<3;r++)for(let c=0;c<3;c++){ const x=X(7+c), y=Y(10+r);
     s+= (r===hot[0]&&c===hot[1]) ? R(x,y,F,F,'fs') : R(x+sw/2,y+sw/2,F-sw,F-sw,'sk',`stroke-width="${sw}"`); }
   return s; });
-// III · Sound: speech as samples; loud in the room, silent in the corridor.
-FIG.roomSound = ROOM('LR', () => { let s=''; const cy=CY(9), h=14, r=rng(3); let k=0;
-  for(let x=X(2)+h/2; x<X(11)-G; x+=h,k++){
-    const t=(x-X(2))/(X(11)-G-X(2)); const env=Math.pow(Math.sin(Math.PI*t),1.3)*(0.55+0.45*Math.sin(t*19));
-    const a=Math.max(6,Math.abs(env)*(r()*0.5+0.5)*210);
-    s+=R(x-4,cy-a,8,2*a,k===22?'fs':'fk');
-  }
+// III · Sound: a voice agent's conversation. The user speaks above the axis, the agent answers below it after a
+// short endpointing silence; the user barges in (signal) and the agent's speech stops dead.
+FIG.roomSound = ROOM('LR', () => { let s=''; const cy=CY(9), h=14, r=rng(5), top=cy-6, bot=cy+6, A=196;
+  const seg=(x0,x1,sign,{hard=false,redFirst=false}={})=>{ let k=0;
+    for(let x=x0; x<=x1; x+=h,k++){ const t=(x-x0)/Math.max(1,x1-x0);
+      const env=(hard? Math.pow(Math.sin(Math.PI*Math.min(t,0.5)),0.8) : Math.pow(Math.sin(Math.PI*t),0.9))*(0.55+0.45*Math.abs(Math.sin(k*0.9)));
+      const a=Math.max(8,env*(0.55+0.45*r())*A), cls=(redFirst&&k===0)?'fs':'fk';
+      s+= sign<0 ? R(x-4,top-(redFirst&&k===0?A:a),8,(redFirst&&k===0?A:a),cls) : R(x-4,bot,8,a,cls); } };
+  seg(X(2)+14, X(5)+10, -1);                 // user
+  seg(X(6)+6,  X(9)+20, +1, {hard:true});    // agent, cut off
+  seg(X(9)+6,  X(10)+30, -1, {redFirst:true}); // user barges in
   return s; });
 // IV · Reasoning: an agent in a grid world, never shown the answer, finds its own way to the reward.
-FIG.roomReason = ROOM('L', () => { let s='';
-  s+=vwall(5,7,13)+vwall(7,5,10)+vwall(9,8,13)+hwall(7,8,9);
-  const pts=[[X(2)-G,CY(9)],[CX(4),CY(9)],[CX(4),CY(6)],[CX(6),CY(6)],[CX(6),CY(11)],[CX(8),CY(11)],[CX(8),CY(7)],[CX(10),CY(7)],[CX(10),CY(5)+26]];
+FIG.roomReason = ROOM('L', () => { let s=''; const floor=RY1-G, ceil=RY0+G;
+  s+=vwallPx(4,Y(7)-G,floor)+vwallPx(6,ceil,Y(11)-G)+vwallPx(8,Y(8)-G,floor)+hwallPx(8,X(8),RX1-G);
+  const pts=[[RX0,CY(9)],[CX(3),CY(9)],[CX(3),CY(6)],[CX(5),CY(6)],[CX(5),CY(11)],[CX(7),CY(11)],[CX(7),CY(7)],[CX(9),CY(7)],[CX(9),CY(6)+26]];
   let d=0; const step=P/2;
   for(let i=0;i<pts.length-1;i++){ const [a,b]=[pts[i],pts[i+1]]; const len=Math.hypot(b[0]-a[0],b[1]-a[1]);
     for(; d<=len; d+=step){ const t=d/len; s+=C(a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,6,'fk'); } d-=len; }
-  s+=R(X(10),Y(5),F,F,'fs');
+  s+=R(X(9),Y(6),F,F,'fs');
   return s; });
 
 /* ---------------- BOOKS ---------------- */
@@ -527,41 +521,41 @@ const book=o=>BOOKS.push(o);
 // core set
 book({g:'core', slug:'ai-context-engineering', level:'intermediate', capsules:43, hours:10, title:['AI Context','Engineering'], fig:'window',
   note:'Outside, an undifferentiated field of information. Inside the window it is selected and ordered — instructions, tools, retrieved knowledge, compressed memory — around one query.'});
-book({g:'core', slug:'mathematical-foundations-for-ml', level:'beginner', capsules:43, hours:10, title:['Mathematical','Foundations for','Machine Learning'], size:'m', fig:'eigen',
-  note:'A matrix maps the unit circle to an ellipse. Its eigenvectors — the directions that do not turn — run off the page.'});
+book({g:'core', slug:'mathematical-foundations-for-ml', level:'beginner', capsules:43, hours:10, title:['Mathematical','Foundations','for Machine Learning'], size:'m', fig:'eigen',
+  note:'A matrix maps the unit circle (outline) to an ellipse (solid). Its eigenvectors only stretch: v₁ by λ₁ out past the circle, v₂ by λ₂ inside it — Av = λv, in red.'});
 book({g:'core', slug:'neural-networks-from-scratch', level:'beginner', capsules:33, hours:7, title:['Neural Networks','from Scratch'], fig:'neuron',
   note:'One neuron, the unit everything else is built from: nine inputs whose line weight is |w|, summed in one cell, bent by ReLU on the way out.'});
-book({g:'core', slug:'build-llms-from-scratch', level:'intermediate', capsules:20, hours:6, title:['Build Large Language','Models (LLMs)','from Scratch'], size:'m', fig:'attention',
+book({g:'core', slug:'build-llms-from-scratch', level:'intermediate', capsules:20, hours:6, title:['Build','Large Language Models','(LLMs) from Scratch'], size:'m', fig:'attention',
   note:'The causal self-attention matrix of a GPT. Square area is attention weight; the upper triangle is masked; the last row is the token being predicted.'});
-book({g:'core', slug:'5d-parallelism', level:'advanced', capsules:40, hours:9, title:['5D Parallelism','for Large Model','Training'], size:'m', fig:'mesh',
-  note:'Sixty-four GPUs in a device mesh. Each gap width is one axis of parallelism — TP, CP, EP, PP, DP — nested like the book composes them. One rank in red.'});
+book({g:'core', slug:'5d-parallelism', level:'advanced', capsules:40, hours:9, title:['5D Parallelism for','Large Model Training'], size:'m', fig:'mesh',
+  note:'Thirty-two GPUs, 2⁵: one binary split per axis. Each gap width is one axis of parallelism — TP, CP, DP across; EP, PP down. One rank in red.'});
 book({g:'core', slug:'pi-vs-hermes-vs-codex', level:'advanced', capsules:9, hours:1, title:['Pi vs Hermes vs Codex:','Context Compaction','and Memory'], size:'m', fig:'compaction',
-  note:'A full context window, then the shape each harness leaves behind: Pi a summary and the recent turns, Hermes head and tail around a summarised middle, Codex a handoff summary.'});
+  note:'Three context windows after compaction, oldest turns at the bottom. Pi summarises the old turns beneath the recent ones, Hermes keeps head and tail around a summarised middle, Codex keeps only a handoff summary.'});
 // range
 book({g:'range', slug:'machine-learning-fundamentals', level:'beginner', capsules:37, hours:9, title:['Machine Learning','Fundamentals'], fig:'boundary',
-  note:'Every point of feature space gets a predicted class; learning is placing the boundary. Three points sit on the wrong side of it.'});
+  note:'Every point of feature space gets a predicted class; learning is placing the boundary. It runs at 45°, touching no point, and three points sit clearly on the wrong side.'});
 book({g:'range', slug:'git-github-masterclass', level:'beginner', capsules:40, hours:9, title:['Git & GitHub','Masterclass'], fig:'branch',
   note:'History is a line. A feature branch leaves it and is merged back; another has just left and is still open, running off the page.'});
 book({g:'range', slug:'decision-trees-from-scratch', level:'beginner', capsules:23, hours:5, title:['Build Decision Trees','from Scratch'], size:'m', fig:'tree',
   note:'Greedy binary splits, drawn orthogonally. One example’s route from the root question to its leaf.'});
 book({g:'range', slug:'rag-in-production', level:'intermediate', capsules:42, hours:10, title:['RAG in','Production'], fig:'cosine',
   note:'Thirty chunks as unit vectors. Retrieval ranks them by angle to the query (cosine similarity); the top four are drawn at full weight.'});
-book({g:'range', slug:'sciml', level:'advanced', capsules:39, hours:9, title:['Scientific Machine','Learning (SciML)'], fig:'odefield',
+book({g:'range', slug:'sciml', level:'advanced', capsules:39, hours:9, title:['Scientific','Machine Learning','(SciML)'], fig:'odefield',
   note:'The direction field of a damped oscillator, one stroke per module, and a single solution curve spiralling into equilibrium.'});
-book({g:'range', slug:'diffusion-lm-from-scratch', level:'advanced', capsules:35, hours:8, title:['Build a Diffusion','Language Model','from Scratch'], size:'m', fig:'unmask',
-  note:'Rows are denoising steps. Masked positions are hollow; tokens unmasked at each step are red — everywhere at once, not left to right.'});
+book({g:'range', slug:'diffusion-lm-from-scratch', level:'advanced', capsules:35, hours:8, title:['Build a','Diffusion Language Model','from Scratch'], size:'m', fig:'unmask',
+  note:'Rows are denoising steps, top row all [MASK]. Every step unmasks one or two tokens (red) scattered across the sentence — everywhere at once, not left to right.'});
 book({g:'range', slug:'vla-world-models', level:'advanced', capsules:42, hours:10, title:['Vision-Language-Action','& World Models','for Robotics'], size:'m', fig:'arm',
-  note:'The arm acts now (solid). The world model imagines the pose that reaches the target (outline) and the path the gripper will take (dots).'});
+  note:'A kinematic schematic on the grid. Solid is the pose now; the outline is the pose the world model imagines reaching the target; the dots are the path it predicts for the gripper.'});
 book({g:'range', slug:'kernel-engineering', level:'advanced', soon:true, title:['Kernel','Engineering'], sub:['From silicon to speculative decoding —','GPU kernels for modern LLMs.'], fig:'gemm',
   note:'Forthcoming. A tiled matrix multiply: one output tile of C accumulates a row-strip of A against a column-strip of B, tile by tile.'});
 // sub-series
-book({g:'series', slug:'charlie-language-room', level:'advanced', capsules:22, hours:5, series:'I', title:['Charlie and the','Language Room'], sub:['Book I — Language: Inference Engineering'], fig:'roomLanguage',
+book({g:'series', slug:'charlie-language-room', level:'advanced', capsules:22, hours:5, series:'I', title:['Charlie and the','Language Room'], sub:['Inference Engineering'], fig:'roomLanguage',
   note:'The prompt is prefilled in one pass; the answer is decoded one token at a time and leaves through the door.'});
-book({g:'series', slug:'charlie-vision-room', level:'intermediate', capsules:20, hours:6, series:'II', title:['Charlie and the','Vision Room'], sub:['Book II — Vision: Vision Transformers'], fig:'roomVision',
-  note:'The picture is cut into patches, the patches become tokens, and at the end pixels generate themselves. One patch is traced through.'});
-book({g:'series', slug:'charlie-sound-room', level:'intermediate', capsules:20, hours:6, series:'III', title:['Charlie and the','Sound Room'], sub:['Book III — Audio: Voice Agents'], fig:'roomSound',
-  note:'Speech as samples: loud in the room, silent in the corridor. The white sample is now.'});
-book({g:'series', slug:'charlie-reasoning-room', level:'advanced', capsules:21, hours:6, series:'IV', title:['Charlie and the','Reasoning Room'], sub:['Book IV — Reason: Reinforcement Learning,','from bandits to reasoning models'], fig:'roomReason',
+book({g:'series', slug:'charlie-vision-room', level:'intermediate', capsules:20, hours:6, series:'II', title:['Charlie and the','Vision Room'], sub:['Vision Transformers'], fig:'roomVision',
+  note:'The picture is cut into patches, the patches become tokens in the corridor, and in the end pixels generate themselves. One patch is traced through all three.'});
+book({g:'series', slug:'charlie-sound-room', level:'intermediate', capsules:20, hours:6, series:'III', title:['Charlie and the','Sound Room'], sub:['Voice Agents'], fig:'roomSound',
+  note:'A conversation: the user speaks above the axis, the agent answers below after a short endpointing silence, then the user barges in (white) and the agent stops dead.'});
+book({g:'series', slug:'charlie-reasoning-room', level:'advanced', capsules:21, hours:6, series:'IV', title:['Charlie and the','Reasoning Room'], sub:['Reinforcement Learning,','from bandits to reasoning models'], fig:'roomReason',
   note:'A grid world. The agent is never shown the answer; step by step it finds its own way to the reward.'});
 
 const LV={beginner:1,intermediate:2,advanced:3};
@@ -575,8 +569,8 @@ function coverInner(b){
     ${FIG[b.fig]()}</svg>`;
   const lvName=b.level[0].toUpperCase()+b.level.slice(1);
   const third = b.soon ? `<b>Forthcoming</b>In preparation` : `<b>${b.capsules} capsules</b>${b.hours} hour${b.hours===1?'':'s'}`;
-  const fourth = b.series ? `<b>Intelligence Factory</b>Charlie, Book ${b.series}` : '';
-  const colo=`<div class="colo">${b.series?'':'<div class="rule"></div>'}
+  const fourth = b.series ? `<b>Book ${b.series}</b>Intelligence Factory` : '';
+  const colo=`<div class="colo"><div class="rule"></div>
     <div class="cell" style="left:${X(0)}px"><b>Vizuara</b>Books</div>
     <div class="cell" style="left:${X(3)}px"><b>Level ${lv}</b>${lvName}</div>
     <div class="cell" style="left:${X(6)}px">${third}</div>

@@ -119,35 +119,47 @@ async function snapped(el, shoot) {
   if (wantPdf) {
     fs.mkdirSync(path.join(outDir, 'pdf'), { recursive: true });
     for (const slug of done) {
-      const pp = await ctx1.newPage();
-      await pp.goto('file://' + file, { waitUntil: 'networkidle', timeout: 120000 });
-      await pp.evaluate(() => document.fonts.ready);
-      await pp.emulateMedia({ media: 'print' });
-      // Isolate the cover in normal flow at the page origin. Everything else is display:none and
-      // every ancestor collapses to a plain 720px block, so the printed document is exactly one
-      // trim-sized page. (If the document stays wider than the page, Chrome shrinks the whole
-      // printout to fit and the cover comes out at a fraction of its size.)
-      const box = await pp.evaluate((slug) => {
-        const el = document.querySelector(`.cover[data-slug="${slug}"]`);
-        const set = (n, props) => { for (const [k, v] of Object.entries(props)) n.style.setProperty(k, v, 'important'); };
-        for (let node = el; node.parentElement; node = node.parentElement) {
-          const parent = node.parentElement;
-          for (const sib of parent.children) if (sib !== node) set(sib, { display: 'none' });
-          set(parent, { display: 'block', position: 'static', width: '720px', 'min-width': '0', 'max-width': 'none',
-            height: 'auto', 'min-height': '0', margin: '0', padding: '0', border: '0', transform: 'none',
-            float: 'none', overflow: 'visible', 'box-shadow': 'none', background: 'none' });
+      // Pages that build their covers with heavy JS can occasionally lose their execution
+      // context mid-load on a busy machine; retry a couple of times before giving up.
+      for (let attempt = 1; ; attempt++) {
+        let pp;
+        try {
+          pp = await ctx1.newPage();
+          await pp.goto('file://' + file, { waitUntil: 'networkidle', timeout: 120000 });
+          await pp.evaluate(() => document.fonts.ready);
+          await pp.emulateMedia({ media: 'print' });
+          // Isolate the cover in normal flow at the page origin. Everything else is display:none and
+          // every ancestor collapses to a plain 720px block, so the printed document is exactly one
+          // trim-sized page. (If the document stays wider than the page, Chrome shrinks the whole
+          // printout to fit and the cover comes out at a fraction of its size.)
+          const box = await pp.evaluate((slug) => {
+            const el = document.querySelector(`.cover[data-slug="${slug}"]`);
+            const set = (n, props) => { for (const [k, v] of Object.entries(props)) n.style.setProperty(k, v, 'important'); };
+            for (let node = el; node.parentElement; node = node.parentElement) {
+              const parent = node.parentElement;
+              for (const sib of parent.children) if (sib !== node) set(sib, { display: 'none' });
+              set(parent, { display: 'block', position: 'static', width: '720px', 'min-width': '0', 'max-width': 'none',
+                height: 'auto', 'min-height': '0', margin: '0', padding: '0', border: '0', transform: 'none',
+                float: 'none', overflow: 'visible', 'box-shadow': 'none', background: 'none' });
+            }
+            const pos = getComputedStyle(el).position;
+            set(el, { margin: '0', transform: 'none', float: 'none', ...(pos === 'absolute' || pos === 'fixed' || pos === 'sticky' ? { position: 'relative', inset: 'auto' } : {}) });
+            const r = el.getBoundingClientRect();
+            return { x: r.x, y: r.y, w: r.width, h: r.height, docW: document.body.scrollWidth, docH: document.body.scrollHeight };
+          }, slug);
+          if (Math.round(box.x) !== 0 || Math.round(box.y) !== 0 || Math.round(box.w) !== 720 || Math.round(box.h) !== 888 || box.docW > 721 || box.docH > 889)
+            console.warn(`! ${slug}: PDF layout off — cover at ${box.x},${box.y} ${box.w}x${box.h}, document ${box.docW}x${box.docH}`);
+          await pp.addStyleTag({ content: `@page { size: 7.5in 9.25in; margin: 0; }` });
+          await pp.waitForTimeout(300);
+          await pp.pdf({ path: path.join(outDir, 'pdf', `${slug}.pdf`), width: '7.5in', height: '9.25in', printBackground: true, pageRanges: '1', margin: { top: 0, right: 0, bottom: 0, left: 0 } });
+          await pp.close();
+          break;
+        } catch (e) {
+          if (pp) await pp.close().catch(() => {});
+          if (attempt >= 3) throw e;
+          console.warn(`! ${slug}: PDF attempt ${attempt} failed (${String(e.message).split('\n')[0]}), retrying`);
         }
-        const pos = getComputedStyle(el).position;
-        set(el, { margin: '0', transform: 'none', float: 'none', ...(pos === 'absolute' || pos === 'fixed' || pos === 'sticky' ? { position: 'relative', inset: 'auto' } : {}) });
-        const r = el.getBoundingClientRect();
-        return { x: r.x, y: r.y, w: r.width, h: r.height, docW: document.body.scrollWidth, docH: document.body.scrollHeight };
-      }, slug);
-      if (Math.round(box.x) !== 0 || Math.round(box.y) !== 0 || Math.round(box.w) !== 720 || Math.round(box.h) !== 888 || box.docW > 721 || box.docH > 889)
-        console.warn(`! ${slug}: PDF layout off — cover at ${box.x},${box.y} ${box.w}x${box.h}, document ${box.docW}x${box.docH}`);
-      await pp.addStyleTag({ content: `@page { size: 7.5in 9.25in; margin: 0; }` });
-      await pp.waitForTimeout(300);
-      await pp.pdf({ path: path.join(outDir, 'pdf', `${slug}.pdf`), width: '7.5in', height: '9.25in', printBackground: true, pageRanges: '1', margin: { top: 0, right: 0, bottom: 0, left: 0 } });
-      await pp.close();
+      }
     }
   }
   if (!only && !pdfOnly) {

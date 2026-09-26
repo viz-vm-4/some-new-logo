@@ -10,5 +10,5 @@ function curlFetch(url, ua){const key=crypto.createHash('sha1').update(url+'|'+u
  const lines=JSON.parse(process.argv[2]);
  await p.setContent(`<link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@700&display=block" rel="stylesheet"><div id=m></div>`,{waitUntil:'networkidle'});
  await p.evaluate(()=>document.fonts.ready);
- const res=await p.evaluate((lines)=>lines.map(t=>{const s=document.createElement('span');s.style.cssText="font:700 56px 'Albert Sans';letter-spacing:-0.024em;white-space:nowrap";s.textContent=t;document.body.appendChild(s);return [t,Math.round(s.getBoundingClientRect().width)];}),lines);
+ const res=await p.evaluate((lines)=>lines.map(t=>{const s=document.createElement('span');s.style.cssText="font:700 56px 'Albert Sans';letter-spacing:-0.024em;white-space:nowrap;font-kerning:normal;font-feature-settings:'kern','ss01'";s.textContent=t;document.body.appendChild(s);return [t,Math.round(s.getBoundingClientRect().width)];}),lines);
  res.forEach(r=>console.log(r[1],r[0]));await b.close();})();

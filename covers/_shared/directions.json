@@ -70,5 +70,9 @@
   "20-cutpaper": {
     "name": "Paperworks",
     "pitch": "Every book is a small construction of cut, folded and layered coloured card, and the construction is the idea: a die-cut window over a scroll of context, neurons pinned with brass paper fasteners, chat history pleated into a concertina. Board colour marks the subject shelf (Matisse's cut-out palette plus kraft), and the number of sheets stacked under the title slip is the level. In print the layers become real die-cut, laminated board."
+  },
+  "08-clothbound": {
+    "name": "Buckram",
+    "pitch": "Every book is designed as a real case-bound hardcover: a deep bookcloth, one foil (gold, copper, palladium or black pigment) and one blind die. The title is blocked in Cormorant capitals, and a sunk roundel holds a device from the book's mechanism (a causal attention matrix, the 5-cube in Petrie projection, ⋈ for SQL). A blind-pressed band repeats the subject as pattern. Level is read from the binding itself: quarter-bound, half-bound or full cloth."
   }
 }

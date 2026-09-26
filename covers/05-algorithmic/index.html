@@ -30,6 +30,8 @@ svg.plate{position:absolute;left:0;top:0;width:720px;height:888px;display:block}
 .plate .fk2{fill:var(--ink2);stroke:none}
 .plate .fr{fill:var(--sig);stroke:none}
 .plate .ring{fill:var(--ground);stroke:var(--ink)}
+.plate .g{stroke:var(--ground);fill:none}
+.plate .fg{fill:var(--ground);stroke:none}
 .plate text{font-family:var(--mono);fill:var(--ink)}
 .plate text.acc{fill:var(--sig)}
 
@@ -44,6 +46,7 @@ h1 .pre{display:block;font-style:italic;font-weight:400;letter-spacing:-.01em;ma
 h1 .sub{display:block;font-style:italic;font-weight:400;letter-spacing:-.005em;margin-top:16px;line-height:1.14}
 .cap{position:absolute;left:40px;bottom:32px;width:486px;font:400 10px/1.45 var(--mono);letter-spacing:.005em}
 .cap b{font-weight:600;letter-spacing:.06em;margin-right:.6em}
+.cap .nw{white-space:nowrap}
 .imp{position:absolute;right:40px;bottom:32px;display:flex;align-items:center;gap:9px;
   font:600 19px/1 var(--serif);font-variation-settings:'opsz' 36;letter-spacing:.005em}
 .imp svg{width:20px;height:20px;display:block}
@@ -55,19 +58,19 @@ h1 .sub{display:block;font-style:italic;font-weight:400;letter-spacing:-.005em;m
 .anat{display:block;margin-top:48px;max-width:100%;height:auto}
 .dir{font:500 148px/.9 var(--serif);font-variation-settings:'opsz' 72;letter-spacing:-.03em;margin:0}
 .dir small{display:block;font:italic 400 34px/1.15 var(--serif);letter-spacing:-.01em;margin-top:22px;max-width:17em;text-wrap:balance}
-.lede{font:400 19px/1.5 var(--serif);font-variation-settings:'opsz' 16;margin:0 0 18px;max-width:34em}
+.lede{font:400 19px/28px var(--serif);font-variation-settings:'opsz' 16;margin:0 0 18px;max-width:34em}
 .lede em{font-style:italic}
 .spec{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:26px}
 .sw{border-radius:2px;padding:14px 14px 12px;min-height:150px;display:flex;flex-direction:column;justify-content:space-between;font:500 10.5px/1.4 var(--mono);letter-spacing:.04em}
 .sw b{font:500 24px/1 var(--serif);letter-spacing:-.01em;display:block;margin-bottom:6px}
 .sw .lvl{font:500 10px/1 var(--mono);letter-spacing:.09em;text-transform:uppercase}
-.specrow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px;margin-top:30px;font:400 15px/1.45 var(--serif)}
+.specrow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px;margin-top:30px;font:400 15px/22px var(--serif)}
 .specrow h3{font:600 10.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;margin:0 0 10px}
 .specrow .t1{font:500 44px/1 var(--serif);font-variation-settings:'opsz' 72;letter-spacing:-.02em}
 .specrow .t2{font:400 13px/1.5 var(--mono)}
-.sec{padding:72px 48px 28px;display:flex;align-items:baseline;gap:24px;max-width:1640px}
+.sec{padding:72px 48px 28px;display:flex;align-items:baseline;gap:24px;max-width:1640px;height:140px;box-sizing:border-box}
 .sec h2{flex:none;font:500 40px/1 var(--serif);font-variation-settings:'opsz' 72;letter-spacing:-.02em;margin:0}
-.sec p{font:400 12px/1.5 var(--mono);margin:0;max-width:62em}
+.sec p{font:400 12px/18px var(--mono);margin:0;max-width:62em}
 .wrapbox{padding:0 48px 96px;overflow-x:auto}
 .wrap{position:relative;width:1512px;height:888px;display:flex;flex:none}
 .wrap .back{position:relative;width:720px;height:888px;background:var(--ground);color:var(--ink);overflow:hidden}
@@ -160,11 +163,14 @@ const D = (pts) => { let s = ''; for (let i = 0; i < pts.length; i++) s += (i ? 
 const seg = (x0, y0, x1, y1) => `M${f1(x0)} ${f1(y0)}L${f1(x1)} ${f1(y1)}`;
 const box = (x, y, w, h) => `M${f1(x)} ${f1(y)}h${f1(w)}v${f1(h)}h${f1(-w)}z`;
 const path = (d, cls, w, extra = '') => d ? `<path class="${cls}" d="${d}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" ${extra}/>` : '';
+/* the answer gets a second channel besides hue: a ground-coloured casing, then the accent on top (>= 2.4px) */
+const cased = (d, w, extra = '', gap = 1.8) => path(d, 'g', w + 2 * gap, extra) + path(d, 'r', w, extra);
 const unit = (v) => { let n = 0; for (const x of v) n += x * x; n = Math.sqrt(n) || 1; return v.map((x) => x / n); };
 const dot = (a, b) => { let s = 0; for (let i = 0; i < a.length; i++) s += a[i] * b[i]; return s; };
 
-/* the plate: the figure's field, identical on every cover of the main list */
-const P = { x: 0, y: 306, w: 720, h: 484 };
+/* the plate: the figure's field, identical on every cover of the main list.
+   Rule: fields (maths, NN, SciML) bleed left and right; charts sit on the 40px column, x 40–680. */
+const P = { x: 0, y: 306, w: 720, h: 484 }, CX0 = 40, CW = 640;
 /* the "room": a square plate used only by the Charlie sub-series */
 const Q = { x: 132, y: 318, w: 456, h: 456 };
 
@@ -242,10 +248,10 @@ GEN['mathematical-foundations-for-ml'] = (r, b, acc) => {
     trails += D(pts);
     if (!ends.some((e) => Math.hypot(e[0] - x, e[1] - y) < 0.05)) ends.push([x, y]);
   }
-  let mins = ''; for (const [x, y] of ends) { const [px, py] = toS(x, y); mins += `<circle class="fr" cx="${f1(px)}" cy="${f1(py)}" r="6"/>`; }
+  let mins = ''; for (const [x, y] of ends) { const [px, py] = toS(x, y); mins += `<circle class="fg" cx="${f1(px)}" cy="${f1(py)}" r="8.6"/><circle class="fr" cx="${f1(px)}" cy="${f1(py)}" r="6.2"/>`; }
   return {
     svg: path(trails, 'k', 0.7, 'opacity=".74"') + mins,
-    caption: `Gradient descent (η = ${eta}) from ${fmt(NX * NY)} starting points on Himmelblau’s function, f(x,y) = (x²+y−11)² + (x+y²−7)². ${fmt(steps)} steps in all; every path ends in one of its ${ends.length} minima, in ${acc}.`
+    caption: `Gradient descent (lr = ${eta}) from ${fmt(NX * NY)} starting points on Himmelblau’s function, f(x,y) = (x²+y−11)² + (x+y²−7)². ${fmt(steps)} steps in all; every path ends in one of its ${ends.length} minima, in ${acc}.`
   };
 };
 
@@ -284,7 +290,7 @@ GEN['neural-networks-from-scratch'] = (r, b, acc) => {
   let dots = '';
   for (let n = 0; n < M; n++) { const px = cx + X0[n] * s, py = cy - X1[n] * s; dots += Yd[n] ? `<circle class="fk" cx="${f1(px)}" cy="${f1(py)}" r="2.7"/>` : `<circle class="ring" cx="${f1(px)}" cy="${f1(py)}" r="2.4" stroke-width="1.1"/>`; }
   return {
-    svg: path(con, 'k', 0.75, 'opacity=".66"') + path(bnd, 'r', 2.4) + dots,
+    svg: path(con, 'k', 0.75, 'opacity=".5"') + cased(bnd, 2.6) + dots,
     caption: `A 2–16–16–1 tanh network trained in this page — ${E} steps of Adam on ${M} points of two interleaved spirals. The lines are its output, ${nLev} levels of it; ${acc} is the decision boundary it learned (training accuracy ${(100 * right / M).toFixed(0)}%).`
   };
 };
@@ -315,11 +321,11 @@ GEN['ai-context-engineering'] = (r, b, acc) => {
   const eig = (defl) => { let v = unit(Array.from({ length: dim }, g)); for (let it = 0; it < 120; it++) { let w = cov.map((row) => dot(row, v)); for (const u of defl) { const c = dot(w, u); w = w.map((x, d) => x - c * u[d]); } v = unit(w); } return v; };
   const v1 = eig([]), v2 = eig([v1]), pr = Xc.map((x) => [dot(x, v1), dot(x, v2)]), qp = [dot(cen(q), v1), dot(cen(q), v2)];
   const xs = pr.map((p) => p[0]), ys = pr.map((p) => p[1]), [ax, bx, ay, by] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
-  const sx0 = 44, sx1 = 676, sy0 = P.y + 16, sy1 = P.y + P.h - 196;
+  const sx0 = CX0 + 6, sx1 = CX0 + CW - 6, sy0 = P.y + 16, sy1 = P.y + P.h - 196;
   const M2 = ([u, v]) => [sx0 + (u - ax) / (bx - ax) * (sx1 - sx0), sy0 + (v - ay) / (by - ay) * (sy1 - sy0)];
   // the window: most relevant chunks at both ends (where long-context models recall best)
   const sel = S.slice().sort((a, c) => rel[c] - rel[a]), front = [], back = []; sel.forEach((c, i) => (i % 2 ? back : front).push(c));
-  const ord = front.concat(back.reverse()), bx0 = 36, bw = 648, byy = P.y + P.h - 30, bh = 16; let a0 = 0; const slot = new Map();
+  const ord = front.concat(back.reverse()), bx0 = CX0, bw = CW, byy = P.y + P.h - 30, bh = 16; let a0 = 0; const slot = new Map();
   for (const c of ord) { slot.set(c, [bx0 + bw * a0 / budget, bw * L[c] / budget]); a0 += L[c]; }
   let dots = '', threads = '', chosen = '', segs = '';
   for (let c = 0; c < N; c++) { if (inS[c]) continue; const [x, y] = M2(pr[c]), rr = 0.7 + 2.4 * clamp(rel[c], 0, 1) ** 3; dots += `M${f1(x - rr)} ${f1(y)}a${f1(rr)} ${f1(rr)} 0 1 0 ${f1(2 * rr)} 0a${f1(rr)} ${f1(rr)} 0 1 0 ${f1(-2 * rr)} 0`; }
@@ -328,40 +334,47 @@ GEN['ai-context-engineering'] = (r, b, acc) => {
   return {
     svg: `<path class="fk" d="${dots}"/>` + path(threads, 'k', 1.05) + `<path class="fr" d="${segs}"/>` + path(box(bx0, byy, bw, bh), 'k', 1) + chosen +
       `<circle class="ring" cx="${f1(qx)}" cy="${f1(qy)}" r="7" stroke-width="1.8"/><circle class="fk" cx="${f1(qx)}" cy="${f1(qy)}" r="2"/>`,
-    caption: `${fmt(N)} synthetic document chunks in a ${dim}-dimensional embedding space, flattened here by PCA; ◎ is the query. Maximal marginal relevance (λ = ${lam}) picks the ${S.length} that fill an ${fmt(budget)}-token window (${fmt(used)} used), laid out most-relevant-at-the-ends. The chosen are in ${acc}.`
+    caption: `${fmt(N)} synthetic document chunks in a ${dim}-dimensional embedding space, flattened here by PCA; the ringed point is the query. Maximal marginal relevance (lambda = ${lam}) picks the ${S.length} that fill an ${fmt(budget)}-token window (${fmt(used)} used), laid out most-relevant-at-the-ends. The chosen are in ${acc}.`
   };
 };
 
-/* ---- Build LLMs from Scratch: a byte-pair tokenizer trained on this library's titles ---- */
+/* ---- Build LLMs from Scratch: a byte-pair tokenizer trained on the library, building this title ---- */
 GEN['build-llms-from-scratch'] = (r, b, acc) => {
-  const text = TITLES.join('\n'), words = text.match(/\n| ?[A-Za-z]+| ?[0-9]+| ?[^\sA-Za-z0-9]+/g);
-  const freq = new Map(); for (const w of words) freq.set(w, (freq.get(w) || 0) + 1);
-  const vocab = new Map(); for (const w of freq.keys()) vocab.set(w, [...w].map((ch, i) => ({ s: ch, a: i, b: i + 1 })));
-  let merges = 0;
+  // 1. train BPE on every title in the library (GPT-style pre-tokens: words keep their leading space)
+  const split = (t) => t.match(/\n| ?[A-Za-z]+| ?[0-9]+| ?[^\sA-Za-z0-9]+/g);
+  const words = split(TITLES.join('\n')), freq = new Map(); for (const w of words) freq.set(w, (freq.get(w) || 0) + 1);
+  const vocab = new Map(); for (const w of freq.keys()) vocab.set(w, [...w]);
+  const rules = [];
   for (;;) {
     const pc = new Map();
-    for (const [w, sy] of vocab) { const f = freq.get(w); for (let i = 0; i < sy.length - 1; i++) { const k = sy[i].s + '\u0001' + sy[i + 1].s; pc.set(k, (pc.get(k) || 0) + f); } }
+    for (const [w, sy] of vocab) { const f = freq.get(w); for (let i = 0; i < sy.length - 1; i++) { const k = sy[i] + '\u0001' + sy[i + 1]; pc.set(k, (pc.get(k) || 0) + f); } }
     let bk = null, bc = 1; for (const [k, c] of pc) if (c > bc || (c === bc && bk !== null && k < bk)) { bk = k; bc = c; }
     if (!bk || bc < 2) break;
-    const [A, B] = bk.split('\u0001'); merges++;
-    for (const [w, sy] of vocab) { const out = []; for (let i = 0; i < sy.length; i++) { if (i < sy.length - 1 && sy[i].s === A && sy[i + 1].s === B) { out.push({ s: A + B, a: sy[i].a, b: sy[i + 1].b }); i++; } else out.push(sy[i]); } vocab.set(w, out); }
+    const [A, B] = bk.split('\u0001'); rules.push([A, B]);
+    for (const [w, sy] of vocab) { const out = []; for (let i = 0; i < sy.length; i++) { if (i < sy.length - 1 && sy[i] === A && sy[i + 1] === B) { out.push(A + B); i++; } else out.push(sy[i]); } vocab.set(w, out); }
   }
-  const toks = []; let off = 0;
-  for (const w of words) { vocab.get(w).forEach((t, k) => toks.push({ s: t.s, a: off + t.a, b: off + t.b, head: k === 0 })); off += w.length; }
-  const total = off, X = (c) => 36 + 648 * c / total;
-  const cnt = new Map(); for (const t of toks) cnt.set(t.s, (cnt.get(t.s) || 0) + 1);
-  let sig = null; for (const [s, c] of cnt) if (s.trim().length >= 5 && (!sig || c > cnt.get(sig))) sig = s;
-  // arcs: consecutive uses of the same token. Word-initial tokens above the line, word-pieces below.
-  const last = new Map(), arcs = [];
-  for (const t of toks) { if (t.s === '\n') continue; const m = (X(t.a) + X(t.b)) / 2; if (last.has(t.s)) arcs.push([last.get(t.s), m, t.head, t.s === sig]); last.set(t.s, m); }
-  const mA = Math.max(...arcs.filter((a) => a[2]).map((a) => (a[1] - a[0]) / 2)), mB = Math.max(...arcs.filter((a) => !a[2]).map((a) => (a[1] - a[0]) / 2));
-  const k = (P.h - 22) / (mA + mB), base = P.y + 11 + mA * k;
-  let up = '', down = '', red = '', nUp = 0;
-  for (const [p, m, head, isSig] of arcs) { const rx = (m - p) / 2, ry = rx * k, d = `M${f1(p)} ${f1(base)}A${f1(rx)} ${f1(ry)} 0 0 ${head ? 1 : 0} ${f1(m)} ${f1(base)}`; if (isSig) red += d; else if (head) { up += d; nUp++; } else down += d; }
-  let ticks = ''; for (const t of toks) if (t.s !== '\n' && t.head) ticks += seg(X(t.a), base - 3, X(t.a), base + 3);
+  // 2. run the learned merges, in order, on this book's own title, keeping the tree they build
+  const title = 'Build Large Language Models (LLMs) from Scratch', n = title.length;
+  const X = (i) => CX0 + CW * (i + 0.5) / n, base = P.y + P.h - 58;
+  const merges = []; let off = 0; const toks = [];
+  for (const w of split(title)) {
+    let sy = [...w].map((ch, i) => ({ s: ch, a: off + i, b: off + i + 1, rank: 0 }));
+    rules.forEach(([A, B], k) => { const out = []; for (let i = 0; i < sy.length; i++) { if (i < sy.length - 1 && sy[i].s === A && sy[i + 1].s === B) { const nd = { s: A + B, a: sy[i].a, b: sy[i + 1].b, rank: k + 1, L: sy[i], R: sy[i + 1] }; merges.push(nd); out.push(nd); i++; } else out.push(sy[i]); } sy = out; });
+    toks.push(...sy); off += w.length;
+  }
+  const maxRank = Math.max(...merges.map((m) => m.rank)), H = base - (P.y + 10), Yr = (rk) => base - 14 - (H - 14) * Math.pow(rk / maxRank, 0.62);
+  const sig = toks.find((t) => t.s.trim() === 'Scratch');
+  let arches = '', red = '', glyphs = '', bars = '';
+  // every node joins its parent at the apex of its own arch, so the drawing is one continuous tree
+  const pt = (nd) => { if (nd.cx === undefined) { if (!nd.rank) { nd.cx = X(nd.a); nd.cy = base - 14; } else { const l = pt(nd.L), q = pt(nd.R); nd.cx = (l[0] + q[0]) / 2; nd.cy = Yr(nd.rank); } } return [nd.cx, nd.cy]; };
+  for (const m of merges) { const [xl, yl] = pt(m.L), [xr, yr] = pt(m.R), yn = pt(m)[1], top = (yn - 0.125 * (yl + yr)) / 0.75;
+    const d = `M${f1(xl)} ${f1(yl)}C${f1(xl)} ${f1(top)} ${f1(xr)} ${f1(top)} ${f1(xr)} ${f1(yr)}`;
+    if (sig && m.a >= sig.a && m.b <= sig.b) red += d; else arches += d; }
+  [...title].forEach((ch, i) => { if (ch !== ' ') glyphs += `<text x="${f1(X(i))}" y="${f1(base)}" font-size="13" text-anchor="middle"${sig && i >= sig.a && i < sig.b ? ' class="acc"' : ''}>${ch.replace('&', '&amp;')}</text>`; });
+  for (const t of toks) { const a = t.s[0] === ' ' ? t.a + 1 : t.a; bars += seg(X(a) - 5, base + 12, X(t.b - 1) + 5, base + 12); }
   return {
-    svg: path(up, 'k', 0.7, 'opacity=".78"') + path(down, 'k', 0.7, 'opacity=".5"') + path(red, 'r', 1.6) + path(seg(36, base, 684, base), 'k', 1.2) + path(ticks, 'k', 0.8),
-    caption: `The titles of all ${TITLES.length} Vizuara books, tokenised by a byte-pair encoder trained on them in this page: ${merges} merges turn ${fmt(total)} characters into ${fmt(toks.length)} tokens. Each arc joins two uses of one token — tokens that begin a word above the line, the rest below; ${acc} is “${sig.trim()}”, used ${cnt.get(sig)} times.`
+    svg: path(arches, 'k', 1.2) + cased(red, 2.4) + glyphs + path(bars, 'k', 3, 'stroke-linecap="butt"'),
+    caption: `A byte-pair tokenizer trained in this page on the titles of all ${TITLES.length} Vizuara books (${rules.length} merges), then run on this one. Each arch is a merge, as tall as it was late to be learned; the ${n} characters become the ${toks.length} tokens barred below. The merges that build “Scratch” are ${acc}.`
   };
 };
 
@@ -388,13 +401,14 @@ GEN['5d-parallelism'] = (r, b, acc) => {
         (op === 'F' ? endF : endB)[s][m] = en; free[s] = en; idx[s]++; progress = true; } }
     for (let s = 0; s < PP; s++) stageEnd[s][d] = free[s];
   }
-  const T = Math.max(...stageEnd.flat()), tEnd = T + 3.4, x0 = 36, x1 = 684, y0 = P.y + 6, y1 = P.y + P.h - 6, rowH = (y1 - y0) / gpus, sx = (x1 - x0) / tEnd;
+  const T = Math.max(...stageEnd.flat()), tEnd = T + 3.4, x0 = CX0, x1 = CX0 + CW, y0 = P.y + 6, y1 = P.y + P.h - 6, rowH = (y1 - y0) / gpus, sx = (x1 - x0) / tEnd;
   const rowOf = (s, d, k) => s * DP * grp + d * grp + k;
   let fw = '', bw = '', ar = '';
   for (const [s, d, k, op, st, en] of bars) { const y = y0 + rowH * (rowOf(s, d, k) + 0.5), a = x0 + st * sx + 0.8, e = x0 + en * sx - 0.8; if (op === 'F') fw += seg(a, y, e, y); else bw += seg(a, y, e, y); }
-  for (let s = 0; s < PP; s++) { const st = Math.max(...stageEnd[s]) + 0.35; for (let d = 0; d < DP; d++) for (let k = 0; k < grp; k++) { const y = y0 + rowH * (rowOf(s, d, k) + 0.5); ar += seg(x0 + st * sx, y, x0 + (st + 2.2) * sx, y); } }
+  // the gradient all-reduce: one solid block per stage (solid, not striped — readable without colour)
+  for (let s = 0; s < PP; s++) { const st = Math.max(...stageEnd[s]) + 0.35, ya = y0 + rowH * rowOf(s, 0, 0), yb = y0 + rowH * (rowOf(s, DP - 1, grp - 1) + 1); ar += box(x0 + st * sx, ya + 0.6, 2.2 * sx, yb - ya - 1.2); }
   return {
-    svg: path(fw, 'k', rowH * 0.3, 'stroke-linecap="butt" opacity=".85"') + path(bw, 'k', rowH * 0.66, 'stroke-linecap="butt"') + path(ar, 'r', rowH * 0.66, 'stroke-linecap="butt"'),
+    svg: path(fw, 'k', rowH * 0.3, 'stroke-linecap="butt" opacity=".6"') + path(bw, 'k', rowH * 0.66, 'stroke-linecap="butt" opacity=".72"') + `<path class="fr" d="${ar}"/>`,
     caption: `One training step on a ${gpus}-GPU mesh — data ${DP} × pipeline ${PP} × tensor ${TP} × context ${CP} × expert ${EP} — simulated under a 1F1B schedule of ${M} micro-batches with ±${Math.round(JIT * 100)}% kernel-time noise. Each row is a GPU: thin = forward, thick = backward, ${acc} = gradient all-reduce.`
   };
 };
@@ -418,11 +432,12 @@ GEN['pi-vs-hermes-vs-codex'] = (r, b, acc) => {
       for (const tier of [1, 2]) { const tt = st.filter((x) => x.tier === tier); if (tt.length >= 3) { const at = st.indexOf(tt[0]); st.splice(at, tt.length); const up = { sum: 1, tier: tier + 1, len: Math.max(4, Math.round(total(tt) * 0.5)) }; st.splice(at, 0, up); ev.push({ members: tt, into: up }); } }
       return ev; }],
   ];
-  const gut = 30, cw = (648 - 2 * gut) / 3, y0 = P.y + 34, dy = (P.h - 50) / T, FAN = 18;
+  const gut = 30, cw = (CW - 2 * gut) / 3, y0 = P.y + 34, dy = (P.h - 50) / T, FAN = 18, EVERY = 3;
   let raw = '', sums = '', sys = '', labels = ''; const counts = [];
-  const draw = (tr, isSum) => { let d = D(tr); if (tr.fan) { const [lx, ly, tx, ty] = tr.fan; d += `C${f1(lx)} ${f1(ly + (ty - ly) * 0.6)} ${f1(tx)} ${f1(ty - (ty - ly) * 0.5)} ${f1(tx)} ${f1(ty)}`; } if (isSum) sums += d; else raw += d; };
+  msgs.forEach((m, i) => { m.id = i; });
+  const draw = (tr, isSum, id) => { if (!isSum && id % EVERY) return; let d = D(tr); if (tr.fan) { const [lx, ly, tx, ty] = tr.fan; d += `C${f1(lx)} ${f1(ly + (ty - ly) * 0.6)} ${f1(tx)} ${f1(ty - (ty - ly) * 0.5)} ${f1(tx)} ${f1(ty)}`; } if (isSum) sums += d; else raw += d; };
   policies.forEach(([name, compact], pi) => {
-    const cx0 = 36 + pi * (cw + gut), ux = cw / CAP, st = [{ sys: 1, len: SYS }], trail = new Map();
+    const cx0 = CX0 + pi * (cw + gut), ux = cw / CAP, st = [{ sys: 1, len: SYS }], trail = new Map();
     const X = (it) => { let a = 0; for (const x of st) { if (x === it) return cx0 + (a + x.len / 2) * ux; a += x.len; } return null; };
     let mi = 0, events = 0;
     for (let t = 0; t < T; t++) {
@@ -431,20 +446,20 @@ GEN['pi-vs-hermes-vs-codex'] = (r, b, acc) => {
       const ev = compact(st); if (ev.length) events++;
       const fin = (s) => { for (const e of ev) if (e.members && e.members.includes(s)) return fin(e.into); return s; };
       for (const e of ev) {
-        if (e.gone) { for (const m of e.gone) { const tr = trail.get(m); if (tr) { draw(tr, m.sum); trail.delete(m); } } continue; }
+        if (e.gone) { for (const m of e.gone) { const tr = trail.get(m); if (tr) { draw(tr, m.sum, m.id); trail.delete(m); } } continue; }
         const tx = X(fin(e.into));
-        for (const m of e.members) { const tr = trail.get(m); if (!tr) continue; const [lx, ly] = tr[tr.length - 1]; tr.fan = [lx, ly, tx, y + FAN]; draw(tr, m.sum); trail.delete(m); }
+        for (const m of e.members) { const tr = trail.get(m); if (!tr) continue; const [lx, ly] = tr[tr.length - 1]; tr.fan = [lx, ly, tx, y + FAN]; draw(tr, m.sum, m.id); trail.delete(m); }
       }
       for (const it of st) { if (it.sys) continue; const x = X(it), tr = trail.get(it); if (!tr) trail.set(it, [[x, y]]); else tr.push([x, y]); }
     }
-    for (const [it, tr] of trail) draw(tr, it.sum);
+    for (const [it, tr] of trail) draw(tr, it.sum, it.id);
     sys += seg(cx0 + SYS * ux / 2, y0, cx0 + SYS * ux / 2, y0 + (T - 1) * dy);
     counts.push(events);
-    labels += `<text x="${f1(cx0)}" y="${f1(P.y + 12)}" font-size="9.5" letter-spacing=".06em">${['I', 'II', 'III'][pi]} · ${name.toUpperCase()}</text>`;
+    labels += `<text x="${f1(cx0)}" y="${f1(P.y + 12)}" font-size="9.5" letter-spacing=".06em">${'ABC'[pi]} · ${name.toUpperCase()}</text>`;
   });
   return {
-    svg: path(sys, 'k2', 1.4, 'stroke-linecap="butt"') + path(raw, 'k', 0.5, 'opacity=".78"') + path(sums, 'r', 1.5) + labels,
-    caption: `One simulated ${T}-turn agent session (${fmt(msgs.length)} messages) replayed under three compaction policies. Each line is one message’s place in the context window, time running down; where lines converge, the window was compacted (${counts[0]}, ${counts[1]} and ${counts[2]} times). Summaries in ${acc}.`
+    svg: path(sys, 'k2', 1.4, 'stroke-linecap="butt"') + path(raw, 'k', 0.7, 'opacity=".8"') + cased(sums, 2.4) + labels,
+    caption: `One simulated ${T}-turn agent session replayed under three textbook compaction policies, A–C — not the three agents’ own implementations. Each line is every third message’s place in the window, time running down; lines converge where it was compacted (${counts[0]}, ${counts[1]}, ${counts[2]} times). Summaries in ${acc}.`
   };
 };
 
@@ -467,16 +482,17 @@ GEN['decision-trees-from-scratch'] = (r, b, acc) => {
     else { grow(best.L, bx0, by0, bx1, best.thr, depth + 1); grow(best.R, bx0, best.thr, bx1, by1, depth + 1); }
   };
   grow(pts, 0, 0, 1, 1, 0);
-  const x0 = 36, y0 = P.y + 6, W = 648, H = P.h - 12, X = (u) => x0 + u * W, Y = (v) => y0 + v * H;
+  const x0 = CX0, y0 = P.y + 6, W = CW, H = P.h - 12, X = (u) => x0 + u * W, Y = (v) => y0 + v * H;
   let hatch = '', dense = '', lines = '';
   const rule = (a, bq, w, h, sp, dir) => { let d = ''; for (let o = -h; o < w; o += sp) { const u0 = Math.max(o, 0), u1 = Math.min(o + h, w); if (u1 <= u0) continue; const v0 = u0 - o, v1 = u1 - o; d += dir > 0 ? seg(a + u0, bq + v0, a + u1, bq + v1) : seg(a + u0, bq + h - v0, a + u1, bq + h - v1); } return d; };
   for (const [bx0, by0, bx1, by1, c] of leaves) { const a = X(bx0), bq = Y(by0), w = X(bx1) - a, h = Y(by1) - bq; if (c === 1) hatch += rule(a, bq, w, h, 6, 1); if (c === 2) dense += rule(a, bq, w, h, 3.2, -1); }
   splits.sort((p, q) => q[6] - p[6]);
-  for (const [ax, thr, bx0, by0, bx1, by1, depth] of splits) { const d = ax === 0 ? seg(X(thr), Y(by0), X(thr), Y(by1)) : seg(X(bx0), Y(thr), X(bx1), Y(thr)); lines += path(d, depth === 0 ? 'r' : 'k', depth === 0 ? 5 : Math.max(0.9, 4.2 - depth * 0.6), 'stroke-linecap="square"'); }
-  let dots = ''; for (const [x, y] of pts) dots += `<circle class="ring" cx="${f1(X(x))}" cy="${f1(Y(y))}" r="1.9" stroke-width="0.9"/>`;
+  for (const [ax, thr, bx0, by0, bx1, by1, depth] of splits) { const d = ax === 0 ? seg(X(thr), Y(by0), X(thr), Y(by1)) : seg(X(bx0), Y(thr), X(bx1), Y(thr)); lines += depth === 0 ? cased(d, 7, 'stroke-linecap="butt"', 2) : path(d, 'k', Math.max(0.9, 3.4 - depth * 0.5), 'stroke-linecap="square"'); }
+  let dots = '', cross = ''; for (const [x, y, c] of pts) { const px = X(x), py = Y(y); if (c === 0) dots += `<circle class="ring" cx="${f1(px)}" cy="${f1(py)}" r="2.1" stroke-width="1"/>`; else if (c === 1) dots += `<circle class="fg" cx="${f1(px)}" cy="${f1(py)}" r="3.2"/><circle class="fk" cx="${f1(px)}" cy="${f1(py)}" r="2.2"/>`; else cross += `M${f1(px - 2.3)} ${f1(py - 2.3)}l4.6 4.6M${f1(px + 2.3)} ${f1(py - 2.3)}l-4.6 4.6`; }
+  dots += path(cross, 'g', 3.4) + path(cross, 'k', 1.2);
   return {
     svg: path(hatch, 'k', 0.7, 'stroke-linecap="butt"') + path(dense, 'k', 0.7, 'stroke-linecap="butt"') + path(box(x0, y0, W, H), 'k', 1.2) + lines + dots,
-    caption: `A classification tree grown in this page by CART — Gini impurity, depth ≤ ${MAXD} — on ${N} labelled points of three classes. Every line is one question the tree asks, heavier the earlier it is asked; the first is ${acc}. ${splits.length} questions, ${leaves.length} leaves, shaded by the class they vote for.`
+    caption: `A classification tree grown in this page by CART — Gini impurity, depth <= ${MAXD} — on ${N} labelled points of three classes (rings, dots, crosses). Every line is one question the tree asks, heavier the earlier it is asked; the first is ${acc}. ${splits.length} questions, ${leaves.length} leaves, shaded by the class they vote for.`
   };
 };
 
@@ -498,19 +514,23 @@ GEN['sciml'] = (r, b, acc) => {
     if (t >= nextSnap - 1e-12) { nextSnap += Tend / snaps; for (let k = 0; k < np; k++) tracks[k].push([parts[k], t]);
       for (let i = 2; i < N - 2; i++) { const s = -(u[i + 1] - u[i - 1]) / (2 * dx), sl = -(u[i] - u[i - 2]) / (2 * dx), sr = -(u[i + 2] - u[i]) / (2 * dx); if (s > 9 && s >= sl && s > sr) shocks.push([xs(i), t]); } }
   }
-  const x0 = 36, W = 648, y0 = P.y + 6, H = P.h - 12, X = (x) => x0 + (x + 1) / 2 * W, Y = (tt) => y0 + tt / Tend * H;
+  const x0 = P.x, W = P.w, y0 = P.y + 6, H = P.h - 12, X = (x) => x0 + (x + 1) / 2 * W, Y = (tt) => y0 + tt / Tend * H;
   let lines = ''; for (const tr of tracks) lines += D(tr.map(([x, tt]) => [X(x), Y(tt)]));
-  let red = ''; for (const [x, tt] of shocks) red += seg(X(x), Y(tt) - 0.9, X(x), Y(tt) + 0.9);
+  // link shock detections from one snapshot to the next into tracks
+  const strk = []; let prevT = -1, open = [];
+  for (const [x, tt] of shocks) { if (tt !== prevT) { open = open.filter((o) => o.t === prevT); prevT = tt; } let best = null; for (const o of open) if (o.t < tt && Math.abs(o.x - x) < 0.04 && (!best || Math.abs(o.x - x) < Math.abs(best.x - x))) best = o;
+    if (best) { best.pts.push([X(x), Y(tt)]); best.x = x; best.t = tt; } else { const o = { x, t: tt, pts: [[X(x), Y(tt)]] }; open.push(o); strk.push(o); } }
+  let red = ''; for (const o of strk) if (o.pts.length > 2) red += D(o.pts);
   return {
-    svg: path(lines, 'k', 0.7, 'opacity=".8"') + path(red, 'r', 2.6, 'stroke-linecap="butt"'),
-    caption: `Burgers’ equation, uₜ + u·uₓ = (0.01/π)·uₓₓ — the classic benchmark for physics-informed networks — solved in this page by finite volumes (${N} cells, ${fmt(steps)} time steps). Lines: ${np} fluid particles carried by the flow, time running down; ${acc}: shocks, where they collide.`
+    svg: path(lines, 'k', 0.7, 'opacity=".55"') + cased(red, 3, '', 2.2),
+    caption: `Burgers’ equation, u_t + u·u_x = (0.01/pi)·u_xx, solved in this page by finite volumes (${N} cells, ${fmt(steps)} steps) from a perturbed start, u0 = −sin(pi·x) ${a3 < 0 ? '−' : '+'} ${Math.abs(a3).toFixed(2)} sin(3pi·x) ${a5 < 0 ? '−' : '+'} ${Math.abs(a5).toFixed(2)} sin(5pi·x), to t = ${Tend}. Lines: ${np} particles carried by the flow, time running down; ${acc}: shocks, where they collide.`
   };
 };
 
 /* ---- Kernel Engineering: a Kogge–Stone parallel prefix sum across GPU lanes ---- */
 GEN['kernel-engineering'] = (r, b, acc) => {
   const LN = 64, ST = 6, target = 40 + Math.floor(r() * 20);
-  const X = (i) => 36 + (i + 0.5) * 648 / LN, Y = (k) => P.y + 26 + k * (P.h - 40) / ST;
+  const X = (i) => CX0 + (i + 0.5) * CW / LN, Y = (k) => P.y + 26 + k * (P.h - 40) / ST;
   const vals0 = Array.from({ length: LN }, () => 1 + Math.floor(r() * 9));
   let vals = vals0.slice();
   const cone = Array.from({ length: ST + 1 }, () => new Set()); cone[ST].add(target);
@@ -528,8 +548,8 @@ GEN['kernel-engineering'] = (r, b, acc) => {
   let digits = ''; vals0.forEach((v, i) => { digits += `<text x="${f1(X(i))}" y="${f1(P.y + 12)}" font-size="8" text-anchor="middle"${cone[0].has(i) ? ' class="acc"' : ''}>${v}</text>`; });
   digits += `<text x="${f1(X(target))}" y="${f1(Y(ST) + 16)}" font-size="9" text-anchor="middle" class="acc">${vals[target]}</text>`;
   return {
-    svg: path(lanes, 'k2', 0.8) + path(diag, 'k', 0.7, 'opacity=".9"') + `<path class="fk" d="${adds}"/>` + path(red, 'r', 1.5) + digits,
-    caption: `A Kogge–Stone prefix sum, the pattern inside GPU scan kernels: ${LN} threads, ${ST} steps, ${nOps} additions. At step k each thread adds the partial sum 2ᵏ places to its left. In ${acc}: the additions thread ${target} depends on, gathering ${cone[0].size} of the digits above into ${vals[target]}${ok ? '' : ' (check failed)'}.`
+    svg: path(lanes, 'k2', 0.8) + path(diag, 'k', 0.7, 'opacity=".45"') + `<path class="fk" d="${adds}" opacity=".7"/>` + cased(red, 2.6) + digits,
+    caption: `A Kogge–Stone prefix sum, the pattern inside GPU scan kernels: ${LN} threads, ${ST} steps, ${nOps} additions. At step k each thread adds the partial sum 2^k places to its left. In ${acc}: the additions thread ${target} depends on, gathering ${cone[0].size} of the digits above into ${vals[target]}${ok ? '' : ' (check failed)'}.`
   };
 };
 
@@ -548,7 +568,7 @@ GEN['git-github-masterclass'] = (r, b, acc) => {
     if (t > main.last && r() < 0.2) { commits.push([main, t]); main.last = t; }
     for (const x of live) if (x.end === null && t >= x.t0 + 2 && r() < 0.36) { commits.push([x, t]); x.n++; x.last = t; }
   }
-  const x0 = 36, W = 648, cy = P.y + P.h / 2, gap = 46, X = (t) => x0 + W * t / (T - 1), Y = (k) => cy + LANES[k] * gap;
+  const x0 = CX0, W = CW, cy = P.y + P.h / 2, gap = 46, X = (t) => x0 + W * t / (T - 1), Y = (k) => cy + LANES[k] * gap;
   const curve = (ta, ya, tb, yb) => { const a = X(ta), c = X(tb), m = (a + c) / 2; return `C${f1(m)} ${f1(ya)} ${f1(m)} ${f1(yb)} ${f1(c)} ${f1(yb)}`; };
   let lines = '', dots = '', beads = '', rings = '', open = 0;
   for (const x of br) {
@@ -559,8 +579,8 @@ GEN['git-github-masterclass'] = (r, b, acc) => {
   for (const [x, t, isMerge] of commits) { if (x === main) { if (!isMerge) beads += `<circle class="ring" cx="${f1(X(t))}" cy="${f1(cy)}" r="3.3" stroke-width="1.8" style="stroke:var(--sig)"/>`; } else dots += `<circle class="fk" cx="${f1(X(t))}" cy="${f1(Y(x.lane))}" r="2.6"/>`; }
   for (const [, t] of merges) rings += `<circle class="ring" cx="${f1(X(t))}" cy="${f1(cy)}" r="4.6" stroke-width="1.8"/>`;
   return {
-    svg: path(lines, 'k', 1.5) + path(seg(X(0), cy, X(T - 1), cy), 'r', 3.4) + dots + beads + rings,
-    caption: `A repository’s history, simulated in this page and laid out like git log --graph, time running right: ${commits.length} commits, ${br.length} feature branches, ${merges.length} merged back into main (○)${open ? `, ${open} still open` : ''}. The trunk is ${acc}.`
+    svg: path(lines, 'k', 1.5) + cased(seg(X(0), cy, X(T - 1), cy), 3.6, '', 2) + dots + beads + rings,
+    caption: `A repository’s history, simulated in this page and laid out like <span class="nw">git log --graph</span>, time running right: ${commits.length} commits, ${br.length} feature branches, ${merges.length} merged back into main at the rings${open ? `, ${open} still open` : ''}. The trunk is ${acc}.`
   };
 };
 
@@ -576,30 +596,33 @@ GEN['charlie-language-room'] = (r, b, acc) => {
     for (let o = 0; o <= 4; o++) { const m = cnt[o].get(ctx.slice(ctx.length - o)); if (!m) continue; let tot = 0; for (const v of m.values()) tot += v; for (const [c, v] of m) p.set(c, p.get(c) + lam[o] * v / tot); wsum += lam[o]; }
     for (const c of Vs) p.set(c, (p.get(c) + 1e-4) / (wsum + 1e-4 * Vs.length)); return p; };
   const prompt = 'Charlie and the ', goal = 'Language Room', B = 32, depth = 16;
-  let beams = [{ s: '^^^^' + prompt, lp: 0, id: 0, done: false }], nid = 1; const all = new Map([[0, { id: 0, parent: -1, s: prompt, kids: [] }]]);
+  let beams = [{ s: '^^^^' + prompt, lp: 0, id: 0, done: false }], nid = 1; const all = new Map([[0, { id: 0, parent: -1, s: prompt, lp: 0, kids: [] }]]);
   for (let d = 1; d <= depth; d++) {
     const cand = [];
     for (const bm of beams) { if (bm.done) { cand.push({ ...bm }); continue; } const p = prob(bm.s.slice(-4)); const top = [...p].sort((a, c) => c[1] - a[1]).slice(0, 5); for (const [c, pr] of top) cand.push({ s: bm.s + c, lp: bm.lp + Math.log(pr), parent: bm.id, done: c === '\n', fresh: true }); }
     cand.sort((a, c) => c.lp - a.lp); beams = cand.slice(0, B);
-    for (const bm of beams) if (bm.fresh) { bm.id = nid++; bm.fresh = false; const nd = { id: bm.id, parent: bm.parent, s: bm.s.slice(4), done: bm.done, kids: [] }; all.set(nd.id, nd); all.get(bm.parent).kids.push(nd); }
+    for (const bm of beams) if (bm.fresh) { bm.id = nid++; bm.fresh = false; const nd = { id: bm.id, parent: bm.parent, s: bm.s.slice(4), lp: bm.lp, done: bm.done, kids: [] }; all.set(nd.id, nd); all.get(bm.parent).kids.push(nd); }
   }
-  // tidy layout: leaves in alphabetical order, parents centred on their children, x = letters generated
+  // tidy layout across the whole room: leaves in alphabetical order, parents centred on their children
   let leafN = 0; const lay = (nd, d) => { nd.d = d; if (!nd.kids.length) { nd.y = leafN++; return; } nd.kids.sort((a, c) => (a.s < c.s ? -1 : 1)); nd.kids.forEach((k) => lay(k, d + 1)); nd.y = (nd.kids[0].y + nd.kids[nd.kids.length - 1].y) / 2; };
-  const root = all.get(0); lay(root, 0);
-  const dx = 20.5, X = (nd) => Q.x + 4 + nd.d * dx, Y = (nd) => Q.y + 6 + (Q.h - 12) * nd.y / (leafN - 1);
-  const ranked = beams.filter((bm) => bm.done).map((bm) => bm.s.slice(4)), goalRank = ranked.indexOf(prompt + goal + '\n') + 1;
+  lay(all.get(0), 0);
+  const dx = (Q.w - 62) / depth, X = (nd) => Q.x + 2 + nd.d * dx, Y = (nd) => Q.y + 4 + (Q.h - 8) * nd.y / (leafN - 1);
+  // stroke weight = the branch's probability relative to the likeliest branch at the same depth
+  const best = new Map(); for (const nd of all.values()) best.set(nd.d, Math.max(best.get(nd.d) ?? -Infinity, nd.lp));
+  const full = prompt + goal + '\n', ranked = beams.filter((bm) => bm.done).map((bm) => bm.s.slice(4)), goalRank = ranked.indexOf(full) + 1;
+  const words = new Set(TITLES.join(' ').split(/[^A-Za-z]+/));
   let lines = '', red = '', labels = '';
-  for (const nd of all.values()) { if (nd.parent < 0) continue; const p = all.get(nd.parent), x0 = X(p), y0 = Y(p), x1 = X(nd), y1 = Y(nd), mx = (x0 + x1) / 2, d = `M${f1(x0)} ${f1(y0)}C${f1(mx)} ${f1(y0)} ${f1(mx)} ${f1(y1)} ${f1(x1)} ${f1(y1)}`;
-    if ((prompt + goal + '\n').startsWith(nd.s)) red += d; else lines += d; }
-  // label the finished titles, goal first, skipping any label a branch would run through
-  const done = [...all.values()].filter((nd) => nd.done).sort((a, c) => (a.s === prompt + goal + '\n' ? -1 : c.s === prompt + goal + '\n' ? 1 : 0)), boxes = [];
-  for (const nd of done) { const txt = nd.s.slice(prompt.length).replace('\n', ''), lx = X(nd) + 6, ly = Y(nd), w = txt.length * 5.2;
-    const hit = [...all.values()].some((n) => n !== nd && n.parent >= 0 && Math.abs(Y(n) - ly) < 6.5 && X(n) > lx - 2 && X(all.get(n.parent)) < lx + w) || boxes.some(([a, b, c]) => Math.abs(b - ly) < 10 && a < lx + w && c > lx);
-    if (hit && txt !== goal) continue; boxes.push([lx, ly, lx + w]);
-    labels += `<text x="${f1(lx)}" y="${f1(ly + 2.9)}" font-size="8.5" stroke="var(--ground)" stroke-width="3.2" paint-order="stroke" stroke-linejoin="round"${txt === goal ? ' class="acc"' : ''}>${txt}</text>`; }
+  const nodes = [...all.values()].filter((nd) => nd.parent >= 0).sort((a, c) => a.lp - c.lp);
+  for (const nd of nodes) { const p = all.get(nd.parent), x0 = X(p), y0 = Y(p), x1 = X(nd), y1 = Y(nd), mx = (x0 + x1) / 2, d = `M${f1(x0)} ${f1(y0)}C${f1(mx)} ${f1(y0)} ${f1(mx)} ${f1(y1)} ${f1(x1)} ${f1(y1)}`;
+    if (full.startsWith(nd.s)) { red += d; continue; }
+    const w = 0.7 + 3.1 * Math.pow(Math.exp(nd.lp - best.get(nd.d)), 0.6); lines += path(d, 'k', f1(w)); }
+  // label only finished titles made of real words, on a ground-coloured card so no branch runs through them
+  for (const nd of all.values()) { if (!nd.done) continue; const txt = nd.s.slice(prompt.length).replace('\n', ''); if (!txt.split(' ').every((w) => words.has(w))) continue;
+    const lx = X(nd) + 5, ly = Y(nd), w = txt.length * 5.1 + 6;
+    labels += `<rect class="fg" x="${f1(lx - 3)}" y="${f1(ly - 6.5)}" width="${f1(w)}" height="12"/><text x="${f1(lx)}" y="${f1(ly + 3)}" font-size="8.5"${txt === goal ? ' class="acc"' : ''}>${txt}</text>`; }
   return {
-    svg: path(lines, 'k', 0.9) + path(red, 'r', 2.2) + labels,
-    caption: `Beam search (width ${B}) through a character 5-gram model trained in this page on the ${TITLES.length} titles of this library, continuing the words “${prompt.trim()}”. Each branch is a letter it considered; the labels are titles it finished. In ${acc}: this one, its no. ${goalRank} guess.`
+    svg: lines + cased(red, 2.8) + labels,
+    caption: `Beam search (width ${B}) through a character 5-gram model trained in this page on the ${TITLES.length} titles of this library, continuing “${prompt.trim()}”. Each branch is a letter it weighed, drawn as heavy as it was likely; the labels are titles it finished. In ${acc}: this one, its no. ${goalRank} guess.`
   };
 };
 
@@ -619,7 +642,7 @@ GEN['charlie-vision-room'] = (r, b, acc) => {
   }
   return {
     svg: path(lines, 'k', 0.9) + self,
-    caption: `A Vision Transformer reads a picture as an ${G} × ${G} grid of patches and tells them apart by position embeddings. These are its fixed 2-D sine–cosine ones (d = ${d}): each small field contours one patch’s cosine similarity to every other position; ${acc} marks the patch itself.`
+    caption: `A Vision Transformer reads a picture as an ${G} × ${G} grid of patches and tells them apart by position embeddings — here the fixed 2-D sine–cosine kind used by MAE and Simple ViT (d = ${d}). Each small field contours one patch’s cosine similarity to every position; ${acc} marks the patch itself.`
   };
 };
 
@@ -657,7 +680,7 @@ GEN['charlie-sound-room'] = (r, b, acc) => {
   }
   return {
     svg: `<path class="fk" d="${ribbons}"/><path class="fr" d="${fund}"/>`,
-    caption: `A voice made in this page — glottal pulses through three formant filters, gliding /a/ → /i/ → /u/ — then listened to: pitch found by autocorrelation, loudness by a ${Nf}-point short-time Fourier transform. Each ribbon is one of ${nh} harmonics, as wide as it is loud; the fundamental is ${acc}.`
+    caption: `A voice made in this page — glottal pulses through three formant filters, gliding from /a/ through /i/ to /u/ — then listened to: pitch found by autocorrelation, loudness by a ${Nf}-point short-time Fourier transform. Each ribbon is one of ${nh} harmonics, as wide as it is loud; the fundamental is ${acc}.`
   };
 };
 
@@ -678,8 +701,8 @@ GEN['charlie-reasoning-room'] = (r, b, acc) => {
   pulls.forEach((a, t) => { const x = Q.x + a * cw, d = seg(x + 2, Y(t), x + cw - 2, Y(t)); if (a === bestArm) red += d; else dash += d; });
   for (let k = 0; k < K; k++) mean += D(means[k].map(([t, m]) => [Q.x + k * cw + 3 + (cw - 6) * m, Y(t)]));
   return {
-    svg: path(dash, 'k', 0.8, 'stroke-linecap="butt"') + path(red, 'r', 0.8, 'stroke-linecap="butt"') + path(mean, 'k2', 1),
-    caption: `Thompson sampling on a ${K}-armed bandit, ${fmt(T)} pulls computed in this page, time running down (on a square-root scale). Each dash is one pull; the thin line in each column is the agent’s belief about that arm. The best arm (p = ${p[bestArm].toFixed(2)}) is ${acc}: it won ${fmt(pre[T])} of the ${fmt(T)} pulls${settled >= 0 ? `, and 9 in 10 from pull ${fmt(settled + 1)} on` : ''}.`
+    svg: path(dash, 'k', 0.8, 'stroke-linecap="butt" opacity=".72"') + path(red, 'r', 1.1, 'stroke-linecap="butt"') + path(mean, 'k2', 1),
+    caption: `Thompson sampling on a ${K}-armed bandit, ${fmt(T)} pulls computed in this page, time running down (on a square-root scale). Each dash is one pull; the thin line in each column is the agent’s belief about that arm. The best arm (p = ${p[bestArm].toFixed(2)}) is ${acc}: it was pulled ${fmt(pre[T])} times of the ${fmt(T)} and paid out ${fmt(A[bestArm] - 1)}.`
   };
 };
 
@@ -688,14 +711,14 @@ GEN['charlie-reasoning-room'] = (r, b, acc) => {
    ========================================================================= */
 const BOOKS = [
   { set: 'core', slug: 'ai-context-engineering', title: 'AI Context<br>Engineering', level: 'intermediate', capsules: 43, hours: 10, size: 84 },
-  { set: 'core', slug: 'mathematical-foundations-for-ml', title: 'Mathematical Foundations<br>for Machine Learning', level: 'beginner', capsules: 43, hours: 10, size: 62 },
+  { set: 'core', slug: 'mathematical-foundations-for-ml', title: 'Mathematical<br>Foundations for<br>Machine Learning', level: 'beginner', capsules: 43, hours: 10, size: 68 },
   { set: 'core', slug: 'neural-networks-from-scratch', title: 'Neural Networks<br>from Scratch', level: 'beginner', capsules: 33, hours: 7, size: 80 },
   { set: 'core', slug: 'build-llms-from-scratch', title: 'Build Large Language<br>Models (LLMs)<br>from Scratch', level: 'intermediate', capsules: 20, hours: 6, size: 62 },
-  { set: 'core', slug: '5d-parallelism', title: '5D Parallelism for<br>Large Model Training', level: 'advanced', capsules: 40, hours: 9, size: 60 },
+  { set: 'core', slug: '5d-parallelism', title: '5D Parallelism<br>for Large<br>Model Training', level: 'advanced', capsules: 40, hours: 9, size: 72 },
   { set: 'core', slug: 'pi-vs-hermes-vs-codex', title: 'Pi vs Hermes vs Codex:<br>Context Compaction<br>and Memory', level: 'advanced', capsules: 9, hours: 1, size: 60 },
   { set: 'range', slug: 'decision-trees-from-scratch', title: 'Build Decision Trees<br>from Scratch', level: 'beginner', capsules: 23, hours: 5, size: 68 },
   { set: 'range', slug: 'git-github-masterclass', title: 'Git &amp; GitHub<br>Masterclass', level: 'beginner', capsules: 40, hours: 9, size: 84 },
-  { set: 'range', slug: 'sciml', title: 'Scientific Machine<br>Learning (SciML)', level: 'advanced', capsules: 39, hours: 9, size: 70 },
+  { set: 'range', slug: 'sciml', title: 'Scientific<br>Machine Learning<br>(SciML)', level: 'advanced', capsules: 39, hours: 9, size: 70 },
   { set: 'range', slug: 'kernel-engineering', title: 'Kernel<br>Engineering', level: 'advanced', soon: true, size: 84, sub: 'From silicon to speculative decoding — GPU kernels for modern LLMs.', subSize: 20 },
   { set: 'series', slug: 'charlie-language-room', pre: 'Charlie and the', title: 'Language Room', level: 'advanced', capsules: 22, hours: 5, size: 70, series: 'I', sub: 'Language — Inference Engineering' },
   { set: 'series', slug: 'charlie-vision-room', pre: 'Charlie and the', title: 'Vision Room', level: 'intermediate', capsules: 20, hours: 6, size: 70, series: 'II', sub: 'Vision — Vision Transformers' },
@@ -736,6 +759,9 @@ if (typeof document !== 'undefined') {
   const mf = BOOKS.find((b) => b.slug === 'mathematical-foundations-for-ml');
   document.getElementById('wrapbox').innerHTML = wrap(mf, outs.get(mf.slug));
   document.getElementById('kmark').innerHTML = MARK(22);
+  // keep every cover on a whole-pixel row (text above it may lay out at fractional heights)
+  const snap = () => { for (const w of document.querySelectorAll('.wall, .wrapbox')) { w.style.marginTop = '0px'; const y = w.getBoundingClientRect().top + window.scrollY, d = Math.ceil(y - 1e-3) - y; if (d > 1e-3) w.style.marginTop = d.toFixed(3) + 'px'; } };
+  snap(); document.fonts.ready.then(snap);
   /* schematic only: ruled lines stand in for the plate */
   let hd = ''; for (let k = 0; k < 44; k++) { const y = 112 + k * 5.6; hd += `M0.6 ${y}H324.6`; }
   document.getElementById('anatHatch').innerHTML = `<path d="${hd}" stroke-width=".6" opacity=".55"/><rect x="0.6" y="108" width="324" height="248" stroke-width="1.2"/>`;

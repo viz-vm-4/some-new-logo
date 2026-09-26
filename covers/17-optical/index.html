@@ -49,16 +49,18 @@ body{font-family:'Archivo',system-ui,sans-serif;-webkit-font-smoothing:antialias
 :is(.cover,.face) .cap{position:absolute;left:48px;right:48px;top:562px;height:16px;display:flex;justify-content:space-between;align-items:center;
   font-size:11.5px;font-weight:650;letter-spacing:.15em;text-transform:uppercase;font-stretch:112%}
 :is(.cover,.face) .cap .lv{display:flex;align-items:center;gap:10px}
-:is(.cover,.face) .tblock{position:absolute;left:48px;right:48px;top:608px}
+:is(.cover,.face) .tblock{position:absolute;left:48px;right:48px;top:600px}
+:is(.cover,.face) h2 .hang{margin-left:-.3em}
 :is(.cover,.face) .kick{font-size:13px;font-weight:650;letter-spacing:.14em;text-transform:uppercase;font-stretch:112%;margin:0 0 14px}
-:is(.cover,.face) h2{margin:0;font-weight:800;font-stretch:100%;letter-spacing:-.028em;line-height:.95;font-feature-settings:"kern" 1}
+:is(.cover,.face) h2{margin:0;font-weight:800;font-stretch:100%;letter-spacing:-.028em;word-spacing:.04em;line-height:.95;font-feature-settings:"kern" 1}
 :is(.cover,.face) h2.L{font-size:72px}
 :is(.cover,.face) h2.M{font-size:58px;line-height:.97}
 :is(.cover,.face) h2.S{font-size:50px;line-height:.98}
 :is(.cover,.face) .tail{font-size:23px;font-weight:500;letter-spacing:-.01em;line-height:1.16;margin:14px 0 0;max-width:600px}
-:is(.cover,.face) .foot{position:absolute;left:48px;right:48px;bottom:36px;display:flex;align-items:center;justify-content:space-between}
+:is(.cover,.face) .foot{position:absolute;left:48px;right:48px;bottom:30px;display:flex;align-items:center;justify-content:space-between}
 :is(.cover,.face) .imprint{display:flex;align-items:center;gap:11px;font-size:13px;font-weight:700;letter-spacing:.22em;font-stretch:125%}
 :is(.cover,.face) .imprint i{font-style:normal;font-weight:400}
+:is(.cover,.face) .foot .series{font-size:13.5px;font-weight:450;font-style:italic;letter-spacing:0}
 :is(.cover,.face) .foot .r{font-size:11.5px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;font-stretch:112%}
 
 /* ---------- print wrap ---------- */
@@ -166,13 +168,26 @@ function runs(P, Wd, m) {
   }
   return {on, off};
 }
-// a field of (roughly) horizontal lines: y(x,b), w(x,b), optional colour mask c(x,b)
-function hLines({bases, xs = XS, y, w, c}) {
+// a field of (roughly) horizontal lines: y(x,b), w(x,b), optional colour mask c(x,b).
+// Print guard: where neighbouring lines crowd, a line is thinned so the paper gap stays >= 1.6px;
+// where even 1px lines would not fit, the lines are fused into solid ink (no slivers either way).
+function hLines({bases, xs = XS, y, w, c, guard = 1.6}) {
+  const L = bases.map(b => ({ b, Y: xs.map(x => y(x, b)), Wd: xs.map(x => Math.max(1, w(x, b))) }));
+  if (guard) for (let k = 0; k < xs.length; k++) {
+    const k0 = Math.max(0, k - 1), k1 = Math.min(xs.length - 1, k + 1);
+    const lim = L.map((l, i) => {
+      const sl = (l.Y[k1] - l.Y[k0]) / (xs[k1] - xs[k0]), cs = 1 / Math.sqrt(1 + sl * sl);
+      let sp = Infinity;
+      for (const j of [i - 1, i + 1]) if (j >= 0 && j < L.length) sp = Math.min(sp, Math.abs(L[j].Y[k] - l.Y[k]) * cs);
+      return sp;
+    });
+    L.forEach((l, i) => { const sp = lim[i]; l.Wd[k] = sp < guard + 1 ? sp + 0.8 : Math.min(l.Wd[k], sp - guard); });
+  }
   let ink = '', col = '';
-  for (const b of bases) {
-    const P = xs.map(x => [x, y(x, b)]), Wd = xs.map(x => Math.max(1, w(x, b)));
-    if (c) { const r = runs(P, Wd, xs.map(x => !!c(x, b))); ink += r.off; col += r.on; }
-    else ink += ribbon(P, Wd);
+  for (const l of L) {
+    const P = xs.map((x, k) => [x, l.Y[k]]);
+    if (c) { const r = runs(P, l.Wd, xs.map(x => !!c(x, l.b))); ink += r.off; col += r.on; }
+    else ink += ribbon(P, l.Wd);
   }
   return {ink, col};
 }
@@ -192,20 +207,23 @@ function fMath(bk) {
   return svg(path(r.ink, INK) + path(r.col, bk.color));
 }
 
-// Neural Networks — a 12-18-18-12 fully-connected net drawn edge by edge across the whole field;
-// the all-to-all fans interfere into moiré. One hidden neuron's fan-in and fan-out in colour.
+// Neural Networks — a fully-connected net drawn edge by edge; the all-to-all fans interfere into
+// moiré. Grain sets the net: beginner = 6-9-9-6 neurons with 2px edges. The first and last neurons
+// sit outside the trim so the web bleeds like every other field. One hidden neuron's fan-in and
+// fan-out are in colour, and heavier, so it survives greyscale.
 function fNN(bk) {
-  const L = [{x: -2, n: 12}, {x: 240, n: 18}, {x: 480, n: 18}, {x: 722, n: 12}];
-  const y0 = 22, y1 = 522;
+  const g = GRAIN[bk.level], k = 16 / g;
+  const L = [{x: -2, n: Math.round(6 * k)}, {x: 240, n: Math.round(9 * k)}, {x: 480, n: Math.round(9 * k)}, {x: 722, n: Math.round(6 * k)}];
+  const y0 = -20, y1 = FH + 20;
   const ys = n => range(0, n - 1, 1).map(i => y0 + (y1 - y0) * i / (n - 1));
   let d = '', c = '';
-  const hot = 11; // hidden neuron in layer 1
+  const hot = Math.floor(L[1].n / 2);
   for (let l = 0; l < L.length - 1; l++) ys(L[l].n).forEach((a, ia) => ys(L[l + 1].n).forEach((b, ib) => {
     const seg = `M${L[l].x},${f1(a)}L${L[l + 1].x},${f1(b)}`;
     if ((l === 0 && ib === hot) || (l === 1 && ia === hot)) c += seg; else d += seg;
   }));
-  return svg(`<path d="${d}" stroke="${INK}" stroke-width="1.15" fill="none"/>` +
-    `<path d="${c}" stroke="${bk.color}" stroke-width="2.4" fill="none"/>`);
+  return svg(`<path d="${d}" stroke="${INK}" stroke-width="${f1(g / 8)}" fill="none"/>` +
+    `<path d="${c}" stroke="${bk.color}" stroke-width="${f1(g / 3.5)}" fill="none"/>`);
 }
 
 // Build LLMs — the causal mask: attend-to region in heavy horizontals, the future in hairline verticals
@@ -268,6 +286,8 @@ function f5D(bk) {
     if (thin) {
       const d = `M${pt(gu, gv)}L${pt(1 - gu, gv)}L${pt(1 - gu, 1 - gv)}L${pt(gu, 1 - gv)}Z`;
       if (isHot) solidC += d; else solid += d;
+    } else if (isHot) {
+      solidC += `M${pt(gu, gv)}L${pt(1 - gu, gv)}L${pt(1 - gu, 1 - gv)}L${pt(gu, 1 - gv)}Z`;
     } else {
       const n = Math.max(2, Math.round(E * sin / p)), w = p * 0.5, dv = w / (2 * E * sin);
       let d = '';
@@ -282,36 +302,31 @@ function f5D(bk) {
 }
 
 // Pi vs Hermes vs Codex — one history of lines, three compaction profiles (top, middle, bottom band).
-// Older lines (left) are squeezed into memory; the lines bend where one profile hands over to the next.
+// Older lines (left) are squeezed into memory; the lines bend where one profile hands over to the
+// next. N is set so the uncompressed pitch stays at advanced grain (6-8px) in every band.
 function fCompaction(bk) {
-  const p = GRAIN[bk.level], N = 88;
-  const bands = [{nc: 22, sc: 3.0}, {nc: 46, sc: 3.2}, {nc: 70, sc: 3.0}];
+  const p = GRAIN[bk.level], sc = 3.0, N = Math.round(1100 / p);
+  const bands = [{nc: 22}, {nc: 49}, {nc: 72}];
   const b1 = 181, b2 = 363, tw = 58;
-  const par = y => {
-    const t1 = smooth(b1 - tw, b1 + tw, y), t2 = smooth(b2 - tw, b2 + tw, y);
-    const [A, B, C] = bands;
-    return { nc: A.nc + (B.nc - A.nc) * t1 + (C.nc - B.nc) * t2, sc: A.sc + (B.sc - A.sc) * t1 + (C.sc - B.sc) * t2 };
-  };
+  const ncAt = y => { const t1 = smooth(b1 - tw, b1 + tw, y), t2 = smooth(b2 - tw, b2 + tw, y); return bands[0].nc + (bands[1].nc - bands[0].nc) * t1 + (bands[2].nc - bands[1].nc) * t2; };
   const YS = range(-8, FH + 8, 3);
   const rows = YS.map(y => {
-    const {nc, sc} = par(y), sr = (744 - nc * sc) / (N - nc);
+    const nc = ncAt(y), sr = (744 - nc * sc) / (N - nc);
     const xs = [], sp = []; let x = -12;
-    for (let j = 0; j < N; j++) {
-      const s = sc + (sr - sc) / (1 + Math.exp(-(j - nc) / 1.1));
-      xs.push(x + s / 2); sp.push(s); x += s;
-    }
-    return {xs, sp, sc, sr};
+    for (let j = 0; j < N; j++) { const s = sc + (sr - sc) / (1 + Math.exp(-(j - nc) / 1.1)); xs.push(x + s / 2); sp.push(s); x += s; }
+    return {xs, sp, sr};
   });
   let ink = '', col = '';
   for (let j = 0; j < N; j++) {
     const P = YS.map((y, i) => [rows[i].xs[j], y]);
+    const m = YS.map((y, i) => rows[i].sp[j] < (sc + rows[i].sr) / 2);
     const Wd = YS.map((y, i) => {
       const a = rows[Math.max(0, i - 1)].xs[j], c = rows[Math.min(YS.length - 1, i + 1)].xs[j];
-      const slope = (c - a) / (YS[Math.min(YS.length - 1, i + 1)] - YS[Math.max(0, i - 1)]);
-      const k = rows[i].sp[j] < (rows[i].sc + rows[i].sr) / 2 ? 0.6 : 0.46;
-      return clamp(rows[i].sp[j] * k / Math.sqrt(1 + slope * slope), 1.2, 6);
+      const sl = (c - a) / (YS[Math.min(YS.length - 1, i + 1)] - YS[Math.max(0, i - 1)]);
+      const sp = rows[i].sp[j] / Math.sqrt(1 + sl * sl);           // perpendicular pitch
+      const want = (m[i] ? 0.6 : 0.48) * sp;
+      return sp < 2.2 ? sp + 0.8 : clamp(Math.min(want, sp - 1.2), 1, p * 0.5);
     });
-    const m = YS.map((y, i) => rows[i].sp[j] < (rows[i].sc + rows[i].sr) / 2);
     const r = runs(P, Wd, m); ink += r.off; col += r.on;
   }
   return svg(path(ink, INK) + path(col, bk.color));
@@ -323,79 +338,87 @@ function fTransformer(bk) {
   const p = GRAIN[bk.level], w = p * 0.42;
   const A = [300, 318], B = [412, 236], R = 196;
   const rings = ([cx, cy], rmax, color) => {
-    let s = ''; for (let r = p / 2; r < rmax; r += p) s += `<circle cx="${cx}" cy="${cy}" r="${f1(r)}"/>`;
+    let s = ''; for (let r = p / 2; r + w / 2 <= rmax; r += p) s += `<circle cx="${cx}" cy="${cy}" r="${f1(r)}"/>`;
     return `<g fill="none" stroke="${color}" stroke-width="${f1(w)}" style="mix-blend-mode:multiply">${s}</g>`;
   };
   const id = bk.slug + '-head';
-  return svg(`<defs><clipPath id="${id}"><circle cx="${B[0]}" cy="${B[1]}" r="${R}"/></clipPath></defs>` +
+  return svg(`<defs><clipPath id="${id}"><circle cx="${B[0]}" cy="${B[1]}" r="${R}"/></clipPath></defs>` + '' +
     rings(A, 900, INK) +
     `<circle cx="${B[0]}" cy="${B[1]}" r="${R}" fill="${PAPER}"/>` +
-    `<g clip-path="url(#${id})">${rings(A, 900, INK)}${rings(B, R + p, bk.color)}</g>` +
+    `<g clip-path="url(#${id})">${rings(A, 900, INK)}${rings(B, R - 1, bk.color)}</g>` +
     ``);
 }
 
-// Prompt Engineering — one small input, and the ripple runs through every line downstream
+// Prompt Engineering — read left to right like text. The first 144px of every line is the prompt
+// (colour): three identical bumps, a three-shot example. The completion (ink) carries the same bump
+// on toward the right edge and slowly lets it go.
 function fPrompt(bk) {
-  const p = GRAIN[bk.level], cx = 360, cy = 214, A = 15, lam = 100, Lr = 330;
-  const r = hLines({ bases: range(-32, FH + 32, p),
-    y: (x, b) => { const R = Math.hypot(x - cx, b - cy); return b + A * Math.sin(2 * Math.PI * R / lam) * Math.exp(-R / Lr) * edgeWin(b, 60); },
+  const p = GRAIN[bk.level], per = 48, xp = 3 * per, A = 14, Ld = 170;
+  const disp = x => x <= 0 ? 0 : -A * Math.sin(Math.PI * x / per) ** 2 * (x <= xp ? 1 : Math.exp(-(x - xp) / Ld));
+  const r = hLines({ bases: range(p / 2, FH + p, p), xs: range(-12, 732, 2),
+    y: (x, b) => b + disp(x),
     w: () => p * 0.5,
-    c: (x, b) => Math.hypot(x - cx, b - cy) < 62 });
+    c: (x) => x < xp });
   return svg(path(r.ink, INK) + path(r.col, bk.color));
 }
 
 // SQL Masterclass — a JOIN: a table of rows (horizontal lines) overlaps a table of columns (vertical
-// lines); the matched region, where both line systems exist, is printed in colour.
+// lines); the matched region, where both line systems exist, is printed in colour. Everything is
+// snapped to one grating so every edge of the join ends on a whole line.
 function fSQL(bk) {
-  const p = GRAIN[bk.level], w = p * 0.5;
-  const A = {x0: -10, y0: -10, x1: 456, y1: 376}, B = {x0: 264, y0: 184, x1: 730, y1: 560};
-  const I = {x0: B.x0, y0: B.y0, x1: A.x1, y1: A.y1};
+  const p = GRAIN[bk.level], w = p * 0.5, at = k => p / 2 + k * p;          // line k's centre
+  const rowsA = [0, 22], colsI = [16, 28], rowsI = [12, 22], colsB = [16, 46];
+  const top = k => at(k) - w / 2, bot = k => at(k) + w / 2;
   const R = (x0, y0, x1, y1) => `M${f1(x0)},${f1(y0)}H${f1(x1)}V${f1(y1)}H${f1(x0)}Z`;
+  const Ix0 = top(colsI[0]), Ix1 = bot(colsI[1]), Iy0 = top(rowsI[0]), Iy1 = bot(rowsI[1]);
   let ink = '', col = '';
-  for (let y = p / 2; y < A.y1; y += p) {
-    if (y > I.y0 && y < I.y1) { ink += R(A.x0, y - w / 2, I.x0, y + w / 2); col += R(I.x0, y - w / 2, I.x1, y + w / 2); }
-    else ink += R(A.x0, y - w / 2, A.x1, y + w / 2);
+  for (let i = rowsA[0]; i <= rowsA[1]; i++) {
+    const y = at(i);
+    if (i >= rowsI[0]) { ink += R(-10, y - w / 2, Ix0, y + w / 2); col += R(Ix0, y - w / 2, Ix1, y + w / 2); }
+    else ink += R(-10, y - w / 2, Ix1, y + w / 2);
   }
-  for (let x = B.x0 + p / 2; x < B.x1; x += p) {
-    if (x > I.x0 && x < I.x1) { ink += R(x - w / 2, I.y1, x + w / 2, B.y1); col += R(x - w / 2, I.y0, x + w / 2, I.y1); }
-    else ink += R(x - w / 2, B.y0, x + w / 2, B.y1);
+  for (let k = colsB[0]; k <= colsB[1]; k++) {
+    const x = at(k);
+    if (k <= colsI[1]) { col += R(x - w / 2, Iy0, x + w / 2, Iy1); ink += R(x - w / 2, Iy1, x + w / 2, FH + 10); }
+    else ink += R(x - w / 2, Iy0, x + w / 2, FH + 10);
   }
   return svg(path(ink, INK) + path(col, bk.color));
 }
 
-// Diffusion LM — masked diffusion, read top to bottom: rows of word-length dashes start as masked
-// tokens (colour, jittered) and are unmasked step by step until the bottom rows are clean text (ink).
+// Diffusion LM — masked diffusion with the sequence held still. One fixed row of tokens runs across
+// the field; each row below is one denoising step. A token is the same short [MASK] block (colour)
+// until its step (a thin violet placeholder), then its word (a full ink stroke) from there down:
+// violet stalactites of different depths.
 function fDiffusion(bk) {
-  const p = GRAIN[bk.level], w = p * 0.5;
-  let seed = 7; const rnd = () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  const p = GRAIN[bk.level], w = p * 0.5, rows = Math.ceil(FH / p) + 1, mk = 12;
+  let seed = 11; const rnd = () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  const toks = []; let x = -6;
+  while (x < 730) { const len = 16 + Math.floor(rnd() * 5) * 8; toks.push({x, len, step: 2 + Math.floor(rnd() * (rows - 6))}); x += len + 8; }
   let ink = '', col = '';
-  for (let y = p / 2; y < FH + p; y += p) {
-    const t = y / FH, clean = smooth(0.12, 0.9, t);
-    let x = -rnd() * 40;
-    while (x < 730) {
-      const len = 8 + Math.floor(rnd() * 7) * 8, masked = rnd() > clean;
-      const jy = masked ? (rnd() - 0.5) * p * 0.6 * (1 - t) : 0;
-      // a masked token is the same short [MASK] block whatever word will land there
-      const L = masked ? 12 : len;
-      const d = `M${f1(x)},${f1(y - w / 2 + jy)}h${L}v${f1(w)}h${-L}Z`;
+  for (let r = 0; r < rows; r++) {
+    const y = p / 2 + r * p;
+    for (const t of toks) {
+      const masked = r < t.step, ww = masked ? 2 : w;   // a [MASK] is a thin placeholder; a word is a full stroke
+      const d = `M${f1(t.x)},${f1(y - ww / 2)}h${t.len}v${f1(ww)}h${-t.len}Z`;
       if (masked) col += d; else ink += d;
-      x += len + 6;
     }
   }
   return svg(path(ink, INK) + path(col, bk.color));
 }
 
-// Kernel Engineering — Movement in Squares: tiles compress as they move toward the chip
+// Kernel Engineering — the roofline, the kernel engineer's own diagram, drawn as a line field.
+// Every line follows the roof: rising along the memory-bound slope, flat under the compute ceiling.
+// Below the roof is the attainable region (ink); above it, paper. The ridge point — the arithmetic
+// intensity where a kernel turns compute-bound — runs down the stack in colour.
 function fKernel(bk) {
-  const rows = 17, h = FH / rows, N = 24, a = 0.94, u0 = 0.64;
-  const G = u => u - a / (2 * Math.PI) * Math.sin(2 * Math.PI * (u - u0));
-  const F = u => (G(u) - G(0)) / (G(1) - G(0));
-  const xs = range(0, N, 1).map(i => W * F(i / N));
+  const p = GRAIN[bk.level], w = p * 0.5, xr = 432, yL = 520, yT = 116, band = 26;   // yT puts the trim mid-gap
+  const R = x => x <= xr ? yL + (yT - yL) * (x / xr) : yT;
+  const X = [-10, 0, xr - band, xr, xr + band, 730];
   let ink = '', col = '';
-  for (let i = 0; i < rows; i++) for (let j = 0; j < N; j++) {
-    if ((i + j) % 2) continue;
-    const d = `M${f1(xs[j])},${f1(i * h)}H${f1(xs[j + 1])}V${f1((i + 1) * h)}H${f1(xs[j])}Z`;
-    if (i >= 6 && i <= 9 && j >= 3 && j <= 6) col += d; else ink += d;
+  for (let k = 0; yT + k * p - w / 2 < FH + 2; k++) {
+    const pts = X.map(x => [x, R(Math.max(0, x)) + k * p]);
+    const poly = (a, b) => { const q = pts.slice(a, b + 1); return 'M' + q.map(([x, y]) => `${f1(x)},${f1(y - w / 2)}`).join('L') + 'L' + q.reverse().map(([x, y]) => `${f1(x)},${f1(y + w / 2)}`).join('L') + 'Z'; };
+    ink += poly(0, 2) + poly(4, 5); col += poly(2, 4);
   }
   return svg(path(ink, INK) + path(col, bk.color));
 }
@@ -404,7 +427,7 @@ function fKernel(bk) {
 // patch shifts the student's phase by how much of an image (a disc) falls in that patch, so the
 // picture only exists where the two overlap — already cut into patches, the way a ViT sees it.
 function fDeiT(bk) {
-  const p = GRAIN[bk.level], P = 48, cols = 15, rows = 12, oy = (FH - rows * P) / 2, w = p * 0.46;
+  const p = GRAIN[bk.level], P = 48, cols = 15, rows = 12, oy = (FH - rows * P) / 2, w = p / 2 + 0.15;
   const cov = (X, Y) => { let n = 0; for (let a = 0; a < 6; a++) for (let b = 0; b < 6; b++) { const x = X + (a + .5) * P / 6, y = Y + (b + .5) * P / 6; if (Math.hypot(x - 360, y - 272) < 196) n++; } return n / 36; };
   let t = '', st = '';
   for (let x = p / 2; x < W; x += p) t += `M${f1(x - w / 2)},-2H${f1(x + w / 2)}V${FH + 2}H${f1(x - w / 2)}Z`;
@@ -424,15 +447,21 @@ function fRoom(bk) {
   const P = z => ({x0: vx + (0 - vx) * z, x1: vx + (W - vx) * z, y0: vy + (0 - vy) * z, y1: vy + (FH - vy) * z});
   const back = P(s);
   let ink = '', walls = '';
-  // walls: vertical depth lines, perspective spaced
-  const dz = 0.066, zs = []; for (let k = 0; ; k++) { const z = 1 / (1 + k * dz); if (z < s) break; zs.push(z); }
-  zs.forEach(z => {
-    const r = P(z), w = 5 * z;
-    walls += `M${f1(r.x0 - w / 2)},${f1(r.y0)}H${f1(r.x0 + w / 2)}V${f1(r.y1)}H${f1(r.x0 - w / 2)}Z`;
-    walls += `M${f1(r.x1 - w / 2)},${f1(r.y0)}H${f1(r.x1 + w / 2)}V${f1(r.y1)}H${f1(r.x1 - w / 2)}Z`;
-  });
-  // floor & ceiling: lines converging to the vanishing point (as tapered wedges)
-  const n = 26;
+  // walls: vertical depth lines, perspective spaced; spacing follows the grain. The first line sits
+  // ~10px inside the trim (never on it), and each wall stops before its gaps drop under 1.6px.
+  const g = GRAIN[bk.level], dz = 0.066 * g / 12, zs = [];
+  for (let k = 0; ; k++) { const z = 1 / (1 + (k + 0.8) * dz); if (z < s) break; zs.push(z); }
+  for (const side of ['x0', 'x1']) {
+    let prev = null;
+    for (const z of zs) {
+      const r = P(z), w = 5 * z, x = r[side];
+      if (prev && Math.abs(prev.x - x) - (prev.w + w) / 2 < 1.6) break;
+      walls += `M${f1(x - w / 2)},${f1(r.y0)}H${f1(x + w / 2)}V${f1(r.y1)}H${f1(x - w / 2)}Z`;
+      prev = {x, w};
+    }
+  }
+  // floor & ceiling: lines converging to the vanishing point (as tapered wedges), count by grain
+  const n = Math.round(26 * 12 / g);
   for (let k = 0; k <= n; k++) {
     const xf = -40 + (W + 80) * k / n, w0 = 7;
     const xb = vx + (xf - vx) * s;
@@ -465,7 +494,8 @@ const rooms = {
   sound: (b, bk) => {
     const p = GRAIN[bk.level]; const xs = range(b.x0 + 12, b.x1 - 12, 2); let d = '';
     const cy = (b.y0 + b.y1) / 2, H = (b.y1 - b.y0);
-    for (let y = b.y0 + 14; y < b.y1 - 10; y += p) {
+    const inset = 3 + 14 + p * 0.25 + 4;   // clip inset + amplitude + half stroke + air: every wave sits whole
+    for (let y = b.y0 + inset; y <= b.y1 - inset; y += p) {
       const P = xs.map(x => { const u = (x - b.x0) / (b.x1 - b.x0); return [x, y + 14 * Math.sin(u * Math.PI * 6 + (y - cy) / H * 2) * Math.sin(u * Math.PI)]; });
       d += ribbon(P, P.map(() => p * .45));
     }
@@ -493,9 +523,9 @@ const BOOKS = [
   {group:'core', slug:'ai-context-engineering', t:'AI Context<br>Engineering', size:'L', level:'intermediate', cap:43, hrs:10, ink:'ultramarine', field:fContext,
     why:'The context window as a lens: every line of the stream survives, but the relevant slice is magnified into the window while the rest is compressed around it.'},
   {group:'core', slug:'mathematical-foundations-for-ml', t:'Mathematical<br>Foundations for<br>Machine Learning', size:'M', level:'beginner', cap:43, hrs:10, ink:'vermilion', field:fMath,
-    why:'A 2-D Gaussian lifts a field of lines — the normal distribution as a surface; the 1σ region is printed in colour.'},
+    why:'A 2-D Gaussian lifts a field of lines — the normal distribution as a surface; the region within 1.5σ is printed in colour.'},
   {group:'core', slug:'neural-networks-from-scratch', t:'Neural Networks<br>from Scratch', size:'L', level:'beginner', cap:33, hrs:7, ink:'viridian', field:fNN,
-    why:'A 12-18-18-12 fully-connected network drawn edge by edge across the whole field; the all-to-all fans interfere into moiré. One hidden neuron’s fan-in and fan-out in colour.'},
+    why:'A 6-9-9-6 fully-connected network (beginner grain: few neurons, 2px edges) drawn edge by edge, bleeding off the field; the fans interfere into moiré. One hidden neuron’s fan-in and fan-out in colour, and heavier.'},
   {group:'core', slug:'build-llms-from-scratch', t:'Build Large Language<br>Models (LLMs)<br>from Scratch', size:'M', level:'intermediate', cap:20, hrs:6, ink:'violet', field:fLLM,
     why:'The causal attention mask: attended cells in heavy horizontals, the masked future in hairline verticals, the diagonal (each token attending to itself) in colour.'},
   {group:'core', slug:'5d-parallelism', t:'5D Parallelism', tail:'for Large Model Training', size:'L', level:'advanced', cap:40, hrs:9, ink:'cadmium', field:f5D,
@@ -507,20 +537,20 @@ const BOOKS = [
   {group:'more', slug:'transformers-from-scratch', t:'Transformers', tail:'Theory, Intuition, and Building from Scratch', size:'L', level:'intermediate', cap:20, hrs:5, ink:'carmine', field:fTransformer,
     why:'Attention as interference: the sequence is a field of rings; one attention head is a disc of coloured rings from a second centre, and the fringes appear only where the two overprint.'},
   {group:'more', slug:'prompt-engineering', t:'Prompt<br>Engineering', size:'L', level:'beginner', cap:31, hrs:7, ink:'teal', field:fPrompt,
-    why:'One small input, and the ripple runs through every line downstream.'},
-  {group:'more', slug:'deit-from-scratch', t:'Build a Data-Efficient<br>Image Transformer<br>(DeiT) from Scratch', size:'M', level:'advanced', cap:42, hrs:10, ink:'ultramarine', field:fDeiT,
+    why:'Read left to right like text: the first 144px of every line is the prompt (colour), three identical bumps — a three-shot example. The completion (ink) carries the same bump on and slowly lets it go.'},
+  {group:'more', slug:'deit-from-scratch', t:'Build a Data-Efficient<br>Image Transformer<br><span class="hang">(</span>DeiT) from Scratch', size:'M', level:'advanced', cap:42, hrs:10, ink:'ultramarine', field:fDeiT,
     why:'Distillation as a moiré hidden image: a black teacher grating under a coloured student grating whose phase is set per 48px patch — the disc exists only where the two overlap, already cut into patches.'},
   {group:'more', slug:'diffusion-lm-from-scratch', t:'Build a Diffusion<br>Language Model<br>from Scratch', size:'M', level:'advanced', cap:35, hrs:8, ink:'violet', field:fDiffusion,
-    why:'Masked diffusion read top to bottom: every token starts as the same short [MASK] block (colour) and is unmasked, step by step, into a word of ink.'},
-  {group:'more', slug:'kernel-engineering', t:'Kernel<br>Engineering', tail:'From silicon to speculative decoding — GPU kernels for modern LLMs.', size:'L', level:'advanced', soon:true, ink:'cadmium', field:fKernel,
-    why:'Riley\'s Movement in Squares as a tiled matmul: tiles compress toward the chip, one tile in colour.'},
+    why:'Masked diffusion with the sequence held still: one row of tokens, each row below one denoising step. A token is a thin violet [MASK] placeholder until its step, then its word (ink) from there down — violet stalactites of different depths.'},
+  {group:'more', slug:'kernel-engineering', t:'Kernel<br>Engineering', tail:'From silicon to speculative decoding —<br>GPU kernels for modern LLMs', size:'L', level:'advanced', soon:true, ink:'cadmium', field:fKernel,
+    why:'The roofline as a line field: every line rises along the memory-bound slope and runs flat under the compute ceiling; the ridge point, where a kernel turns compute-bound, runs down the stack in colour.'},
   {group:'charlie', slug:'charlie-language-room', t:'Charlie and the<br>Language Room', kick:'Charlie and the Intelligence Factory · I', tail:'Language — Inference Engineering', size:'M', level:'advanced', cap:22, hrs:5, ink:'vermilion', field:fRoom, vp:250, room:rooms.language,
     why:'Room I: the back wall holds lines of text.'},
   {group:'charlie', slug:'charlie-vision-room', t:'Charlie and the<br>Vision Room', kick:'Charlie and the Intelligence Factory · II', tail:'Vision — Vision Transformers', size:'M', level:'intermediate', cap:20, hrs:6, ink:'ultramarine', field:fRoom, vp:320, room:rooms.vision,
     why:'Room II: an iris of concentric rings.'},
   {group:'charlie', slug:'charlie-sound-room', t:'Charlie and the<br>Sound Room', kick:'Charlie and the Intelligence Factory · III', tail:'Audio — Voice Agents', size:'M', level:'intermediate', cap:20, hrs:6, ink:'viridian', field:fRoom, vp:400, room:rooms.sound,
-    why:'Room III: modulated waveforms.'},
-  {group:'charlie', slug:'charlie-reasoning-room', t:'Charlie and the<br>Reasoning Room', kick:'Charlie and the Intelligence Factory · IV', tail:'Reason — Reinforcement Learning, from bandits to reasoning models', size:'M', level:'advanced', cap:21, hrs:6, ink:'violet', field:fRoom, vp:470, room:rooms.reasoning,
+    why:'Room III: modulated waveforms, each whole inside the back wall.'},
+  {group:'charlie', slug:'charlie-reasoning-room', t:'Charlie and the<br>Reasoning Room', kick:'Charlie and the Intelligence Factory · IV', tail:'Reason — Reinforcement Learning,<br>from bandits to reasoning models', size:'M', level:'advanced', cap:21, hrs:6, ink:'violet', field:fRoom, vp:470, room:rooms.reasoning,
     why:'Room IV: a branching search tree.'},
 ];
 
@@ -528,11 +558,11 @@ const BOOKS = [
 const LEVELN = {beginner:0, intermediate:1, advanced:2};
 function grainMark(level, color = INK) {
   // three 14px squares: coarse, medium, fine. the book's own grain is inked, the others are outlines.
-  const n = LEVELN[level], pitches = [14 / 3, 14 / 5, 14 / 8];
+  const n = LEVELN[level], pitches = [14 / 3, 14 / 4, 14 / 6];
   let s = '';
   pitches.forEach((pt, i) => {
     const x = i * 19;
-    if (i === n) { let d = ''; for (let y = pt / 2; y < 14; y += pt) d += `M${x},${f1(y - pt * .28)}h14v${f1(pt * .56)}h-14Z`; s += `<path d="${d}" fill="${color}"/>`; }
+    if (i === n) { let d = ''; for (let y = pt / 2; y < 14; y += pt) d += `M${x},${f1(y - pt * .25)}h14v${f1(pt * .5)}h-14Z`; s += `<path d="${d}" fill="${color}"/>`; }
     else s += `<rect x="${x + .75}" y=".75" width="12.5" height="12.5" fill="none" stroke="${color}" stroke-width="1.5"/>`;
   });
   return `<svg width="52" height="14" viewBox="0 0 52 14">${s}</svg>`;
@@ -553,7 +583,7 @@ function cover(bk) {
       <h2 class="${bk.size}">${bk.t}</h2>
       ${bk.tail ? `<p class="tail">${bk.tail}</p>` : ''}
     </div>
-    <div class="foot"><span class="imprint">${mark()}VIZUARA<i>BOOKS</i></span>${bk.kick ? `<span class="r">${bk.kick}</span>` : ''}</div>
+    <div class="foot"><span class="imprint">${mark()}VIZUARA<i>BOOKS</i></span>${bk.kick ? `<span class="series">${bk.kick}</span>` : ''}</div>
   </div>`;
 }
 for (const bk of BOOKS) {

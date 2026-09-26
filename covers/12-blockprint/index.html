@@ -586,13 +586,12 @@ function weaveIkat(design, lv, rand, id){
 
 /* ---------- the kinar: one border for the whole library ---------- */
 function kinar(id,W=720){
-  let s=`<g filter="url(#${id}-ink-k)"><rect x="-6" y="${KINAR_Y}" width="${W+12}" height="${KINAR_H}" fill="${P.iron}"/></g>`;
   let w='';
   const cy=KINAR_Y+KINAR_H/2;
   for(let k=-1;k<W/24+1;k++){ const cx=12+k*24; w+=lozenge(cx,cy,7.2,7.2); w+=C(cx+12,cy,1.9); }
   w+=R(-4,KINAR_Y+4,W+8,1.6)+R(-4,KINAR_Y+KINAR_H-5.6,W+8,1.6);
-  s+=`<g fill="${P.kora}" filter="url(#${id}-ink-kw)">${w}</g>`;
-  return s;
+  // band and reserved motif go through the ink in one pass
+  return `<g filter="url(#${id}-ink-k)"><rect x="-6" y="${KINAR_Y}" width="${W+12}" height="${KINAR_H}" fill="${P.iron}"/><g fill="${P.kora}">${w}</g></g>`;
 }
 
 /* ---------- Vizuara stamp: a carved square block with a stepped V ---------- */
@@ -603,11 +602,28 @@ function mark(size=24,col=P.iron,bg=P.kora){
   return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" aria-label="Vizuara"><rect width="${size}" height="${size}" fill="${col}"/><g fill="${bg}">${cells}</g></svg>`;
 }
 
+/* ---------- plain-weave cotton, as vector threads ----------
+   Every warp and weft thread is a hairline of slightly different tone; slubs
+   (thick spots in hand-spun yarn) are short, heavier segments. Vector, so the
+   print PDF stays small and sharp. */
+function weaveVec(W, rand){
+  let dk='', lt='';
+  const thread=(horiz,pos)=>{ const a=(rand()*rand()*.11+.012).toFixed(3), w=(.7+rand()*.5).toFixed(2);
+    const r= horiz? `<rect x="0" y="${pos}" width="${W}" height="${w}" opacity="${a}"/>` : `<rect x="${pos}" y="0" width="${w}" height="888" opacity="${a}"/>`;
+    if(rand()<.55) dk+=r; else lt+=r; };
+  for(let y=0;y<888;y+=1.8) thread(true, y.toFixed(1));
+  for(let x=0;x<W;x+=1.8) thread(false, x.toFixed(1));
+  for(let i=0;i<W*.4;i++){ const horiz=rand()<.6, L=6+rand()*26, x=rand()*W, y=rand()*888, a=(.045+rand()*.075).toFixed(3);
+    const r= horiz? `<rect x="${f(x)}" y="${f(y)}" width="${f(L)}" height="1.3" opacity="${a}"/>` : `<rect x="${f(x)}" y="${f(y)}" width="1.3" height="${f(L)}" opacity="${a}"/>`;
+    if(rand()<.5) dk+=r; else lt+=r; }
+  return `<g fill="#1a120c">${dk}</g><g fill="#fffaf0">${lt}</g>`;
+}
+
 /* ---------- the cloth: field, kinar, reserved pallu, weave ---------- */
 function cloth(b, id, rand, W=720, x0=0){
   const lv=LV[b.level];
   let defs=clothDefs(id,hash(b.slug)%997), body='';
-  defs+=inkFilter(`${id}-ink-k`,11,2.0,.70)+inkFilter(`${id}-ink-kw`,19,1.6,.74);
+  defs+=inkFilter(`${id}-ink-k`,11,1.8,.72);
   defs+=`<clipPath id="${id}-field"><rect x="0" y="0" width="${W}" height="${KINAR_Y+2}"/></clipPath>`;
   body+=`<rect width="${W}" height="888" fill="${lv.ground}"/>`;
   body+=`<rect width="${W}" height="${FIELD_H}" filter="url(#${id}-mottle)" opacity="${b.level==='beginner'?.14:.36}"/>`;
@@ -619,9 +635,10 @@ function cloth(b, id, rand, W=720, x0=0){
     body+=`<g clip-path="url(#${id}-field)">${weaveIkat(IKAT[b.ikat](mulberry(hash(b.slug))), lv, rand, id)}</g>`;
   }
   body+=`<rect x="0" y="${PANEL_Y}" width="${W}" height="${888-PANEL_Y}" fill="${P.kora}"/>`;
+  // one weave pass over the whole cloth; the pallu is then washed back so the type sits on quiet cotton
+  body+=weaveVec(W, mulberry(hash(b.slug)+W));
+  body+=`<rect x="0" y="${PANEL_Y}" width="${W}" height="${888-PANEL_Y}" fill="${P.kora}" opacity=".56"/>`;
   body+=kinar(id,W);
-  body+=`<rect width="${W}" height="888" filter="url(#${id}-weave)" opacity=".16" clip-path="url(#${id}-field)"/>`;
-  body+=`<rect y="${PANEL_Y}" width="${W}" height="${888-PANEL_Y}" filter="url(#${id}-weave)" opacity=".07"/>`;
   return `<svg class="cloth" width="${W}" height="888" viewBox="0 0 ${W} 888" xmlns="http://www.w3.org/2000/svg"><defs>${defs}</defs>${body}</svg>`;
 }
 

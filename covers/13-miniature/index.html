@@ -32,6 +32,15 @@ h1 small{display:block;font-weight:500;font-size:30px;letter-spacing:-.005em;mar
 .specs:before{content:"";position:absolute;left:0;right:0;top:3px;border-top:4px solid var(--gold)}
 .specs:after{content:"";position:absolute;left:0;right:0;bottom:3px;border-top:4px solid var(--gold)}
 .sw{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.swnote{font-size:13.5px;color:#4A3A2C;margin:14px 0 0;max-width:60em}
+.swnote i{font-style:normal;color:#8C1F35}
+.fam{padding:28px 0 36px;border-bottom:1.5px solid var(--ink)}
+.fam h3{font-stretch:112%;font-weight:600;font-size:12.5px;letter-spacing:.22em;text-transform:uppercase;margin:0 0 14px}
+.famgrid{display:grid;grid-template-columns:repeat(8,1fr);gap:12px}
+.famgrid div{font-size:12.5px;line-height:1.35}
+.famgrid i{display:block;height:46px;border:1.2px solid var(--ink);margin-bottom:6px}
+.famgrid span{color:#5b4a3b;font-variant-numeric:tabular-nums}
+.famgrid em{font-style:normal;color:#5b4a3b}
 .sw div{font-size:12.5px;line-height:1.3}
 .sw i{display:block;height:54px;border:1.2px solid var(--ink);margin-bottom:6px}
 .sw b{display:block;font-weight:600}
@@ -84,12 +93,15 @@ p.secnote{margin:0 0 22px;max-width:62em;color:#4A3A2C}
   <div class="anat"><h3>Anatomy of a folio</h3><div id="anatomy"></div></div>
 </header>
 <section class="specs">
-  <div class="spec"><h3>Pigments</h3><div class="sw" id="swatches"></div></div>
+  <div class="spec"><h3>Constant pigments</h3><div class="sw" id="swatches"></div>
+    <p class="swnote">The three level pigments live in the hashiya and nowhere else, so the margin alone tells the level.</p></div>
   <div class="spec type"><h3>Type — both made in India</h3>
     <p class="e">Eczar 600</p><p>Titles. Vaibhav Singh for Rosetta — a Latin + Devanagari display serif with a calligraphic edge.</p>
     <p class="a">Anek Latin</p><p>Rubrics, imprint, labels. Ek Type, Mumbai — set semi-expanded, tracked capitals.</p></div>
   <div class="spec"><h3>Level — margin pigment × jadval count</h3><div class="lv" id="levels"></div></div>
 </section>
+<section class="fam"><h3>Grounds — one per subject family</h3><div class="famgrid" id="families"></div>
+<p class="swnote">The miniature and cartouche share one flat ground, chosen by the book's subject family and never from the level pigments. A forthcoming book is shown on primed, unpainted <i>wasli</i>; it gets its family ground when it is published.</p></section>
 <h2 class="sec">The core set</h2>
 <p class="secnote">Six folios. The page architecture never moves; the painting and its ground change with the book.</p>
 <main class="covers" id="core"></main>
@@ -242,7 +254,7 @@ EMBLEM.math = (w,h,r,b)=>{
   s+=arrow(qx-18,by,qx-18+s0*.5,by-s0*.8,P.saffron,3.4);
   s+=arrow(sx+s0+14,by-s0*.42,qx-4,by-s0*.42,P.gold,3);
   // the matrix, set like an inscription above
-  const mx=w/2+14, my=by-s0-72;
+  const mx=w/2+30, my=by-s0-72;
   const br=(x,dir)=>`<path d="M${f(x+dir*8)},${f(my-43)} h${-dir*8} v86 h${dir*8}" fill="none" stroke="${P.ivory}" stroke-width="2.6"/>`;
   s+=br(mx-52,1)+br(mx+52,-1);
   const num=(x,cy,v)=>txt(x,cy+9,v,{size:27,weight:600,family:'Eczar',fill:P.ivory});
@@ -291,7 +303,7 @@ EMBLEM.llm = (w,h,r)=>{
     let ws=[]; for(let j=0;j<=i;j++){ let v=r()*.6; if(j===0) v+=1.1; if(j===i) v+=.9; if(j===i-1) v+=.4; ws.push(v);}
     const mx=Math.max(...ws);
     for(let j=0;j<=i;j++){ const q=Math.min(4,Math.floor(ws[j]/mx*4.99)); s+=tile(ox+j*cs+1.5,oy+i*cs+1.5,cs-3,cs-3,cols[q],1.2);
-      if(ws[j]===mx) s+=rect(ox+j*cs+4.6,oy+i*cs+4.6,cs-9.2,cs-9.2,'none',`stroke="${P.gold}" stroke-width="3.2"`)+rect(ox+j*cs+7.4,oy+i*cs+7.4,cs-14.8,cs-14.8,'none',S(1)); }
+      if(ws[j]===mx) s+=rect(ox+j*cs+4.8,oy+i*cs+4.8,cs-9.6,cs-9.6,'none',`stroke="${P.gold}" stroke-width="3.6"`); }
   }
   const ty=oy+N*cs+12, gr=rng('tok');
   for(let j=0;j<N;j++){ s+=tile(ox+j*cs+3,ty,cs-6,cs-8,P.ivory); s+=glyph(ox+j*cs+3,ty,cs-6,cs-8,gr); }
@@ -329,8 +341,8 @@ EMBLEM.p5d = (w,h,r)=>{
   // the key sits on the mesh's own ivory, inside the same gold-and-ink edge, so every swatch looks as it does in the mesh
   const ky=Y0+HH+44;
   s+=rect(X0-11,ky-18,WW+22,36,P.ink)+rect(X0-8,ky-15,WW+16,30,P.gold)+rect(X0-5,ky-12,WW+10,24,P.ivory);
-  s+=`<g class="key5" data-x0="${f(X0-5)}" data-w="${f(WW+10)}" data-gap="24">`+AX.map(a=>`<g class="ki" transform="translate(${f(X0)},0)">`+
-    rect(0,ky-a.t/2,24,a.t,a.col)+txt(31,ky+4.2,a.k.toUpperCase(),{size:11.5,anchor:'start',ls:1.4,fill:P.ink})+`</g>`).join('')+`</g>`;
+  s+=`<g class="key5" data-x0="${f(X0-5)}" data-w="${f(WW+10)}" data-gap="17">`+AX.map(a=>`<g class="ki" transform="translate(${f(X0)},0)">`+
+    rect(0,ky-a.t/2,20,a.t,a.col)+txt(26,ky+4,a.k.toUpperCase(),{size:11,anchor:'start',ls:1.2,fill:P.ink})+`</g>`).join('')+`</g>`;
   return s;
 };
 
@@ -372,29 +384,39 @@ EMBLEM.ace = (w,h,r)=>{
   return s;
 };
 
-/* Pi vs Hermes vs Codex — three vessels, one long conversation each: early turns set aside (outlined),
-   a compacted summary in their place, recent turns kept whole, and a jewel of memory beside. */
+/* Pi vs Hermes vs Codex — three stelae, one long conversation each. Old turns thin and crowd as they reach the press,
+   and come out as a gold summary; recent turns stay whole. Each memory jewel sits in a niche beside its stele, threaded
+   back to the one old turn it was taken from. The three compaction ratios differ boldly (10%, 20%, 35%) and are not
+   attributed to any particular agent. */
 EMBLEM.pi = (w,h,r)=>{
-  const cw=120, gapx=50, x0=(w-(3*cw+2*gapx))/2, top=48, bot=h-66;
-  const split=[[0.30,0.12],[0.38,0.08],[0.22,0.18]];
+  const cw=112, gapx=58, x0=(w-(3*cw+2*gapx))/2-16, top=44, bot=h-58;
+  const ratio=[.10,.20,.35], memAt=[3,6,2];
   const role=[P.ivory,P.sky,P.pink];
   let s='';
   for(let c=0;c<3;c++){
-    const x=x0+c*(cw+gapx), g=rng('pi'+c);
+    const x=x0+c*(cw+gapx), g=rng('pi'+c), Hin=bot-top-12;
     s+=rect(x-6,top-6,cw+12,bot-top+12,P.ink)+rect(x-3,top-3,cw+6,bot-top+6,P.gold)+rect(x,top,cw,bot-top,P.lapisD);
     s+=tile(x-14,top-20,cw+28,9,P.gold,1.2)+tile(x-8,top-11,cw+16,6,P.ivory,1.1)+tile(x-8,bot+5,cw+16,6,P.ivory,1.1)+tile(x-14,bot+11,cw+28,9,P.gold,1.2);
-    const H0=bot-top-16, yOld=top+8, hOld=H0*split[c][0], hSum=H0*split[c][1];
-    let y=yOld, i=0;
-    while(y+6<yOld+hOld){ const L=(0.45+g()*0.5)*(cw-20), left=i%2===0; s+=rect(left?x+10:x+cw-10-L,y,L,6,'none',`stroke="${P.sky}" stroke-width="1" stroke-opacity=".75"`); y+=10; i++; }
-    // compaction: the press
-    const ys=yOld+hOld+4;
-    s+=rect(x,ys,cw,5,P.gold)+poly([[x,ys-4],[x+10,ys+2.5],[x,ys+9]],P.gold,S(1))+poly([[x+cw,ys-4],[x+cw-10,ys+2.5],[x+cw,ys+9]],P.gold,S(1));
-    const yb=ys+11; s+=tile(x+8,yb,cw-16,hSum,P.gold,1.2);
-    for(let k=0;k<Math.floor((hSum-8)/4);k++) s+=line(x+14,yb+6+k*4,x+cw-14-(k%3)*8,yb+6+k*4,role[k%3],1.4);
-    y=yb+hSum+10; i=0;
-    while(y+8<bot-8){ const L=(0.45+g()*0.5)*(cw-20), left=i%2===0; s+=rect(left?x+10:x+cw-10-L,y,L,7,role[i%3],S(.9)); y+=11.5; i++; }
-    // memory jewel, set into the vessel's foot
-    s+=jewel(x+cw/2,bot+40,10,[P.vermilion,P.saffron,P.malachite][c]);
+    // old turns, thinning and crowding toward the press
+    const yOld=top+9, hOld=Hin*.34; let y=yOld, i=0; const bars=[];
+    while(true){ const t=(y-yOld)/hOld, bh=1.6+6.4*(1-t)*(1-t), gp=1.3+3.6*(1-t); if(t>=1||y+bh>yOld+hOld) break;
+      const L=(0.45+g()*0.5)*(cw-20), left=i%2===0, bx=left?x+10:x+cw-10-L;
+      s+=rect(bx,y,L,bh,role[i%3],bh>3.2?S(.8):''); bars.push({x:bx,y,L,h:bh}); y+=bh+gp; i++; }
+    // the press: two gold jaws close on the stream, over a heavy bar
+    const yp=yOld+hOld+2;
+    s+=poly([[x,yp-26],[x+cw*.36,yp+10],[x,yp+10]],P.gold,S(1.2))+poly([[x+cw,yp-26],[x+cw*.64,yp+10],[x+cw,yp+10]],P.gold,S(1.2));
+    s+=tile(x-5,yp+10,cw+10,11,P.gold,1.3)+line(x+cw*.36,yp+15.5,x+cw*.64,yp+15.5,P.ink,1.4);
+    // the summary, at this stele's ratio
+    const ys=yp+27, hs=Hin*ratio[c];
+    s+=tile(x+7,ys,cw-14,hs,P.gold,1.3);
+    for(let k=0;k*3.4+7<hs-4;k++) s+=line(x+14,ys+7+k*3.4,x+cw-14-((k*5+c)%4)*7,ys+7+k*3.4,P.goldD,1.3);
+    // recent turns, kept whole
+    y=ys+hs+9; i=0;
+    while(y+7<bot-6){ const L=(0.45+g()*0.5)*(cw-20), left=i%2===0; s+=rect(left?x+10:x+cw-10-L,y,L,7,role[i%3],S(.9)); y+=11.5; i++; }
+    // memory: a niche beside the stele, threaded back to the old turn it keeps
+    const bb=bars[memAt[c]], ty=bb.y+bb.h/2, nx=x+cw+13, nw=28, nh=40, ny=ty-nh/2;
+    s+=line(bb.x+bb.L,ty,nx,ty,P.ink,4.2)+line(bb.x+bb.L,ty,nx,ty,P.gold,2.2)+circ(bb.x+bb.L,ty,3.4,P.gold,S(1));
+    s+=rect(nx,ny,nw,nh,P.ink)+rect(nx+2.5,ny+2.5,nw-5,nh-5,P.gold)+rect(nx+5,ny+5,nw-10,nh-10,P.lapisD)+jewel(nx+nw/2,ty,7.5,[P.vermilion,P.saffron,P.ivory][c]);
   }
   return s;
 };
@@ -470,7 +492,7 @@ EMBLEM.deit = (w,h,r)=>{
 };
 
 /* Charlie and the Intelligence Factory — one pavilion, four rooms. Shared architecture; the mechanism lives on the back wall and the floor. */
-function room(w,h,r,wallCol,wallArt,floorArt){
+function room(w,h,r,wallCol,wallArt,floorArt,overArt){
   const X0=58, X1=w-58, colW=16, roofY=62, wallY=112, floorY=300, plinthY=392, baseY=424;
   let s='';
   // parapet merlons
@@ -487,6 +509,7 @@ function room(w,h,r,wallCol,wallArt,floorArt){
   s+=line(fx,floorY,fx+fw,floorY,P.ink,1.6);
   s+=wallArt(X0+colW+18,wallY+10,X1-X0-2*colW-36,floorY-wallY-26);
   s+=floorArt(X0+colW+14,floorY+8,X1-X0-2*colW-28,plinthY-floorY-16);
+  if(overArt) s+=overArt();
   // columns
   for(const cx of [X0,X1-colW]){ s+=tile(cx,wallY-6,colW,plinthY-wallY+6,P.ivory,1.2)+tile(cx-3,wallY-6,colW+6,10,P.gold,1.1)+tile(cx-3,plinthY-10,colW+6,10,P.gold,1.1)+line(cx+colW/2,wallY+8,cx+colW/2,plinthY-12,P.goldD,1.4); }
   // plinth
@@ -495,31 +518,65 @@ function room(w,h,r,wallCol,wallArt,floorArt){
   s+=tile(X0-22,baseY,X1-X0+44,6,P.ink,0);
   return s;
 }
-EMBLEM.roomLanguage=(w,h,r)=> room(w,h,r,P.lapis,
-  (x,y,ww,hh)=>{ // a paged KV cache: niches in the wall, filled page by page
-    let s=''; const cols=8, rows=4, gx=8, gy=10, cw=(ww-(cols-1)*gx)/cols, ch=(hh-(rows-1)*gy)/rows; let n=0; const filled=27, gk=rng('kv');
-    for(let j=0;j<rows;j++) for(let i=0;i<cols;i++){ const nx=x+i*(cw+gx), ny=y+j*(ch+gy);
-      s+=tile(nx,ny,cw,ch,P.lapisD,1.2)+rect(nx+3,ny+3,cw-6,3,P.gold);
-      if(n<filled){ const k=Math.floor(gk()*4); s+=rect(nx+cw*.2,ny+ch*.34,cw*.6,ch*.5,[P.ivory,P.saffron,P.sky,P.pink][k],S(1))+glyph(nx+cw*.2,ny+ch*.34,cw*.6,ch*.5,gk); }
-      if(i%2===1) s+=line(nx+cw+gx/2,ny+2,nx+cw+gx/2,ny+ch-2,P.goldL,1);
-      n++; }
-    return s; },
-  (x,y,ww,hh)=>{ let s=''; const n=12, tw=(ww-(n-1)*6)/n; const g=rng('lang');
-    for(let i=0;i<n;i++){ const tx=x+i*(tw+6); s+=tile(tx,y+14,tw,hh-24,i===n-1?P.gold:P.ivory,1.2)+glyph(tx,y+14,tw,hh-24,g); }
-    return s; });
-EMBLEM.roomVision=(w,h,r)=> room(w,h,r,P.malachite,
-  (x,y,ww,hh)=>{ // a picture on the wall, cut into 4x4 patches
-    const sz=hh, px=x+(ww-sz)/2;
-    let s=rect(px-6,y-6,sz+12,sz+12,P.ink)+rect(px-3,y-3,sz+6,sz+6,P.gold)+`<svg x="${f(px)}" y="${f(y)}" width="${f(sz)}" height="${f(sz)}" viewBox="0 0 120 120">${garden()}</svg>`;
-    for(let k=1;k<4;k++) s+=line(px+k*sz/4,y,px+k*sz/4,y+sz,P.ivory,1.8)+line(px,y+k*sz/4,px+sz,y+k*sz/4,P.ivory,1.8);
-    return s; },
-  (x,y,ww,hh)=>{ // the patches, flattened into a sequence behind a class token
-    let s=''; const n=17, gap=3.5, tw=(ww-(n-1)*gap)/n, ty=y+(hh-tw)/2;
-    for(let i=0;i<n;i++){ const tx=x+i*(tw+gap);
-      if(i===0){ s+=tile(tx,ty,tw,tw,P.gold,1.2)+circ(tx+tw/2,ty+tw/2,3,P.ink); continue; }
-      const p=i-1;
-      s+=`<svg x="${f(tx)}" y="${f(ty)}" width="${f(tw)}" height="${f(tw)}" viewBox="${(p%4)*30} ${Math.floor(p/4)*30} 30 30">${garden()}</svg>`+rect(tx,ty,tw,tw,'none',S(1.1)); }
-    return s; });
+/* Language Room — paged attention. The floor holds the logical sequence; the wall holds physical memory: pages of four
+   slots, allocated out of order, some belonging to another request, some still free. Gold threads are the block table. */
+EMBLEM.roomLanguage=(w,h,r)=>{
+  const st={};
+  const tokCol=i=> i===11?P.gold:[P.ivory,P.saffron,P.pink][i%3];
+  const owner={5:0,2:1,7:2};              // this sequence: run -> page (non-adjacent, out of order)
+  const other={0:1,4:1};                  // pages held by another request
+  return room(w,h,r,P.lapis,
+    (x,y,ww,hh)=>{ st.wall={x,y,ww,hh}; return ''; },
+    (x,y,ww,hh)=>{ st.floor={x,y,ww,hh}; return ''; },
+    ()=>{
+      let s=''; const {x,y,ww,hh}=st.wall, F=st.floor;
+      const rows=4, pg=16, pw=(ww-pg)/2, gy=10, ch=(hh-(rows-1)*gy)/rows, nw=(pw-12-3*3)/4;
+      const page=p=>({x:x+(p%2)*(pw+pg), y:y+Math.floor(p/2)*(ch+gy)});
+      // floor: 12 tokens in three runs of four
+      const tw=24, ing=5, rg=22, tot=12*tw+3*3*ing+2*rg, fx=F.x+(F.ww-tot)/2, th=F.hh-26, fy=F.y+16;
+      const tokX=i=>fx+i*(tw+ing)+Math.floor(i/4)*(rg-ing);
+      // wall: 8 pages x 4 slots
+      for(let p=0;p<8;p++){ const P0=page(p);
+        s+=rect(P0.x-3,P0.y-3,pw+6,ch+6,P.ink)+rect(P0.x-1,P0.y-1,pw+2,ch+2,owner[p]!==undefined?P.gold:P.lapisD);
+        for(let k=0;k<4;k++){ const nx=P0.x+5+k*(nw+3), ny=P0.y+4;
+          s+=tile(nx,ny,nw,ch-8,P.lapisD,1.1)+rect(nx+3,ny+3,nw-6,2.4,P.gold);
+          if(owner[p]!==undefined){ const i=owner[p]*4+k; s+=rect(nx+nw*.18,ny+ch*.3,nw*.64,ch*.44,tokCol(i),S(1))+glyph(nx+nw*.18,ny+ch*.3,nw*.64,ch*.44,rng('t'+i)); }
+          else if(other[p]){ s+=rect(nx+nw*.18,ny+ch*.3,nw*.64,ch*.44,P.sky,S(1))+glyph(nx+nw*.18,ny+ch*.3,nw*.64,ch*.44,rng('o'+p+k)); } } }
+      // floor tokens with their run brackets
+      for(let i=0;i<12;i++){ const tx=tokX(i); s+=tile(tx,fy,tw,th,tokCol(i),1.2)+glyph(tx,fy,tw,th,rng('t'+i)); }
+      // the block table: one gold thread from each run of the sequence to the page that holds it
+      for(let run=0;run<3;run++){ const p=+Object.keys(owner).find(k=>owner[k]===run), P0=page(p);
+        const x1=(tokX(run*4)+tokX(run*4+3)+tw)/2, y1=fy-7, x2=P0.x+pw/2, y2=P0.y+ch+3;
+        s+=line(x1,y1,x2,y2,P.ink,5.2)+line(x1,y1,x2,y2,P.gold,2.8)+circ(x2,y2,4,P.gold,S(1.2))+circ(x1,y1,3.4,P.gold,S(1.1)); }
+      for(let run=0;run<3;run++){ const a=tokX(run*4), b=tokX(run*4+3)+tw; s+=`<path d="M${f(a)},${f(fy-3)} V${f(fy-7)} H${f(b)} V${f(fy-3)}" fill="none" stroke="${P.ink}" stroke-width="3.6"/><path d="M${f(a)},${f(fy-3)} V${f(fy-7)} H${f(b)} V${f(fy-3)}" fill="none" stroke="${P.gold}" stroke-width="1.8"/>`; }
+      return s; });
+};
+/* Vision Room — a ViT's class token looking at the picture. Patches it ignores are washed with lapis; the three it attends
+   to most are set in gold and threaded to the class token, which leads the patch sequence along a dark runner on the floor. */
+EMBLEM.roomVision=(w,h,r)=>{
+  const st={};
+  const att=[[.1,.35,.1,.45],[.6,.95,.5,.1],[.5,.85,.8,.15],[.2,.3,.3,.15]];
+  const top=[[1,1],[2,1],[2,2]];
+  return room(w,h,r,P.malachite,
+    (x,y,ww,hh)=>{ const sz=hh, px=x+(ww-sz)/2; st.pic={px,y,sz};
+      let s=rect(px-6,y-6,sz+12,sz+12,P.ink)+rect(px-3,y-3,sz+6,sz+6,P.gold)+`<svg x="${f(px)}" y="${f(y)}" width="${f(sz)}" height="${f(sz)}" viewBox="0 0 120 120">${garden()}</svg>`;
+      const q=sz/4;
+      att.forEach((row,j)=>row.forEach((a,i)=>{ if(a<.5) s+=rect(px+i*q,y+j*q,q,q,P.ink,`fill-opacity="${f(Math.min(.5,(.5-a)*1.1+.1))}"`); }));
+      for(let k=1;k<4;k++) s+=line(px+k*q,y,px+k*q,y+sz,P.ivory,1.8)+line(px,y+k*q,px+sz,y+k*q,P.ivory,1.8);
+      return s; },
+    (x,y,ww,hh)=>{ const n=17, gap=3.5, tw=(ww-(n-1)*gap)/n, ty=y+(hh-tw)/2; st.cls={x:x+tw/2,y:ty,tw};
+      let s=rect(x-7,ty-7,ww+14,tw+14,P.ink)+rect(x-4,ty-4,ww+8,tw+8,P.lapisD);
+      for(let i=0;i<n;i++){ const tx=x+i*(tw+gap);
+        if(i===0){ s+=tile(tx,ty,tw,tw,P.gold,1.2)+circ(tx+tw/2,ty+tw/2,3,P.ink); continue; }
+        const p=i-1;
+        s+=`<svg x="${f(tx)}" y="${f(ty)}" width="${f(tw)}" height="${f(tw)}" viewBox="${(p%4)*30} ${Math.floor(p/4)*30} 30 30">${garden()}</svg>`+rect(tx,ty,tw,tw,'none',S(1.1)); }
+      return s; },
+    ()=>{ const {px,y,sz}=st.pic, q=sz/4, c=st.cls; let s='';
+      for(const [j,i] of top){ const x2=px+i*q+q/2, y2=y+j*q+q/2; s+=line(c.x,c.y-2,x2,y2,P.ink,4.2)+line(c.x,c.y-2,x2,y2,P.gold,2.2); }
+      for(const [j,i] of top){ s+=rect(px+i*q+1.5,y+j*q+1.5,q-3,q-3,'none',`stroke="${P.ink}" stroke-width="5.4"`)+rect(px+i*q+1.5,y+j*q+1.5,q-3,q-3,'none',`stroke="${P.gold}" stroke-width="3"`)+circ(px+i*q+q/2,y+j*q+q/2,3.6,P.gold,S(1)); }
+      s+=tile(c.x-c.tw/2,c.y,c.tw,c.tw,P.gold,1.2)+circ(c.x,c.y+c.tw/2,3,P.ink);
+      return s; });
+};
 EMBLEM.roomSound=(w,h,r)=> room(w,h,r,P.lac,
   (x,y,ww,hh)=>{ // a spectrogram hung like a textile: time across, frequency up
     let s=''; const cols=22, rows=9, cw=ww/cols, ch=hh/rows; const pal=[P.lac,P.vermilion,P.saffron,P.goldL,P.ivory];
@@ -568,23 +625,34 @@ EMBLEM.kernel=(w,h,r)=>{
 };
 /* ======================= books ======================= */
 const SERIES='Charlie and the Intelligence Factory';
+/* Ground = subject family. The three level pigments (peori, sabz, lajward) are reserved for the hashiya and never used as a ground. */
+const FAMILY = [
+  ['Foundations', 'maths, statistics, classical ML', P.surmai, 'Surmai'],
+  ['Neural networks & deep learning', 'perceptrons to CNNs, generative basics', P.jamuni, 'Jamuni'],
+  ['Language models', 'LLMs, transformers, finetuning, RLHF', P.vermilion, 'Hingul'],
+  ['Vision & multimodal', 'ViT, DeiT, VLMs, robotics', P.sky, 'Asmani'],
+  ['Agents, context & memory', 'context, agents, RAG, prompting', P.lac, 'Lakh'],
+  ['Systems & infrastructure', 'parallelism, kernels, serving', P.ink, 'Kajal'],
+  ['Data & code', 'SQL, Python, R, DSA, Git', P.geru, 'Geru'],
+  ['A series', 'one ground for the whole set', P.pink, 'Gulabi'],
+];
 const BOOKS = [
   {slug:'ai-context-engineering', level:'intermediate', capsules:43, hours:10,
-   title:['AI Context','Engineering'], size:68, ground:P.saffron, emblem:'ace'},
+   title:['AI Context','Engineering'], size:68, ground:P.lac, emblem:'ace'},
   {slug:'mathematical-foundations-for-ml', level:'beginner', capsules:43, hours:10,
-   title:['Mathematical','Foundations for','Machine Learning'], size:52, ground:P.lapis, emblem:'math'},
+   title:['Mathematical','Foundations','for Machine Learning'], size:54, ground:P.surmai, emblem:'math'},
   {slug:'neural-networks-from-scratch', level:'beginner', capsules:33, hours:7,
-   title:['Neural Networks','from Scratch'], size:64, ground:P.malachite, emblem:'nn'},
+   title:['Neural Networks','from Scratch'], size:64, ground:P.jamuni, emblem:'nn'},
   {slug:'build-llms-from-scratch', level:'intermediate', capsules:20, hours:6,
-   title:['Build Large Language','Models (LLMs)','from Scratch'], size:52, ground:P.vermilion, emblem:'llm'},
+   title:['Build Large','Language Models','(LLMs) from Scratch'], size:54, ground:P.vermilion, emblem:'llm'},
   {slug:'5d-parallelism', level:'advanced', capsules:40, hours:9,
-   title:['5D Parallelism','for Large Model Training'], size:54, ground:P.ink, emblem:'p5d'},
+   title:['5D Parallelism'], sub:['for Large Model Training'], subSize:.58, size:66, ground:P.ink, emblem:'p5d'},
   {slug:'pi-vs-hermes-vs-codex', level:'advanced', capsules:9, hours:1,
    title:['Pi vs Hermes vs Codex'], sub:['Context Compaction and Memory'], subSize:.58, size:56, ground:P.lac, emblem:'pi'},
   {slug:'sql-masterclass', level:'beginner', capsules:36, hours:8,
-   title:['SQL Masterclass'], size:72, ground:P.vermilion, emblem:'sql'},
+   title:['SQL Masterclass'], size:72, ground:P.geru, emblem:'sql'},
   {slug:'deit-from-scratch', level:'advanced', capsules:42, hours:10,
-   title:['Build a Data-Efficient','Image Transformer','(DeiT) from Scratch'], size:50, ground:P.malachite, emblem:'deit'},
+   title:['Build a Data-Efficient','Image Transformer','(DeiT) from Scratch'], size:50, ground:P.sky, emblem:'deit'},
   {slug:'kernel-engineering', level:'advanced', soon:true,
    rub:'Forthcoming', title:['Kernel Engineering'], sub:['From silicon to speculative decoding —','GPU kernels for modern LLMs.'], subSize:.42, size:62, ground:'primed', emblem:'kernel'},
   {slug:'charlie-language-room', level:'advanced', capsules:22, hours:5, series:'I',
@@ -634,7 +702,7 @@ const COLOPHON = {
   'neural-networks-from-scratch': {
     blurb:['<b>Neural Networks from Scratch</b> is a beginner’s book in 33 short lessons — capsules — about seven hours of reading, free to read at books.vizuara.ai.',
            'It belongs to Vizuara Books, a library of technical books on artificial intelligence and machine learning.'],
-    cover:'The miniature on the front is a 3·5·5·2 perceptron. Every thread is a weight — gold where it is positive, vermilion where it is negative, its width its magnitude. Every neuron is a set stone, its colour its activation; one forward path is strung with pearls. The folio follows the Mughal album page: a painting inside ruled borders (jadval), inside a coloured margin (hashiya). A saffron margin and a single rule mark a beginner’s book.'
+    cover:'The miniature on the front is a 3·5·5·2 perceptron. Every thread is a weight — gold where it is positive, vermilion where it is negative, its width its magnitude. Every neuron is a set stone coloured by its activation in a real forward pass through exactly these weights: lapis for quiet, then vermilion and saffron, ivory for fully on. The path of strongest activation is strung with pearls, ending at the larger stone, the prediction. The folio follows the Mughal album page: a painting inside ruled borders (jadval), inside a coloured margin (hashiya). A saffron margin and a single rule mark a beginner’s book; the jamuni ground marks the neural-network family.'
   }
 };
 function wrapEl(b){
@@ -683,9 +751,10 @@ function wrapEl(b){
 
 /* ======================= presentation chrome ======================= */
 function chrome(){
-  const sw=[['Peori','Indian yellow — beginner margin',P.saffron],['Sabz','malachite — intermediate margin',P.malachite],['Lajward','lapis — advanced margin',P.lapis],
-            ['Hingul','vermilion',P.vermilion],['Lakh','lac crimson',P.lac],['Gulabi','pink',P.pink],['Asmani','sky',P.sky],['Wasli','paper ivory',P.ivory],['Sona','shell gold',P.gold],['Kajal','lamp black',P.ink]];
+  const sw=[['Peori','Indian yellow — beginner margin only',P.saffron],['Sabz','malachite — intermediate margin only',P.malachite],['Lajward','lapis — advanced margin only',P.lapis],
+            ['Wasli','paper ivory — cartouche',P.ivory],['Sona','shell gold — rules, bezels',P.gold]];
   document.getElementById('swatches').innerHTML=sw.map(([n,d,c])=>`<div><i style="background:${c}"></i><b>${n}</b>${d}<br><span>${c}</span></div>`).join('');
+  document.getElementById('families').innerHTML=FAMILY.map(([n,d,c,pg])=>`<div><i style="background:${c}"></i><b>${pg}</b> <span>${c}</span><br>${n}<br><em>${d}</em></div>`).join('');
   document.getElementById('levels').innerHTML=Object.values(LEVEL).map(L=>{
     let g=`<svg width="92" height="70" viewBox="0 0 92 70">`+rect(0,0,92,70,L.margin);
     for(let i=0;i<L.n;i++){ const o=4+i*4; g+=ring(14-o,10-o,64+2*o,50+2*o,1.3,L.margin===P.saffron?P.ink:P.gold); }
@@ -723,7 +792,7 @@ function build(){
 function fit(){
   document.querySelectorAll('.key5').forEach(k=>{
     const items=[...k.querySelectorAll('.ki')], gap=+k.dataset.gap;
-    const ws=items.map(g=>31+g.querySelector('text').getComputedTextLength()-1.4);
+    const ws=items.map(g=>26+g.querySelector('text').getComputedTextLength()-1.2);
     const tot=ws.reduce((a,b)=>a+b,0)+gap*(items.length-1); let x=+k.dataset.x0+(+k.dataset.w-tot)/2;
     items.forEach((g,i)=>{ g.setAttribute('transform',`translate(${x.toFixed(2)},0)`); x+=ws[i]+gap; });
   });
