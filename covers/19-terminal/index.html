@@ -360,23 +360,22 @@ EMBLEM['pi-vs-hermes-vs-codex']=function(g){
     'summary: the webhook handler dropped events when the ledger was slow. added backoff with jitter, at most five attempts, and an idempotency key so no event applies twice; 12 passed. after five failures the event goes to the dead letter queue with its error and an alert fires; replays reuse the keys; 15 passed. next: ship behind a flag.',
     'summary: the nightly ingest slowed after a merge that swapped a vectorised call in normalize_rows for a python loop (71 percent of time). restored the vectorised path: sample run 4.1 s, was 58 s. a benchmark now fails the build above 8 s, because review missed the loop. user approved shipping.',
   ];
-  const centers=[20,60,100], W0=36, LIM=27, MEM=FR-4;
+  const centers=[20,60,100], W0=36, LIM=23, MEM=FR-4;
   T.forEach((turns,f)=>{
     const c0=centers[f]-W0/2; let r=0;
     for(const t of turns){ if(r>=LIM) break; r+=g.flow(r,c0,LIM,c0+W0,t,.56); }
     // the trigger
     const lab=' context limit ', dash='- '.repeat(W0).slice(0,W0), at=Math.floor((W0-lab.length)/2);
     g.text(LIM,c0,dash.slice(0,at)+lab+dash.slice(at+lab.length),.84);
-    // older turns rewritten as a summary, narrowing into memory
-    const words=S[f].split(' '); let wi=0; const rows=MEM-LIM-2;
-    for(let i=0;i<rows&&wi<words.length;i++){
-      const u=i/(rows-1), w=Math.max(8,Math.round(W0*(1-.78*u)/2)*2);
-      let line='';
-      while(wi<words.length&&(line?line.length+1:0)+words[wi].length<=w){ line+=(line?' ':'')+words[wi]; wi++; }
-      if(!line){ line=words[wi].slice(0,w); wi++; }
-      const lp=Math.floor((W0-line.length)/2);
-      g.text(LIM+2+i,c0+lp,line,.72+.18*u);
-    }
+    // older turns rewritten as a summary, narrowing into memory; the top width is chosen so the text ends on the last row
+    const words=S[f].split(' '), rows=MEM-LIM-2;
+    const lay=(W)=>{ const out=[]; let wi=0;
+      for(let i=0;i<rows&&wi<words.length;i++){ const u=i/(rows-1), w=Math.max(6,Math.round((W-(W-6)*u)/2)*2); let line='';
+        while(wi<words.length&&(line?line.length+1:0)+words[wi].length<=w){ line+=(line?' ':'')+words[wi]; wi++; }
+        if(!line){ line=words[wi]; wi++; } out.push(line); }
+      return wi>=words.length?out:null; };
+    let best=null; for(let W=12;W<=W0;W+=2){ const o=lay(W); if(o){ best=o; break; } }
+    const L2=best||[]; L2.forEach((line,i)=>{ const u=i/Math.max(1,L2.length-1), lp=Math.floor((W0-line.length)/2); g.text(MEM-1-L2.length+i,c0+lp,line,.66+.18*u); });
     const mw=8, mc=centers[f]-mw/2;
     g.fill(MEM,mc,FR,mc+mw,' ',.95,1);
     g.text(MEM+1,mc+1,'MEMORY',.95,1);
@@ -488,23 +487,21 @@ EMBLEM['charlie-language-room']=function(g){
 EMBLEM['charlie-vision-room']=function(g){
   seriesBand(g,1);
   // a 36 x 32 px image of an eye; every byte is a pixel's luminance (00 = black, ff = white)
-  const cx=360, cy=272;
+  const cx=360, cy=268;
   const lum=(x,y)=>{
-    const dx=(x-cx)/335, u=Math.abs(dx);
-    const up=cy-150*(1-dx*dx)*(1-.12*dx), lo=cy+108*(1-dx*dx)*(1+.05*dx);
-    const brow=cy-196+(dx*dx)*64-12*dx;
-    let L=.8-.08*Math.abs((y-cy)/250);
-    if(Math.abs(y-brow)<15-9*u && u<.95) L=.3;
+    const dx=(x-cx)/350, u=Math.abs(dx);
+    const up=cy-172*(1-dx*dx)*(1-.1*dx), lo=cy+128*(1-dx*dx)*(1+.05*dx);
+    let L=.56-.1*Math.abs((y-cy)/260);                       // skin
     if(u<1 && y>up && y<lo){
-      L=.93-.25*Math.max(0,1-(y-up)/40);
-      const d=Math.hypot(x-cx,y-(cy-8));
-      if(d<128){ const th=Math.atan2(y-cy,x-cx); L=.42+.13*Math.sin(th*19)-.14*(d/128); }
-      if(d>=116&&d<128) L=.1;
-      if(d<50) L=.02;
-      if(Math.hypot(x-(cx+30),y-(cy-40))<15) L=1;
+      L=.97-.35*Math.max(0,1-(y-up)/30);                     // sclera, shaded under the lid
+      const d=Math.hypot(x-cx,y-(cy-6));
+      if(d<140){ const th=Math.atan2(y-cy,x-cx); L=.24+.1*Math.sin(th*17)-.08*(d/140); }   // iris
+      if(d>=126&&d<140) L=.08;                               // limbal ring
+      if(d<62) L=.02;                                        // pupil
+      if(Math.hypot(x-(cx+34),y-(cy-44))<18) L=1;            // catch-light
     }
-    if(u<1.03 && y<=up && y>up-17+8*u) L=.04;
-    if(u<1 && y>=lo && y<lo+7) L=.5;
+    if(u<1.05 && y<=up && y>up-30+14*u) L=.03;               // lash line
+    if(u<1 && y>=lo && y<lo+12) L=.3;                        // lower lid
     return clamp(L);
   };
   const PW=10, PH=5, c0=1, r0=5, hot=[3,7];
@@ -524,8 +521,7 @@ EMBLEM['charlie-vision-room']=function(g){
   seq.forEach(t=>{ const on=t===`p${k}`, cls=t==='[CLS]';
     if(on||cls) g.text(47,c,' '+t+' ',.95,on?1:0); else g.text(47,c,' '+t+' ',t==='...'?.5:.8);
     c+=t.length+3; });
-  g.text(48,6+4+7*0,'',.5);
-  return {cap:['x','= [CLS] + patches(img, 4 x 3 px) @ W_embed + pos   # 36 x 32 px -> 12 x 8 = 96 patches -> 97 tokens']};
+  return {cap:['x','= [CLS] + patchify(img, 3x4) @ W_embed + pos   # a 36 x 32 image: 12 x 8 = 96 patches -> 97 tokens']};
 };
 
 // III · Sound room: a user turn and an agent turn, each column made of the letter being spoken
@@ -548,7 +544,7 @@ EMBLEM['charlie-sound-room']=function(g){
   for(let c=0;c<COLS;c++) g.put(mid,c,'-',.3);
   turn('can you move my dentist appointment to friday?',2,61,0);
   turn('sure. friday at ten is free. shall i book it?',67,118,1);
-  g.text(49,6,' USER  0.00-2.36 s ',.95); g.text(49,61,'240 ms',.7); g.text(49,67,' AGENT  2.60-4.64 s ',.95,1);
+  g.text(49,6,' USER  0.00-2.36 s ',.95); g.text(30,61,'240 ms',.7); g.text(49,67,' AGENT  2.60-4.64 s ',.95,1);
   return {cap:['reply','= tts(llm(asr(mic)))   # user turn · 240 ms · agent turn · 40 ms per column']};
 };
 
@@ -586,27 +582,27 @@ EMBLEM['charlie-reasoning-room']=function(g){
 
 // ─── books ───────────────────────────────────────────────────────────────
 const BOOKS=[
-  {slug:'build-llms-from-scratch', desc:'Causal self-attention over a 51-token sentence, each weight printed as one digit (row max = 9). The masked future is the empty half; the selected diagonal is each token attending to itself.', level:'intermediate', meta:'20 capsules · 6 h',
+  {slug:'build-llms-from-scratch', desc:"GPT-2 small's real attention (layer 1, head 2) over a 51-token sentence, run in NumPy from the released weights; each weight printed as one digit, rows scaled to max 9. The masked future is the empty half; the selected diagonal is each token attending to itself.", level:'intermediate', meta:'20 capsules · 6 h',
    title:[['Build Large','Language Models','(LLMs) from Scratch'],5]},
-  {slug:'neural-networks-from-scratch', desc:'A 40 × 51 hex dump of a handwritten seven — one byte of ink per pixel — and the ten-way softmax a small network returns for it.', level:'beginner', meta:'33 capsules · 7 h',
+  {slug:'neural-networks-from-scratch', desc:'MNIST test image 0 — a handwritten seven — dumped as hex, one byte of ink per pixel, beside the softmax that the back-cover program actually returns for it after ten epochs (0.998 on seven; test accuracy 0.976).', level:'beginner', meta:'33 capsules · 7 h',
    title:[['Neural Networks','from Scratch'],6]},
-  {slug:'mathematical-foundations-for-ml', desc:'420 draws from N(0, 1), every sample printed in its own bin; the selected asterisks trace the density the histogram converges to.', level:'beginner', meta:'43 capsules · 10 h',
+  {slug:'mathematical-foundations-for-ml', desc:'420 draws from N(0, 1), every sample printed in its own 0.25-wide bin over [-2.5, 2.5]; the selected asterisks trace 420 · 0.25 · pdf(x), the curve the histogram converges to.', level:'beginner', meta:'43 capsules · 10 h',
    title:[['Mathematical','Foundations','for Machine Learning'],5]},
   {slug:'5d-parallelism', desc:"The 2×2×2×2×2 device mesh drawn as what it is, a 5-cube: 32 ranks, 80 links, each link spelled with its axis (dp, pp, tp, cp, ep). Rank 00's five process groups are selected.", level:'advanced', meta:'40 capsules · 9 h',
    title:[['5D Parallelism for','Large Model Training'],5]},
   {slug:'ai-context-engineering', desc:"A 128k-token window packed with system prompt, tool schemas, retrieved docs, memory and history; the user's question selected, 594 tokens spare, one document left outside.", level:'intermediate', meta:'43 capsules · 10 h',
    title:[['AI Context','Engineering'],6]},
-  {slug:'pi-vs-hermes-vs-codex', desc:'Three agent transcripts squeezed through compaction — stop-words go, then vowels, then whole words — until each lands in memory.', level:'advanced', meta:'9 capsules · 1 h',
+  {slug:'pi-vs-hermes-vs-codex', desc:'The real mechanism, drawn identically three times: a transcript fills the context up to its limit; the older turns are rewritten as a plain-language summary that narrows into memory. No behaviour is attributed to any one agent.', level:'advanced', meta:'9 capsules · 1 h',
    title:[['Pi vs Hermes','vs Codex:'],5,['Context Compaction and Memory']]},
-  {slug:'decision-trees-from-scratch', desc:'Iris, petal length × petal width, split to depth 3. Every leaf is textured with its own decision rule; the root split is selected.', level:'beginner', meta:'23 capsules · 5 h',
+  {slug:'decision-trees-from-scratch', desc:"Fisher's 150 iris flowers at their real petal length × width, printed as their class ids, over the depth-3 CART partition fitted to them (thresholds 2.45, 1.75, 4.95, 4.85; leaf counts as the tree reports them). Root split selected.", level:'beginner', meta:'23 capsules · 5 h',
    title:[['Build Decision Trees','from Scratch'],5]},
-  {slug:'kernel-engineering', desc:'One step of a tiled GEMM in fp16: row-tile i of A and column-tile j of B stream through; the selected tiles are this k-step and the accumulator. Coming soon: the cursor is hollow.', level:'advanced', meta:'coming soon', soon:true,
+  {slug:'kernel-engineering', desc:'One step of a tiled fp16 GEMM with consistent shapes (K = 2 tiles on both A and B): the selected tiles are this k-step and the accumulator, finished C tiles hold the real products A @ B, and unwritten tiles are zero. Coming soon: the cursor is hollow.', level:'advanced', meta:'coming soon', soon:true,
    title:[['Kernel','Engineering'],6,['From silicon to speculative decoding —','GPU kernels for modern LLMs.'],2.4]},
-  {slug:'charlie-language-room', desc:'The H100 roofline, min(989 TFLOP/s, 3.35 TB/s × intensity). Every row under the roof names its own throughput; decode sits on the slope, prefill on the flat.', level:'advanced', meta:'22 capsules · 5 h',
+  {slug:'charlie-language-room', desc:'The H100 roofline, min(989 TFLOP/s, 3.35 TB/s × intensity), computed column by column. Every row under the roof names its own throughput; decode sits on the slope, prefill on the flat, the ridge at 295 FLOP/byte is selected.', level:'advanced', meta:'22 capsules · 5 h',
    title:[['Charlie and','the Language Room'],5,['Inference Engineering']]},
-  {slug:'charlie-vision-room', desc:'An eye, as bytes, cut into 13 × 9 patches — the 117 tokens a Vision Transformer sees. One patch selected.', level:'intermediate', meta:'20 capsules · 6 h',
+  {slug:'charlie-vision-room', desc:'An eye as a 36 × 32 image of luminance bytes (00 black, ff white), cut into 12 × 8 patches, then the token sequence a ViT reads: [CLS] followed by the 96 patches. One patch and its token are selected.', level:'intermediate', meta:'20 capsules · 6 h',
    title:[['Charlie and','the Vision Room'],5,['Vision Transformers']]},
-  {slug:'charlie-sound-room', desc:'A user turn and an agent turn as waveforms. Each column is built from the letter being spoken, so the centre line reads the transcript.', level:'intermediate', meta:'20 capsules · 6 h',
+  {slug:'charlie-sound-room', desc:'A user turn and an agent turn as waveforms at 40 ms per column. Each column is built from the letter being spoken, so the centre line reads the transcript; 240 ms of silence between turns.', level:'intermediate', meta:'20 capsules · 6 h',
    title:[['Charlie and','the Sound Room'],5,['Voice Agents']]},
   {slug:'charlie-reasoning-room', desc:'A group of eight sampled chains for 17 × 24; the ones that reach 408 score +1. The chain being reinforced is selected.', level:'advanced', meta:'21 capsules · 6 h',
    title:[['Charlie and','the Reasoning Room'],5,['Reinforcement Learning,','from bandits to reasoning models']]},
@@ -706,7 +702,6 @@ for epoch in range(10):
 _, _, p = forward(x_test[:1])
 print(p.round(3))    # a seven, like the one on the front`.split('\n');
   const g=new Grid();
-  for(let r=0;r<FR;r++)for(let x=0;x<40;x++) g.text(r,x*3,'00 ',.02);
   const lines=code.filter(ln=>ln!=='');
   lines.slice(0,FR-1).forEach((ln,i)=>{
     const row=i+1, hot=ln.includes('# a seven');
@@ -717,12 +712,12 @@ print(p.round(3))    # a seven, like the one on the front`.split('\n');
   });
   const M=6, back=document.createElement('div'); back.className='back';
   back.innerHTML=`<div class="field">${g.html()}</div>
-   <div class="cap" style="left:${M*CW}px;top:${(52.5*CH).toFixed(1)}px"><b>$</b> python mnist_from_scratch.py</div>
-   <div class="bk" style="left:${M*CW}px;top:${(56*CH).toFixed(1)}px;width:420px;font-size:13px;line-height:1.55;font-variation-settings:'wdth' 87.5,'wght' 500">
+   <div class="cap" style="left:${M*CW}px;top:${(52.5*CH).toFixed(1)}px"><b>$</b> python mnist_from_scratch.py<br>epoch 9  loss 0.087  acc 0.976<br>[[0.    0.    0.    0.001 0.    0.    0.    0.998 0.    0.   ]]</div>
+   <div class="bk" style="left:${M*CW}px;top:${(58*CH).toFixed(1)}px;width:420px;font-size:13px;line-height:1.55;font-variation-settings:'wdth' 87.5,'wght' 500">
      <div style="font-variation-settings:'wdth' 100,'wght' 800;letter-spacing:.08em;font-size:11px;margin-bottom:8px">ON THE COVER</div>
-     A handwritten seven, printed the way a network reads it: 40 × 51 pixels, one hex byte of ink per pixel. Beside it, a softmax over the ten digits — the kind of answer the program above learns to give. The program is the whole network: forward pass, backward pass, and the loop that trains it.
+     MNIST test image 0, a handwritten seven, printed the way the network reads it: one hex byte of ink per pixel (rows 3 to 27 of 28). Beside it, the softmax that the program above returned for it after ten epochs. Every number on this cover is that program's input or its output.
    </div>
-   <div class="bk" style="left:${M*CW}px;top:${(71*CH).toFixed(1)}px;font-size:11px;line-height:1.6;font-variation-settings:'wdth' 100,'wght' 700;letter-spacing:.05em">
+   <div class="bk" style="left:${M*CW}px;top:${(72.5*CH).toFixed(1)}px;font-size:11px;line-height:1.6;font-variation-settings:'wdth' 100,'wght' 700;letter-spacing:.05em">
      <span style="color:var(--sig)">&gt;</span> BEGINNER · 33 CAPSULES · 7 H · BOOKS.VIZUARA.AI</div>
    <div class="bk" style="right:${M*CW}px;top:${(62*CH).toFixed(1)}px;width:192px;height:${(14*CH).toFixed(1)}px;border:2px dashed var(--ink);font-size:10px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:10px;letter-spacing:.08em;font-variation-settings:'wdth' 100,'wght' 600">ISBN · BARCODE</div>
    <div class="foot im" style="left:${M*CW}px;top:${(76*CH).toFixed(1)}px">VIZUARA BOOKS<i></i></div>`;

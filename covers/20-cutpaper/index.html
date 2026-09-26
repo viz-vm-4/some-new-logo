@@ -540,22 +540,23 @@ ART['charlie-sound-room'] = () => room(C.saff, (B,O) => {
 });
 ART['charlie-reasoning-room'] = () => room(C.rose, (B,O) => {
   let s = '';
-  const fl = FLOOR - 8;
-  // where RL starts: three bandit arms on the left, each with the stack of counters it has paid out
-  [[104,3],[152,6],[200,2]].forEach(([x,n]) => {
-    s += lift(2, strip(x+20, fl-8, x+6, fl-104, 5, jit(C.ink)) + circ(x+6, fl-110, 9, jit(C.ink)));
-    for (let i=0;i<n;i++) s += lift(2, rect(x + (i%2?2:-1), fl-10-i*11, 34, 9, jit(i===n-1 ? C.lemon : C.ivory)));
+  const fl = FLOOR - 6;
+  // where RL starts: three bandit arms, shown as the stacks of counters each has paid out
+  [[92,3],[134,7],[176,2]].forEach(([x,n]) => {
+    for (let i=0;i<n;i++) s += lift(2, rect(x + (i%2?2:-1), fl-11-i*12, 34, 10, jit(i===n-1 ? C.lemon : C.ivory)));
   });
-  // where it ends: a tree of reasoning traces. One is kept and reaches the reward;
-  // the others have been snipped off, and the offcuts lie on the floor.
-  const P = {r:[452,fl], a:[452,388], b:[378,318], c:[522,316], d:[486,242], e:[590,248], h:[472,170]};
-  const br = (p,q,t=1) => strip(p[0], p[1], p[0]+(q[0]-p[0])*t, p[1]+(q[1]-p[1])*t, 12, jit(C.ivory));
-  s += lift(4, br(P.r,P.a) + br(P.a,P.c) + br(P.c,P.d) + br(P.d,P.h) + br(P.a,P.b,.45) + br(P.c,P.e,.4));
-  s += lift(5, ['a','c','d'].map(k => circ(P[k][0], P[k][1], 13, jit(C.ivory)) + brad(P[k][0], P[k][1], 5)).join(''));
-  s += lift(8, circ(P.h[0], P.h[1], 26, jit(C.verm)) + circ(P.h[0], P.h[1], 11, jit(C.ivory)));
-  // offcuts: the pruned branches, lying flat
-  s += lift(1, `<g transform="rotate(-8 300 ${fl-6})">${rect(262, fl-12, 70, 12, jit(shade(C.ivory,.06)))}${circ(340, fl-6, 12, jit(shade(C.ivory,.06)))}</g>`);
-  s += lift(1, `<g transform="rotate(10 606 ${fl-4})">${rect(580, fl-10, 52, 12, jit(shade(C.ivory,.06)))}${circ(640, fl-4, 12, jit(shade(C.ivory,.06)))}</g>`);
+  // where it ends: a tree of reasoning traces grown from one prompt. Reward picks one trace
+  // (vermilion) all the way to the reward token; the others stop where they were cut off.
+  const N = {r:[392,fl], a:[392,410], b1:[276,352], b2:[392,332], b3:[514,350], c0:[226,282], c1:[334,262], c2:[452,250], c3:[578,286], c4:[520,262], d:[488,162]};
+  const E = [['a','b1'],['a','b3'],['b1','c0'],['b2','c1'],['b3','c3'],['b3','c4']];
+  const K = [['r','a'],['a','b2'],['b2','c2'],['c2','d']];
+  const seg = (p,q,w,c) => strip(N[p][0], N[p][1], N[q][0], N[q][1], w, jit(c));
+  s += lift(3, E.map(([p,q]) => seg(p,q,13,C.ivory)).join(''));
+  s += lift(5, K.map(([p,q]) => seg(p,q,17,C.verm)).join(''));
+  // dead ends: small ivory caps where the trace was cut
+  s += lift(4, ['c0','c1','c3','c4'].map(k => circ(N[k][0], N[k][1], 11, jit(C.ivory))).join(''));
+  s += lift(6, ['a','b1','b2','b3','c2'].map(k => circ(N[k][0], N[k][1], 14, jit(C.ivory)) + brad(N[k][0], N[k][1], 5)).join(''));
+  s += lift(8, circ(N.d[0], N.d[1], 32, jit(C.verm)) + circ(N.d[0], N.d[1], 14, jit(C.ivory)));
   return s;
 });
 
@@ -638,7 +639,7 @@ ART['rag-in-production'] = () => {
   // the cards still in the drawer, tab after tab
   for (let i=0;i<N;i++){
     if (skip.has(i)) continue;
-    s += lift(1, card(X, top0 + i*step, Wc, 150, tabs[i%4], i%3===0 ? shade(C.ivory,.14) : shade(C.ivory,.05), false));
+    s += lift(1, card(X, top0 + i*step, Wc, 136, tabs[i%4], i%3===0 ? shade(C.ivory,.14) : shade(C.ivory,.05), false));
   }
   // the drawer front, with its label and brass pull
   const D = {x:108, y:FLOOR-158, w:504, h:158};
@@ -678,7 +679,7 @@ const BOOKS = [
   {slug:'charlie-sound-room', shelf:'factory', level:'intermediate', lines:['Charlie and the','Sound Room'], sub:'Audio: Voice Agents', series:'III', capsules:20, hours:6,
     note:'Voice agents are about turn-taking: an ink utterance, a clear pause while the agent listens for the end of the turn, then an ivory reply with its own envelope.'},
   {slug:'charlie-reasoning-room', shelf:'factory', level:'advanced', lines:['Charlie and the','Reasoning Room'], sub:'Reason: Reinforcement Learning', series:'IV', capsules:21, hours:6,
-    note:'From bandits to reasoning models: three bandit arms with the counters each has paid out, then a tree of reasoning traces. One trace is kept and reaches the vermilion reward; the others have been snipped off and lie on the floor.'},
+    note:'From bandits to reasoning models: three bandit arms, shown as the counters each has paid out, then a tree of reasoning traces grown from one prompt. Reward picks one trace (vermilion) all the way to the reward token; the others stop where they were cut off.'},
   {slug:'inference-engineering', shelf:'systems', level:'advanced', lines:['Inference','Engineering'], sub:'Batching, KV-cache, paged attention, speculative decoding', soon:true,
     note:'<b>Coming soon</b> books show the kit before assembly: a punch-out sheet with die lines and registration marks. Here the pieces are numbered KV-cache pages; a few are already pressed out and no longer in order, as in paged attention.'},
   {slug:'rag-in-production', shelf:'agents', level:'intermediate', lines:['RAG','in Production'], capsules:42, hours:10,

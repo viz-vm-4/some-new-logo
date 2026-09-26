@@ -23,7 +23,7 @@ function trickSVG(b, suffix = '', w = 400, cls = 'arms') {
   const id = 'c-' + b.slug + suffix;
   const lab = (x, y, t) => `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" fill="${ink}">${t}</text>`;
   const inner = `<g style="color:${ink}">${ARMS[b.slug]()}</g>` +
-    lab(40, 40, 'sa') + lab(120, 120, 'sa') + lab(360, 360, 'sa') + lab(40, 440, 'sa') + lab(120, 360, 'sa') + lab(360, 40, 'sa') +
+    lab(40, 40, 'sa') + lab(360, 120, 'sa') + lab(120, 360, 'sa') + lab(200, 440, 'sa') +
     lab(120, 200, 'or') + lab(360, 200, 'or') + lab(280, 80, 'or') + lab(280, 360, 'or') + lab(280, 200, 'gu');
   return `<svg class="${cls} trick" viewBox="0 0 400 480" width="${w}" height="${n(w * 1.2)}" overflow="visible" aria-hidden="true">` +
     `<clipPath id="${id}"><path d="${SHIELD}"/></clipPath><g clip-path="url(#${id})">${inner}</g>` +
@@ -38,7 +38,7 @@ function coverInner(b, suffix = '') {
   const adv = b.level === 'advanced';
   const fg = adv ? T.argent : T.sable, bg = adv ? T.sable : (b.level === 'intermediate' ? T.or : GROUND.beginner);
   const lines = b.title.split('|').length;
-  const size = { 1: 86, 2: 86, 3: 70, 4: 58 }[lines];
+  const size = (b.subtitle || b.series) && lines <= 2 ? 76 : { 1: 86, 2: 86, 3: 70, 4: 58 }[lines];
   const ext = b.soon ? 'Coming soon' : `${b.capsules} capsules · ${b.hours} hours`;
   return `
     <div class="imprint">${imprintMark(fg, bg)}<span>Vizuara Books</span></div>
@@ -101,13 +101,13 @@ function buildOrdinary() {
   const items = [
     ['Roundel', 'a token; a data point', fieldRect(T.argent) + roundel(200, 200, 90, T.gules)],
     ['Annulet', 'the token still to come; a neighbourhood', fieldRect(T.azure) + annulet(200, 200, 100, 34, T.or)],
-    ['Billet', 'a document', fieldRect(T.purpure) + billet(200, 210, 130, 200, T.argent)],
+    ['Billet', 'a document; a prompt', fieldRect(T.purpure) + billet(200, 210, 130, 200, T.argent)],
     ['Mullet', 'a query, the question', fieldRect(T.argent) + mullet(200, 210, 120, T.azure)],
     ['Estoile', 'a reward', fieldRect(T.purpure) + estoile(200, 210, 120, T.or)],
     ['Lozenge', 'another class of data', fieldRect(T.or) + lozenge(200, 210, 150, 240, T.vert)],
     ['Bend', 'a boundary drawn by a line', fieldRect(T.argent) + poly([[-60, -20], [40, -80], [480, 360], [380, 420]], T.azure)],
     ['Grady', 'causality: one step at a time', ARMS['build-llms-from-scratch']()],
-    ['Pile', 'the context window', fieldRect(T.purpure) + poly([[70, -10], [330, -10], [200, 430]], T.or)],
+    ['Fess', 'the context window', fieldRect(T.purpure) + poly([[-10, 170], [410, 170], [410, 300], [-10, 300]], T.or)],
     ['Pall', 'a branch', fieldRect(T.azure) + poly([[-40, -40], [39, -40], [200, 159], [361, -40], [440, -40], [440, 30], [244, 232], [244, 520], [156, 520], [156, 232], [-40, 30]], T.or)],
     ['Chequy', 'a matrix; an image of pixels', (() => { let d = ''; for (let r = 0; r < 6; r++) for (let c = 0; c < 5; c++) if ((r + c) % 2) d += `M${c * 80} ${r * 80}h80v80h-80Z`; return fieldRect(T.argent) + `<path d="${d}" fill="${T.vert}" stroke="${S}" stroke-width="3"/>`; })()],
     ['Canton', 'a kernel; a local window', fieldRect(T.vert) + poly([[-10, -10], [170, -10], [170, 180], [-10, 180]], T.or)],
@@ -116,7 +116,8 @@ function buildOrdinary() {
     ['Escutcheon', 'a whole system; borne in pretence, a teacher', fieldRect(T.vert) + escutcheon(200, 230, 200, fieldRect(T.or), 'ord-esc')],
     ['Quartering', 'work shared out: parallelism', fieldRect(T.or) + poly([[200, -10], [410, -10], [410, 240], [200, 240]], T.sable) + poly([[-10, 240], [200, 240], [200, 500], [-10, 500]], T.sable)],
     ['Impalement', 'a join', fieldRect(T.azure) + poly([[200, -10], [410, -10], [410, 500], [200, 500]], T.argent)],
-    ['Wavy', 'a signal; a voice', fieldRect(T.azure) + poly([...along('wavy', [-60, 170], [460, 170], { p: 130, a: 60 }), ...along('wavy', [460, 290], [-60, 290], { p: 130, a: 60, phase: 0 }).map(([x, y]) => [x, y])], T.argent)],
+    ['Pallets couped', 'a waveform; a voice', fieldRect(T.azure) + [70, 150, 230, 150, 90].map((h, i) => `<rect x="${86 + i * 50}" y="${220 - h / 2}" width="30" height="${h}" rx="15" fill="${T.argent}" stroke="${S}" stroke-width="3"/>`).join('')],
+    ['Dancetty, embattled, wavy…', 'lines of partition: one kind of cut each', (() => { const d = [below(160, 'embattled', { p: 80, a: 30, origin: 0 }), below(320, 'wavy', { p: 100, a: 36, origin: 0 })].map(pathOf).join(''); return fieldRect(T.or) + `<path d="${d}" fill="${T.sable}" fill-rule="evenodd" stroke="${S}" stroke-width="3"/>`; })()],
   ];
   document.getElementById('ordinary').innerHTML = items.map(([name, m, inner], i) =>
     `<figure>${miniShield(inner, 'ord' + i, 150)}<figcaption><b>${name}</b>${m}</figcaption></figure>`).join('');

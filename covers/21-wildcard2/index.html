@@ -408,7 +408,7 @@ const PARTS = {
     kids.forEach(k=>g+=ROD(`M${root[0]} ${root[1]}L${k[0]} ${k[1]}`,7));
     leaves.forEach((l,i)=>g+=ROD(`M${kids[i>>1][0]} ${kids[i>>1][1]}L${l[0]} ${l[1]}`,7));
     g += R(root[0]-44,0,88,36,8); kids.forEach(k=>g+=R(k[0]-38,k[1]-16,76,32,8)); leaves.forEach(l=>g+=C(l[0],l[1],17));
-    d += ETX(root[0],23,'x ≤ 2.5',12) + ETX(kids[0][0],kids[0][1]+5,'y ≤ 1',11) + ETX(kids[1][0],kids[1][1]+5,'y ≤ 4',11);
+    d += ETX(root[0],23,'x <= 2.5',12) + ETX(kids[0][0],kids[0][1]+5,'y <= 1',11) + ETX(kids[1][0],kids[1][1]+5,'y <= 4',11);
     leaves.forEach((l,i)=> d += i%2 ? ENG(circ(l[0],l[1],7),2.2) : EDOT(l[0],l[1],7));
     return {w:264,h:190,g,d,gates:[[132,0,'up'],[98,189,'down']],name:'Decision tree'};
   },
@@ -466,7 +466,7 @@ const PARTS = {
   spring() {
     const zz=[]; for (let i=0;i<=10;i++) zz.push([34+i*9.4, 30+(i%2?-12:12)*(i>0&&i<10?1:0)]);
     const g=C(17,30,17)+ROD(pts(zz),5)+C(151,30,17);
-    return {w:168,h:60,g,d:ELT(17,36,'π',17)+ETX(151,34,'ref',10),gates:[[17,13,'up'],[151,47,'down']],name:'KL penalty'};
+    return {w:168,h:60,g,d:RELIEF(`<path transform="translate(17 30) scale(.4)" d="M-22 -12Q-20 -20 -10 -20H24V-10H10V14Q10 20 18 20V24Q0 26 0 12V-10H-8V24H-18V-10Q-20 -10 -22 -6Z"/>`)+ETX(151,34,'ref',10),gates:[[17,13,'up'],[151,47,'down']],name:'KL penalty'};
   },
   /* ----- software craft ----- */
   commitGraph() {

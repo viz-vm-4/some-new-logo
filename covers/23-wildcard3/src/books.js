@@ -4,8 +4,8 @@ const ROLL = [
   {
     slug: 'ai-context-engineering', no: 1, level: 'intermediate', capsules: 43, hours: 10, field: 'purpure',
     title: 'AI Context|Engineering',
-    blazon: 'Purpure, semé of plates, a pile Or charged in pale with four roundels diminishing: a pellet, a torteau, a hurt and a plate.',
-    symbolism: 'Everything a model could be shown is strewn across the field. The pile is the context window, and only what is set on it reaches the model: instructions, tools, retrieved knowledge and memory, selected, ordered and compressed to fit.',
+    blazon: 'Purpure, semé of plates, a fess Or charged with four roundels: a pellet, a torteau, a hurt and a plate.',
+    symbolism: 'Everything a model could be shown lies scattered across the field. The fess is the context window, and only what is set on it reaches the model: instructions, tools, retrieved knowledge and memory, selected, ordered and fitted.',
   },
   {
     slug: 'mathematical-foundations-for-ml', no: 2, level: 'beginner', capsules: 43, hours: 10, field: 'azure',
@@ -83,8 +83,8 @@ const ROLL = [
     slug: 'charlie-language-room', no: 46, level: 'advanced', capsules: 22, hours: 5, field: 'gules',
     series: 'Charlie and the Intelligence Factory', book: 'I',
     title: 'Charlie and the|Language Room', subtitle: 'Language — Inference Engineering',
-    blazon: 'Gules, a chief sawtoothed Or charged with a label Gules; in fess four plates and an annulet Argent.',
-    symbolism: 'The Factory’s roof over every room; the label marks the first son. Here language is made one token at a time: four already spoken, and the ring of the next, being decoded.',
+    blazon: 'Gules, a chief sawtoothed Or charged with a label Gules; in fess a billet, two plates and an annulet Argent.',
+    symbolism: 'The label marks the first son. Inference in its two halves: the prompt prefilled in a single pass (the billet), then decode, one token at a time; the ring is the token being generated now.',
   },
   {
     slug: 'charlie-vision-room', no: 47, level: 'intermediate', capsules: 20, hours: 6, field: 'vert',
@@ -97,14 +97,14 @@ const ROLL = [
     slug: 'charlie-sound-room', no: 48, level: 'intermediate', capsules: 20, hours: 6, field: 'azure',
     series: 'Charlie and the Intelligence Factory', book: 'III',
     title: 'Charlie and the|Sound Room', subtitle: 'Audio — Voice Agents',
-    blazon: 'Azure, a chief sawtoothed Or charged with a mullet Azure; two bars wavy, Argent and Or.',
-    symbolism: 'The mullet marks the third son. Two waves, one after the other: the caller speaks, and the agent listens, thinks and answers in kind.',
+    blazon: 'Azure, a chief sawtoothed Or charged with a mullet Azure; eleven pallets couped and rounded, of diverse lengths, five Argent and six Or.',
+    symbolism: 'The mullet marks the third son. A conversation drawn as its waveform: the caller speaks in silver, and the agent listens, thinks and answers in gold, fast enough to feel alive.',
   },
   {
     slug: 'charlie-reasoning-room', no: 49, level: 'advanced', capsules: 21, hours: 6, field: 'purpure',
     series: 'Charlie and the Intelligence Factory', book: 'IV',
     title: 'Charlie and the|Reasoning Room', subtitle: 'Reason — Reinforcement Learning, from bandits to reasoning models',
     blazon: 'Purpure, a chief sawtoothed Or charged with a martlet Purpure; a base of four steps Or, above the highest an estoile Argent.',
-    symbolism: 'The martlet marks the fourth son. A chain of steps is climbed, and only at the top is the reward, the estoile, paid out: reinforcement learning from bandits to reasoning models.',
+    symbolism: 'The martlet marks the fourth son. The one room where the machine is never shown the right answer: it climbs step by step, and only at the top is the reward, the estoile, paid out.',
   },
 ];

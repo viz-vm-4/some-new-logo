@@ -83,19 +83,17 @@ function mullet(x, y, r, fill, sw = CW) {
 function estoile(x, y, r, fill) {
   // six wavy rays
   let d = '';
-  const ri = r * 0.26;
+  const ri = r * 0.30;
   for (let i = 0; i < 6; i++) {
-    const a = (-90 + i * 60) * Math.PI / 180, a1 = a - 0.30, a2 = a + 0.30;
-    const tip = [x + r * Math.cos(a), y + r * Math.sin(a)];
-    const b1 = [x + ri * Math.cos(a1), y + ri * Math.sin(a1)];
-    const b2 = [x + ri * Math.cos(a2), y + ri * Math.sin(a2)];
-    // wave: control points pushed sideways alternately
-    const m = 0.55, s = r * 0.16;
-    const cx1 = x + (r * m) * Math.cos(a) + s * Math.cos(a + Math.PI / 2), cy1 = y + (r * m) * Math.sin(a) + s * Math.sin(a + Math.PI / 2);
-    const cx2 = x + (r * m) * Math.cos(a) + s * Math.cos(a + Math.PI / 2) * 0.2, cy2 = y + (r * m) * Math.sin(a) + s * Math.sin(a + Math.PI / 2) * 0.2;
+    const a = (-90 + i * 60) * Math.PI / 180, h = 0.36;
+    const P = (rad, ang) => [x + rad * Math.cos(ang), y + rad * Math.sin(ang)];
+    const b1 = P(ri, a - h), b2 = P(ri, a + h), tip = P(r, a);
+    // each flank of the ray is an S-curve
+    const c1 = P(r * 0.52, a - 0.22), c2 = P(r * 0.70, a + 0.10);
+    const c3 = P(r * 0.70, a + 0.22), c4 = P(r * 0.52, a + 0.30);
     d += (i === 0 ? `M${n(b1[0])} ${n(b1[1])}` : `L${n(b1[0])} ${n(b1[1])}`);
-    d += `Q${n(cx1 - (r * 0.10) * Math.cos(a + Math.PI / 2))} ${n(cy1 - (r * 0.10) * Math.sin(a + Math.PI / 2))} ${n(tip[0])} ${n(tip[1])}`;
-    d += `Q${n(cx2 + (r * 0.02) * Math.cos(a + Math.PI / 2))} ${n(cy2 + (r * 0.02) * Math.sin(a + Math.PI / 2))} ${n(b2[0])} ${n(b2[1])}`;
+    d += `C${n(c1[0])} ${n(c1[1])} ${n(c2[0])} ${n(c2[1])} ${n(tip[0])} ${n(tip[1])}`;
+    d += `C${n(c3[0])} ${n(c3[1])} ${n(c4[0])} ${n(c4[1])} ${n(b2[0])} ${n(b2[1])}`;
   }
   return `<path d="${d}Z" fill="${fill}" stroke="${S}" stroke-width="${CW}" stroke-linejoin="round"/>`;
 }
@@ -106,10 +104,11 @@ function crescent(x, y, R, fill) {
   return `<path d="M${n(L[0])} ${n(L[1])}A${R} ${R} 0 1 0 ${n(Rr[0])} ${n(Rr[1])}A${r2} ${r2} 0 1 1 ${n(L[0])} ${n(L[1])}Z" fill="${fill}" stroke="${S}" stroke-width="${CW}"/>`;
 }
 function label(x, y, w, fill) {
-  const h = w * 0.13, pw = w * 0.15, ph = w * 0.26, top = y - (h + ph) / 2;
+  // a label of three points: a fillet with three flared pendants
+  const h = w * 0.15, ph = w * 0.30, top = y - (h + ph) / 2;
+  const pt = w * 0.13, pb = w * 0.19, cs = [x + w * 0.31, x, x - w * 0.31];
   let d = `M${n(x - w / 2)} ${n(top)}H${n(x + w / 2)}V${n(top + h)}`;
-  const cs = [x + w * 0.3, x, x - w * 0.3];
-  for (const c of cs) d += `H${n(c + pw / 2)}L${n(c + pw * 0.62)} ${n(top + h + ph)}H${n(c - pw * 0.62)}L${n(c - pw / 2)} ${n(top + h)}`;
+  for (const c of cs) d += `H${n(c + pt / 2)}L${n(c + pb / 2)} ${n(top + h + ph)}H${n(c - pb / 2)}L${n(c - pt / 2)} ${n(top + h)}`;
   d += `H${n(x - w / 2)}Z`;
   return `<path d="${d}" fill="${fill}" stroke="${S}" stroke-width="${CW}" stroke-linejoin="miter"/>`;
 }
@@ -276,24 +275,68 @@ ARMS['sql-masterclass'] = () => {
   return out;
 };
 
-ARMS['charlie-reasoning-room'] = () => {
-  let out = `<rect width="400" height="480" fill="${T.purpure}"/>` + factoryChief(T.or) + martlet(200, 52, 104, T.purpure);
-  // four steps climbed without ever being shown the answer; the reward only at the top
-  const pts = [[-20, 500], [-20, 426], [100, 426], [100, 362], [200, 362], [200, 298], [300, 298], [300, 234], [420, 234], [420, 500]];
-  out += poly(pts, T.or);
-  out += estoile(350, 182, 40, T.argent);
+// CNN Fundamentals — the image is chequy; the canton is the kernel in its first position
+ARMS['cnn-fundamentals'] = () => {
+  const cols = 8, rows = 10, cw = 400 / cols, rh = 480 / rows;
+  let out = `<rect width="400" height="480" fill="${T.argent}"/>`;
+  let d = '';
+  for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) if ((r + c) % 2) d += `M${c * cw} ${r * rh}h${cw}v${rh}h${-cw}Z`;
+  out += `<path d="${d}" fill="${T.vert}"/>`;
+  let g = '';
+  for (let c = 1; c < cols; c++) g += `M${c * cw} 0V480`;
+  for (let r = 1; r < rows; r++) g += `M0 ${r * rh}H400`;
+  out += `<path d="${g}" stroke="${S}" stroke-width="2"/>`;
+  out += poly([[-10, -10], [3 * cw, -10], [3 * cw, 3 * rh], [-10, 3 * rh]], T.or, 5);
+  out += `<path d="M${cw} 0V${3 * rh}M${2 * cw} 0V${3 * rh}M0 ${rh}H${3 * cw}M0 ${2 * rh}H${3 * cw}" stroke="${S}" stroke-width="2.5"/>`;
   return out;
 };
 
-ARMS['charlie-sound-room'] = () => {
-  let out = `<rect width="400" height="480" fill="${T.azure}"/>` + factoryChief(T.or) + mullet(200, 50, 32, T.azure);
-  // a voice as pallets couped of diverse lengths: the caller (Argent), then the agent (Or)
-  const hs = [46, 104, 168, 120, 70, 30, 84, 150, 196, 132, 60];
-  const pw = 22, gap = 11.5, x0 = 200 - (hs.length * (pw + gap) - gap) / 2, cy = 282;
-  hs.forEach((h, i) => {
-    const x = x0 + i * (pw + gap);
-    out += `<rect x="${n(x)}" y="${n(cy - h / 2)}" width="${pw}" height="${h}" rx="${pw / 2}" fill="${i < 5 ? T.argent : T.or}" stroke="${S}" stroke-width="${CW}"/>`;
-  });
+// RAG in Production — documents strewn; the query's neighbourhood holds the three nearest
+ARMS['rag-in-production'] = () => {
+  let out = `<rect width="400" height="480" fill="${T.purpure}"/>`;
+  const c = [200, 222], R = 118;
+  const inside = [];
+  for (let r = 0; r < 9; r++) for (let k = 0; k < 7; k++) {
+    const x = 28 + k * 58 + (r % 2 ? 29 : 0), y = 26 + r * 56;
+    const dd = Math.hypot(x - c[0], y - c[1]);
+    if (dd < R - 30) inside.push([x, y]);
+    else if (dd > R + 30) out += billet(x, y, 20, 32, T.argent);
+  }
+  out += annulet(c[0], c[1], R, 26, T.or);
+  inside.forEach(([x, y]) => { out += billet(x, y, 20, 32, T.or); });
+  out += mullet(c[0], c[1] + 2, 26, T.or);
+  return out;
+};
+
+// DeiT — patch tokens with class and distillation tokens; the CNN teacher borne in pretence
+ARMS['deit-from-scratch'] = (slug) => {
+  let out = `<rect width="400" height="480" fill="${T.vert}"/>`;
+  const h = 76, n8 = 8, cw = 400 / n8;
+  for (let i = 0; i < n8; i++) out += poly([[i * cw, -10], [(i + 1) * cw, -10], [(i + 1) * cw, h], [i * cw, h]], i % 2 ? T.or : T.argent);
+  out += roundel(cw / 2 + 5, h / 2 + 3, 17, T.gules) + roundel(400 - cw / 2 - 5, h / 2 + 3, 17, T.sable);
+  out += escutcheon(200, 272, 212, ARMS['cnn-fundamentals'](), slug + '-pretence');
+  return out;
+};
+
+// Kernel Engineering (coming soon) — a tiled matrix multiply; drawn in trick
+ARMS['kernel-engineering'] = () => {
+  const cw = 80;
+  let g = '';
+  for (let c = 1; c < 5; c++) g += `M${c * cw} 0V480`;
+  for (let r = 1; r < 6; r++) g += `M0 ${r * cw}H400`;
+  return `<path d="${g}" stroke="currentColor" stroke-width="2" fill="none" stroke-dasharray="7 7"/>` +
+    `<path d="M-10 160H410V240H-10ZM240 -10V490H320V-10Z" stroke="currentColor" stroke-width="5" fill="none"/>` +
+    `<rect x="240" y="160" width="80" height="80" fill="none" stroke="currentColor" stroke-width="5"/>`;
+};
+
+/* The Intelligence Factory — four rooms, four sons differenced by cadency */
+ARMS['charlie-language-room'] = () => {
+  // prefill (the prompt, read in one pass) then decode, one token at a time
+  let out = `<rect width="400" height="480" fill="${T.gules}"/>` + factoryChief(T.or) + label(200, 48, 150, T.gules);
+  const y = 268;
+  out += billet(96, y, 132, 58, T.argent);
+  [206, 268].forEach((x) => { out += roundel(x, y, 26, T.argent); });
+  out += annulet(334, y, 28, 10, T.argent);
   return out;
 };
 
@@ -309,56 +352,24 @@ ARMS['charlie-vision-room'] = () => {
   return out;
 };
 
-/* The Intelligence Factory — four rooms, four sons differenced by cadency */
-ARMS['charlie-language-room'] = () => {
-  // prefill (the prompt, read in one pass) then decode, one token at a time
-  let out = `<rect width="400" height="480" fill="${T.gules}"/>` + factoryChief(T.or) + label(200, 50, 128, T.gules);
-  const y = 268;
-  out += billet(96, y, 132, 58, T.argent);
-  [206, 268].forEach((x) => { out += roundel(x, y, 26, T.argent); });
-  out += annulet(334, y, 28, 10, T.argent);
+ARMS['charlie-sound-room'] = () => {
+  let out = `<rect width="400" height="480" fill="${T.azure}"/>` + factoryChief(T.or) + mullet(200, 50, 32, T.azure);
+  // a voice as pallets couped of diverse lengths: the caller (Argent), then the agent (Or)
+  const hs = [46, 104, 168, 120, 70, 30, 84, 150, 196, 132, 60];
+  const pw = 22, gap = 11.5, x0 = 200 - (hs.length * (pw + gap) - gap) / 2, cy = 282;
+  hs.forEach((h, i) => {
+    const x = x0 + i * (pw + gap);
+    out += `<rect x="${n(x)}" y="${n(cy - h / 2)}" width="${pw}" height="${h}" rx="${pw / 2}" fill="${i < 5 ? T.argent : T.or}" stroke="${S}" stroke-width="${CW}"/>`;
+  });
   return out;
 };
 
-/* The Intelligence Factory — four rooms, four sons differenced by cadency */
-ARMS['charlie-language-room'] = () => {
-  let out = `<rect width="400" height="480" fill="${T.gules}"/>` + factoryChief(T.or) + label(200, 50, 128, T.gules);
-  const y = 262, xs = [60, 130, 200, 270];
-  xs.forEach((x) => { out += roundel(x, y, 27, T.argent); });
-  out += annulet(344, y, 29, 11, T.argent);
-  return out;
-};
-ARMS['charlie-vision-room'] = () => {
-  let out = `<rect width="400" height="480" fill="${T.vert}"/>` + factoryChief(T.or) + crescent(200, 50, 28, T.vert);
-  const s = 116, x0 = 200 - s, y0 = 164, cols = [T.or, T.argent, T.argent, T.or];
-  // the image, quarterly
-  out += poly([[x0, y0], [x0 + s, y0], [x0 + s, y0 + s], [x0, y0 + s]], cols[0]);
-  out += poly([[x0 + s, y0], [x0 + 2 * s, y0], [x0 + 2 * s, y0 + s], [x0 + s, y0 + s]], cols[1]);
-  out += poly([[x0, y0 + s], [x0 + s, y0 + s], [x0 + s, y0 + 2 * s], [x0, y0 + 2 * s]], cols[2]);
-  out += poly([[x0 + s, y0 + s], [x0 + 2 * s, y0 + s], [x0 + 2 * s, y0 + 2 * s], [x0 + s, y0 + 2 * s]], cols[3]);
-  // the same patches as a row of tokens
-  const bw = 58, bx = 200 - 2 * bw, by = 424;
-  cols.forEach((col, i) => { out += poly([[bx + i * bw, by - 26], [bx + (i + 1) * bw, by - 26], [bx + (i + 1) * bw, by + 26], [bx + i * bw, by + 26]], col); });
-  return out;
-};
-ARMS['charlie-sound-room'] = () => {
-  let out = `<rect width="400" height="480" fill="${T.azure}"/>` + factoryChief(T.or) + mullet(200, 50, 32, T.azure);
-  const band = (y, fill) => {
-    const top = along('wavy', [-60, y - 26], [460, y - 26], { p: 100, a: 44 });
-    const bot = along('wavy', [460, y + 26], [-60, y + 26], { p: 100, a: 44, phase: 0 });
-    // keep bottom edge parallel to the top edge
-    const botPar = top.slice().reverse().map(([x, yy]) => [x, yy + 52]);
-    return poly([...top, ...botPar], fill);
-  };
-  out += band(240, T.argent) + band(352, T.or);
-  return out;
-};
 ARMS['charlie-reasoning-room'] = () => {
-  let out = `<rect width="400" height="480" fill="${T.purpure}"/>` + factoryChief(T.or) + martlet(200, 50, 96, T.purpure);
-  // a staircase rising to the sinister: four steps
-  const pts = [[-20, 500], [-20, 420], [80, 420], [80, 350], [170, 350], [170, 280], [260, 280], [260, 210], [420, 210], [420, 500]];
+  let out = `<rect width="400" height="480" fill="${T.purpure}"/>` + factoryChief(T.or) + martlet(200, 52, 104, T.purpure);
+  // four steps climbed without ever being shown the answer; the reward only at the top
+  const pts = [[-20, 500], [-20, 440], [100, 440], [100, 380], [200, 380], [200, 320], [300, 320], [300, 260], [420, 260], [420, 500]];
   out += poly(pts, T.or);
-  out += estoile(338, 170, 34, T.argent);
+  out += estoile(350, 200, 48, T.argent);
   return out;
 };
 

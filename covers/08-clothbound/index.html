@@ -34,6 +34,20 @@ section{margin:0 0 84px}
 .sw b{display:block;font-weight:600;margin-top:8px}
 .sw code{font:13px/1.2 "EB Garamond",serif;color:var(--mute);letter-spacing:.04em}
 .foils .sw svg{height:64px}
+.fw{width:190px}.fw svg{width:190px!important}
+.fam{margin:0 30px 22px 0;display:inline-block;vertical-align:top}
+.famname{font:600 12.5px/1 "EB Garamond";letter-spacing:.16em;text-transform:uppercase;color:var(--mute);margin-bottom:10px}
+.famrow{display:flex;gap:14px}
+.rules{display:grid;grid-template-columns:1fr 1fr;gap:40px;font-size:16.5px}
+.rules ol{margin:0;padding-left:1.2em}.rules li{margin-bottom:8px}
+table.checks{border-collapse:collapse;font-size:14.5px;width:100%}
+.checks th{text-align:left;font-weight:600;letter-spacing:.12em;text-transform:uppercase;font-size:11.5px;color:var(--mute);border-bottom:1px solid var(--rule);padding:6px 10px 6px 0}
+.checks td{border-bottom:1px solid var(--rule);padding:5px 10px 5px 0;font-variant-numeric:lining-nums tabular-nums}
+.plates{display:flex;gap:34px;flex-wrap:wrap}
+.plate{width:240px;font-size:15px;line-height:1.4}
+.plate svg{display:block;width:240px;height:296px;margin-bottom:10px;box-shadow:0 8px 16px -10px rgba(40,25,10,.6)}
+.plate b{display:block;font-weight:600;letter-spacing:.14em;text-transform:uppercase;font-size:12.5px;margin-bottom:3px}
+.printview .so{display:none!important}.printview .po{display:inline!important}
 .keyrow{display:flex;gap:40px;flex-wrap:wrap}
 .key{width:270px;font-size:15.5px;line-height:1.4}
 .key svg{display:block;width:150px;height:185px;margin-bottom:12px;box-shadow:0 10px 18px -12px rgba(40,25,10,.7)}
@@ -75,28 +89,50 @@ footer{color:var(--mute);font-size:15px;border-top:1px solid var(--rule);padding
   <div class="lede">
     <div>
       <p>A technical library should feel like something you keep. So every Vizuara book is designed as a real case-bound hardcover: a deep bookcloth, a single foil and a single blind die. The title is blocked in foil at the head of the board. Below it, in a sunk roundel, is the book's own device, drawn from the mechanism the book teaches: a causal mask, a penteract, a gradient descent through its contours. A blind-blocked band repeats that subject as texture, in the way a clothbound classic repeats its motif.</p>
-      <p>You can read the level from the binding itself. Beginner books are <i>quarter-bound</i>, intermediate books are <i>half-bound</i> (spine and corners) and advanced books are in <i>full cloth</i>, so a book with more binding goes deeper. The Vizuara mark is a small stamped device at the tail of the board: an open book seen end-on, which is also a V.</p>
+      <p>You can read the level from the binding itself. Beginner books are in <i>full cloth</i>, intermediate books are <i>quarter-bound</i> (a leather-grain spine) and advanced books are <i>half-bound</i> (spine and corners). The leather you can see goes 0, 1, 2 as the book goes deeper, in the same order as binding prestige. The Vizuara mark is a small stamped device at the tail of the board: an open book seen end-on, which is also a V.</p>
     </div>
     <div class="spec">
       <dl>
         <dt>Trim</dt><dd>7.5 × 9.25 in case-bound; front board shown at 720 × 888 px</dd>
-        <dt>Grid</dt><dd>Title zone 66–392 (auto-fitted) · blind band 418–792 · roundel ⌀300 at y 605 · imprint on 848. Centred on the board, which is offset by the hinge or the quarter-cloth</dd>
+        <dt>Grid</dt><dd>Label baseline fixed at 372, with the title stacked upward from it (auto-fitted) · blind band 418–792 · roundel ⌀300 at y 605 · imprint on 848. Centred on the board, which is offset by the hinge or the spine leather</dd>
         <dt>Title</dt><dd>Cormorant Garamond Bold capitals, +4% tracking; continuations in Semibold Italic</dd>
         <dt>Labels</dt><dd>Cormorant Garamond Bold capitals, +24% tracking</dd>
-        <dt>Finishes</dt><dd>One foil per book (gold, copper, palladium or black pigment), one blind die, and a two-cloth case for quarter and half bindings</dd>
-        <dt>Level</dt><dd>Quarter = beginner · Half = intermediate · Full = advanced</dd>
+        <dt>Finishes</dt><dd>One foil per book, one blind die, and a two-cloth case for quarter and half bindings</dd>
+        <dt>Colour</dt><dd>Cloth by subject family · gold by default, palladium for systems, copper for agents and context, black pigment only on light cloth</dd>
+        <dt>Level</dt><dd>Full cloth = beginner · Quarter = intermediate · Half = advanced</dd>
       </dl>
     </div>
   </div>
 
   <section class="rowrule">
-    <h2>The cloth book</h2>
+    <h2>The cloth book, by subject family</h2>
     <div class="swatches" id="cloths"></div>
   </section>
 
   <section class="rowrule foils">
     <h2>Foils</h2>
     <div class="swatches" id="foils"></div>
+  </section>
+
+  <section class="rowrule">
+    <h2>Assignment rules</h2>
+    <div class="rules">
+      <ol>
+        <li><b>Cloth follows the subject family</b> (above). Within a family, neighbouring books alternate cloths, so fifty books stay a library rather than a random spread.</li>
+        <li><b>Gold is the default foil</b>, and every other foil means something: palladium for systems and infrastructure, copper for agents, context and memory, black pigment only on a light cloth (Saffron). A series keeps one foil across its volumes.</li>
+        <li><b>Level is the binding</b>: full cloth, quarter or half. It is never a colour.</li>
+      </ol>
+      <ol start="4">
+        <li><b>Each device has a unique silhouette at 45 px</b> (the size of the roundel in a 180 px thumbnail). The device draws the book's mechanism, not a generic icon, and it may not repeat another device's figure.</li>
+        <li><b>Type is legible by construction.</b> Lettering uses only the light stops of its foil, so each line gets the same highlight wherever it falls. A build check requires every type stop to reach at least 3:1 against the cloth, and the label and print foil at least 4.5:1 (table below).</li>
+        <li><b>Forthcoming books</b> carry their device blind, with only its key element foiled, until publication.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="rowrule">
+    <h2>Legibility check (computed on build)</h2>
+    <table class="checks" id="checks"></table>
   </section>
 
   <section class="rowrule">
@@ -109,7 +145,7 @@ footer{color:var(--mute);font-size:15px;border-top:1px solid var(--rule);padding
     <div class="type">
       <div><div class="s1">NEURAL NETWORKS</div><p>Title: Cormorant Garamond Bold in capitals. The strokes are heavy enough to take foil on cloth without closing up, and the serifs are sharp enough to keep the stamp crisp.</p></div>
       <div><div class="s2">from Scratch</div><p>Continuations: Semibold Italic. Long titles are broken the way a title page is, with the substance in capitals and the connecting words in italic, so the capitals never run past three lines.</p></div>
-      <div><div class="s3">BEGINNER · THIRTY-THREE CAPSULES</div><p>Labels are spaced capitals at 10 pt. Capsule counts are written out in words, as an old binding would give its volume count.</p></div>
+      <div><div class="s3">BEGINNER · THIRTY-THREE CAPSULES</div><p>Labels are spaced capitals at 10 pt, always on the same baseline (372). Capsule counts are written out in words, as an old binding would give its volume count.</p></div>
     </div>
   </section>
 
@@ -124,23 +160,28 @@ footer{color:var(--mute);font-size:15px;border-top:1px solid var(--rule);padding
   </section>
 
   <section class="rowrule">
-    <h2>Full case wrap: Neural Networks from Scratch (quarter-bound)</h2>
+    <h2>Full case wrap: 5D Parallelism for Large Model Training (half-bound)</h2>
     <div class="wrapbox"><div class="wrap" id="wrap"></div></div>
+  </section>
+
+  <section class="rowrule">
+    <h2>From screen to press: one book, four outputs</h2>
+    <div class="plates" id="plates"></div>
   </section>
 
   <section class="rowrule">
     <h2>How it prints</h2>
     <div class="print">
-      <div><b>Cloth</b>Real bookcloth (a buckram or linen-finish cloth) matched to the swatch. The weave, mottle and lighting on screen only stand in for it and are never printed.</div>
+      <div><b>Cloth</b>Real bookcloth (a buckram or linen-finish cloth) matched to the swatch. The weave, mottle, grain and lighting are screen-only and never reach the print file.</div>
       <div><b>Foil</b>Hot-foil blocking from one brass die per book, in gold, copper, palladium or black pigment foil. Every foil line is at least 1.5 px (1.1 pt), and counters are open.</div>
       <div><b>Blind band</b>A second brass die pressed with no foil (blind blocking). The pressed cloth darkens and burnishes, which is the darker tone shown here.</div>
       <div><b>Roundel</b>A sunk panel made by a deeper, two-level die: the roundel is pressed about 0.6 mm, and the foil device is blocked into it.</div>
       <div><b>Quarter / half</b>A two-cloth case. The spine and corners are in house black leather-grain cloth, with a gilt fillet blocked along each join.</div>
-      <div><b>Paperback / POD</b>Printed as flat colour. The foil becomes Pantone 871 / 876 / 877 C metallic (or a spot-gloss UV over a flat tone), and the blind band becomes a 25% darker tint under matt laminate. The PDFs are this proof: the foil, blind and type are vector, and only the cloth texture is raster.</div>
+      <div><b>Paperback / POD</b>The PDFs are this file: flat cloth colour, the blind band as a 28% darker flat tint, and every foil element in one flat value, to print as Pantone 871 / 876 / 877 C metallic or as a spot-gloss UV over a flat tone. It is pure vector with no images, so it prints sharp at any size.</div>
     </div>
   </section>
 
-  <footer>Buckram · proposal 08 for Vizuara Books. All artwork is generated in code as vector SVG. The cloth, leather and foil-grain textures are computed from value noise when the page loads, so no image files are used. Set in Cormorant Garamond and EB Garamond from Google Fonts.</footer>
+  <footer>Buckram · proposal 08 for Vizuara Books. All artwork is generated in code as vector SVG. The screen-only cloth, leather and foil-grain textures are computed from value noise when the page loads; no image files are used, and none of them reach the print PDFs. Set in Cormorant Garamond and EB Garamond from Google Fonts.</footer>
 </div>
 
 <script>
