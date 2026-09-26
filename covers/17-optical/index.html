@@ -328,9 +328,10 @@ function fCompaction(bk) {
   const rows = YS.map(y => {
     const nc = ncAt(y), sr = (744 - nc * sc) / (N - nc);
     const raw = []; for (let j = 0; j < N; j++) raw.push(sc + (sr - sc) / (1 + Math.exp(-(j - nc) / 1.1)));
-    // scale so the trim at 720 falls exactly mid-gap: last line fully outside, the one before fully inside
-    const tot = raw.reduce((a, v) => a + v, 0), kk = 732 / (tot - raw[N - 1]);
-    const xs = [], sp = []; let x = -12;
+    // scale and place so both trims (0 and 720) fall exactly on slot boundaries, i.e. mid-gap:
+    // no line is ever cut into a sliver at either edge
+    const tot = raw.reduce((a, v) => a + v, 0), kk = 720 / (tot - raw[N - 1] - 4 * raw[0]);
+    const xs = [], sp = []; let x = -4 * raw[0] * kk;
     for (const r0 of raw) { const s = r0 * kk; xs.push(x + s / 2); sp.push(s); x += s; }
     return {xs, sp, sr};
   });

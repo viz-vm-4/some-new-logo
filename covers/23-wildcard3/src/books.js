@@ -1,0 +1,110 @@
+/* The Roll. Each entry: the book's facts (from books.json), its arms, blazon and symbolism.
+   Tincture of the shield's field follows the book's field of study; the cover's ground follows level. */
+const ROLL = [
+  {
+    slug: 'ai-context-engineering', no: 1, level: 'intermediate', capsules: 43, hours: 10, field: 'purpure',
+    title: 'AI Context|Engineering',
+    blazon: 'Purpure, semé of plates, a pile Or charged in pale with a billet Sable, a billet Azure and a mullet Gules.',
+    symbolism: 'The field is strewn with everything the model could be shown. The pile is the context window: only what is set on it reaches the model, in order — instructions, retrieved documents, the question.',
+  },
+  {
+    slug: 'mathematical-foundations-for-ml', no: 2, level: 'beginner', capsules: 43, hours: 10, field: 'azure',
+    title: 'Mathematical|Foundations for|Machine Learning',
+    blazon: 'Azure, a chevron reversed ployé Or, thereon three plates diminishing in descent and a torteau at the point.',
+    symbolism: 'A convex loss, and gradient descent walking down it in ever shorter steps to the minimum: calculus, linear algebra and probability doing their one shared job.',
+  },
+  {
+    slug: 'neural-networks-from-scratch', no: 3, level: 'beginner', capsules: 33, hours: 7, field: 'azure',
+    title: 'Neural Networks|from Scratch',
+    blazon: 'Azure, on a bend Or two torteaux, between two plates.',
+    symbolism: 'XOR, the problem one neuron cannot solve. A hidden layer draws two parallel lines, and the class that lies between them becomes the bend: red within, white without.',
+  },
+  {
+    slug: 'build-llms-from-scratch', no: 4, level: 'intermediate', capsules: 20, hours: 6, field: 'gules',
+    title: 'Build Large|Language Models|(LLMs) from Scratch',
+    blazon: 'Per bend grady of eight Argent and Gules.',
+    symbolism: 'The causal mask. Read row by row, each token may attend only to itself and to what came before it. Everything above the stair is the future, and is masked out.',
+  },
+  {
+    slug: '5d-parallelism', no: 5, level: 'advanced', capsules: 40, hours: 9, field: 'sable',
+    title: '5D Parallelism|for Large|Model Training',
+    blazon: 'Chequy of thirty-two Or and Sable, parted per pale for data, per pale indented for tensor, per fess embattled for pipeline, per fess wavy for context and per fess dovetailed for expert.',
+    symbolism: 'The smallest five-dimensional mesh: two ways along each axis, thirty-two GPUs, one square each. Every kind of split has its own line, so you can read which axis divides any two neighbours.',
+  },
+  {
+    slug: 'pi-vs-hermes-vs-codex', no: 6, level: 'advanced', capsules: 9, hours: 1, field: 'purpure',
+    title: 'Pi vs Hermes|vs Codex', subtitle: 'Context Compaction and Memory',
+    blazon: 'Purpure, three escutcheons Or, each charged with a pile of the field.',
+    symbolism: 'Three harnesses, three shields, one charge. Each bears the pile of the context window: a long conversation narrowed to what survives compaction. How each one narrows it is the book.',
+  },
+  {
+    slug: 'decision-trees-from-scratch', no: 14, level: 'beginner', capsules: 23, hours: 5, field: 'azure',
+    title: 'Build Decision|Trees from Scratch',
+    blazon: 'Per pale Or and per fess Argent and Azure; in dexter three hurts in pale, in sinister chief two mullets Azure, in sinister base three lozenges Argent.',
+    symbolism: 'Fisher’s irises, split twice: at petal length 2.45 cm, then petal width 1.75 cm, one charge for each species. Every heraldic division is an axis-aligned cut; the decision tree is the most heraldic algorithm there is.',
+  },
+  {
+    slug: 'git-github-masterclass', no: 18, level: 'beginner', capsules: 40, hours: 9, field: 'azure',
+    title: 'Git & GitHub|Masterclass',
+    blazon: 'Azure, a pall Or charged with seven hurts.',
+    symbolism: 'One trunk of commits rising from the first, parting into two branches. Every commit is a roundel; every branch is an arm of the pall.',
+  },
+  {
+    slug: 'sql-masterclass', no: 21, level: 'beginner', capsules: 36, hours: 8, field: 'azure',
+    title: 'SQL|Masterclass',
+    blazon: 'Azure impaling Argent, barry of ten counterchanged, over the line of impalement a pallet Gules.',
+    symbolism: 'Impalement is how heraldry joins two houses in one shield; a join is how SQL marries two tables. Each row of one sits beside its match in the other, along the key that runs between them.',
+  },
+  {
+    slug: 'rag-in-production', no: 13, level: 'intermediate', capsules: 42, hours: 10, field: 'purpure',
+    title: 'RAG in|Production',
+    blazon: 'Purpure, billetty Argent, an annulet Or, within it a mullet and three billets Or.',
+    symbolism: 'A store of documents strewn across the field. The mullet is the query and the annulet its neighbourhood; the three billets inside are the nearest documents, retrieved and handed to the model.',
+  },
+  {
+    slug: 'cnn-fundamentals', no: 24, level: 'intermediate', capsules: 34, hours: 8, field: 'vert',
+    title: 'Convolutional|Neural Networks|Fundamentals',
+    blazon: 'Chequy Argent and Vert, a canton Or gridded of nine.',
+    symbolism: 'An image is a chequy of pixels. The canton is the 3 × 3 kernel in its first position, top left, before it slides across every square to make the next layer.',
+  },
+  {
+    slug: 'deit-from-scratch', no: 37, level: 'advanced', capsules: 42, hours: 10, field: 'vert',
+    title: 'Build a Data-Efficient|Image Transformer|(DeiT) from Scratch',
+    blazon: 'Vert, a chief compony Argent and Or charged with a torteau and a pellet; over all an escutcheon of the arms of Convolution.',
+    symbolism: 'Image patches become a row of tokens, a class token at one end and a distillation token at the other. The student bears its teacher’s arms in pretence: a convolutional network, whose knowledge the distillation token learns to carry.',
+  },
+  {
+    slug: 'kernel-engineering', no: 51, level: 'advanced', field: 'sable', soon: true,
+    title: 'Kernel|Engineering', subtitle: 'From silicon to speculative decoding — GPU kernels for modern LLMs.',
+    blazon: 'Sable, a bar and a pallet Or, at their crossing a square Gules, the field latticed in tiles.',
+    symbolism: 'A tiled matrix multiply: one row of tiles from A, one column from B, and where they cross, the output tile. Shown in trick — drafted, the tinctures written in — until the book is out.',
+  },
+  {
+    slug: 'charlie-language-room', no: 46, level: 'advanced', capsules: 22, hours: 5, field: 'gules',
+    series: 'Charlie and the Intelligence Factory', book: 'I',
+    title: 'Charlie and the|Language Room', subtitle: 'Language — Inference Engineering',
+    blazon: 'Gules, a chief sawtoothed Or charged with a label Gules; in fess four plates and an annulet Argent.',
+    symbolism: 'The Factory’s roof over every room; the label marks the first son. Here language is made one token at a time: four already spoken, and the ring of the next, being decoded.',
+  },
+  {
+    slug: 'charlie-vision-room', no: 47, level: 'intermediate', capsules: 20, hours: 6, field: 'vert',
+    series: 'Charlie and the Intelligence Factory', book: 'II',
+    title: 'Charlie and the|Vision Room', subtitle: 'Vision — Vision Transformers',
+    blazon: 'Vert, a chief sawtoothed Or charged with a crescent Vert; a square quarterly Or and Argent, in base a bar compony of the same.',
+    symbolism: 'The crescent marks the second son. A vision transformer cuts the picture into patches and reads them as a sentence: the same four squares, above as an image, below as a row of tokens.',
+  },
+  {
+    slug: 'charlie-sound-room', no: 48, level: 'intermediate', capsules: 20, hours: 6, field: 'azure',
+    series: 'Charlie and the Intelligence Factory', book: 'III',
+    title: 'Charlie and the|Sound Room', subtitle: 'Audio — Voice Agents',
+    blazon: 'Azure, a chief sawtoothed Or charged with a mullet Azure; two bars wavy, Argent and Or.',
+    symbolism: 'The mullet marks the third son. Two waves, one after the other: the caller speaks, and the agent listens, thinks and answers in kind.',
+  },
+  {
+    slug: 'charlie-reasoning-room', no: 49, level: 'advanced', capsules: 21, hours: 6, field: 'purpure',
+    series: 'Charlie and the Intelligence Factory', book: 'IV',
+    title: 'Charlie and the|Reasoning Room', subtitle: 'Reason — Reinforcement Learning, from bandits to reasoning models',
+    blazon: 'Purpure, a chief sawtoothed Or charged with a martlet Purpure; a base of four steps Or, above the highest an estoile Argent.',
+    symbolism: 'The martlet marks the fourth son. A chain of steps is climbed, and only at the top is the reward, the estoile, paid out: reinforcement learning from bandits to reasoning models.',
+  },
+];

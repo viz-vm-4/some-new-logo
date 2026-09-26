@@ -449,13 +449,17 @@
     const X = (u, v) => { const d = lay.disp(u, v); return [d[0] + ox, d[1] + oy]; };
     const G = geom(sol, o);
     let out = '';
+    // double line (hollow): every outer stroke first, then every inner channel, so all crossings,
+    // within one line or between lines, are drawn the same way: flat, merged, as flour lines are.
+    let inner = '';
     G.forEach((g, i) => {
       const col = (o.accentLoop != null && i === o.accentLoop) ? o.accent : (o.loopColors ? o.loopColors[i % o.loopColors.length] : o.color);
       const dash = o.partial != null ? ` pathLength="1000" stroke-dasharray="${Math.round(o.partial * 1000)} 2000" stroke-dashoffset="${o.partialOffset || 0}"` : '';
       const d = g.toSvg(X);
       out += `<path d="${d}" fill="none" stroke="${col}" stroke-width="${o.stroke}" stroke-linecap="round" stroke-linejoin="round"${dash}/>`;
-      if (o.hollow) out += `<path d="${d}" fill="none" stroke="${o.hollow}" stroke-width="${o.stroke - 2 * o.wall}" stroke-linecap="round" stroke-linejoin="round"${dash}/>`;
+      if (o.hollow) inner += `<path d="${d}" fill="none" stroke="${o.hollow}" stroke-width="${o.stroke - 2 * o.wall}" stroke-linecap="round" stroke-linejoin="round"${dash}/>`;
     });
+    out += inner;
     if (o.dot > 0) sol.M.shape.cells.forEach((c) => { const p = X(c.u, c.v); out += `<circle cx="${p[0].toFixed(2)}" cy="${p[1].toFixed(2)}" r="${o.dot}" fill="${o.dotColor || o.color}"/>`; });
     return { svg: out, box: lay.box, ox, oy };
   }

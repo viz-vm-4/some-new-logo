@@ -25,7 +25,7 @@ body{background:var(--table);color:var(--paper);font-family:'Instrument Sans',sy
 .lab{font:600 8.5px/1 'Overpass Mono','Noto Sans Mono','Noto Sans Math',monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--g2)}
 .lab .ser{color:var(--g)}
 .title{font-family:'Instrument Sans',sans-serif;font-weight:600;font-variation-settings:'wdth' 88;
-  line-height:.97;letter-spacing:-.018em;margin:10px 0 0;color:var(--g);font-kerning:normal}
+  line-height:.97;letter-spacing:-.018em;margin:8px 0 0;color:var(--g);font-kerning:normal}
 .title .tl{white-space:nowrap}
 .desc{position:absolute;left:20px;right:20px;bottom:17px;font:400 15.5px/19px 'Instrument Sans',sans-serif;
   font-variation-settings:'wdth' 92;color:var(--g2);white-space:nowrap;overflow:hidden}
@@ -529,10 +529,10 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
     return `<svg class="mk" width="${f(w)}" height="${f(h)}" viewBox="-1.5 ${f(1.8 * size - 1.5)} ${f(w)} ${f(h)}">${mark(0, 0, size, { id, ...o })}</svg>`;
   }
 
-  /* Title sizes are a rule, not a per-book choice: two lines → 66 px, or 52 px if the longest
+  /* Title sizes are a rule, not a per-book choice: two lines → 64 px, or 52 px if the longest
      line is wider than the 584 px measure; three lines → 42 px (40 if needed). Line breaks are set
      by hand in the data: break before a preposition or conjunction, never inside a compound noun. */
-  const STEPS = { 2: [66, 52, 46], 3: [42, 40, 38] };
+  const STEPS = { 2: [64, 52, 46], 3: [42, 40, 38] };
   const MEASURE = 584;
   function fitTitles(root = document) {
     const run = () => root.querySelectorAll('.sheetbox .title').forEach((h) => {
@@ -1479,15 +1479,15 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
 
   const DRAWN = {
     'ai-context-engineering': 'Section A–A through one context window: instructions, tools, knowledge, memory and a jacketed sub-agent packed inside a fixed diameter; write / select / compress / isolate called out.',
-    'mathematical-foundations-for-ml': 'The unit circle and unit square under a matrix A: ellipse with its eigen-axes as centre lines, det A as the hatched area, before-and-after in phantom and solid line.',
+    'mathematical-foundations-for-ml': 'The unit circle and unit square under a matrix A: ellipse with its eigen-axes as centre lines and λ₁, λ₂ dimensioned, before and after in phantom and solid line; det A is the one ink area.',
     'neural-networks-from-scratch': 'A multilayer perceptron dimensioned as a hole pattern; Detail A enlarges one neuron; the backward pass runs home in ink.',
-    'build-llms-from-scratch': 'GPT-2 (124M) general arrangement with residual bypasses and a conventional break for the 12 repeated blocks; Section B–B is the causal mask.',
-    '5d-parallelism': 'Isometric 4 × 4 × 4 lattice of GPUs (data × tensor × pipeline) with rank 0 in ink, plus auxiliary views for the context ring and expert routing.',
-    'pi-vs-hermes-vs-codex': 'One overflowing session drawn three times as a turned shaft: cut at a turn (Pi), conventional break through the middle (Hermes), coupling to the next model (Codex).',
-    'charlie-language-room': 'Enlarged plan of Room I: scheduler, prefill, a decode loop and paged KV-cache racks. Key plan locates the room in the factory.',
-    'charlie-vision-room': 'Enlarged plan of Room II: an image cut into patches, flattened onto a conveyor behind a [CLS] token, fed to the encoder.',
-    'charlie-sound-room': 'Enlarged plan of Room III: mic → VAD → ASR → LLM → TTS → speaker, barge-in path, latency budget dimensioned in ink.',
-    'charlie-reasoning-room': 'Enlarged plan of Room IV: bandit arms on the wall, an agent–environment loop track, reward returning in ink.',
+    'build-llms-from-scratch': 'GPT-2 (124M) general arrangement, pre-LN: each block is LN → masked attention → ⊕, then LN → feed-forward → ⊕, with a conventional break for the 12 repeated blocks. Section B–B is the causal mask, allowed cells in solid ink.',
+    '5d-parallelism': 'Isometric 4 × 4 × 4 lattice of GPUs (data × tensor × pipeline) with rank 0 in ink, plus auxiliary views for the context ring and top-2 expert routing.',
+    'pi-vs-hermes-vs-codex': 'One overflowing session drawn three times as a turned shaft against an ink context limit: cut at a turn (Pi), conventional break through the middle (Hermes), coupling to the next model (Codex). Every summary is solid ink.',
+    'charlie-language-room': 'Enlarged plan of Room I: scheduler, prefill, a decode loop and paged KV-cache racks, the used pages in solid ink. Key plan locates the room in the factory.',
+    'charlie-vision-room': 'Enlarged plan of Room II: an image cut into 4 × 4 patches, flattened onto a conveyor as [CLS] + 16 tokens (the lifted patch and its token in ink), fed to the encoder.',
+    'charlie-sound-room': 'Enlarged plan of Room III: mic → VAD → ASR → LLM → TTS → speaker, a barge-in path, and a chain dimension of each stage’s time t, summing to the latency budget drawn as one ink bar.',
+    'charlie-reasoning-room': 'Enlarged plan of Room IV: bandit arms on the wall and a gridworld floor, every tile carrying V(s) from value iteration (γ = 0.9), the greedy path from S, and the +1 goal in ink.',
     'decision-trees-from-scratch': 'Feature space cut by greedy axis-aligned splits, thresholds dimensioned, beside the tree that makes the cuts.',
     'kernel-engineering': 'Tiled C = A·B: one output tile, its row and column strips, the current k-step in ink; memory hierarchy in section. Stamped PRELIMINARY.'
   };

@@ -42,14 +42,20 @@ The old orange / sky-blue / magenta pinwheel palette is not used anywhere.
   lead-in ("Charlie and the") and for subtitles. Title size is set per title length (60–84px) with
   hand-set line breaks so nothing orphans.
 - **IBM Plex Mono** — level line, capsule count, the FIG. 0 caption (10px/1.45), plate labels.
+  Captions are written in a code voice (`lr = 0.0006`, `lambda = 0.55`, `u_t + u·u_x`, `2^k`,
+  `depth <= 7`) so every glyph is one Plex Mono actually has — no per-glyph fallback in print.
 
 ## Grid (720 × 888)
 
 - Meta line at 34px: level squares + level word left; capsules · hours (or *Forthcoming*, or
   *Room N of IV*) right. 40px side margins.
 - Title from y = 76, always finished by y ≈ 290.
-- **Plate**: full-bleed field, y 306 → 790 (720 × 484). The Charlie sub-series uses a centred
-  456 × 456 square "room" instead.
+- **Plate**: y 306 → 790. Written rule: *fields* (maths, NN, SciML) bleed left and right
+  (720 wide); *charts* (context, LLM, 5D, pi, trees, git, kernel) sit exactly on the 40px column,
+  x 40–680. The Charlie sub-series uses a centred 456 × 456 square "room" instead.
+- **The answer**: every plate carries one accent figure ≥ 2.4px, drawn on a ground-coloured
+  casing, so it is the heaviest thing on the plate in weight and luminance, not just hue — it
+  survives 180px and greyscale.
 - Caption bottom-left (≤ 4 lines, 486px wide); imprint bottom-right.
 - Imprint: **the valley** — a V drawn as a loss curve with its minimum found (a dot in the accent),
   + "Vizuara" in Newsreader. Signature-sized; never competes with the title.
@@ -71,34 +77,40 @@ greyscale print by construction (light / mid / dark), and is repeated by three s
   two spirals; the plate is the trained net's own output contoured (47 levels) with the learned
   decision boundary in red.
 - **Build LLMs from Scratch** — a byte-pair tokenizer trained in the page on the titles of all 52
-  Vizuara books (195 merges); arcs join consecutive uses of the same token (word-initial tokens
-  above, the rest below); "Scratch" in white.
+  Vizuara books (195 merges), then run on this book's own title: the merge tree, each arch as tall
+  as the merge was late to be learned; 47 characters → 10 tokens; the arches that build "Scratch"
+  in white.
 - **5D Parallelism** — discrete-event simulation of one step on a 128-GPU mesh (DP2 × PP8 × TP2 ×
   CP2 × EP2), 1F1B schedule, 16 micro-batches, ±7% kernel noise, groups wait for their slowest
   member; red = gradient all-reduce.
-- **Pi vs Hermes vs Codex** — one simulated 200-turn agent session replayed under three generic
-  compaction policies (drop-oldest, rolling summary, tiered memory); lines are message positions in
-  the window over time; summaries in red. (Deliberately *not* labelled as the three products'
-  actual implementations — the caption only claims what was simulated.)
+- **Pi vs Hermes vs Codex** — one simulated 200-turn agent session replayed under three textbook
+  compaction policies, lettered A–C (drop-oldest, rolling summary, tiered memory); every third
+  message's position in the window over time; summaries in red. Caption says outright these are
+  not the three agents' own implementations.
 - **Build Decision Trees from Scratch** — CART (Gini, depth ≤ 7) grown on 300 labelled points; the
   partition drawn with line weight by depth, root split in red, leaves hatched by vote.
 - **Git & GitHub Masterclass** — a simulated repository history (commits, feature branches, merges)
   laid out like `git log --graph`, time running right; main in red.
-- **Scientific ML (SciML)** — viscous Burgers' equation (the classic PINN benchmark) solved by
-  finite volumes; 170 particles carried by the flow; shocks in red, merging into a Y.
+- **Scientific ML (SciML)** — viscous Burgers' equation (ν = 0.01/π) from a seeded, perturbed
+  start (u0 = −sin πx + 0.39 sin 3πx − 0.12 sin 5πx, to t = 1.5 — printed in the caption) solved
+  by finite volumes; 170 particles carried by the flow; shocks tracked and drawn in red, merging
+  into a Y.
 - **Kernel Engineering** (forthcoming) — a Kogge–Stone prefix sum over 64 threads, 6 steps, with the
   seeded input digits on top; red = the additions one thread depends on, and the sum it reaches
   (checked against a sequential sum).
 - **Charlie I · Language Room** — a character 5-gram model trained in-page on the library's titles;
-  beam search continues "Charlie and the …"; the tree is its branches, labels are the titles it
-  finished (it invents "Rearning"); red is this book's own title, found as its no. 11 guess.
-- **Charlie II · Vision Room** — the fixed 2-D sine–cosine position embeddings of a ViT (8 × 8
-  patches, d = 256): each glyph contours one patch's cosine similarity to every position.
+  beam search (width 32) continues "Charlie and the …" across the full room; branch weight is its
+  probability relative to the best branch at that depth; only finished whole-word titles are
+  labelled; red is this book's own title, found as its no. 11 guess.
+- **Charlie II · Vision Room** — fixed 2-D sine–cosine position embeddings, the kind used by MAE
+  and Simple ViT (8 × 8 patches, d = 256): each glyph contours one patch's cosine similarity to
+  every position.
 - **Charlie III · Sound Room** — a voice synthesised in-page (glottal pulses → 3 formant filters,
   /a/→/i/→/u/), then analysed: pitch by autocorrelation, loudness by a 512-point STFT; 35 harmonic
   ribbons, width = loudness, the fundamental in white.
 - **Charlie IV · Reasoning Room** — Thompson sampling on a 12-armed Bernoulli bandit, 1,600 pulls,
-  sqrt time axis; each dash a pull, thin line = the agent's belief; the best arm in red.
+  sqrt time axis; each dash a pull, thin line = the agent's belief; the best arm in red (pulled
+  1,345 times, paid out 990 — both counted separately).
 
 Sub-series treatment: the Charlie books swap the full-bleed field for the square room plate, add
 an italic lead-in, and carry "Room N of IV" in the meta line — same grid, recognisably a set.
@@ -107,7 +119,10 @@ an italic lead-in, and carry "Room N of IV" in the meta line — same grid, reco
 
 - Everything is vector; PDFs from `render.js --pdf` embed Newsreader and IBM Plex Mono.
 - Minimum stroke 0.5 CSS px (0.375pt) — only in the densest textures; most lines are 0.7–1.5px.
-- No grey body text on light grounds; captions are full ink. Checked as a greyscale contact sheet.
+- No grey body text on light grounds; captions are full ink. Checked as greyscale conversions of
+  the JPGs at 180px and 440px: the cased accent is the heaviest figure on every plate.
+- PDFs embed only Newsreader and IBM Plex Mono (checked with `grep FontName`); labels on plates
+  sit on ground-coloured cards, not `paint-order` halos (those print as blobs in Chrome PDF).
 - A full wrap (back + 0.75in spine + front) is on the page for *Mathematical Foundations*; the back
   cover prints the exact function that drew the front, plus its seed.
 - Page load, including training the network, is ~1.3s in headless Chromium.
@@ -125,3 +140,99 @@ an italic lead-in, and carry "Room N of IV" in the meta line — same grid, reco
 4. Spine system for the whole shelf (level squares + valley mark line up across 50 spines).
 5. Per-title optical kerning pass on the big Newsreader settings, and a proof on uncoated stock to
    tune the red and the 0.5px textures.
+
+## Generator map — all 52 slugs (to catch collisions before writing them)
+
+Rules: one mechanism per book, never reused; **survey books** (… Fundamentals / Mastery,
+Foundations, certification) get a plate computed from the book's own capsule list (topic graph,
+laid out by force-directed layout, the capsule it starts from in accent) until a single algorithm
+is chosen; the **Kimi K3** trio becomes a sub-series like Charlie: one MoE router run seen at
+three scales.
+
+| slug | plate | state |
+|---|---|---|
+| ai-context-engineering | MMR packing of an 8k window | done |
+| mathematical-foundations-for-ml | GD on Himmelblau | done |
+| neural-networks-from-scratch | MLP trained in-page, logit contours | done |
+| build-llms-from-scratch | BPE merge tree of its own title | done |
+| 5d-parallelism | 1F1B on a 128-GPU mesh | done |
+| pi-vs-hermes-vs-codex | 3 textbook compaction policies | done |
+| decision-trees-from-scratch | CART partition | done |
+| git-github-masterclass | simulated `git log --graph` | done |
+| sciml | Burgers' shocks | done |
+| kernel-engineering | Kogge–Stone scan | done |
+| charlie-language/vision/sound/reasoning-room | beam search / 2-D pos-emb / STFT / Thompson | done |
+| inference-engineering | paged KV-cache block allocation under continuous batching | next |
+| harness-engineering | agent-loop state machine: tool calls, retries, a timeline | next |
+| deepseek-harness | needs the book's content; must not repeat harness-engineering | open |
+| how-to-host-kimi-k3 / pretraining-mini-kimi-k3 / kimi-k3-from-scratch | Kimi sub-series: one MoE router — serving load per GPU / expert load over training / one sentence's routing path | next |
+| transformers-from-scratch | 1-head causal attention trained on the titles — the triangle | next |
+| vit-from-scratch | patch embedding of its own rasterised title | next |
+| deit-from-scratch | teacher/student agreement of the distillation token | next |
+| transformers-vision-multimodal | cross-attention, text tokens → image patches | next |
+| nanovlm-from-scratch | contrastive image–text similarity matrix, diagonal emerging | next |
+| diffusion-lm-from-scratch | masked diffusion: unmasking order of its own title | next |
+| rlhf-from-scratch | Bradley–Terry reward fit on seeded preferences | next |
+| llm-finetuning | LoRA: singular spectrum of the low-rank update | next |
+| llm-production-deployment | autoscaling queue simulation, latency percentiles | next |
+| rag-in-production | HNSW graph built, one greedy search path | next |
+| memory-in-ai-systems | Hopfield network storing and recalling patterns | next |
+| mini-clawdbot | tool-call dependency DAG scheduled in parallel | next |
+| ai-agents-bootcamp | A* search trails on a seeded maze | next |
+| reinforcement-learning | Q-learning value field + greedy policy on a gridworld | next |
+| modern-robot-learning | 2-link arm reaching by CCD inverse kinematics | next |
+| vla-world-models | world-model rollouts diverging from the true trajectory | next |
+| cnn-fundamentals | conv feature maps of its own rasterised title | next |
+| computer-vision-bootcamp | Hough transform on a procedural scene | next |
+| deep-learning-fundamentals | per-layer gradient norms through a deep MLP (vanishing) | next |
+| machine-learning-fundamentals | k-means: Lloyd iterations as centroid trails | next |
+| generative-ai-fundamentals | Gaussian mixture fit by EM, samples drawn | next |
+| prompt-engineering | one prompt sampled at five temperatures (sampling, not beam) | next |
+| python-for-data-science | Timsort run-merging trace (Python's own sort) | next |
+| dsa-in-python | quicksort swap trace | next |
+| sql-masterclass | B-tree built by inserts | next |
+| r-masterclass | lowess smoothing iterations (R core) | next |
+| writing-papers | Knuth–Plass line breaking of its own blurb | next |
+| modern-software-developer | topological sort of a seeded dependency tree | next |
+| foundations-for-ai-ml, ml-dl-mastery, nlp-cv-mastery, claude-certified-architect | survey rule: capsule-list topic graph | rule |
+
+## Review response (round 2)
+
+Every must-fix was checked against the renders first; all seven were correct.
+
+1. **889px renders** — confirmed (720×889 / 1440×1778). Re-rendered with the new render.js; `.sec`
+   headers now have a fixed 140px height, presentation text uses integer line-heights, and each
+   wall snaps to a whole-pixel y. All outputs are now 720×888 / 1440×1776.
+2. **Accent fails in greyscale** — confirmed. Every answer is now drawn on a ground-coloured casing
+   and at ≥ 2.4px (SciML 4.4, Kernel 3.4, trees root 7, NN boundary 2.6); competing texture knocked
+   back (Kernel diagonals .45, 5D fwd/bwd .6/.72, SciML particles .5, NN contours .5); the 5D
+   all-reduce is now a solid block per stage. Re-checked on greyscale JPGs at 180px and 440px.
+3. **Glyph fallback** — confirmed (DejaVuSansMono in 7 PDFs). Took the code-voice route rather than
+   a second mono: it suits a caption that describes code. No DejaVu in any PDF now. `git log
+   --graph` is nowrap.
+4. **SciML "classic benchmark"** — correct. The caption now prints the seeded initial condition and
+   t = 1.5; the benchmark claim is gone. Kept the perturbed start: the merging Y is the image.
+5. **Bandit "won"** — correct. Now "pulled 1,345 times … paid out 990", both counted.
+6. **Pi/Hermes/Codex mapping** — correct that the layout implied it. Panels are lettered A–C and
+   the caption says they are "not the three agents' own implementations". I kept the order
+   simple → complex, because that progression is the plate's argument; the letters and the
+   disclaimer break the mapping. Labelling each agent's real policy needs the book's content,
+   which I don't have.
+7. **Vision provenance** — correct. Caption now says "the fixed 2-D sine–cosine kind used by MAE and
+   Simple ViT".
+
+Improvements:
+1. **LLM plate** — taken: the merge tree of the book's own title (first option). Kept the attention
+   triangle for *Transformers from Scratch* so the two don't collide.
+2. **Language Room** — taken: tree spans the room, weight = probability, labels only for whole-word
+   titles, on cards. Kept left-to-right rather than radial, because it reads in the direction the
+   text is generated.
+3. **Pi line budget** — taken: every third message on all three panels, 0.7px strokes. Panel A
+   stays the densest, honestly: drop-oldest never consolidates anything.
+4. **Column rule + tree classes** — taken, written into the grid above; tree points are now
+   rings / dots / crosses.
+5. **Titles** — taken: Maths "Mathematical / Foundations for / Machine Learning" 68px; 5D
+   "5D Parallelism / for Large / Model Training" at 72px (74 would pass y 290); SciML
+   "Scientific / Machine Learning / (SciML)". Kerning: declined a manual pass for now. I reviewed
+   the 84px settings with the font's own kerning on and saw no pair that needed overriding.
+6. **Generator map** — taken: the table above, with the survey-book rule and the Kimi sub-series.

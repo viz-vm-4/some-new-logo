@@ -30,17 +30,17 @@ const COVERS = [
   { slug: 'mathematical-foundations-for-ml', t: 'Mathematical|Foundations for|Machine Learning', size: 72, seed: 3 },
   { slug: 'neural-networks-from-scratch', t: 'Neural Networks|from Scratch', seed: 5 },
   { slug: 'build-llms-from-scratch', t: 'Build Large|Language Models|(LLMs) from Scratch', size: 64, seed: 4 },
-  { slug: '5d-parallelism', t: '5D Parallelism|for Large|Model Training', seed: 7 },
+  { slug: '5d-parallelism', t: '5D Parallelism|for Large|Model Training', seed: 2 },
   { slug: 'pi-vs-hermes-vs-codex', t: 'Pi vs Hermes|vs Codex', sub: 'Context Compaction and Memory', seed: 1 },
-  { slug: 'r-masterclass', t: 'R Masterclass', seed: 3 },
+  { slug: 'r-masterclass', t: 'R Masterclass', seed: 4 },
   { slug: 'prompt-engineering', t: 'Prompt|Engineering', seed: 2 },
   { slug: 'dsa-in-python', t: 'Data Structures|& Algorithms|in Python', seed: 2 },
-  { slug: 'deit-from-scratch', t: 'Build a Data-|Efficient Image|Transformer (DeiT)|from Scratch', size: 64, seed: 3 },
+  { slug: 'deit-from-scratch', t: 'Build a Data-Efficient|Image Transformer|(DeiT) from Scratch', size: 64, seed: 1 },
   { slug: 'charlie-language-room', t: 'Charlie and the|Language Room', seed: 4 },
   { slug: 'charlie-vision-room', t: 'Charlie and the|Vision Room', seed: 1 },
   { slug: 'charlie-sound-room', t: 'Charlie and the|Sound Room', seed: 1 },
-  { slug: 'charlie-reasoning-room', t: 'Charlie and the|Reasoning Room', seed: 4 },
-  { slug: 'kernel-engineering', t: 'Kernel|Engineering', seed: 1 },
+  { slug: 'charlie-reasoning-room', t: 'Charlie and the|Reasoning Room', sub: 'Reason — Reinforcement Learning,|from bandits to reasoning models', seed: 4 },
+  { slug: 'kernel-engineering', t: 'Kernel|Engineering', sub: 'From silicon to speculative decoding —|GPU kernels for modern LLMs', seed: 1 },
 ];
 
 const cache = {};
@@ -87,8 +87,8 @@ const TA_LINES = ['', 'ஒரு கோடு', 'இரு கோடுகள்
 const SYMWORD = { D2: 'mirrored about both axes', D4: 'with the full symmetry of the square', C2: 'unchanged by a half turn', C4: 'unchanged by a quarter turn', MX: 'mirrored left to right', MY: 'mirrored top to bottom', none: 'free of symmetry' };
 const pips = (n, cls = '') => `<b class="pips ${cls}">${[1, 2, 3].map((i) => `<i class="${i <= n ? 'on' : ''}"></i>`).join('')}</b>`;
 
-const BOX = { cx: 360, cy: 596, w: 600, h: 396 };
-const SERIES_BOX = { cx: 360, cy: 600, w: 580, h: 372 };
+const BOX = { cx: 360, cy: 574, w: 600, h: 396 };  // spans y 376–772: ≥40 px to the footer and below the deepest title
+const SERIES_BOX = { cx: 360, cy: 587, w: 580, h: 370 }; // spans y 402–772, under the series line + title + subtitle
 
 function cover(c, opts = {}) {
   const d = bySlug[c.slug];
@@ -115,15 +115,16 @@ function cover(c, opts = {}) {
     art = drawKolam(sol, L.fg, BOX).svg;
   }
   const right = soon ? 'Coming soon' : `${d.capsules} capsules · ${d.hours} hour${d.hours === 1 ? '' : 's'}`;
-  const taSpec = soon ? `${n} புள்ளி · கோடு தொடங்கியது` : `${n} புள்ளி · ${TA_LINES[sol.loops]}`;
-  const enSpec = soon ? `${n} pulli · the line has begun` : `${n} pulli · ${NUMW[sol.loops]} line${sol.loops > 1 ? 's' : ''}`;
+  // a coming-soon book has no capsule count yet: its grid is a placeholder, so the caption gives the grid, not a count
+  const taSpec = soon ? `8 × 4 · கோடு தொடங்கியது` : `${n} புள்ளி · ${TA_LINES[sol.loops]}`;
+  const enSpec = soon ? `8 × 4 · one warp · the line has begun` : `${n} pulli · ${NUMW[sol.loops]} line${sol.loops > 1 ? 's' : ''}`;
   return `
 <div class="cover lv-${d.level}${series ? ' series' : ''}${soon ? ' soon' : ''}" data-slug="${c.slug}" style="--bg:${L.bg};--fg:${L.fg};--acc:${L.acc}">
   <svg class="kolam" width="720" height="888" viewBox="0 0 720 888" aria-hidden="true">${art}</svg>
   <header class="top"><span class="lvl">${pips(L.n)}${L.name}</span><span>${right}</span></header>
   ${series ? `<p class="series-line">${esc(d.series)} <span class="no">${d.series_no}</span></p>` : ''}
   <h1 class="title" style="font-size:${size}px;top:${top}px">${lines.map(esc).join('<br>')}</h1>
-  ${sub ? `<p class="sub" style="top:${titleBottom + 16}px">${esc(sub)}</p>` : ''}
+  ${sub ? `<p class="sub" style="top:${titleBottom + 16}px">${sub.split('|').map(esc).join('<br>')}</p>` : ''}
   <footer class="foot"><span class="imprint">${mark(L.fg, 24)}<span>Vizuara Books</span></span>
     <span class="spec"><span lang="ta" class="acc">${taSpec}</span><span>${enSpec}</span></span></footer>
 </div>`;
@@ -140,8 +141,11 @@ function wrap(slug) {
   // legend kolam: a tiny 2 x 2 kolam labelled
   const small = K.solve(K.fromRows([3, 3], 'ner'), { loops: 1, density: 0, sym: [], seed: 1, iters: 10, restarts: 1 });
   const leg = K.svg(small, { pitch: 38, stroke: 3.6, dot: 2.8, color: L.fg, cx: 70, cy: 50 });
-  const spineKolam = drawKolam(sol, L.fg, { cx: SPINE / 2, cy: 700, w: 34, h: 120, minStroke: 1.6 }).svg;
+  // spine: a legible excerpt, one side of the frame braid (7 dots, one line), at print-safe weight
+  const excerpt = K.solve(K.fromRows([1, 1, 1, 1, 1, 1, 1], 'ner'), { loops: 1, density: 0, sym: [], seed: 1, iters: 10, restarts: 1 });
+  const spineKolam = K.svg(excerpt, { pitch: 19, stroke: 2.8, dot: 2.2, color: L.fg, cx: SPINE / 2, cy: 712 }).svg;
   return `
+<div class="wrap-outer"><span class="fold t" style="left:720px"></span><span class="fold t" style="left:${720 + SPINE}px"></span><span class="fold b" style="left:720px"></span><span class="fold b" style="left:${720 + SPINE}px"></span>
 <div class="wrap" style="--bg:${L.bg};--fg:${L.fg};--acc:${L.acc};width:${720 * 2 + SPINE}px">
   <div class="face back">
     <p class="back-kicker">${pips(L.n)}${L.name} · ${d.capsules} capsules · about ${d.hours} hours</p>
@@ -166,7 +170,7 @@ function wrap(slug) {
     <span class="spine-pips">${pips(L.n)}</span>
   </div>
   ${front}
-</div>`;
+</div></div>`;
 }
 
 // ---------------- presentation page ----------------
@@ -240,7 +244,7 @@ figure{margin:0}
   font:500 13.5px/1.3 'Anek Latin',sans-serif;letter-spacing:.04em}
 .imprint{display:flex;align-items:center;gap:10px;font-weight:600;letter-spacing:.01em;font-size:17px}
 .spec{display:flex;flex-direction:column;align-items:flex-end;gap:1px}
-.spec [lang=ta],[lang=ta]{font-family:'Anek Tamil',sans-serif;letter-spacing:0}
+.spec [lang=ta],[lang=ta]{font-family:'Anek Tamil',sans-serif;letter-spacing:0;font-style:normal;font-synthesis:none}
 
 /* ---- wrap ---- */
 .wrap-holder{max-width:1600px;margin:0 auto;padding:36px 0 24px;display:flex;justify-content:center}
@@ -259,7 +263,10 @@ figure{margin:0}
 .back-spec{position:absolute;left:64px;right:64px;top:744px;margin:0;font:italic 400 17px/1.3 'Tiro Tamil',serif;opacity:1}
 .back-foot{position:absolute;left:64px;right:64px;bottom:38px;display:flex;justify-content:space-between;align-items:flex-end;font:500 14px/1 'Anek Latin',sans-serif;letter-spacing:.04em}
 .barcode{width:150px;height:82px;border:1.6px solid var(--fg);display:flex;align-items:center;justify-content:center;font-size:11px;letter-spacing:.1em;text-transform:uppercase}
-.spine{position:relative;flex:none;height:888px;border-left:1px solid rgba(128,128,128,.28);border-right:1px solid rgba(128,128,128,.28)}
+.spine{position:relative;flex:none;height:888px}
+.wrap-outer{position:relative;padding:18px 0}
+.fold{position:absolute;width:0;height:12px;border-left:1px solid #6b6258}
+.fold.t{top:0}.fold.b{bottom:0}
 .spine-mark{position:absolute;top:34px;left:0;right:0;display:flex;justify-content:center}
 .spine-title{position:absolute;left:50%;top:92px;transform-origin:0 0;transform:rotate(90deg) translateY(-50%);white-space:nowrap;font:400 25px/1 'Tiro Tamil',serif;letter-spacing:-.005em}
 .spine-k{position:absolute;left:0;top:0}
@@ -277,7 +284,8 @@ function page() {
   };
   const covers = COVERS.map((c) => {
     const d = bySlug[c.slug]; const { b, sol, n } = emblem(c.slug, c.seed);
-    return `<figure>${cover(c)}<figcaption class="cap"><b>${esc(d.title)}</b> — ${n} pulli, ${NUMW[sol.loops]} line${sol.loops > 1 ? 's' : ''}, ${esc(b.spec)}. ${esc(b.why)}</figcaption></figure>`;
+    const head = b.placeholder ? `placeholder grid, ${esc(b.spec)}` : `${n} pulli, ${NUMW[sol.loops]} line${sol.loops > 1 ? 's' : ''}, ${esc(b.spec)}`;
+    return `<figure>${cover(c)}<figcaption class="cap"><b>${esc(d.title)}</b> — ${head}. ${esc(b.why)}</figcaption></figure>`;
   }).join('\n');
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Pulli — Vizuara Books</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -329,6 +337,28 @@ document.fonts.ready.then(()=>{document.querySelectorAll('.title').forEach(t=>{c
 </script>
 </body></html>`;
 }
+
+// ---------------- shelf check ----------------
+// silhouette = hull aspect ratio + fill ratio of the dot field; near-twins on the same ground are flagged
+function silhouette(slug, seed) {
+  const { sol, n } = emblem(slug, seed);
+  const lay = K.layout(sol, 1);
+  const w = lay.box.w + 1, h = lay.box.h + 1;
+  const unit = sol.M.shape.lattice === 'idukku' ? 0.5 : 1; // idukku packs two dots per unit square
+  // where the mass sits: centroid offset from the box centre, as a share of width / height
+  const mx = lay.pts.reduce((a, p) => a + p[0], 0) / n, my = lay.pts.reduce((a, p) => a + p[1], 0) / n;
+  return { aspect: Math.max(w, h) / Math.min(w, h), fill: (n * unit) / (w * h), ox: (mx - (lay.box.x0 + lay.box.x1) / 2) / w, oy: (my - (lay.box.y0 + lay.box.y1) / 2) / h };
+}
+(function shelfCheck() {
+  const S = COVERS.map((c) => ({ slug: c.slug, level: bySlug[c.slug].level, series: !!bySlug[c.slug].series, ...silhouette(c.slug, c.seed) }));
+  for (let i = 0; i < S.length; i++) for (let j = i + 1; j < S.length; j++) {
+    const a = S[i], b = S[j];
+    if (a.level !== b.level) continue; // a different ground already separates them on the shelf
+    const da = Math.abs(Math.log(a.aspect / b.aspect)), df = Math.abs(a.fill - b.fill);
+    const dm = Math.hypot(a.ox - b.ox, a.oy - b.oy);
+    if (da < 0.15 && df < 0.08 && dm < 0.06) console.warn(`shelf: ${a.slug} and ${b.slug} share a silhouette (aspect ${a.aspect.toFixed(2)}/${b.aspect.toFixed(2)}, fill ${a.fill.toFixed(2)}/${b.fill.toFixed(2)})`);
+  }
+})();
 
 const out = process.argv[2] || path.join(__dirname, '../index.html');
 fs.writeFileSync(out, page());

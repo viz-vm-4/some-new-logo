@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blazon — the Vizuara Roll of Arms</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --argent: #F8F5EE; --or: #D4A236; --gules: #B3261E; --azure: #213F93; --vert: #1D6946; --purpure: #5E2B5F; --sable: #161517;
+    --paper: #ECE6D9;
+    --page: #D8D2C5;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { background: var(--page); color: var(--sable); font-family: 'Newsreader', Georgia, serif; font-optical-sizing: auto; }
+
+  /* ================= THE COVER ================= */
+  .cover {
+    width: 720px; height: 888px; position: relative; overflow: hidden; flex: none;
+    background: var(--ground); color: var(--ink);
+    font-family: 'Newsreader', Georgia, serif; font-optical-sizing: auto;
+  }
+  .cover.beginner     { --ground: var(--paper); --ink: var(--sable); --label: var(--sable); }
+  .cover.intermediate { --ground: var(--or);    --ink: var(--sable); --label: var(--sable); }
+  .cover.advanced     { --ground: var(--sable); --ink: var(--argent); --label: var(--or); }
+
+  .cover .imprint {
+    position: absolute; left: 44px; top: 34px; height: 26px;
+    display: flex; align-items: center; gap: 11px;
+    font-size: 12.5px; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; line-height: 1;
+    font-variation-settings: 'opsz' 12;
+  }
+  .cover .imprint .mark { display: block; }
+  .cover .roll {
+    position: absolute; right: 44px; top: 34px; height: 26px; display: flex; align-items: center;
+    font-size: 12.5px; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; line-height: 1;
+    font-variation-settings: 'opsz' 12; font-variant-numeric: lining-nums;
+  }
+  .cover .head { position: absolute; left: 44px; top: 86px; width: 632px; }
+  .cover .series {
+    font-size: 12.5px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; line-height: 1;
+    font-variation-settings: 'opsz' 12; margin: 4px 0 18px; color: var(--label);
+  }
+  .cover .title {
+    margin: 0; font-weight: 600; line-height: .99; letter-spacing: -0.018em;
+    font-variation-settings: 'opsz' 72; font-variant-numeric: lining-nums;
+  }
+  .cover .title span { display: block; white-space: nowrap; }
+  .cover .sub {
+    margin: 14px 0 0; font-style: italic; font-weight: 400; font-size: 25px; line-height: 1.18; max-width: 600px;
+    font-variation-settings: 'opsz' 36;
+  }
+  .cover .arms { position: absolute; left: 276px; top: 340px; width: 400px; height: 480px; overflow: visible; }
+  .cover .register {
+    position: absolute; left: 44px; top: 348px; width: 206px; height: 472px;
+    display: flex; flex-direction: column;
+  }
+  .cover .lab {
+    font-size: 10.5px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; line-height: 1;
+    color: var(--label); margin: 0 0 8px; font-variation-settings: 'opsz' 10;
+  }
+  .cover .blazon { margin: 0 0 22px; font-style: italic; font-size: 16px; line-height: 1.3; font-weight: 400; }
+  .cover .symb { margin: 0; font-size: 13.5px; line-height: 1.4; font-weight: 400; }
+  .cover .meta { margin-top: auto; border-top: 2px solid currentColor; padding-top: 10px; }
+  .cover .meta .lvl { font-size: 12.5px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; line-height: 1.2; font-variation-settings: 'opsz' 12; }
+  .cover .meta .ext { font-size: 14px; line-height: 1.3; margin-top: 3px; font-variant-numeric: lining-nums; }
+
+  /* coming soon: arms in trick */
+  .cover .trick text { font-family: 'Newsreader', serif; font-style: italic; font-size: 26px; }
+
+  /* ================= THE PRESENTATION ================= */
+  .wrapall { max-width: 1520px; margin: 0 auto; padding: 72px 40px 120px; }
+  .mast { display: grid; grid-template-columns: 1.1fr 1fr; gap: 56px; align-items: end; border-bottom: 3px solid var(--sable); padding-bottom: 36px; }
+  .mast h1 { font-size: 168px; line-height: .86; margin: 0; font-weight: 600; letter-spacing: -0.03em; font-variation-settings: 'opsz' 72; }
+  .mast .kick { font-size: 15px; letter-spacing: .22em; text-transform: uppercase; font-weight: 600; margin: 0 0 18px; }
+  .mast .pitch { font-size: 25px; line-height: 1.3; margin: 0; font-variation-settings: 'opsz' 30; }
+  .mast .pitch em { font-style: italic; }
+  .cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin: 40px 0 56px; }
+  .cols p { font-size: 17.5px; line-height: 1.5; margin: 0 0 12px; }
+  .cols h3, .sec h2 { font-size: 13px; letter-spacing: .22em; text-transform: uppercase; font-weight: 700; margin: 0 0 14px; }
+  .sec { margin: 0 0 64px; }
+  .sec h2 { border-top: 2px solid var(--sable); padding-top: 12px; }
+  .tinctures { display: grid; grid-template-columns: repeat(7, 1fr); gap: 16px; }
+  .tinc .sw { height: 120px; border: 2.5px solid var(--sable); position: relative; overflow: hidden; }
+  .tinc .sw svg { position: absolute; right: 0; bottom: 0; width: 44%; height: 44%; border-left: 2.5px solid var(--sable); border-top: 2.5px solid var(--sable); background: #fff; }
+  .tinc b { display: block; font-size: 20px; margin-top: 10px; font-weight: 600; }
+  .tinc span { display: block; font-size: 14.5px; line-height: 1.35; }
+  .tinc code { font-family: 'Newsreader', serif; font-size: 14px; font-variant-numeric: lining-nums; letter-spacing: .04em; }
+  .levels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .levels div { height: 110px; border: 2.5px solid var(--sable); padding: 16px 18px; display: flex; flex-direction: column; justify-content: space-between; }
+  .levels b { font-size: 26px; font-weight: 600; }
+  .levels span { font-size: 15px; }
+  .ordinary { display: grid; grid-template-columns: repeat(6, 1fr); gap: 18px 16px; }
+  .ordinary figure { margin: 0; }
+  .ordinary svg { width: 100%; height: auto; display: block; }
+  .ordinary figcaption { font-size: 15px; line-height: 1.3; margin-top: 8px; }
+  .ordinary figcaption b { display: block; font-style: italic; font-weight: 500; font-size: 17px; }
+  .typeset { display: grid; grid-template-columns: 1.3fr 1fr; gap: 40px; align-items: start; }
+  .typeset .big { font-size: 76px; line-height: .99; font-weight: 600; letter-spacing: -0.018em; font-variation-settings: 'opsz' 72; }
+  .typeset .it { font-style: italic; font-size: 22px; line-height: 1.35; margin: 8px 0 0; }
+  .typeset p { font-size: 16.5px; line-height: 1.5; margin: 0 0 10px; }
+  .shelf { display: flex; flex-wrap: wrap; gap: 56px 48px; justify-content: flex-start; }
+  .shelf figure { margin: 0; width: 720px; }
+  .shelf figcaption { font-size: 15px; margin-top: 12px; display: flex; justify-content: space-between; letter-spacing: .02em; }
+  .shelf figcaption b { font-weight: 600; }
+  .note { font-size: 16px; line-height: 1.5; max-width: 900px; }
+  .hatch-row { display: flex; gap: 28px; align-items: flex-end; flex-wrap: wrap; }
+  .hatch-row figure { margin: 0; }
+  .hatch-row figcaption { font-size: 14.5px; margin-top: 8px; font-style: italic; }
+  .cadency { display: flex; gap: 22px; flex-wrap: wrap; }
+  .cadency figure { margin: 0; text-align: center; width: 120px; }
+  .cadency figcaption { font-size: 14.5px; line-height: 1.3; margin-top: 6px; }
+  .wrapwrap { overflow-x: auto; padding-bottom: 10px; }
+  .wrap { display: flex; width: max-content; box-shadow: 0 1px 0 rgba(0,0,0,.1); }
+  .wrap .back, .wrap .spine, .wrap .front { height: 888px; position: relative; overflow: hidden; flex: none; }
+</style>
+</head>
+<body>
+<div class="wrapall">
+
+  <header class="mast">
+    <div>
+      <p class="kick">Vizuara Books · a cover system</p>
+      <h1>Blazon</h1>
+    </div>
+    <p class="pitch">Every Vizuara book is <em>granted arms</em>. Its shield is drawn from the mechanism it teaches, in heraldry’s own grammar, and printed beside its <em>blazon</em> — the eight-hundred-year-old formal language that compiles to exactly one picture.</p>
+  </header>
+
+  <section class="cols">
+    <div>
+      <h3>The idea</h3>
+      <p>Heraldry is the oldest identity system that works at a distance: flat tinctures, a hard outline, a few bold charges, and a rule of contrast (never metal on metal) that is seven centuries older than WCAG. It was built to tell a thousand houses apart across a field. Fifty books across a library grid is an easier job.</p>
+    </div>
+    <div>
+      <p style="margin-top:31px">And its grammar is uncannily computational. Heraldic divisions are recursive axis-aligned cuts, so a decision tree <em>is</em> a blazon. A line <em>grady</em> (stepped) is the causal mask. Marshalling is composition: parallelism is quartering, a SQL join is impalement, and a distilled student bears its teacher’s arms <em>in pretence</em>.</p>
+    </div>
+    <div>
+      <p style="margin-top:31px">The drawing follows mid-century civic heraldry — the reduced municipal arms of Finland and Switzerland — not Gothic pastiche: no helms, lions or blackletter. One shield, placed the same way on every cover, the blazon set beside it like source code beside its output, and a quiet publisher’s mark.</p>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2>Tinctures — the field of the shield names the field of study</h2>
+    <div class="tinctures" id="tinctures"></div>
+    <p class="note" style="margin-top:18px">Each small square is the tincture’s <em>Petra Sancta</em> hatching (1638), heraldry’s own system for printing every colour in one ink. The shields can be reproduced in black alone for a one-colour spine, a stamp or a fax-grade printout and still be read correctly, and the covers’ three grounds are light, middle and dark in greyscale.</p>
+  </section>
+
+  <section class="sec">
+    <h2>Level is the ground the shield is displayed on</h2>
+    <div class="levels">
+      <div style="background:var(--paper)"><b>Argent</b><span>Beginner — the shield on bare paper.</span></div>
+      <div style="background:var(--or)"><b>Or</b><span>Intermediate — displayed on gold.</span></div>
+      <div style="background:var(--sable);color:var(--argent)"><b style="color:var(--or)">Sable</b><span>Advanced — displayed on black.</span></div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2>The Ordinary — one meaning per charge, across the whole library</h2>
+    <p class="note" style="margin:-4px 0 22px">An <em>ordinary of arms</em> is the heraldic reference that indexes shields by what is on them. This is Vizuara’s: every new book is blazoned from the same vocabulary, so a reader who has learnt that a pile is a context window can read the next shield unaided.</p>
+    <div class="ordinary" id="ordinary"></div>
+  </section>
+
+  <section class="sec">
+    <h2>Type</h2>
+    <div class="typeset">
+      <div>
+        <div class="big">Newsreader, Semibold at display size</div>
+        <p class="it">and its italic, at text size, for the blazon: <em>Per bend grady of eight Argent and Gules.</em></p>
+      </div>
+      <div>
+        <p>One family, Production Type’s Newsreader, used through its optical-size axis: the 72pt master for titles (tight, sharp, high contrast), the text masters for the register and letter-spaced capitals for the imprint. It is a reading face for a publisher of reading; nothing on the cover is set in a “tech” font.</p>
+        <p>Titles are set left, broken by sense, never leaving a short word alone, and sized in three steps (two, three or four lines) so a shelf of fifty keeps one voice.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2>The Roll — sixteen books</h2>
+    <div class="shelf" id="shelf"></div>
+  </section>
+
+  <section class="sec" id="cadency-sec">
+    <h2>A family of rooms — the Charlie books share a chief and are differenced like brothers</h2>
+    <p class="note" style="margin:-4px 0 20px">All four <em>Charlie and the Intelligence Factory</em> shields carry the Factory’s sawtoothed chief — its north-light roof — over the room’s own device. On the chief sits the heraldic mark of cadency that distinguished a first, second, third and fourth son: the label, crescent, mullet and martlet. Book numbers you can see at a glance, in a language that already existed.</p>
+    <div class="cadency" id="cadency"></div>
+  </section>
+
+  <section class="sec">
+    <h2>Printed in one ink</h2>
+    <p class="note" style="margin:-4px 0 20px">The same arms hatched in Petra Sancta: the monochrome fallback for a stamped spine, an ex-libris or a black-only reprint.</p>
+    <div class="hatch-row" id="hatch"></div>
+  </section>
+
+  <section class="sec">
+    <h2>Full wrap — back, spine, front</h2>
+    <div class="wrapwrap"><div class="wrap" id="wrap"></div></div>
+  </section>
+
+</div>
+
+<!--SCRIPTS-->
+</body>
+</html>
