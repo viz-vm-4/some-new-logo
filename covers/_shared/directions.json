@@ -6,5 +6,9 @@
   "06-letterform": {
     "name": "Codepoint",
     "pitch": "One book, one character. Each title gets a single glyph from its own subject (∂ for the maths, σ for neural networks, ≈ for context compaction, QKᵀ for transformers), set monumental and cropped above a fixed rule, with the title hung below like a type-specimen caption. Level is how much ink the cover carries: bare paper, ultramarine, then black."
+  },
+  "10-wildcard": {
+    "name": "Some Assembly Required",
+    "pitch": "Vizuara is a library for building things, and half its titles end in “from Scratch”, so every book is a model kit. Each emblem is an injection-moulded parts tree (a sprue) built from the book's own mechanism: an H-tree runner feeding 32 GPUs for 5D Parallelism, weights as runners for Neural Networks. Card colour and skill-level pips show level, plastic colour shows series, and kit numbers VZ-001 to VZ-052 make the shelf collectable."
   }
 }

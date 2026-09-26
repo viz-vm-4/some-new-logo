@@ -378,7 +378,7 @@ EMBLEMS['mathematical-foundations-for-ml'] = (S,b) => {
     S.gate(gsx,cy,cx+reach[k],cy,3.6);
     for(const it of sym[k]()){
       if(it[0]==='s') S.rod(it[1].replace(/(-?\d+\.?\d*) (-?\d+\.?\d*)/g,(m,a,bb)=>`${f(+a+cx)} ${f(+bb+cy)}`),12);
-      else S.disc(cx+it[1],cy+it[2],it[3]);
+      else { const sx=Math.sign(it[1]); S.gate(cx+it[1],cy+it[2],cx+sx*38,cy+it[2],3); S.disc(cx+it[1],cy+it[2],it[3]); }
     }
     S.tag(6+cw*c+cw-18, 6+ch*r+16, i+1);
   });
