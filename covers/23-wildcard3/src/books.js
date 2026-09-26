@@ -52,7 +52,7 @@ const ROLL = [
   {
     slug: 'sql-masterclass', no: 21, level: 'beginner', capsules: 36, hours: 8, field: 'azure',
     title: 'SQL|Masterclass',
-    blazon: 'Azure impaling Argent, barry of ten counterchanged, over the line of impalement a pallet Gules.',
+    blazon: 'Azure, five bars Argent, impaling Or, five bars Azure; over the line of impalement a pallet Gules.',
     symbolism: 'Impalement is how heraldry joins two houses in one shield; a join is how SQL marries two tables. Each row of one sits beside its match in the other, along the key that runs between them.',
   },
   {

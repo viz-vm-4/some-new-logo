@@ -262,16 +262,16 @@ ARMS['git-github-masterclass'] = () => {
   return out;
 };
 
-// SQL Masterclass — a join is an impalement
+// SQL Masterclass — a join is an impalement: two tables side by side, row matched to row along the key
 ARMS['sql-masterclass'] = () => {
   let out = `<rect width="400" height="480" fill="${T.azure}"/>`;
-  out += poly([[200, -10], [410, -10], [410, 500], [200, 500]], T.argent);
+  out += poly([[200, -10], [410, -10], [410, 500], [200, 500]], T.or);
   const bh = 48;
   for (let i = 1; i < 10; i += 2) {
     out += poly([[-10, i * bh], [200, i * bh], [200, (i + 1) * bh], [-10, (i + 1) * bh]], T.argent);
     out += poly([[200, i * bh], [410, i * bh], [410, (i + 1) * bh], [200, (i + 1) * bh]], T.azure);
   }
-  out += poly([[184, -10], [216, -10], [216, 500], [184, 500]], T.gules);
+  out += poly([[182, -10], [218, -10], [218, 500], [182, 500]], T.gules);
   return out;
 };
 
@@ -291,20 +291,22 @@ ARMS['cnn-fundamentals'] = () => {
   return out;
 };
 
-// RAG in Production — documents strewn; the query's neighbourhood holds the three nearest
+// RAG in Production — documents strewn; the query's neighbourhood holds exactly its three nearest
 ARMS['rag-in-production'] = () => {
   let out = `<rect width="400" height="480" fill="${T.purpure}"/>`;
-  const c = [200, 222], R = 118;
-  const inside = [];
-  for (let r = 0; r < 9; r++) for (let k = 0; k < 7; k++) {
-    const x = 28 + k * 58 + (r % 2 ? 29 : 0), y = 26 + r * 56;
-    const dd = Math.hypot(x - c[0], y - c[1]);
-    if (dd < R - 30) inside.push([x, y]);
-    else if (dd > R + 30) out += billet(x, y, 20, 32, T.argent);
+  const dx = 70, dy = 60.6, ox = 25, oy = 83.6;           // an equilateral lattice of documents
+  const P = (r, k) => [ox + k * dx + (((r % 2) + 2) % 2) * dx / 2, oy + r * dy];
+  const three = [P(2, 2), P(2, 3), P(3, 2)];                // the query sits among these three
+  const q = [(three[0][0] + three[1][0] + three[2][0]) / 3, (three[0][1] + three[1][1] + three[2][1]) / 3];
+  const Rin = 60, Rout = 82;
+  const bw = 18, bh = 28;
+  for (let r = -2; r < 9; r++) for (let k = -1; k < 7; k++) {
+    const [x, y] = P(r, k), d = Math.hypot(x - q[0], y - q[1]);
+    if (d < Rin) out += ''; else if (d - 17 > Rout) out += billet(x, y, bw, bh, T.argent);
   }
-  out += annulet(c[0], c[1], R, 26, T.or);
-  inside.forEach(([x, y]) => { out += billet(x, y, 20, 32, T.or); });
-  out += mullet(c[0], c[1] + 2, 26, T.or);
+  out += annulet(q[0], q[1], Rout, Rout - Rin, T.or);
+  three.forEach(([x, y]) => { out += billet(x, y, bw, bh, T.or); });
+  out += mullet(q[0], q[1] + 1, 16, T.or);
   return out;
 };
 

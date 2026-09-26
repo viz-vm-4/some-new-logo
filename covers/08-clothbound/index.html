@@ -49,7 +49,7 @@ table.checks{border-collapse:collapse;font-size:14.5px;width:100%}
 .plate b{display:block;font-weight:600;letter-spacing:.14em;text-transform:uppercase;font-size:12.5px;margin-bottom:3px}
 .printview .so{display:none!important}.printview .po{display:inline!important}
 .keyrow{display:flex;gap:40px;flex-wrap:wrap}
-.key{width:270px;font-size:15.5px;line-height:1.4}
+.key{width:300px;font-size:15.5px;line-height:1.4}
 .key svg{display:block;width:150px;height:185px;margin-bottom:12px;box-shadow:0 10px 18px -12px rgba(40,25,10,.7)}
 .key b{font:700 13px/1 "EB Garamond";letter-spacing:.22em;text-transform:uppercase;display:block;margin-bottom:6px}
 .type{display:grid;grid-template-columns:repeat(3,1fr);gap:40px}
@@ -430,7 +430,7 @@ const DEVICES = {
       for (let j = 0; j < N; j++){
         const x = o + j*cell, y = o + i*cell;
         if (j <= i){ const w = ex[j]/Z; s += `<circle cx="${f(x)}" cy="${f(y)}" r="${f(2.4 + 7.4*Math.sqrt(w))}" fill="${WHT}"/>`; }
-        else s += `<circle cx="${f(x)}" cy="${f(y)}" r="2.6" fill="none" stroke="${WHT}" stroke-width="1.5"/>`;
+        else s += `<circle cx="${f(x)}" cy="${f(y)}" r="2.6" fill="none" stroke="${WHT}" stroke-width="1.6"/>`;
       } }
     // the diagonal rule and the frame of the matrix
     const e = N*cell/2 + 8;
@@ -827,6 +827,10 @@ function sunkRim(d, P, id){
     <path d="${d}" stroke-width="3" opacity=".9"/><path d="${d}" stroke-width="7" opacity=".45"/><path d="${d}" stroke-width="13" opacity=".2"/></g>`;
 }
 
+/* Blind blocking darkens most cloths; on a near-black cloth the pressed area burnishes to a sheen instead,
+   so the band is drawn a touch lighter there (and stays visible in the flat print file). */
+const blindTone = (cloth) => lum(cloth) < .015 ? shade(cloth, .10) : shade(cloth, -.28);
+
 /* Level is the binding: visible leather goes 0 → 1 → 2 as the book goes deeper. */
 const BINDING = {
   beginner:     { S:0,  CN:0,   name:'full cloth' },
@@ -866,7 +870,7 @@ function coverParts(b, P){
   if (CN) fillets += `<path d="M${W-CN-12.7} 0L${W} ${CN+12.7}M${W-CN-12.7} ${H}L${W} ${H-CN-12.7}" stroke="${WHT}" stroke-width="2.2"/>`;
   const foilAbs = head + title + frame + devExtra + imprint(cx, 848) + fillets;
   return { cloth, foil, S, CN, HINGE, cx, cy, band, pattern, bandLines, clearD, devY, devInner, devG, sunkD, foilAbs, arch, RING,
-    dark: shade(cloth, -.28), sunk: shade(cloth, -.10), blindDev: shade(cloth, -.34), lip: shade(cloth, .22), seed: hash(b.slug) % 97 };
+    dark: blindTone(cloth), sunk: shade(cloth, -.10), blindDev: shade(cloth, -.34), lip: shade(cloth, .22), seed: hash(b.slug) % 97 };
 }
 
 function buildCover(b, P, opts = {}){
@@ -920,7 +924,7 @@ function buildWrap(b){
   const SP = 84, WW = W*2 + SP, P = 'wr-', HINGE = 30;
   const { S, CN } = BINDING[b.level];
   const cloth = CLOTH[b.cloth].hex, foil = FOILS[b.foil], seed = hash(b.slug) % 97;
-  const dark = shade(cloth, -.28), lip = shade(cloth, .22);
+  const dark = blindTone(cloth), lip = shade(cloth, .22);
   // back board: the blind band runs on; a blind colophon sits where the front has its device
   const bx1 = W - (S || HINGE), bcx = Math.round(bx1 / 2), cy = 605;
   const band = { x0:0, y0:418, x1:W - S, y1:792 };
