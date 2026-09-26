@@ -363,9 +363,7 @@ function fTransformer(bk) {
   const id = bk.slug + '-head';
   return svg(`<defs><clipPath id="${id}"><circle cx="${B[0]}" cy="${B[1]}" r="${R}"/></clipPath></defs>` + '' +
     rings(A, 900, INK) +
-    `<circle cx="${B[0]}" cy="${B[1]}" r="${R}" fill="${PAPER}"/>` +
-    `<g clip-path="url(#${id})">${rings(A, 900, INK)}${rings(B, R - 1, bk.color)}</g>` +
-    ``);
+    `<g clip-path="url(#${id})">${rings(B, R - 1, bk.color)}</g>`);
 }
 
 // Prompt Engineering — read left to right like text. The first 144px of every line is the prompt
@@ -374,7 +372,8 @@ function fTransformer(bk) {
 function fPrompt(bk) {
   const p = GRAIN[bk.level], per = 48, xp = 3 * per, A = 14, Ld = 170;
   const disp = x => x <= 0 ? 0 : -A * Math.sin(Math.PI * x / per) ** 2 * (x <= xp ? 1 : Math.exp(-(x - xp) / Ld));
-  const r = hLines({ bases: range(p / 2, FH + p, p), xs: range(-12, 732, 2),
+  // the last line (base 536) is whole; no line grazes the field/plate edge, since bumps only rise
+  const r = hLines({ bases: range(p / 2, FH - p / 2, p), xs: range(-12, 732, 2),
     y: (x, b) => b + disp(x),
     w: () => p * 0.5,
     c: (x) => x < xp });

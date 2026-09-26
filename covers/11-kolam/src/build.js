@@ -263,7 +263,7 @@ figure{margin:0}
 .back-spec{position:absolute;left:64px;right:64px;top:744px;margin:0;font:italic 400 17px/1.3 'Tiro Tamil',serif;opacity:1}
 .back-foot{position:absolute;left:64px;right:64px;bottom:38px;display:flex;justify-content:space-between;align-items:flex-end;font:500 14px/1 'Anek Latin',sans-serif;letter-spacing:.04em}
 .barcode{width:150px;height:82px;border:1.6px solid var(--fg);display:flex;align-items:center;justify-content:center;font-size:11px;letter-spacing:.1em;text-transform:uppercase}
-.spine{position:relative;flex:none;height:888px}
+.spine{position:relative;flex:none;height:888px;background:var(--bg)}
 .wrap-outer{position:relative;padding:18px 0}
 .fold{position:absolute;width:0;height:12px;border-left:1px solid #6b6258}
 .fold.t{top:0}.fold.b{bottom:0}

@@ -570,11 +570,11 @@ GEN['kernel-engineering'] = (r, b, acc) => {
 /* ---- Git & GitHub Masterclass: a repository's history, simulated and drawn like git log --graph ---- */
 GEN['git-github-masterclass'] = (r, b, acc) => {
   const T = 96, LANES = [0, -1, 1, -2, 2, -3, 3, -4, 4, -5, 5], free = new Array(LANES.length).fill(true), br = [], commits = [], merges = [];
-  const main = { lane: 0, t0: 0, end: T - 1, last: 0 }; free[0] = false;
+  const main = { lane: 0, t0: 0, end: T - 1, last: 0 }; free[0] = false; let lastMerge = -9;
   for (let t = 1; t < T - 1; t++) {
     const live = br.filter((x) => x.end === null);
     // merges back into main: a branch needs two commits and a step of quiet since its last one
-    for (const x of live) if (x.n >= 2 && t >= x.last + 2 && r() < 0.12) { x.end = t; merges.push([x, t]); commits.push([main, t, true]); main.last = t; break; }
+    if (t >= lastMerge + 2) for (const x of live) if (x.n >= 2 && t >= x.last + 2 && r() < 0.12) { x.end = t; merges.push([x, t]); commits.push([main, t, true]); main.last = t; lastMerge = t; break; }
     // open a feature branch off main, on the free lane nearest the trunk
     if (r() < 0.2 && live.length < 9) { const k = LANES.findIndex((_, i) => i > 0 && free[i]); if (k > 0) { free[k] = false; br.push({ lane: k, t0: t, end: null, n: 0, last: t }); } }
     for (const x of br) if (x.end !== null && x.end < t && !x.freed) { free[x.lane] = true; x.freed = true; }

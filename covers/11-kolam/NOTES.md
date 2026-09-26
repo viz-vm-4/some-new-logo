@@ -22,7 +22,7 @@ We took the structure, the logic and the craft. We did not take the surface. The
 | | |
 |---|---|
 | Trim | 720 × 888 px = 7.5 × 9.25 in |
-| Title | Tiro Tamil (Tiro Typeworks: a Tamil–Latin book face made for Indian classical publishing), 80 px, or 64 px for long titles. Line breaks set by hand. |
+| Title | Tiro Tamil (Tiro Typeworks: a Tamil–Latin book face made for Indian classical publishing), 80 px as standard, 72 px or 64 px for long titles. Line breaks set by hand. |
 | Labels / imprint | Anek Latin (Ek Type, Mumbai), letter-spaced caps at 14 px |
 | Kolam caption | Anek Tamil: e.g. `43 புள்ளி · ஒரு கோடு` / "43 pulli · one line". Kolam notebooks record designs the same way, by their dot count. |
 | Imprint mark | Five idukku pulli in a V, drawn as **one closed line** by the same generator |
@@ -50,13 +50,13 @@ The three grounds sit far apart in value, so the code survives greyscale printin
 ### Sub-series and states
 
 - **Charlie and the Intelligence Factory** (I–IV): each book has a series line with a roman numeral, and every kolam is drawn in **double line** (*irattai kodu*), a real kolam style that makes the four read as a set. All crossings are drawn flat and merged, the way two flour lines meet, both where a line crosses itself and where two lines cross.
-- **Coming soon**: the whole design is pencilled in faintly, as in a kolam notebook. The dots are laid, and only the first third of the line is drawn in full white. The caption reads "32 pulli · the line has begun".
+- **Coming soon**: the whole design is pencilled in faintly, as in a kolam notebook. The dots are laid, and only the first third of the line is drawn in full white. The caption gives the grid, not a count: "8 × 4 · one warp · the line has begun" (Tamil "8 × 4 · கோடு தொடங்கியது").
 
 ## Emblems, one line per book
 
 - **AI Context Engineering**: 43 dots. An outer 9 × 7 frame (28) around an inner 5 × 3 block (15), which is the window and what you put inside it. The frame is forced to a pure two-strand braid (two lines) and the inside is one line: 3 lines in all, D2.
 - **Mathematical Foundations for ML**: 43 dots. The classic nēr diamond 1–3–5–7–11–7–5–3–1, crossed by an eleven-dot horizontal axis (a number line). One line, D2.
-- **Neural Networks from Scratch**: 33 dots in layer columns 5–7–9–7–5. The line only crosses inside a layer, so each column is a braid. Between layers it mostly turns, and a few crossings (the weights) link them. One line.
+- **Neural Networks from Scratch**: 33 dots in layer columns 5–7–9–7–5. Inside a layer the line only crosses, so each column is its own braid. Between layers it turns back everywhere except at one crossing on the centre line (the signal passing forward), and these crossings join the five layers into one line.
 - **Build LLMs from Scratch**: 20 dots in a tower of five identical 2 × 2 blocks: the N× decoder stack. Each block is woven the same way (one turn makes it a single line on its own), and each block joins the next through exactly one crossing. One line climbs the whole model.
 - **5D Parallelism**: 40 dots, a device mesh 2–4–6–8–8–6–4–2, woven by exactly five closed lines: data, tensor, pipeline, sequence and expert. The solver now rejects any line that touches fewer than 6 dots, and any pair of lines that never cross. Every one of the 10 pairs crosses, and each line touches 16–18 dots. Mirrored left to right, because only a single mirror axis allows an odd count on this shape.
 - **Pi vs Hermes vs Codex**: 9 capsules, a 3 × 3 grid, no turns at all. The square falls naturally into three interlaced lines, one for each of the three agents sharing one memory.
