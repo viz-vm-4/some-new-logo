@@ -479,11 +479,13 @@ ARMS['5d-parallelism'] = () => {
   for (const x of [100, 300]) subs.push(rightOfPts(x, 'indented', { p: 30, a: 12, origin: 7.5 })); // tensor (teeth cross each fess line mid-edge, never at a tip)
   subs.push(below(240, 'embattled', { p: 50, a: 12, origin: -12.5 }));                   // pipeline
   for (const y of [120, 360]) subs.push(below(y, 'wavy', { p: 50, a: 12, origin: -12.5 })); // context
-  // expert; the lowest line is set half a period over so a tenon, not a gap, meets each flank in the point
-  for (const y of [60, 180, 300, 420]) subs.push(below(y, 'dovetailed', { p: 50, a: 11, origin: y === 420 ? 25 : 0 }));
+  for (const y of [60, 180, 300, 420]) subs.push(below(y, 'dovetailed', { p: 50, a: 11, origin: 0 })); // expert
   const d = subs.map(pathOf).join('');
+  // In the point, the outer squares of the last rank (0,7) and (3,7) survive the shield's curve only as
+  // specks cut off by the tensor teeth. Give each the tincture of its two neighbours so no speck is left.
+  const specks = `<path d="M294 414.5H430V520H294Z" fill="${T.sable}"/><path d="M-30 414.5H106V520H-30Z" fill="${T.or}"/>`;
   return `<rect width="400" height="480" fill="${T.or}"/><path d="${d}" fill="${T.sable}" fill-rule="evenodd"/>` +
-    `<path d="${d}" fill="none" stroke="${S}" stroke-width="3"/>`;
+    `<path d="${d}" fill="none" stroke="${S}" stroke-width="3"/>` + specks;
 };
 
 // Git & GitHub — a pall: one trunk of commits parting into two branches
