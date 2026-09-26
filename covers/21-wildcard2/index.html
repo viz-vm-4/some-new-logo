@@ -244,8 +244,8 @@ const PARTS = {
     for (let i=0;i<n;i++) for (let j=0;j<n;j++) { const x=j*pitch,y=i*pitch; g+=R(x,y,cell,cell,4); clip+=R(x,y,cell,cell,4);
       if (j<n-1) g+=R(x+cell-1,y+cell/2-3,gap+2,6); if (i<n-1) g+=R(x+cell/2-3,y+cell-1,6,gap+2); }
     const id=uid('cp');
-    const pic = `M0 ${s*.86}L${s*.3} ${s*.44}L${s*.5} ${s*.68}L${s*.68} ${s*.5}L${s} ${s*.9}` ;
-    const d = `<defs><clipPath id="${id}">${clip}</clipPath></defs><g clip-path="url(#${id})">${ENG(pic,2.2)}${ENG(circ(s*.76,s*.22,s*.1),2.2)}</g>`;
+    const hill=`M0 ${s}V${s*.84}L${s*.3} ${s*.42}L${s*.5} ${s*.66}L${s*.68} ${s*.48}L${s} ${s*.88}V${s}Z`;
+    const d = `<defs><clipPath id="${id}">${clip}</clipPath></defs><g clip-path="url(#${id})"><path d="${hill}" fill="%LO%" opacity=".5"/><circle cx="${s*.78}" cy="${s*.2}" r="${s*.11}" fill="%LO%" opacity=".5"/>${ENG(`M0 ${s*.84}L${s*.3} ${s*.42}L${s*.5} ${s*.66}L${s*.68} ${s*.48}L${s} ${s*.88}`,1.6)}</g>`;
     return {w:s,h:s,g,d,gates:[[cell/2,0,'up'],[s-cell/2,s,'down']],name:'Image patches'};
   },
   patchSeq(labels=['CLS','1','2','3','4']) {
@@ -268,17 +268,33 @@ const PARTS = {
     return {w,h,g,d:ETX(w/2,h-11,label,15,{w:800}),gates:[[w/2,2,'up'],[w/2,h,'down']],name:label+' axis'};
   },
   ring(k=8, r=58, nr=11) {
-    let g=RING(r+nr,r+nr,r+3.5,r-3.5), d='';
-    for (let i=0;i<k;i++){ const a=i/k*2*Math.PI-Math.PI/2; g+=C(r+nr+r*Math.cos(a),r+nr+r*Math.sin(a),nr); }
-    for (let i=0;i<k;i++){ const a=(i+.5)/k*2*Math.PI-Math.PI/2, x=r+nr+(r-16)*Math.cos(a), y=r+nr+(r-16)*Math.sin(a), t=a+Math.PI/2;
-      d += ENG(`M${n2(x-5*Math.cos(t)+4*Math.cos(a))} ${n2(y-5*Math.sin(t)+4*Math.sin(a))}L${n2(x)} ${n2(y)}L${n2(x-5*Math.cos(t)-4*Math.cos(a))} ${n2(y-5*Math.sin(t)-4*Math.sin(a))}`,1.6); }
-    const s=2*(r+nr);
-    return {w:s,h:s,g,d,gates:[[s/2,0,'up'],[s/2,s,'down']],name:'All-reduce ring'};
+    const c=r+nr; let g=RING(c,c,r+3.5,r-3.5);
+    for (let i=0;i<k;i++){ const a=i/k*2*Math.PI-Math.PI/2; g+=C(c+r*Math.cos(a),c+r*Math.sin(a),nr); }
+    for (let i=0;i<k;i++){ const a=(i+.62)/k*2*Math.PI-Math.PI/2; g+=HEAD(c+r*Math.cos(a),c+r*Math.sin(a),a*180/Math.PI+90,13); }
+    return {w:2*c,h:2*c,g,d:'',gates:[[c,0,'up'],[c,2*c,'down']],name:'All-reduce ring'};
+  },
+  axisHub(labels=['DP','TP','PP','CP','EP']) {
+    // five parallelism axes radiating from one hub, 72° apart
+    const Rr=86, cx=106, cy=101; let g=C(cx,cy,24), d=ETX(cx,cy+5,'5D',14,{f:'Archivo',w:800});
+    labels.forEach((l,i)=>{ const a=(-90+i*72)*Math.PI/180, x=cx+Rr*Math.cos(a), y=cy+Rr*Math.sin(a);
+      g += ROD(`M${cx} ${cy}L${n2(x)} ${n2(y)}`,8) + R(x-24,y-15,48,30,7); d += ETX(x,y+5,l,14,{w:800}); });
+    return {w:212,h:186,g,d,gates:[[cx,0,'up'],[n2(cx+Rr*Math.cos(54*Math.PI/180)),185.6,'down']],name:'Five parallelism axes'};
   },
   pipeline(k=3) {
     let g='', x=0; const b=40;
     for (let i=0;i<k;i++){ g+=R(x,0,b,b,6); if(i<k-1){ g+=ROD(`M${x+b} ${b/2}L${x+b+16} ${b/2}`,6)+HEAD(x+b+26,b/2,0,12);} x+=b+30; }
     return {w:x-30,h:b,g,d:'',gates:[[b/2,0,'up'],[x-30-b/2,b,'down']],name:'Pipeline stages'};
+  },
+  teacherCNN() {
+    const slabs=[[0,96,12],[36,78,18],[78,60,24],[124,42,30]], o=10, H0=110; let g='', d='';
+    slabs.forEach(([x,h,w],i)=>{ const y=(H0-h)/2+o;
+      g += P(`M${x} ${y}L${x+o} ${y-o}H${x+w+o}V${y+h-o}L${x+w} ${y+h}H${x}Z`);
+      d += ENG(`M${x} ${y}H${x+w}V${y+h}M${x+w} ${y}L${x+w+o} ${y-o}`,1.4);
+      if (i<slabs.length-1) g += R(x+w+o-2, y+h/2-3.5, slabs[i+1][0]-(x+w+o)+4, 7); });
+    const [lx,lh,lw]=slabs[3], ly=(H0-lh)/2+o;
+    g += ROD(`M${lx+lw+o} ${ly+lh/2}H${lx+lw+o+22}`,6)+HEAD(lx+lw+o+36,ly+lh/2,0,14);
+    d += ETX(lx+lw/2, ly+lh/2+4, 'CNN', 9);
+    return {w:lx+lw+o+38,h:H0+4,g,d,gates:[[16,(H0-96)/2,'up'],[lx+lw/2,ly+lh,'down']],name:'CNN teacher'};
   },
   gpuDie() {
     const s=176; let g=R(0,0,s,s,10), d='';
@@ -326,10 +342,15 @@ const PARTS = {
     const g=RING(30,30,30,20)+ROD(`M52 52L84 84`,12);
     return {w:92,h:92,g,d:'',gates:[[30,0,'up'],[86,90,'down']],name:'Retriever'};
   },
-  transcript(n=9) {
-    let g=ROD(`M60 4V${(n-1)*15+8}`,6), d=''; const L=[44,30,50,22,46,36,52,26,40];
-    for (let i=0;i<n;i++){ const y=6+i*15, l=L[i%L.length]; g += i%2 ? R(60,y-4,l+14,9,4) : R(60-l-14,y-4,l+14,9,4); }
-    return {w:136,h:(n-1)*15+12,g,d,gates:[[60,0,'up'],[60,(n-1)*15+12,'down']],name:'Long transcript'};
+  transcript() {
+    // a long chat log: one tall tray, alternating turns molded inside (≈3× the clamped block)
+    const w=112, h=196; let d=''; const pills=[[0,64],[1,50],[0,40],[1,70],[0,56],[1,44],[0,68],[1,52],[0,36],[1,60]];
+    pills.forEach(([side,len],i)=>{ const y=12+i*18, x=side?w-10-len:10; d+=RELIEF(R(x,y,len,11,5.5)); });
+    return {w,h,g:R(0,0,w,h,14),d,gates:[[w/2,0,'up'],[w/2,h,'down']],name:'Long transcript'};
+  },
+  notepad() {
+    let g=R(0,8,76,92,8); for (let i=0;i<5;i++) g+=RING(12+i*13,8,6,2.6);
+    return {w:76,h:100,g,d:ENG(`M12 44H64M12 58H64M12 72H50`,1.8)+ETX(38,32,'MEMORY',9),gates:[[38,2,'up'],[38,100,'down']],name:'Memory notes'};
   },
   clamp() {
     let g=P(`M0 22Q0 0 22 0H112V20H22V140H112V160H22Q0 160 0 138Z`);
@@ -342,7 +363,7 @@ const PARTS = {
   badge(kind) {
     const r=40, cx=r, cy=r; let el='';
     if (kind==='pi') el = `<path d="M${cx-22} ${cy-12}Q${cx-20} ${cy-20} ${cx-10} ${cy-20}H${cx+24}V${cy-10}H${cx+10}V${cy+14}Q${cx+10} ${cy+20} ${cx+18} ${cy+20}V${cy+24}Q${cx} ${cy+26} ${cx} ${cy+12}V${cy-10}H${cx-8}V${cy+24}H${cx-18}V${cy-10}Q${cx-20} ${cy-10} ${cx-22} ${cy-6}Z"/>`;
-    if (kind==='wing') el = `<path d="M16 52C16 32 32 18 64 18L50 28L58 32L44 40L50 44L36 50L38 54C30 58 18 58 16 52Z" stroke-linejoin="round" stroke-width="2"/>`;
+    if (kind==='wing') el = `<rect x="14" y="22" width="12" height="38" rx="6"/>`+ROD(`M20 28L66 16`,9)+ROD(`M20 41L62 34`,9)+ROD(`M20 54L54 51`,9);
     if (kind==='codex') el = `<path d="M${cx-24} ${cy-18}Q${cx-12} ${cy-24} ${cx-2} ${cy-18}V${cy+22}Q${cx-12} ${cy+16} ${cx-24} ${cy+22}Z M${cx+2} ${cy-18}Q${cx+12} ${cy-24} ${cx+24} ${cy-18}V${cy+22}Q${cx+12} ${cy+16} ${cx+2} ${cy+22}Z"/>`;
     return {w:2*r,h:2*r,g:C(cx,cy,r),d:ENG(circ(cx,cy,r-6),1.4)+RELIEF(el),gates:[[cx,0,'up'],[cx,2*r,'down']],name:{pi:'Pi',wing:'Hermes',codex:'Codex'}[kind]};
   },
@@ -357,9 +378,10 @@ const PARTS = {
     return {w:106,h:136,g,d:'',gates:[[52,0,'up'],[52,136,'down']],name:'Sigma'};
   },
   bell() {
-    const w=200, p=[]; for (let x=4;x<=w-4;x+=4) p.push([x, 92-78*Math.exp(-(((x-w/2)/30)**2))]);
-    let g=ROD(`M0 94H${w}`,7)+ROD(pts(p),8); [-60,-30,30,60].forEach(o=>g+=ROD(`M${w/2+o} 94V103`,4)); g+=ROD(`M${w/2} 94V105`,5);
-    return {w,h:106,g,d:'',gates:[[w/2,10,'up'],[18,97,'down']],name:'Gaussian'};
+    // N(0, sigma = 30 px): ticks at ±1σ and ±2σ; the inflection points sit on the inner ticks
+    const w=232, sg=30, p=[]; for (let x=4;x<=w-4;x+=4) p.push([x, 92-78*Math.exp(-((x-w/2)**2)/(2*sg*sg))]);
+    let g=ROD(`M0 94H${w}`,7)+ROD(pts(p),8); [-2*sg,-sg,sg,2*sg].forEach(o=>g+=ROD(`M${w/2+o} 94V103`,4)); g+=ROD(`M${w/2} 94V105`,5);
+    return {w,h:106,g,d:'',gates:[[w/2,10,'up'],[18,97,'down']],name:'Gaussian (±1σ, ±2σ ticks)'};
   },
   integral() {
     const g=ROD(`M46 12C30 -2 24 14 24 44V92C24 122 16 132 4 120`,11)+C(48,13,8)+C(4,118,8);
@@ -385,14 +407,16 @@ const PARTS = {
     kids.forEach(k=>g+=ROD(`M${root[0]} ${root[1]}L${k[0]} ${k[1]}`,7));
     leaves.forEach((l,i)=>g+=ROD(`M${kids[i>>1][0]} ${kids[i>>1][1]}L${l[0]} ${l[1]}`,7));
     g += R(root[0]-44,0,88,36,8); kids.forEach(k=>g+=R(k[0]-38,k[1]-16,76,32,8)); leaves.forEach(l=>g+=C(l[0],l[1],17));
-    d += ETX(root[0],23,'x ≤ 2.5',12) + ETX(kids[0][0],kids[0][1]+5,'y ≤ 1',11) + ETX(kids[1][0],kids[1][1]+5,'x ≤ 4',11);
+    d += ETX(root[0],23,'x ≤ 2.5',12) + ETX(kids[0][0],kids[0][1]+5,'y ≤ 1',11) + ETX(kids[1][0],kids[1][1]+5,'y ≤ 4',11);
     leaves.forEach((l,i)=> d += i%2 ? ENG(circ(l[0],l[1],7),2.2) : EDOT(l[0],l[1],7));
     return {w:264,h:190,g,d,gates:[[132,0,'up'],[98,189,'down']],name:'Decision tree'};
   },
   boundary() {
+    // the staircase the tree produces: x ≤ 2.5 → y ≤ 1 (low step), else y ≤ 4 (high step); filled class below
     const s=128; const g=R(0,0,s,s,8);
-    let d=''; [[22,112],[34,100],[18,74],[40,114],[28,62],[70,112],[88,98],[64,86]].forEach(([x,y])=>d+=EDOT(x,y,4.2));
-    [[74,22],[100,30],[112,58],[66,34],[92,70],[112,90],[104,14]].forEach(([x,y])=>d+=ENG(circ(x,y,4.2),1.8));
+    let d='';
+    [[18,106],[34,113],[43,101],[66,96],[82,110],[98,84],[114,104],[72,62],[106,60]].forEach(([x,y])=>d+=EDOT(x,y,4.2));
+    [[18,70],[34,50],[24,28],[41,80],[70,26],[92,16],[110,32],[88,33]].forEach(([x,y])=>d+=ENG(circ(x,y,4.2),1.8));
     d += RELIEF(ROD(`M8 92H52V44H120`,5));
     return {w:s,h:s,g,d,gates:[[s/2,0,'up'],[s/2,s,'down']],name:'Decision boundary'};
   },
@@ -434,8 +458,9 @@ const PARTS = {
     return {w:148,h:78,g,d,gates:[[32,0,'up'],[116,78,'down']],name:'Preference pair'};
   },
   clipFn() {
-    const g=ROD(`M6 4V84H152`,5)+ROD(`M12 70H52L104 24H148`,8);
-    return {w:154,h:88,g,d:'',gates:[[6,1,'up'],[80,86,'down']],name:'Clipped objective'};
+    // PPO's L^CLIP = min(r·A, clip(r,1−ε,1+ε)·A) for A>0: rises with r from the origin, flat after 1+ε, no floor
+    const g=ROD(`M6 4V84H152`,5)+ROD(`M6 84L100 24H148`,8)+ROD(`M84 84V94`,4)+ROD(`M100 84V94`,4);
+    return {w:154,h:96,g,d:'',gates:[[6,1,'up'],[128,86,'down']],name:'PPO clipped objective (A > 0)'};
   },
   spring() {
     const zz=[]; for (let i=0;i<=10;i++) zz.push([34+i*9.4, 30+(i%2?-12:12)*(i>0&&i<10?1:0)]);
@@ -500,6 +525,25 @@ const PARTS = {
     [18,32,46].forEach(r=>g+=ROD(`M${n2(52+r*Math.cos(-.8))} ${n2(48+r*Math.sin(-.8))}A${r} ${r} 0 0 1 ${n2(52+r*Math.cos(.8))} ${n2(48+r*Math.sin(.8))}`,5));
     return {w:104,h:96,g,d:'',gates:[[35,19,'up'],[35,78,'down']],name:'Speaker'};
   },
+  voiceLoop() {
+    const tw=58, th=34, gp=34, xs=[0,tw+gp,2*(tw+gp)]; let g='', d='';
+    ['ASR','LLM','TTS'].forEach((t,i)=>{ g+=R(xs[i],0,tw,th,7); d+=ETX(xs[i]+tw/2,th/2+5,t,13,{w:800});
+      if (i<2) g+=ROD(`M${xs[i]+tw} ${th/2}H${xs[i+1]-13}`,5)+HEAD(xs[i+1]-1,th/2,0,12); });
+    g += ROD(`M${xs[2]+tw/2} ${th}V${th+24}H${tw/2}V${th+14}`,5)+HEAD(tw/2,th+2,-90,12);               // next turn
+    const bx=xs[1]+tw+12; g += ROD(`M${bx+10} ${th+46}L${bx-2} ${th+30}L${bx+8} ${th+28}L${bx-6} ${th+10}`,4.5)+HEAD(bx-9,th+4,-110,11); // barge-in
+    return {w:xs[2]+tw,h:th+48,g,d,gates:[[xs[1]+tw/2,0,'up'],[bx+10,th+48,'down']],name:'ASR → LLM → TTS loop, with barge-in'};
+  },
+  vad() {
+    const n=15, L=(n-1)*10+8; let g=ROD(`M0 56H${L}`,4);
+    for (let i=0;i<n;i++){ const x=4+i*10, sp=i>=4&&i<=10, a=sp?10+20*Math.abs(Math.sin(i*1.3+.4)):3; g+=ROD(`M${x} ${n2(56-a)}V${n2(56+a)}`,5); }
+    g += `<path d="${rr(33,20,86,72,8)}" fill="none" stroke-width="4"/>` + R(56,2,40,20,4);
+    return {w:L,h:94,g,d:ETX(76,16,'VAD',10),gates:[[76,2,'up'],[76,92,'down']],name:'Voice-activity window'};
+  },
+  turnTaking() {
+    let g=R(0,4,62,20,5)+R(0,36,62,20,5)+R(26,23,10,14)+ROD(`M62 14H232`,3)+ROD(`M62 46H232`,3);
+    [[74,124,14],[180,208,14],[118,172,46],[202,228,46]].forEach(([a,b,y])=>g+=ROD(`M${a} ${y}H${b}`,11));
+    return {w:234,h:58,g,d:ETX(31,18,'USER',10)+ETX(31,50,'AGENT',10),gates:[[31,4,'up'],[215,51.5,'down']],name:'Turn-taking'};
+  },
   bandit() {
     let g=R(0,92,214,14,5), d='';
     for (let i=0;i<3;i++){ const x=i*70; g+=R(x,20,54,76,8)+ROD(`M${x+54} 52H${x+60}V16`,5)+C(x+60,12,7); d+=ENG(rr(x+10,34,34,34,4),1.6)+ETX(x+27,58,'?',17,{f:'Archivo',w:800}); }
@@ -525,8 +569,9 @@ function sprue(fr, rows, pl, mat, opts={}) {
   const TF=11, TR=9, {x,y,w,h}=fr;
   let geo=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="18" fill="none" stroke-width="${TF}"/>`, deco='', tags='';
   let sheen='', sheenDefs='', frameGeo=''; const SX1=x-40, SX2=x+w+40;
+  const TABW=116, TABX=x+w-26-TABW, TAB=[TABX-10, TABX+TABW+10];   // the maker's tab always lives here
   const tw=rows.reduce((a,r)=>a+(r.h||1),0);
-  const runners=[{y, t:TF, occ:[], block:[]}]; const gates=[]; const parts=[];
+  const runners=[{y, t:TF, occ:[[TABX-4,TABX+TABW+4]], block:[]}]; const gates=[]; const parts=[];
   let top=y, num=1;
   rows.forEach((row,ri)=>{
     const bh=h*(row.h||1)/tw, bot=top+bh;
@@ -536,11 +581,13 @@ function sprue(fr, rows, pl, mat, opts={}) {
     const padY=row.padY||30, padX=26;
     const maxH=Math.max(...items.map(q=>q.p.h*(q.s||1)));
     const sumW=items.reduce((a,q)=>a+q.p.w*(q.s||1),0);
-    let sc=Math.min(row.max||1.3, (bh-2*padY)/maxH, (w-2*padX-(items.length-1)*24)/sumW);
+    let sc=Math.min(row.max||(ri===0?1.6:1.3), (bh-2*padY)/maxH, (w-2*padX-(items.length-1)*24)/sumW);
     const gap=(w-sumW*sc)/(items.length+1);
     let cx=x+gap;
     items.forEach(q=>{
-      const s=sc*(q.s||1), pw=q.p.w*s, ph=q.p.h*s, px=cx+(q.dx||0), py=top+(bh-ph)/2+(q.dy||0);
+      const s=sc*(q.s||1), pw=q.p.w*s, ph=q.p.h*s, px=cx+(q.dx||0);
+      let py=top+(bh-ph)/2+(q.dy||0);
+      if (ri===0 && px<TAB[1] && px+pw>TAB[0]) py=Math.max(py, top+38);   // keep clear of the tab
       const tf=`translate(${n2(px)} ${n2(py)}) scale(${n2(s)})`;
       geo  += `<g transform="${tf}">${q.p.g}</g><!--p-->`;
       if (opts.sheen) {
@@ -549,8 +596,10 @@ function sprue(fr, rows, pl, mat, opts={}) {
         sheen += `<g transform="${tf}" fill="url(#${gp})" stroke="url(#${gp})">${q.p.g}</g>`;
         deco += `<g transform="${tf}">${q.p.d.replace(/%BASE%/g,`url(#${gp})`)}</g>`;
       } else deco += `<g transform="${tf}">${q.p.d}</g>`;
-      q.p.gates.forEach(([gx,gy,dir],gi)=>{ const ro=dir==='up'?runners[ri]:runners[ri+1];
-        gates.push({X:px+gx*s, Y:py+gy*s, ro, dir, num, first:gi===0}); ro.occ.push([px+gx*s-7, px+gx*s+7]); });
+      let firstDone=false;
+      q.p.gates.forEach(([gx,gy,dir])=>{ const ro=dir==='up'?runners[ri]:runners[ri+1], X=px+gx*s;
+        if (ri===0 && dir==='up' && X>TAB[0] && X<TAB[1]) return;          // never gate into the tab
+        gates.push({X, Y:py+gy*s, ro, dir, num, first:!firstDone}); firstDone=true; ro.occ.push([X-7, X+7]); });
       if (py-top<40) runners[ri].block.push([px-6,px+pw+6]); if (bot-(py+ph)<40) runners[ri+1].block.push([px-6,px+pw+6]);
       parts.push({num, name:q.p.name});
       num++; cx+=pw+gap;
@@ -570,17 +619,10 @@ function sprue(fr, rows, pl, mat, opts={}) {
     geo += R(tx,ty,17,13,2);
     tags += `<text x="${n2(tx+8.5)}" y="${n2(ty+10)}" font-size="9.5" font-family="Martian Mono" font-weight="700" text-anchor="middle" fill="%INK%">${G.num}</text>`;
   });
-  // maker's tab: scan the top frame, then the bottom frame, right to left, for a clear span
-  const first=runners[0], last=runners[runners.length-1];
-  if (opts.reserve) first.occ.push(opts.reserve);
-  const scan=(ro,tw)=>{ for (let tx=x+w-24-tw; tx>=x+24; tx-=4) if (!ro.occ.concat(ro.block).some(([p,q])=>!(tx+tw<p-5||tx>q+5))) return tx; return null; };
-  let tabW=116, tro=first, tabX=scan(first,tabW);
-  if (tabX===null){ tro=last; tabX=scan(last,tabW); }
-  if (tabX===null){ tabW=44; tro=first; tabX=scan(first,tabW); if(tabX===null){ tro=last; tabX=scan(last,tabW)??(x+w-24-tabW);} }
-  const tabY = tro===first ? y+TF/2-1 : y+h-TF/2-21;
-  tro.occ.push([tabX,tabX+tabW]);
-  geo += R(tabX,tabY,tabW,22,3);
-  tags += (tabW>60?`<text x="${tabX+10}" y="${tabY+15.5}" font-size="10" font-family="Martian Mono" font-weight="700" letter-spacing=".08em" fill="%INK%">VIZUARA</text>`:'')+`<text x="${tabX+tabW-10}" y="${tabY+16.5}" font-size="14" font-family="Archivo" font-weight="800" text-anchor="end" fill="%INK%">${opts.letter||'A'}</text>`;
+  // maker's tab: one fixed slot, top-right, on every cover
+  const tabY=y+TF/2-1;
+  geo += R(TABX,tabY,TABW,22,3);
+  tags += `<text x="${TABX+10}" y="${tabY+15.5}" font-size="10" font-family="Martian Mono" font-weight="700" letter-spacing=".08em" fill="%INK%">VIZUARA</text><text x="${TABX+TABW-10}" y="${tabY+16.5}" font-size="14" font-family="Archivo" font-weight="800" text-anchor="end" fill="%INK%">${opts.letter||'A'}</text>`;
   // ejector-pin marks where the runners are clear
   let pins='';
   runners.forEach(ro=>{ let k=0; [0.1,0.32,0.5,0.68,0.9].forEach(f=>{ const px=x+w*f; if (k<2 && !ro.occ.some(([p,q])=>px>p-9&&px<q+9)) { k++;
@@ -637,11 +679,12 @@ const TITLE_MAX = W-2*M;
 /* the front cover, as SVG content in a 720×888 space */
 function coverInner(b, size, o={}) {
   const mat=MATS[b.mat||'bench'], pl=PLASTIC[b.plastic], lv=LEVELS[b.level];
-  const lh=size*0.95, capTop=100, base0=capTop+size*0.72;
-  const lastBase=base0+(b.lines.length-1)*lh;
+  const LN=b.lines.map(l=>typeof l==='string'?{t:l,k:1}:l), capTop=100, bases=[capTop+size*LN[0].k*0.72];
+  for (let i=1;i<LN.length;i++) bases.push(bases[i-1]+size*(0.74*LN[i].k+0.21*LN[i-1].k));
+  const lastBase=bases[bases.length-1];
   const subY=lastBase+40, frTop=subY+36, frBot=790;
   const gid=uid('gold');
-  const sp=sprue({x:M,y:frTop,w:W-2*M,h:frBot-frTop}, b.rows(PARTS), pl, mat, {sheen:!!pl.sheen, letter:b.letter, reserve: b.coming?[W-M-230,W-M]:null});
+  const sp=sprue({x:M,y:frTop,w:W-2*M,h:frBot-frTop}, b.rows(PARTS), pl, mat, {sheen:!!pl.sheen, letter:b.letter});
   const right = b.coming ? 'COMING SOON' : `${b.capsules} CAPSULES · ${b.hours} H`;
   const inner = `
     <defs><linearGradient id="${gid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F7DE8E"/><stop offset=".38" stop-color="#C58F35"/><stop offset=".62" stop-color="#F0CF72"/><stop offset="1" stop-color="#A27425"/></linearGradient></defs>
@@ -650,27 +693,29 @@ function coverInner(b, size, o={}) {
     <text x="84" y="57" font-family="Archivo" font-weight="700" style="font-stretch:112.5%" font-size="13" letter-spacing=".2em" fill="${mat.text}">VIZUARA BOOKS</text>
     <text x="${W-M}" y="57" font-family="Martian Mono" font-weight="600" font-size="12" letter-spacing=".06em" text-anchor="end" fill="${mat.dim}">${b.kitLabel||('KIT Nº '+String(b.kit).padStart(2,'0'))}</text>
     <g class="title" font-family="Archivo" font-weight="800" style="font-stretch:87.5%" font-size="${size}" letter-spacing="-0.012em" word-spacing="0.06em" fill="${mat.text}">
-      ${b.lines.map((l,i)=>`<text x="${M-3}" y="${n2(base0+i*lh)}">${l}</text>`).join('')}
+      ${LN.map((l,i)=>`<text x="${M-3}" y="${n2(bases[i])}" font-size="${n2(size*l.k)}">${l.t}</text>`).join('')}
     </g>
     <text class="sub" x="${M}" y="${n2(subY)}" font-family="Martian Mono" font-weight="500" font-size="${o.subSize||13}" fill="${mat.dim}">${b.sub}</text>
     ${sp.svg}
-    ${b.coming ? stamp(W-M-118, frTop+8, mat) : ''}
-    ${levelRow(M, 828, lv, b.level, mat)}
-    <text x="${W-M}" y="843" text-anchor="end" font-family="Martian Mono" font-size="12" font-weight="600" letter-spacing=".06em" fill="${mat.text}">${right}</text>`;
+    ${b.coming ? stamp(W-M-96, 138, mat) : ''}
+    ${levelRow(M, 814, lv, b.level, mat)}
+    <text x="${W-M}" y="834" text-anchor="end" font-family="Martian Mono" font-size="12" font-weight="600" letter-spacing=".06em" fill="${mat.text}">${right}</text>`;
   return {inner, parts:sp.parts};
 }
 function levelRow(x,y,lv,label,mat) {
+  // three 30px squares filled to the level: legible at 180px and in greyscale
   return `<g font-family="Martian Mono" font-size="12" font-weight="600" letter-spacing=".06em" fill="${mat.text}">
-    ${[1,2,3].map(i=>`<rect x="${x+(i-1)*27}" y="${y}" width="21" height="21" rx="3" ${i<=lv?`fill="${mat.text}"`:`fill="none" stroke="${mat.dim}" stroke-width="1.5"`}/><text x="${x+(i-1)*27+10.5}" y="${y+15}" text-anchor="middle" font-size="11" font-weight="800" letter-spacing="0" fill="${i<=lv?mat.ground:mat.dim}">${i}</text>`).join('')}
-    <text x="${x+88}" y="${y+15}">SKILL · ${label.toUpperCase()}</text></g>`;
+    ${[1,2,3].map(i=>`<rect x="${x+(i-1)*38}" y="${y}" width="30" height="30" rx="4" ${i<=lv?`fill="${mat.text}"`:`fill="none" stroke="${mat.dim}" stroke-width="2"`}/><text x="${x+(i-1)*38+15}" y="${y+20.5}" text-anchor="middle" font-size="14" font-weight="800" letter-spacing="0" fill="${i<=lv?mat.ground:mat.dim}">${i}</text>`).join('')}
+    <text x="${x+124}" y="${y+20}">SKILL · ${label.toUpperCase()}</text></g>`;
 }
 const svgWrap = (w,h,inner) => `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">${inner}</svg>`;
 
 function stamp(x,y,mat) {
+  // sits on the bench beside the title, never over plastic
   return `<g transform="translate(${x} ${y}) rotate(-7)" fill="none" stroke="${mat.text}" opacity=".92">
-    <rect x="-96" y="-34" width="192" height="68" rx="6" stroke-width="3"/><rect x="-89" y="-27" width="178" height="54" rx="3" stroke-width="1.2"/>
-    <text x="0" y="-2" text-anchor="middle" font-family="Archivo" font-weight="800" style="font-stretch:112.5%" font-size="22" letter-spacing=".14em" fill="${mat.text}" stroke="none">TEST SHOT</text>
-    <text x="0" y="18" text-anchor="middle" font-family="Martian Mono" font-weight="600" font-size="10.5" letter-spacing=".12em" fill="${mat.text}" stroke="none">COMING SOON</text></g>`;
+    <rect x="-90" y="-31" width="180" height="62" rx="6" stroke-width="3"/><rect x="-83" y="-24" width="166" height="48" rx="3" stroke-width="1.2"/>
+    <text x="0" y="-1" text-anchor="middle" font-family="Archivo" font-weight="800" style="font-stretch:112.5%" font-size="21" letter-spacing=".14em" fill="${mat.text}" stroke="none">TEST SHOT</text>
+    <text x="0" y="16" text-anchor="middle" font-family="Martian Mono" font-weight="600" font-size="10" letter-spacing=".12em" fill="${mat.text}" stroke="none">COMING SOON</text></g>`;
 }
 
 async function renderCover(b, host) {
@@ -684,7 +729,7 @@ async function renderCover(b, host) {
   if (sl>TITLE_MAX) { b._sub=Math.floor(13*TITLE_MAX/sl*10)/10; out=coverInner(b,size,{subSize:b._sub}); el.innerHTML=svgWrap(W,H,out.inner); }
   b._size=size;
   const cap=document.createElement('figcaption');
-  cap.innerHTML=`<b>${b.kitLabel?b.kitLabel.replace('INTELLIGENCE FACTORY','Factory'):'Nº '+String(b.kit).padStart(2,'0')}</b> · ${b.lines.join(' ')}<br><span>Parts — ${out.parts.map(p=>`${p.num} ${p.name}`).join(' · ')}</span>`;
+  cap.innerHTML=`<b>${b.kitLabel?b.kitLabel.replace('INTELLIGENCE FACTORY','Factory'):'Nº '+String(b.kit).padStart(2,'0')}</b> · ${b.lines.map(l=>l.t||l).join(' ')}<br><span>Parts — ${out.parts.map(p=>`${p.num} ${p.name}`).join(' · ')}</span>`;
   fig.appendChild(cap);
   return out.parts;
 }
@@ -711,7 +756,7 @@ function assembled(pl, mat) {
 function wrapSVG(b, size) {
   const mat=MATS.bench, pl=PLASTIC[b.plastic], SP=72, WW=2*W+SP;
   const front=coverInner(b,size,{noBench:true, subSize:b._sub});
-  const title=b.lines.join(' ');
+  const title=b.lines.map(l=>l.t||l).join(' ');
   const back = `
     ${mark(M,38,0.84,mat.text)}
     <text x="84" y="57" font-family="Archivo" font-weight="700" style="font-stretch:112.5%" font-size="13" letter-spacing=".2em" fill="${mat.text}">WHAT YOU WILL HAVE BUILT</text>
@@ -724,8 +769,8 @@ function wrapSVG(b, size) {
     </g>
     <g font-family="Archivo" font-size="19" font-weight="500" fill="${mat.text}">
       <text x="${M}" y="728">${b.blurb[0]}</text><text x="${M}" y="752">${b.blurb[1]}</text></g>
-    ${levelRow(M, 828, LEVELS[b.level], b.level, mat)}
-    <text x="${W-M-190}" y="843" text-anchor="end" font-family="Martian Mono" font-size="12" font-weight="600" letter-spacing=".06em" fill="${mat.text}">books.vizuara.ai</text>
+    ${levelRow(M, 814, LEVELS[b.level], b.level, mat)}
+    <text x="${W-M-190}" y="834" text-anchor="end" font-family="Martian Mono" font-size="12" font-weight="600" letter-spacing=".06em" fill="${mat.text}">books.vizuara.ai</text>
     <rect x="${W-M-166}" y="760" width="166" height="96" rx="3" fill="#F7F4EC"/>
     <text x="${W-M-83}" y="813" text-anchor="middle" font-family="Martian Mono" font-size="10" font-weight="600" letter-spacing=".1em" fill="#7B7A74">ISBN / BARCODE</text>`;
   const spine = `

@@ -1307,7 +1307,7 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
         if (wall.has(k)) t += DO.R(x, y, ts, ts, { fill: C.g, c: 'none' });
         else if (k === goal) t += DO.R(x, y, ts, ts, { fill: C.ink, c: 'none' }) + Tx(x + ts / 2, y + ts / 2 + 5, '+1', { a: 'middle', s: 14, wt: 700, c: C.paper });
         else if (k === pit) t += DO.R(x, y, ts, ts, { fill: `url(#${id}-x)`, c: 'none' }) + DO.R(x + 10, y + 13, 24, 18, { fill: C.paper, c: 'none' }) + Tx(x + ts / 2, y + ts / 2 + 4, '−1', { a: 'middle', s: 11, wt: 700 });
-        else t += Tx(x + ts / 2, y + ts - 7, V[k].toFixed(2).replace(/^0/, ''), { a: 'middle', s: 8.5, wt: 600, c: C.g2 });
+        else t += Tx(x + ts - 4, y + ts - 6, V[k].toFixed(2).replace(/^0/, ''), { a: 'end', s: 8.5, wt: 600, c: C.g2 });
       }
       for (let c = 1; c < cols; c++) t += L(gx + c * ts, gy, gx + c * ts, gy + rows * ts, { w: 0.9, c: C.g2 });
       for (let r = 1; r < rows; r++) t += L(gx, gy + r * ts, gx + cols * ts, gy + r * ts, { w: 0.9, c: C.g2 });
@@ -1326,7 +1326,7 @@ footer.colo{margin-top:80px;padding-top:20px;border-top:1px solid #45484B;font:5
       t += Ci(...pts[0], 5, { fill: C.g, c: 'none' }) + Tx(pts[0][0] - 12, pts[0][1] + 4, 'S', { a: 'end', s: 11, wt: 700 });
       // tags
       t += bal(410, 180, 1, 392, 176) + bal(gx - 24 + 0, gy + 3 * ts + ts - 8, 2, gx + 14, gy + 3 * ts + ts - 12);
-      t += bal(gx + 3 * ts + ts / 2 + 30, gy + 4 * ts + ts + 18, 3, gx + 3 * ts + ts / 2 + 6, gy + 4 * ts + ts / 2 - 4);
+      t += bal(gx + 4 * ts + 22, gy - 20, 3, gx + 4 * ts + 22, gy + ts / 2 - 4);
       t += bal(gx + 6 * ts + 22, gy - 20, 4, gx + 6 * ts + 22, gy, true);
       let s = room(3, id, [{ side: 'L', a: 408, b: 452, door: 1 }, ...wins], t, '');
       s += schedule([{ a: 'BANDITS', b: 'where it starts' }, { a: 'VALUE V(s)', b: 'γ = 0.9, iterated' },

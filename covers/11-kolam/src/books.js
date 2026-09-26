@@ -35,7 +35,7 @@ const BOOKS = {
     why: 'Columns of dots are the layers of a small network, 5–7–9–7–5. Inside a layer the line only crosses, so each column reads as its own braid; between layers it mostly turns back, and a few crossings, the weights, carry it across until the whole network is one line.',
   },
   'build-llms-from-scratch': {
-    shape: () => K.fromRows(Array(10).fill(2), 'ner'), loops: 1, sym: 'C2', density: 0.25,
+    shape: () => K.fromRows(Array(10).fill(2), 'ner'), loops: 1, sym: 'none', density: 0.25,
     // five 2 x 2 blocks stacked; between blocks exactly one crossing, alternating sides
     force: (e, d) => {
       if (e.dir !== 'N') return undefined;

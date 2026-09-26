@@ -660,26 +660,26 @@ function charlieInset(M,idx){
   M.tlabel('you are here',x0+w/2,y0+h+18,{size:12});
 }
 function gate(M,x,y,vertical=true){ M.claim(0,1); return vertical? M.pill(x,y-10,x,y+10,8) : M.pill(x-10,y,x+10,y,8); }
-function doors(M,rooms){ rooms.forEach(([k,path])=>{ const {p}=pointAt(path,0); M.bullet(k,p[0],p[1]); }); }
+function doors(M,rooms,off=0){ rooms.forEach(([k,path])=>{ const {p}=pointAt(path,off); M.bullet(k,p[0],p[1]); }); }
 
 /* Book I — Language: inference. Prefill is one long straight run; decode climbs a step
    per token, and the KV cache under it grows a page per step. */
 MAPS['charlie-language-room'] = { h:372, draw(M){
   charlieInset(M,0);
-  const y=330, x1=246, st=36, rs=30, n=8;
+  const y=334, x1=240, st=38, rs=28, n=7;
   // KV-cache pages growing under the decode staircase
   for(let j=0;j<n;j++){ const tx=x1+j*st, top=y-rs*(j+1)+14; for(let yy=y+18; yy-12>=top; yy-=16) M.rect(tx+5,yy-12,st-10,12,1.5,{fill:(j%2?'var(--tint2)':'var(--tint)')}); }
   const stair=[[x1,y]]; for(let j=0;j<n;j++){ const cx=x1+j*st; stair.push([cx,y-rs*(j+1)],[cx+st,y-rs*(j+1)]); }
-  M.tlabel('prefill',120,y+34); M.tlabel('decode',x1+st*n/2+40,y-rs*n/2+56,{anchor:'start'}); M.tlabel('kv cache',x1+st*3,y+44);
+  M.tlabel('prefill',150,y+34); M.tlabel('decode',x1+st*2-10,y-rs*4-6,{anchor:'end'}); M.tlabel('kv cache',x1+st*n/2,y+44);
   const R=[];
   gate(M,40,y); R.push([0,M.line(0,[[-60,y],[132,y]],{n:2,side:1,avoid:[OUT,[20,-1e4,58,1e4]],bullet:66})]);
   R.push([1,M.line(1,[[132,y],[x1,y]],{side:1,r:8})]);
   const cut=(a,b)=>stair.slice(a,b+1);
-  R.push([2,M.line(2,cut(0,3),{side:1,r:8})]);
-  R.push([3,M.line(3,cut(3,6),{side:1,r:8})]);
-  R.push([4,M.line(4,cut(6,10),{side:1,r:8})]);
-  R.push([5,M.line(5,cut(10,13),{side:1,r:8})]);
-  R.push([6,M.line(6,[...cut(13,16),[x1+st*n+40,y-rs*n]],{side:1,r:8,term:'end'})]);
+  R.push([2,M.line(2,cut(0,2),{side:1,r:8})]);
+  R.push([3,M.line(3,cut(2,5),{side:1,r:8})]);
+  R.push([4,M.line(4,cut(5,9),{side:1,r:8})]);
+  R.push([5,M.line(5,cut(9,11),{side:1,r:8})]);
+  R.push([6,M.line(6,[...cut(11,14),[x1+st*n+52,y-rs*n]],{side:1,r:8,term:'end'})]);
   doors(M,R.slice(1));
 }};
 
@@ -687,33 +687,33 @@ MAPS['charlie-language-room'] = { h:372, draw(M){
    by row, then runs underneath as the flattened sequence of tokens. */
 MAPS['charlie-vision-room'] = { h:372, draw(M){
   charlieInset(M,1);
-  const gx=40, gy=40, ps=46, gap=6, pitch=ps+gap;
+  const gx=40, gy=34, ps=56, gap=6, pitch=ps+gap;
   const tone=[[0,0,0,1],[0,1,0,0],[1,2,1,0],[2,2,2,1]];
   const fills=['var(--tint)','var(--tint2)','var(--tint3)'];
   for(let r=0;r<4;r++) for(let c=0;c<4;c++) M.rect(gx+c*pitch,gy+r*pitch,ps,ps,2,{fill:fills[tone[r][c]]});
   M.tlabel('patches are tokens',gx+2*pitch-3,gy-14);
-  const cx=c=>gx+c*pitch+ps/2, cy=r=>gy+r*pitch+ps/2, yT=330;
+  const cx=c=>gx+c*pitch+ps/2, cy=r=>gy+r*pitch+ps/2, yT=338;
   const R=[];
   gate(M,gx-12,cy(0)); R.push([0,M.line(0,[[-60,cy(0)],[cx(1),cy(0)]],{n:2,side:1,avoid:[OUT,[gx-30,-1e4,gx+6,1e4]],bullet:66})]);
   R.push([1,M.line(1,[[cx(1),cy(0)],[cx(3),cy(0)],[cx(3),cy(1)],[cx(1),cy(1)]],{side:1,r:20})]);
   R.push([2,M.line(2,[[cx(1),cy(1)],[cx(0),cy(1)],[cx(0),cy(2)],[cx(3),cy(2)],[cx(3),cy(3)],[cx(2),cy(3)]],{side:1,r:20})]);
   R.push([3,M.line(3,[[cx(2),cy(3)],[cx(0),cy(3)],[gx-20,cy(3)],[gx-20,yT],[120,yT]],{side:1,r:20})]);
-  R.push([4,M.line(4,[[120,yT],[290,yT]],{side:1})]);
-  R.push([5,M.line(5,[[290,yT],[460,yT]],{side:1})]);
-  R.push([6,M.line(6,[[460,yT],[600,yT]],{side:1,term:'end'})]);
-  M.tlabel('the sequence',470,yT-26,{anchor:'start'});
+  R.push([4,M.line(4,[[120,yT],[330,yT]],{side:1})]);
+  R.push([5,M.line(5,[[330,yT],[560,yT],[600,yT-40]],{side:1,r:30})]);
+  R.push([6,M.line(6,[[600,yT-40],[600,150]],{side:-1,term:'end',r:30})]);
+  M.tlabel('the sequence',420,yT-24,{anchor:'middle'});
   doors(M,R.slice(1));
 }};
 
 /* Book III — Sound: voice agents. Listening and speaking are waveforms; the brain is the
    flat run of text between them; the wire streams in small chunks. */
-MAPS['charlie-sound-room'] = { h:352, draw(M){
+MAPS['charlie-sound-room'] = { h:384, draw(M){
   charlieInset(M,2);
-  const y1=150, y2=312;
+  const y1=196, y2=344;
   const wave=(x,y,amps)=>{ const pts=[[x,y]]; let cx=x, sgn=-1, prev=0; amps.forEach(a=>{ cx+=prev+a; pts.push([cx,y+sgn*a]); sgn=-sgn; prev=a; }); cx+=prev; pts.push([cx,y]); return pts; };
   const L=wave(128,y1,[14,28,42,28,14]), S=wave(L.slice(-1)[0][0]+20,y1,[14,32,32,14]);
-  M.rect(122,y1-58,L.slice(-1)[0][0]-116,116,14); M.rect(S[0][0]-6,y1-58,S.slice(-1)[0][0]-S[0][0]+12,116,14);
-  M.tlabel('audio in',(128+L.slice(-1)[0][0])/2,y1+80); M.tlabel('audio out',(S[0][0]+S.slice(-1)[0][0])/2,y1+80);
+  M.rect(122,y1-54,L.slice(-1)[0][0]-116,108,14); M.rect(S[0][0]-6,y1-54,S.slice(-1)[0][0]-S[0][0]+12,108,14);
+  M.tlabel('audio in',(128+L.slice(-1)[0][0])/2,y1+76); M.tlabel('audio out',(S[0][0]+S.slice(-1)[0][0])/2,y1+76);
   const R=[];
   gate(M,40,y1); R.push([0,M.line(0,[[-60,y1],[128,y1]],{n:2,side:1,avoid:[OUT,[20,-1e4,58,1e4]],bullet:66})]);
   R.push([1,M.line(1,L,{side:1,r:5})]);
@@ -723,7 +723,7 @@ MAPS['charlie-sound-room'] = { h:352, draw(M){
   const wire=[[400,y2]]; for(let i=0;i<10;i++) wire.push([400-(i+1)*12, y2+(i%2?0:-12)]);
   R.push([4,M.line(4,[...wire,[260,y2]],{side:-1,r:3})]);
   R.push([5,M.line(5,[[260,y2],[40,y2]],{side:1,term:'end'})]);
-  M.tlabel('text',628,(y1+y2)/2+5,{anchor:'end'}); M.tlabel('the wire',336,y2+36);
+  M.tlabel('text',576,(y1+y2)/2+28,{anchor:'end'}); M.tlabel('the wire',336,y2+34);
   doors(M,R.slice(1));
 }};
 
@@ -746,9 +746,9 @@ MAPS['charlie-reasoning-room'] = { h:372, draw(M){
   R.push([5,M.line(5,[[J[0],J[1]],[C[0]+42,yM],[700,yM]],{side:1,avoid:[OUTR,[-1e4,-1e4,C[0]+56,1e4]],r:24})]);
   // direction of the loop
   const arr=(x,y,dx,dy)=>M.zone(`M${x-dy*8},${y+dx*8} L${x+dx*14},${y+dy*14} L${x+dy*8},${y-dx*8}Z`,{fill:M.col(0),top:true});
-  arr(C[0]+rx,C[1]-24,0,1); arr(C[0]-rx,C[1]+24,0,-1);
+  arr(C[0]+rx,C[1]-26,0,1); arr(C[0]-rx,C[1]-30,0,-1);
   M.label('TO PRODUCTION',624,yM-16,{cls:'dest',anchor:'end'});
-  doors(M,R.slice(1,5)); M.bullet(5,C[0]+84,yM+24);
+  doors(M,R.slice(2,5)); doors(M,[R[1]],34); M.bullet(5,C[0]+84,yM+24);
 }};
 
 /* ---------- Inference Engineering (coming soon) ----------
