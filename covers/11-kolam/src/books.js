@@ -56,20 +56,9 @@ const BOOKS = {
     why: 'An outer frame of 28 dots around an inner block of 15: the window, and what you choose to put inside it. The frame is a plain two-strand braid; everything inside is one line.',
   },
   '5d-parallelism': {
-    shape: () => K.fromMask([
-      '....oo....',
-      '....oo....',
-      '....oo....',
-      '...oooo...',
-      'oooooooooo',
-      'oooooooooo',
-      '...oooo...',
-      '....oo....',
-      '....oo....',
-      '....oo....',
-    ].join('\n'), 'ner'), loops: 5, sym: 'MX', density: 0.22,
-    spec: 'cross: 4 × 4 core, four 2 × 3 arms',
-    why: 'A cross of forty dots — a 4 × 4 core and four arms — woven by exactly five closed lines: data, tensor, pipeline, sequence and expert parallelism.',
+    shape: () => K.fromRows([2, 4, 6, 8, 8, 6, 4, 2], 'ner'), loops: 5, sym: 'MY', density: 0.23,
+    spec: 'nēr pulli 2–4–6–8–8–6–4–2',
+    why: 'Forty dots, a mesh of devices, carried by exactly five closed lines — data, tensor, pipeline, sequence and expert parallelism — each weaving through the others.',
   },
   'pi-vs-hermes-vs-codex': {
     shape: () => K.fromRows([3, 3, 3], 'ner'), loops: 3, sym: 'D4', density: 0,

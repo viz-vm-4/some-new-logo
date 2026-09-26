@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&family=Instrument+Sans:ital,wdth,wght@0,75..100,400..700;1,75..100,400..700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --chalk:#E7E3DB; --stone:#A7A095; --soot:#232120;
+  --chalk:#E7E3DB; --stone:#A8A39A; --soot:#232120;
   --ink:#171614; --bone:#EEE9E0;
   --page:#F3F0EA; --pageInk:#1d1c1a; --rule:#c9c3b8;
 }
@@ -244,9 +244,9 @@ void main(){
 const KEYS = {
   0:{ paper:'#E9E5DC', keyPos:[-7,10,-7], keyPow:230, keySoft:5, spot:null, glow:.30, glowRad:6, fill:.32, boxLum:3.0, boxSize:[.7,.55], envDark:.35, expo:1.0, vig:.35,
       panels:[[-0.2,1,0.3, 1.1, 1.0,0.8],[1,0.15,-0.3, 0.7, 0.35,0.8],[-0.8,0.2,0.6, 0.5, 0.3,0.9]] },
-  1:{ paper:'#ABA498', keyPos:[-7,9,-6],  keyPow:230, keySoft:6, spot:null, glow:.28, glowRad:5, fill:.22, boxLum:2.8, boxSize:[.65,.5], envDark:.14, expo:1.0, vig:.45,
+  1:{ paper:'#AAA59C', keyPos:[-7,9,-6],  keyPow:230, keySoft:6, spot:null, glow:.28, glowRad:5, fill:.22, boxLum:2.8, boxSize:[.65,.5], envDark:.14, expo:1.0, vig:.45,
       panels:[[-0.2,1,0.3, 0.8, 0.9,0.7],[1,0.15,-0.3, 0.4, 0.35,0.8],[0.7,0.25,0.7, 0.6, 0.12,0.9]] },
-  2:{ paper:'#46423E', keyPos:[-5,9,-5],  keyPow:250, keySoft:7, spot:[.88,.975], glow:.55, glowRad:2.8, fill:.03, boxLum:3.6, boxSize:[.6,.45], envDark:.012, expo:1.0, vig:.6,
+  2:{ paper:'#46423E', keyPos:[-8,7,-3.5],  keyPow:135, keySoft:7, spot:[.88,.975], glow:.55, glowRad:2.8, fill:.03, boxLum:3.6, boxSize:[.6,.45], envDark:.012, expo:1.0, vig:.6,
       panels:[[-0.1,1,0.2, 0.55, 0.7,0.5],[0.75,0.3,0.6, 1.6, 0.10,1.0],[-0.8,0.3,0.5, 0.9, 0.10,1.0],[1,0.1,-0.4, 0.18, 0.4,0.8]] },
 };
 const srgb2lin = (h)=>[1,3,5].map(i=>Math.pow(parseInt(h.substr(i,2),16)/255,2.2));
@@ -291,14 +291,14 @@ vec2 scene(vec3 p){
   return vec2(d,1.);
 }
 Mat material(float id, vec3 p, vec3 n){
-  vec3 q=p*1.7+vec3(3.1,0.,1.7);
-  float w=fbm(q*1.3);
-  float vein=abs(sin((q.x*0.8+q.y*1.3-q.z*0.5)*3.2+w*7.5));
-  float v2=1.-smoothstep(0.0,0.09,vein);
-  float v3=1.-smoothstep(0.0,0.35,vein);
+  vec3 q=p*1.4+vec3(3.1,0.,1.7);
+  float w=fbm(q*1.1+fbm(q*2.3)*1.2);
+  float vein=abs(w-0.52);
+  float v2=1.-smoothstep(0.0,0.012,vein);
+  float v3=1.-smoothstep(0.0,0.06,vein);
   Mat m;
-  m.alb=vec3(0.9,0.89,0.87)*(0.97+0.04*fbm(p*12.));
-  m.alb=mix(m.alb,vec3(0.62,0.63,0.65),v3*0.18+v2*0.22);
+  m.alb=vec3(0.9,0.89,0.87)*(0.96+0.05*fbm(p*9.));
+  m.alb=mix(m.alb,vec3(0.66,0.67,0.69),v3*0.22+v2*0.18);
   m.rough=0.18; m.metal=0.; m.coat=0.9; m.wrap=0.25;
   return m;
 }`});
@@ -339,7 +339,7 @@ Mat material(float id, vec3 p, vec3 n){
 book({ slug:'ai-context-engineering', key:1,
   title:'AI Context<br>Engineering',
   obj:'Window, packed by hand; one block left out', med:'Travertine, slate, marble, terracotta', dim:'43 capsules · 10 hours',
-  cam:{ look:[0.25,1.2,0], dist:21, el:9, yaw:-16, frame:[0.5,0.625] }, bound:[0.3,1.2,0,2.25], steps:130,
+  cam:{ look:[0.3,1.15,0], dist:18.5, el:9, yaw:-16, frame:[0.5,0.64] }, bound:[0.3,1.2,0,2.25], steps:130,
   light:{ keyPos:[-8,8,-6] },
   glsl:`
 // frame: outer half (1.0,1.2,0.2); opening half (0.8,1.0)
@@ -354,7 +354,9 @@ vec2 scene(vec3 p){
   vec2 r=vec2(fr,1.);
   vec3 b=p; b.y-=0.0;
   if(sdBox(q-vec3(0,-0.1,0),vec3(0.82,0.9,0.22))<r.x){
-    for(int i=0;i<9;i++){ float d=sdRBox(b-vec3(BL[i].x,BL[i].y,0.),vec3(BL[i].z-0.008,BL[i].w-0.008,0.17),0.012); if(d<r.x) r=vec2(d,2.+float(i)); }
+    int i0=b.y<0.9?0:(b.y<1.2?3:6); int i1=b.y<0.6?3:(b.y<1.05?6:(b.y<1.35?8:9));
+    for(int i=i0;i<i1;i++){ float d=sdRBox(b-vec3(BL[i].x,BL[i].y,0.),vec3(BL[i].z-0.008,BL[i].w-0.008,0.17),0.012); if(d<r.x) r=vec2(d,2.+float(i)); }
+    float drow=abs(b.y-0.97)-0.66; if(drow>0.) r.x=min(r.x,drow+0.0);
   }
   vec3 o=p-vec3(1.72,0.17,-0.35); o.xz=rot(0.5)*o.xz;
   float dout=sdRBox(o,vec3(0.26,0.17,0.17),0.012); if(dout<r.x) r=vec2(dout,11.);
@@ -415,10 +417,10 @@ Mat material(float id, vec3 p, vec3 n){
 book({ slug:'build-llms-from-scratch', key:1,
   title:'Build Large Language Models<span class="sub">(LLMs) from Scratch</span>', size:'s1',
   obj:'Column of twelve identical blocks', med:'Stoneware, oxblood glaze', dim:'20 capsules · 6 hours',
-  cam:{ look:[0,1.6,0], dist:22, el:6, yaw:-8, frame:[0.62,0.61] }, bound:[0,1.62,0,1.75], steps:140,
+  cam:{ look:[0,2.0,0], dist:24, el:6, yaw:-8, frame:[0.64,0.585] }, bound:[0,2.0,0,2.1], steps:150,
   light:{ keyPos:[-8,8,-5] },
   glsl:`
-const float HM=0.265; const float WW=0.36; const float WN=0.19;
+const float HM=0.33; const float WW=0.25; const float WN=0.125;
 vec2 scene(vec3 p){
   p.xz=rot(0.62)*p.xz;
   float id=clamp(floor(p.y/HM),0.,11.);
@@ -431,7 +433,7 @@ vec2 scene(vec3 p){
 }
 Mat material(float id, vec3 p, vec3 n){
   Mat m; float f=fbm(p*vec3(3.,9.,3.)); float g=fbm(p*18.);
-  vec3 deep=vec3(0.30,0.03,0.03), bright=vec3(0.62,0.10,0.06);
+  vec3 deep=vec3(0.16,0.015,0.015), bright=vec3(0.42,0.045,0.035);
   float pool=smoothstep(0.35,0.75,f);
   m.alb=mix(bright,deep,pool)*(0.92+0.1*g);
   float up=abs(n.y);
@@ -471,7 +473,7 @@ vec2 scene(vec3 p){
 }
 Mat material(float id, vec3 p, vec3 n){
   Mat m;
-  if(id>1.5){ float g=noise(p*vec3(200.,4.,200.)); m.alb=vec3(0.62,0.62,0.63)*(0.95+0.08*g); m.rough=0.2; m.metal=1.; m.coat=0.; m.wrap=0.; }
+  if(id>1.5){ float g=noise(p*vec3(200.,4.,200.)); m.alb=vec3(0.80,0.80,0.81)*(0.95+0.08*g); m.rough=0.38; m.metal=1.; m.coat=0.; m.wrap=0.; }
   else { float f=fbm(p*9.); m.alb=vec3(0.80,0.52,0.14)*(0.85+0.25*f); m.rough=0.42; m.metal=0.; m.coat=0.25; m.wrap=0.65; }
   return m;
 }`});
@@ -555,11 +557,11 @@ Mat material(float id, vec3 p, vec3 n){
 const CHARLIE_MAT=`
 Mat material(float id, vec3 p, vec3 n){
   Mat m; m.wrap=0.3;
-  if(id<1.5){ float f=fbm(p*8.); m.alb=vec3(0.90,0.885,0.86)*(0.97+0.04*f); m.rough=0.1; m.metal=0.; m.coat=0.85; }
+  if(id<1.5){ float f=fbm(p*8.); m.alb=vec3(0.84,0.83,0.80)*(0.97+0.04*f); m.rough=0.1; m.metal=0.; m.coat=0.85; }
   else { float g=noise(p*60.); m.alb=vec3(0.98,0.76,0.38)*(0.95+0.06*g); m.rough=0.24; m.metal=1.; m.coat=0.; m.wrap=0.; }
   return m;
 }`;
-const CHARLIE_CAM={ look:[0,0.72,0], dist:18.5, el:12, yaw:-10, frame:[0.5,0.655] };
+const CHARLIE_CAM={ look:[0,0.72,0], dist:18, el:17, yaw:-10, frame:[0.5,0.655] };
 const CUBE=`const float S=0.72;
 vec3 cubeP(vec3 p){ p.y-=S; p.xz=rot(0.42)*p.xz; return p; }
 `;
@@ -612,7 +614,7 @@ vec2 scene(vec3 p){ vec3 q=cubeP(p);
   float d=sdRBox(q,vec3(S),0.03);
   float u=q.z+S; float n=6.; float st=0.2;
   float k=clamp(floor(u/st),0.,n-1.);
-  float stair=max(abs(q.x)-0.34, max(u-n*st, (S-(n-k)*0.165)-q.y));
+  float stair=max(abs(q.x)-0.46, max(u-n*st, (S-(n-k)*0.165)-q.y));
   float dd=max(d,-stair);
   return vec2(dd, abs(stair)<0.008?2.:1.);
 }`+CHARLIE_MAT });
@@ -621,7 +623,7 @@ vec2 scene(vec3 p){ vec3 q=cubeP(p);
 book({ slug:'kernel-engineering', key:2, forthcoming:true,
   title:'Kernel<br>Engineering', tag:'From silicon to speculative decoding — GPU kernels for modern LLMs.',
   obj:'Maquette for a tiled block, one tile lifted', med:'Plaster maquette · to be cast in silicon bronze', dim:'Forthcoming',
-  cam:{ look:[0,0.3,0], dist:19, el:22, yaw:-20, frame:[0.5,0.67] }, bound:[0,0.35,0,1.75], steps:130,
+  cam:{ look:[0,0.3,0], dist:16.5, el:24, yaw:-20, frame:[0.5,0.67] }, bound:[0,0.35,0,1.75], steps:130,
   glsl:`
 const float TS=0.36; const float TH=0.3;
 vec2 scene(vec3 p){
@@ -646,22 +648,33 @@ Mat material(float id, vec3 p, vec3 n){
 /* ============ DEIT FROM SCRATCH ============ */
 book({ slug:'deit-from-scratch', key:2,
   title:'Build a Data-<br>Efficient Image<br>Transformer (DeiT)<span class="sub">from Scratch</span>', size:'s1',
-  obj:'Sixteen patches in a row, led by a distillation token', med:'Limestone and gilt bronze', dim:'42 capsules · 10 hours',
-  cam:{ look:[0.2,0.3,0], dist:19, el:14, yaw:-34, frame:[0.5,0.73] }, bound:[0.2,0.3,0,2.3], steps:130,
+  obj:'One image as sixteen patches, led by a distillation token', med:'Limestone, iron-oxide ink, gilt bronze', dim:'42 capsules · 10 hours',
+  cam:{ look:[0.,0.3,0], dist:18, el:13, yaw:-50, frame:[0.5,0.735] }, bound:[0.,0.3,0,2.1], steps:130,
+  light:{ keyPos:[6,8,-7], keyPow:140 },
   glsl:`
-const float SP=0.2; const float HT=0.3;
+const float SP=0.21; const float HT=0.28;
 vec2 scene(vec3 p){
-  p.xz=rot(-0.35)*p.xz;
-  float x=p.x+1.6;
+  float x=p.x+1.7;
   float i=clamp(floor(x/SP+0.5),0.,16.);
   vec3 q=vec3(x-i*SP,p.y-HT,p.z);
-  float d=sdRBox(q,vec3(0.035,HT,HT),0.012);
-  return vec2(d, i<0.5?2.:1.);
+  float tall=i>15.5?0.05:0.;
+  q.y-=tall;
+  float d=sdRBox(q,vec3(0.03,HT+tall,HT),0.01);
+  return vec2(d, i>15.5?40.:1.+i);
 }
 Mat material(float id, vec3 p, vec3 n){
   Mat m;
-  if(id>1.5){ m.alb=vec3(0.98,0.76,0.38); m.rough=0.22; m.metal=1.; m.coat=0.; m.wrap=0.; }
-  else { float f=fbm(p*9.); float pits=smoothstep(0.82,0.9,noise(p*60.)); m.alb=vec3(0.80,0.77,0.70)*(0.9+0.14*f)*(1.-0.2*pits); m.rough=0.85; m.metal=0.; m.coat=0.; m.wrap=0.3; }
+  if(id>30.){ m.alb=vec3(0.98,0.76,0.38); m.rough=0.2; m.metal=1.; m.coat=0.; m.wrap=0.; return m; }
+  float i=floor(id-0.5);
+  float r=floor(i/4.), c=mod(i,4.);
+  vec2 f=vec2((p.z/HT+1.)*0.5, (p.y-0.0)/(2.*HT));
+  vec2 uv=vec2((c+f.x)/4., (3.-r+f.y)/4.);
+  float disc=length(uv-vec2(0.5))-0.33;
+  float ink=(1.-smoothstep(-0.004,0.004,disc))*step(0.5,abs(n.x));
+  float fb=fbm(p*9.); float pits=smoothstep(0.82,0.9,noise(p*60.));
+  m.alb=vec3(0.80,0.77,0.70)*(0.9+0.14*fb)*(1.-0.2*pits);
+  m.alb=mix(m.alb,vec3(0.50,0.13,0.07)*(0.9+0.2*fb),ink*0.92);
+  m.rough=0.85; m.metal=0.; m.coat=0.; m.wrap=0.3;
   return m;
 }`});
 
@@ -741,7 +754,7 @@ function renderBook(b, canvas){
   gl.deleteProgram(pr); gl.deleteShader(vs); gl.deleteShader(f);
 }
 
-(function(){
+function renderAll(){
   const only=window.ONLY||null;
   const list=only?BOOKS.filter(b=>only.includes(b.slug)):BOOKS;
   const canvases=list.map((b,i)=>buildCover(b,i));
@@ -750,7 +763,11 @@ function renderBook(b, canvas){
   list.forEach((b,i)=>{ const t0=performance.now(); try{ renderBook(b,canvases[i]); }catch(e){ console.error('render fail '+b.slug+': '+e.message); } times.push(b.slug+':'+Math.round(performance.now()-t0)); });
   console.log('TIMES '+times.join(' '));
   window.RENDER_TIMES=times;
-})();
+}
+/* Start after the load event: the page (type, layout) is live at once and the
+   raymarcher then fills each canvas synchronously; anything that waits on the
+   page (fonts.ready, a screenshot) queues until the last canvas is painted. */
+if(document.readyState==='complete') setTimeout(renderAll,0); else addEventListener('load',()=>setTimeout(renderAll,0));
 </script>
 </body>
 </html>

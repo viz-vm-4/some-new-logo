@@ -569,29 +569,29 @@ EMBLEM['charlie-reasoning-room']=function(g){
 
 // ─── books ───────────────────────────────────────────────────────────────
 const BOOKS=[
-  {slug:'build-llms-from-scratch', level:'intermediate', meta:'20 capsules · 6 h',
+  {slug:'build-llms-from-scratch', desc:'Causal self-attention over a 51-token sentence, each weight printed as one digit (row max = 9). The masked future is the empty half; the selected diagonal is each token attending to itself.', level:'intermediate', meta:'20 capsules · 6 h',
    title:[['Build Large','Language Models','(LLMs) from Scratch'],5]},
-  {slug:'neural-networks-from-scratch', level:'beginner', meta:'33 capsules · 7 h',
+  {slug:'neural-networks-from-scratch', desc:'A 40 × 51 hex dump of a handwritten seven — one byte of ink per pixel — and the ten-way softmax a small network returns for it.', level:'beginner', meta:'33 capsules · 7 h',
    title:[['Neural Networks','from Scratch'],6]},
-  {slug:'mathematical-foundations-for-ml', level:'beginner', meta:'43 capsules · 10 h',
+  {slug:'mathematical-foundations-for-ml', desc:'420 draws from N(0, 1), every sample printed in its own bin; the selected asterisks trace the density the histogram converges to.', level:'beginner', meta:'43 capsules · 10 h',
    title:[['Mathematical','Foundations for','Machine Learning'],5]},
-  {slug:'5d-parallelism', level:'advanced', meta:'40 capsules · 9 h',
+  {slug:'5d-parallelism', desc:"The 2×2×2×2×2 device mesh drawn as what it is, a 5-cube: 32 ranks, 80 links, each link spelled with its axis (dp, pp, tp, cp, ep). Rank 00's five process groups are selected.", level:'advanced', meta:'40 capsules · 9 h',
    title:[['5D Parallelism','for Large Model','Training'],5]},
-  {slug:'ai-context-engineering', level:'intermediate', meta:'43 capsules · 10 h',
+  {slug:'ai-context-engineering', desc:"A 128k-token window packed with system prompt, tool schemas, retrieved docs, memory and history; the user's question selected, 594 tokens spare, one document left outside.", level:'intermediate', meta:'43 capsules · 10 h',
    title:[['AI Context','Engineering'],6]},
-  {slug:'pi-vs-hermes-vs-codex', level:'advanced', meta:'9 capsules · 1 h',
+  {slug:'pi-vs-hermes-vs-codex', desc:'Three agent transcripts squeezed through compaction — stop-words go, then vowels, then whole words — until each lands in memory.', level:'advanced', meta:'9 capsules · 1 h',
    title:[['Pi vs Hermes','vs Codex:'],5,['Context Compaction and Memory']]},
-  {slug:'decision-trees-from-scratch', level:'beginner', meta:'23 capsules · 5 h',
+  {slug:'decision-trees-from-scratch', desc:'Iris, petal length × petal width, split to depth 3. Every leaf is textured with its own decision rule; the root split is selected.', level:'beginner', meta:'23 capsules · 5 h',
    title:[['Build Decision','Trees from Scratch'],5]},
-  {slug:'kernel-engineering', level:'advanced', meta:'coming soon', soon:true,
+  {slug:'kernel-engineering', desc:'One step of a tiled GEMM in fp16: row-tile i of A and column-tile j of B stream through; the selected tiles are this k-step and the accumulator. Coming soon: the cursor is hollow.', level:'advanced', meta:'coming soon', soon:true,
    title:[['Kernel','Engineering'],6,['From silicon to speculative decoding —','GPU kernels for modern LLMs.'],2.4]},
-  {slug:'charlie-language-room', level:'advanced', meta:'22 capsules · 5 h',
+  {slug:'charlie-language-room', desc:'The H100 roofline, min(989 TFLOP/s, 3.35 TB/s × intensity). Every row under the roof names its own throughput; decode sits on the slope, prefill on the flat.', level:'advanced', meta:'22 capsules · 5 h',
    title:[['Charlie and the','Language Room'],5,['Inference Engineering']]},
-  {slug:'charlie-vision-room', level:'intermediate', meta:'20 capsules · 6 h',
+  {slug:'charlie-vision-room', desc:'An eye, as bytes, cut into 13 × 9 patches — the 117 tokens a Vision Transformer sees. One patch selected.', level:'intermediate', meta:'20 capsules · 6 h',
    title:[['Charlie and the','Vision Room'],5,['Vision Transformers']]},
-  {slug:'charlie-sound-room', level:'intermediate', meta:'20 capsules · 6 h',
+  {slug:'charlie-sound-room', desc:'A user turn and an agent turn as waveforms. Each column is built from the letter being spoken, so the centre line reads the transcript.', level:'intermediate', meta:'20 capsules · 6 h',
    title:[['Charlie and the','Sound Room'],5,['Voice Agents']]},
-  {slug:'charlie-reasoning-room', level:'advanced', meta:'21 capsules · 6 h',
+  {slug:'charlie-reasoning-room', desc:'A group of eight sampled chains for 17 × 24; the ones that reach 408 score +1. The chain being reinforced is selected.', level:'advanced', meta:'21 capsules · 6 h',
    title:[['Charlie and the','Reasoning Room'],5,['Reinforcement Learning,','from bandits to reasoning models']]},
 ];
 const PROMPT={beginner:'>',intermediate:'$',advanced:'#'};
@@ -617,10 +617,106 @@ function build(b){
   return el;
 }
 const host=document.getElementById('covers');
-for(const b of BOOKS) host.appendChild(build(b));
+for(const b of BOOKS){
+  const fig=document.createElement('figure');
+  fig.appendChild(build(b));
+  const fc=document.createElement('figcaption');
+  fc.innerHTML=`<b>${b.slug}</b> — ${esc(b.desc||'')}`;
+  fig.appendChild(fc); host.appendChild(fig);
+}
+// tone ramp specimen
+(function(){ const r=document.getElementById('ramp'); if(!r) return;
+  for(let i=0;i<10;i++){ const sp=document.createElement('span'); sp.className='t'+i; sp.textContent='0.42'; r.appendChild(sp); }
+  const sp=document.createElement('span'); sp.className='s9'; sp.textContent='0.42'; r.appendChild(sp);
+  const sp2=document.createElement('span'); sp2.className='s6'; sp2.textContent='0.42'; r.appendChild(sp2);
+})();
+
+// ─── print wrap: back · spine · front for Neural Networks from Scratch ──
+(function(){
+  const wrap=document.getElementById('wrap'); if(!wrap) return;
+  const b=BOOKS.find(x=>x.slug==='neural-networks-from-scratch');
+  const front=build(b); front.className='front'; delete front.dataset.slug;
+  const code=`# mnist_from_scratch.py -- a two-layer network in NumPy
+import numpy as np
+
+f = np.load("mnist.npz")
+x_train = f["x_train"].reshape(-1, 784) / 255.0
+x_test = f["x_test"].reshape(-1, 784) / 255.0
+y_train, y_test = f["y_train"], f["y_test"]
+
+rng = np.random.default_rng(0)
+W1 = rng.normal(0, np.sqrt(2 / 784), (784, 128))
+b1 = np.zeros(128)
+W2 = rng.normal(0, np.sqrt(2 / 128), (128, 10))
+b2 = np.zeros(10)
+
+def relu(z):
+    return np.maximum(0, z)
+
+def softmax(z):
+    z = z - z.max(axis=1, keepdims=True)
+    e = np.exp(z)
+    return e / e.sum(axis=1, keepdims=True)
+
+def forward(x):
+    z1 = x @ W1 + b1
+    a1 = relu(z1)
+    return z1, a1, softmax(a1 @ W2 + b2)
+
+def loss(p, y):
+    return -np.log(p[range(len(y)), y]).mean()
+
+def step(x, y, lr=0.1):
+    global W1, b1, W2, b2
+    z1, a1, p = forward(x)
+    d2 = p.copy()
+    d2[range(len(y)), y] -= 1
+    d2 /= len(y)
+    dW2, db2 = a1.T @ d2, d2.sum(axis=0)
+    d1 = (d2 @ W2.T) * (z1 > 0)
+    dW1, db1 = x.T @ d1, d1.sum(axis=0)
+    W2 -= lr * dW2; b2 -= lr * db2
+    W1 -= lr * dW1; b1 -= lr * db1
+    return loss(p, y)
+
+for epoch in range(10):
+    order = rng.permutation(len(x_train))
+    for i in range(0, len(order), 64):
+        idx = order[i:i + 64]
+        l = step(x_train[idx], y_train[idx])
+    _, _, p = forward(x_test)
+    acc = (p.argmax(axis=1) == y_test).mean()
+    print(f"epoch {epoch}  loss {l:.3f}  acc {acc:.3f}")
+
+_, _, p = forward(x_test[:1])
+print(p.round(3))    # a seven, like the one on the front`.split('\n');
+  const g=new Grid();
+  const half=Math.ceil(code.length/2);
+  code.forEach((ln,i)=>{
+    const col=i<half?4:63, row=(i<half?i:i-half)+1;
+    g.text(row,col,String(i+1).padStart(3,' ')+'  ',.34);
+    const hot=ln.includes('# a seven');
+    g.text(row,col+5,ln.slice(0,54),hot?.84:.7,hot?1:0);
+  });
+  const M=6, back=document.createElement('div'); back.className='back';
+  back.innerHTML=`<div class="field">${g.html()}</div>
+   <div class="cap" style="left:${M*CW}px;top:${(52.5*CH).toFixed(1)}px"><b>$</b> python mnist_from_scratch.py</div>
+   <div class="bk" style="left:${M*CW}px;top:${(56*CH).toFixed(1)}px;width:420px;font-size:13px;line-height:1.55;font-variation-settings:'wdth' 87.5,'wght' 500">
+     <div style="font-variation-settings:'wdth' 100,'wght' 800;letter-spacing:.08em;font-size:11px;margin-bottom:8px">ON THE COVER</div>
+     A handwritten seven, printed the way a network reads it: 40 × 51 pixels, one hex byte of ink per pixel. Beside it, a softmax over the ten digits — the kind of answer the program above learns to give. The program is the whole network: forward pass, backward pass, and the loop that trains it.
+   </div>
+   <div class="bk" style="left:${M*CW}px;top:${(71*CH).toFixed(1)}px;font-size:11px;line-height:1.6;font-variation-settings:'wdth' 100,'wght' 700;letter-spacing:.05em">
+     <span style="color:var(--sig)">&gt;</span> BEGINNER · 33 CAPSULES · 7 H · BOOKS.VIZUARA.AI</div>
+   <div class="bk" style="right:${M*CW}px;top:${(62*CH).toFixed(1)}px;width:192px;height:${(14*CH).toFixed(1)}px;border:2px dashed var(--ink);font-size:10px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:10px;letter-spacing:.08em;font-variation-settings:'wdth' 100,'wght' 600">ISBN · BARCODE</div>
+   <div class="foot im" style="left:${M*CW}px;top:${(76*CH).toFixed(1)}px">VIZUARA BOOKS<i></i></div>`;
+  const spine=document.createElement('div'); spine.className='spine';
+  spine.innerHTML=`<div class="st"><b>&gt;</b> Neural Networks from Scratch<i></i></div><div class="sm"><i></i>VIZ<br>UARA</div>`;
+  wrap.appendChild(back); wrap.appendChild(spine); wrap.appendChild(front);
+})();
+
 // place cursors after the last title line, using real glyph metrics
 document.fonts.ready.then(()=>{
-  document.querySelectorAll('.cover').forEach(cv=>{
+  document.querySelectorAll('.cover, .front').forEach(cv=>{
     const tls=cv.querySelectorAll('.tl'), last=tls[tls.length-1], cur=cv.querySelector('.cur');
     const k=+last.dataset.k, fs=k*10;
     const x=last.offsetLeft+last.getBoundingClientRect().width;
