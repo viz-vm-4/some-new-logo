@@ -8,16 +8,112 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=Martian+Mono:wdth,wght@75..112.5,100..800&display=swap" rel="stylesheet">
 <style>
-:root{ --bench:#1B463C; --cream:#F3EEE2; --ink:#14201D; --paper:#E9E4D8; }
+:root{ --bench:#1B463C; --cream:#F3EEE2; --ink:#14201D; --paper:#E8E3D6; --muted:#55635E; }
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--paper);color:var(--ink);font-family:Archivo,sans-serif}
-.covers{display:flex;flex-wrap:wrap;gap:48px;padding:48px;justify-content:center}
-.cover{position:relative;width:720px;height:888px;overflow:hidden;flex:none;background:var(--bench)}
+body{padding-bottom:96px}
+code{font-family:'Martian Mono',monospace;font-size:11px;color:var(--muted)}
+.intro{max-width:1512px;margin:0 auto;padding:72px 44px 8px}
+.eyebrow{display:flex;align-items:center;gap:14px;font:600 12px/1 'Martian Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.intro h1{font-weight:800;font-stretch:87.5%;font-size:132px;line-height:.9;letter-spacing:-.02em;margin:28px 0 18px;color:var(--bench)}
+.lede{font-size:34px;font-weight:600;font-stretch:87.5%;line-height:1.15;margin:0 0 28px;max-width:1000px}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:48px;max-width:1512px}
+.cols p{font-size:18px;line-height:1.55;margin:0}
+.spec{max-width:1512px;margin:48px auto 0;padding:0 44px;display:grid;grid-template-columns:repeat(4,1fr);gap:28px}
+.card{border-top:3px solid var(--ink);padding-top:14px}
+.card.wide{grid-column:1 / -1}
+.card h3{font:700 11px/1.2 'Martian Mono',monospace;letter-spacing:.14em;text-transform:uppercase;margin:0 0 16px;color:var(--ink)}
+.card p,.card li{font-size:14.5px;line-height:1.5}
+.sw{display:flex;align-items:center;gap:12px;margin:0 0 10px;font-size:14px}
+.sw i{width:44px;height:44px;border-radius:4px;flex:none;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
+#families{list-style:none;margin:0;padding:0}
+#families li{display:flex;gap:12px;align-items:center;margin:0 0 11px;font-size:13.5px;line-height:1.35}
+.chip{width:40px;height:26px;border-radius:13px;flex:none;margin-right:6px}
+.spec-type .big{font-weight:800;font-stretch:87.5%;font-size:64px;line-height:.95;letter-spacing:-.012em;color:var(--bench)}
+.spec-type .mono{font:500 14px/1.5 'Martian Mono',monospace;margin-top:6px}
+.lvl{margin:0 0 8px}
+.rules{columns:2;column-gap:48px;margin:0;padding-left:20px}
+.rules li{margin:0 0 10px;break-inside:avoid}
+h2.section{max-width:1512px;margin:96px auto 8px;padding:0 44px;font-weight:800;font-stretch:87.5%;font-size:44px;letter-spacing:-.01em;color:var(--bench)}
+p.note{max-width:1512px;margin:0 auto 28px;padding:0 44px;font-size:17px;line-height:1.5;color:var(--muted)}
+.covers{display:flex;flex-wrap:wrap;gap:64px 48px;justify-content:center;padding:24px 44px 0}
+figure.kit{margin:0;width:720px}
+.cover{position:relative;width:720px;height:888px;overflow:hidden;flex:none;background:var(--bench);box-shadow:0 2px 0 rgba(0,0,0,.06),0 18px 40px -18px rgba(20,32,29,.45)}
 .cover svg{position:absolute;left:0;top:0;display:block}
+figcaption{font:500 12px/1.65 'Martian Mono',monospace;margin-top:16px;color:#2D3A35}
+figcaption span{color:var(--muted)}
+.wrapbox{display:flex;flex-direction:column;align-items:center;padding:24px 44px 0}
+.wrap{position:relative;width:1512px;height:888px;box-shadow:0 18px 40px -18px rgba(20,32,29,.45)}
+.wrap svg{display:block}
+.wrapbox p{font:500 12px/1.6 'Martian Mono',monospace;color:var(--muted);width:1512px;display:flex;justify-content:space-between;margin:14px 0 0}
+footer{max-width:1512px;margin:96px auto 0;padding:24px 44px 0;border-top:3px solid var(--ink);font:500 12px/1.6 'Martian Mono',monospace;color:var(--muted)}
 </style>
 </head>
 <body>
-<section class="covers" id="covers"></section>
+<header class="intro">
+  <div class="eyebrow"><span id="markbig"></span>Vizuara Books · a cover system for 50+ titles</div>
+  <h1>Some Assembly Required</h1>
+  <p class="lede">Every Vizuara book builds a model. So every cover is a model kit.</p>
+  <div class="cols">
+    <p>The subject of each book is broken into its real components (the causal mask, the all-reduce ring, the KV cache, the split test) and molded onto a plastic sprue, numbered in build order and ready to snap off. It is the honest picture of a library whose titles keep saying <i>from scratch</i>: here are the pieces, now go and put them together. The pun does half the work: an ML model, a scale model.</p>
+    <p>The bench, the frame, the type and the imprint never change; only the parts do, so fifty covers read as one shelf and no two look alike. The plastic’s colour names the field. Skill level is printed the way kit makers always have: Skill 1, 2 or 3. Everything is vector SVG drawn in code, from the injection-moulded highlights to the cutting mat, which is ruled in true inches at trim size.</p>
+  </div>
+</header>
+
+<section class="spec">
+  <div class="card">
+    <h3>The bench</h3>
+    <div class="sw"><i style="background:#1B463C"></i><div><b>Bench green</b> <code>#1B463C</code><br>every cover’s ground</div></div>
+    <div class="sw"><i style="background:#2D6255"></i><div><b>Mat rule</b> <code>#2D6255</code> / <code>#24544A</code><br>1 in and ½ in grid</div></div>
+    <div class="sw"><i style="background:#F3EEE2"></i><div><b>Cream</b> <code>#F3EEE2</code><br>titles, imprint, level</div></div>
+    <div class="sw"><i style="background:#A7C4BA"></i><div><b>Sage</b> <code>#A7C4BA</code><br>taglines, kit number</div></div>
+    <div class="sw"><i style="background:#3A2219"></i><div><b>Factory chocolate</b> <code>#3A2219</code><br>Charlie sub-series bench</div></div>
+  </div>
+  <div class="card">
+    <h3>Plastic = subject family</h3>
+    <ul id="families"></ul>
+  </div>
+  <div class="card spec-type">
+    <h3>Type</h3>
+    <div class="big">Archivo<br>ExtraBold</div>
+    <p>Titles only: 800 weight at 87.5% width, tracked −1.2%, line breaks set by hand. Semi-condensed so long titles stay big in three lines.</p>
+    <div class="mono">Martian Mono — part numbers,<br>taglines, capsules · hours.</div>
+    <p>Both from Google Fonts. The imprint uses Archivo at 112.5% width, spaced.</p>
+  </div>
+  <div class="card">
+    <h3>Skill level</h3>
+    <div id="levels"></div>
+    <p>Three numbered squares, filled to the level, like the skill badge on a kit box. The fill count reads at thumbnail size and in greyscale.</p>
+    <h3 style="margin-top:22px">Imprint</h3>
+    <p style="display:flex;gap:14px;align-items:center;margin:0"><span id="markbig2"></span><span>A <b>V</b> molded on its own little sprue. On covers it sits small, top-left; <b>VIZUARA</b> is also molded into every sprue’s maker’s tab, as real manufacturers do.</span></p>
+  </div>
+  <div class="card wide">
+    <h3>The rules</h3>
+    <ol class="rules">
+      <li><b>One bench.</b> Every cover sits on the same cutting mat, ruled in true inches along the left and bottom edges. Printed at 7.5 × 9.25 in, the ruler is accurate.</li>
+      <li><b>Title first.</b> Cream Archivo ExtraBold, top-left, 66–104 px, always the loudest thing. A one-line truthful tagline in Martian Mono sits under it.</li>
+      <li><b>One sprue per book: the emblem.</b> Three to eight parts taken from the book’s actual mechanism, numbered in build order. One hero part is big enough to carry the 180 px thumbnail.</li>
+      <li><b>Brand signs, title speaks.</b> A small imprint top-left, and VIZUARA plus the sprue letter molded into the maker’s tab.</li>
+      <li><b>Colour has a job.</b> The plastic names the subject family (seven plastics). Numbered squares give the level. The footer carries capsules and hours. The kit number, top-right, is the catalogue number, so the library can be collected in order.</li>
+      <li><b>Special runs.</b> <i>Charlie and the Intelligence Factory</i> is the Factory Edition: gold-plated sprues on a chocolate bench, with Roman sprue letters I–IV. Unreleased books ship as a <i>Test Shot</i>: clear, unpainted plastic with a stamp.</li>
+      <li><b>Scales to the catalogue.</b> A layout engine places the parts, cuts the gates, numbers the tags and finds a clear spot for the maker’s tab, so a new book only needs its parts list.</li>
+      <li><b>Survives print.</b> Pure vector, with no rule under 1 px at trim. All plastics are light on a dark bench, so everything holds in greyscale.</li>
+    </ol>
+  </div>
+</section>
+
+<h2 class="section">The core six</h2>
+<section class="covers" id="core"></section>
+<h2 class="section">Range: Skill 1 to Test Shot</h2>
+<p class="note">A four-part beginner kit, a two-word title at 104 px, a 55-character title in three lines, an advanced alignment kit, a book that is not about AI at all, and an unreleased book as a clear test shot.</p>
+<section class="covers" id="range"></section>
+<h2 class="section">Factory Edition: Charlie and the Intelligence Factory</h2>
+<p class="note">Four rooms, one gold-plated set. The Factory Edition keeps every rule of the system and changes only the bench (chocolate) and the finish (gold plate), so the sub-series pops off the shelf and still belongs to it.</p>
+<section class="covers" id="factory"></section>
+<h2 class="section">Print wrap: back, spine, front</h2>
+<p class="note">The back cover works like the side panel of a kit box: the same parts, out of the sprue and assembled, drawn like an instruction sheet. The spine carries the plastic colour and the kit number, so a shelf of Vizuara books reads as a numbered, colour-coded set.</p>
+<section class="wrapbox"><div class="wrap" id="wrap"></div><p><span>BACK · 7.5 in</span><span>SPINE · 0.75 in</span><span>FRONT · 7.5 in</span></p></section>
+<footer>Some Assembly Required · proposal for Vizuara Books · all artwork is vector SVG generated in the page; fonts: Archivo, Martian Mono (Google Fonts). Each .cover is 720 × 888 CSS px = 7.5 × 9.25 in trim.</footer>
 
 <script>
 /* ============================================================
@@ -612,7 +708,7 @@ function wrapSVG(b, size) {
     <rect x="${W}" y="0" width="${SP}" height="118" fill="${pl.base}"/>
     <text x="${W+SP/2}" y="46" text-anchor="middle" font-family="Martian Mono" font-size="10" font-weight="700" letter-spacing=".12em" fill="${pl.ink}">KIT</text>
     <text x="${W+SP/2}" y="88" text-anchor="middle" font-family="Archivo" font-size="34" font-weight="800" fill="${pl.ink}">${String(b.kit).padStart(2,'0')}</text>
-    <text class="spine-title" transform="translate(${W+SP/2+10} 150) rotate(90)" font-family="Archivo" font-weight="800" style="font-stretch:87.5%" font-size="30" fill="${mat.text}">${title}</text>
+    <text class="spine-title" transform="translate(${W+SP/2-11} 150) rotate(90)" font-family="Archivo" font-weight="800" style="font-stretch:87.5%" font-size="30" fill="${mat.text}">${title}</text>
     ${mark(W+SP/2-15,806,0.94,mat.text)}`;
   return svgWrap(WW,H, bench(mat,WW) + back + spine + `<g transform="translate(${W+SP} 0)">${front.inner}</g>`);
 }
@@ -641,54 +737,71 @@ function buildIntro() {
 
 /* ================= THE CATALOGUE ================= */
 const BOOKS = [
-  { slug:'ai-context-engineering', kit:1, level:'intermediate', capsules:43, hours:10, plastic:'lilac',
+  { slug:'ai-context-engineering', group:'core', kit:1, level:'intermediate', capsules:43, hours:10, plastic:'lilac',
     lines:['AI Context','Engineering'], size:92, sub:'What goes into the window, and what stays out',
     rows:P=>[ {h:1.05, parts:[P.contextTray()]}, {h:1, parts:[P.doc(), P.bubble(), P.wrench(), P.chip(), P.magnifier()]} ] },
-  { slug:'mathematical-foundations-for-ml', kit:2, level:'beginner', capsules:43, hours:10, plastic:'bone',
+  { slug:'mathematical-foundations-for-ml', group:'core', kit:2, level:'beginner', capsules:43, hours:10, plastic:'bone',
     lines:['Mathematical','Foundations for','Machine Learning'], size:76, sub:'Linear algebra, calculus and probability',
     rows:P=>[ {h:1.2, parts:[P.sigma(), P.bell()]}, {h:1, parts:[P.matrix(), P.nabla(), P.integral(), P.vector()]} ] },
-  { slug:'neural-networks-from-scratch', kit:3, level:'beginner', capsules:33, hours:7, plastic:'red',
+  { slug:'neural-networks-from-scratch', group:'core', kit:3, level:'beginner', capsules:33, hours:7, plastic:'red',
     lines:['Neural Networks','from Scratch'], size:84, sub:'Neurons, weights, loss and backprop, by hand',
     rows:P=>[ {h:1.25, parts:[P.network([3,4,2]), P.neuron()]}, {h:1, parts:[P.sigmoid(), P.bowl(), P.ball(), P.tile('w'), P.tile('b')]} ] },
   { slug:'build-llms-from-scratch', kit:4, level:'intermediate', capsules:20, hours:6, plastic:'yellow',
-    lines:['Build Large Language','Models (LLMs)','from Scratch'], size:72, sub:'Tokens to text: a GPT, part by part',
+    lines:['Build Large Language','Models (LLMs)','from Scratch'], size:72, sub:'Tokens to text, one part at a time', group:'core',
+    blurb:['Twenty capsules, about six hours: a large language model,','built one part at a time. Free to read, forever.'],
     rows:P=>[ {h:1.3, parts:[P.causalMask(), P.block(), P.qkv()]}, {h:.8, parts:[P.tokens(), P.wave()]} ] },
-  { slug:'5d-parallelism', kit:5, level:'advanced', capsules:40, hours:9, plastic:'grey',
+  { slug:'5d-parallelism', group:'core', kit:5, level:'advanced', capsules:40, hours:9, plastic:'grey',
     lines:['5D Parallelism','for Large Model','Training'], size:76, sub:'Data · tensor · pipeline · context · expert',
     rows:P=>[ {h:1.35, parts:[P.cluster(), P.ring()]}, {h:1, parts:['DP','TP','PP','CP','EP'].map(l=>P.dimArrow(l)).concat([P.pipeline(3)])} ] },
-  { slug:'pi-vs-hermes-vs-codex', kit:6, level:'advanced', capsules:9, hours:1, plastic:'lilac',
+  { slug:'pi-vs-hermes-vs-codex', group:'core', kit:6, level:'advanced', capsules:9, hours:1, plastic:'lilac',
     lines:['Pi vs Hermes vs Codex:','Context Compaction','and Memory'], size:66, sub:'Three agents, three ways to forget on purpose',
     rows:P=>[ {h:1.35, parts:[P.transcript(), P.clamp(), P.chip()]}, {h:.9, parts:[P.badge('pi'), P.vs(), P.badge('wing'), P.vs(), P.badge('codex')]} ] },
-  { slug:'charlie-language-room', kitLabel:'INTELLIGENCE FACTORY · I', level:'advanced', capsules:22, hours:5, plastic:'gold', mat:'factory', letter:'I',
+  { slug:'charlie-language-room', group:'factory', kitLabel:'INTELLIGENCE FACTORY · I', level:'advanced', capsules:22, hours:5, plastic:'gold', mat:'factory', letter:'I',
     lines:['Charlie and the','Language Room'], size:84, sub:'Book I · Language — Inference Engineering',
     rows:P=>[ {h:1.2, parts:[P.bubble(200,138,{dots:true,name:'Generation'}), P.kvCache()]}, {h:.9, parts:[P.stopwatch(), P.die(), P.tokens(['next','?'])]} ] },
-  { slug:'charlie-vision-room', kitLabel:'INTELLIGENCE FACTORY · II', level:'intermediate', capsules:20, hours:6, plastic:'gold', mat:'factory', letter:'II',
+  { slug:'charlie-vision-room', group:'factory', kitLabel:'INTELLIGENCE FACTORY · II', level:'intermediate', capsules:20, hours:6, plastic:'gold', mat:'factory', letter:'II',
     lines:['Charlie and the','Vision Room'], size:84, sub:'Book II · Vision — Vision Transformers',
     rows:P=>[ {h:1.1, parts:[P.eye(), P.patchGrid()]}, {h:.8, parts:[P.patchSeq(), P.wave(130,14)]} ] },
-  { slug:'charlie-sound-room', kitLabel:'INTELLIGENCE FACTORY · III', level:'intermediate', capsules:20, hours:6, plastic:'gold', mat:'factory', letter:'III',
+  { slug:'charlie-sound-room', group:'factory', kitLabel:'INTELLIGENCE FACTORY · III', level:'intermediate', capsules:20, hours:6, plastic:'gold', mat:'factory', letter:'III',
     lines:['Charlie and the','Sound Room'], size:84, sub:'Book III · Audio — Voice Agents',
     rows:P=>[ {h:1.1, max:1.45, parts:[P.waveform()]}, {h:1, parts:[P.mic(), P.bubble(84,60), P.bubble(70,52), P.speaker()]} ] },
-  { slug:'charlie-reasoning-room', kitLabel:'INTELLIGENCE FACTORY · IV', level:'advanced', capsules:21, hours:6, plastic:'gold', mat:'factory', letter:'IV',
+  { slug:'charlie-reasoning-room', group:'factory', kitLabel:'INTELLIGENCE FACTORY · IV', level:'advanced', capsules:21, hours:6, plastic:'gold', mat:'factory', letter:'IV',
     lines:['Charlie and the','Reasoning Room'], size:84, sub:'Book IV · Reinforcement learning, from bandits to reasoning',
     rows:P=>[ {h:1.1, parts:[P.bandit(), P.gridworld()]}, {h:.85, parts:[P.coin(), P.chain()]} ] },
-  { slug:'decision-trees-from-scratch', kit:14, level:'beginner', capsules:23, hours:5, plastic:'bone',
+  { slug:'decision-trees-from-scratch', group:'range', kit:14, level:'beginner', capsules:23, hours:5, plastic:'bone',
     lines:['Build Decision Trees','from Scratch'], size:76, sub:'Splits, impurity and leaves, one question at a time',
     rows:P=>[ {h:1.25, max:1.5, parts:[P.tree()]}, {h:1, parts:[P.boundary(), P.leq(), P.hist()]} ] },
-  { slug:'deit-from-scratch', kit:37, level:'advanced', capsules:42, hours:10, plastic:'red',
+  { slug:'deit-from-scratch', group:'range', kit:37, level:'advanced', capsules:42, hours:10, plastic:'red',
     lines:['Build a Data-Efficient','Image Transformer','(DeiT) from Scratch'], size:68, sub:'A teacher, a student and a distillation token',
     rows:P=>[ {h:1.2, parts:[P.network([3,5,5,3],{r:13,dx:66,pitch:34,name:'Teacher'}), P.network([2,3,2],{r:12,dx:54,pitch:34,rod:4,name:'Student'})]}, {h:.9, parts:[P.patchGrid(), P.tile('CLS',{w:74,h:46,size:20,name:'Class token',eng:true}), P.tile('DIST',{w:84,h:46,size:20,name:'Distillation token',eng:true})]} ] },
-  { slug:'sql-masterclass', kit:21, level:'beginner', capsules:36, hours:8, plastic:'bone',
+  { slug:'sql-masterclass', group:'range', kit:21, level:'beginner', capsules:36, hours:8, plastic:'bone',
     lines:['SQL','Masterclass'], size:104, sub:'Tables, keys, joins and queries',
     rows:P=>[ {h:1.15, parts:[P.table(), P.venn()]}, {h:.85, parts:[P.key(), P.funnel(), P.star()]} ] },
-  { slug:'kernel-engineering', kit:51, level:'advanced', coming:true, plastic:'clear',
+  { slug:'kernel-engineering', group:'range', kit:51, level:'advanced', coming:true, plastic:'clear',
     lines:['Kernel','Engineering'], size:104, sub:'From silicon to speculative decoding',
     rows:P=>[ {h:1.25, parts:[P.gpuDie(), P.memPyramid()]}, {h:.8, parts:[P.warp(), P.cluster(3,3,24,34)]} ] },
+  { slug:'rlhf-from-scratch', group:'range', kit:42, level:'advanced', capsules:37, hours:8, plastic:'yellow',
+    lines:['RLHF','from Scratch'], size:104, sub:'Preferences, a reward model and PPO',
+    rows:P=>[ {h:1.2, parts:[P.thumbs(), P.prefPair(), P.network([3,3,1],{r:12,dx:58,pitch:34,name:'Reward model'})]}, {h:.9, parts:[P.clipFn(), P.spring()]} ] },
+  { slug:'git-github-masterclass', group:'range', kit:18, level:'beginner', capsules:40, hours:9, plastic:'bone',
+    lines:['Git & GitHub','Masterclass'], size:100, sub:'Commits, branches, merges and pull requests',
+    rows:P=>[ {h:1, max:1.6, parts:[P.commitGraph()]}, {h:1, parts:[P.terminal(), P.diff(), P.tag(), P.fork()]} ] },
 ];
+const ORDER=['ai-context-engineering','mathematical-foundations-for-ml','neural-networks-from-scratch','build-llms-from-scratch','5d-parallelism','pi-vs-hermes-vs-codex',
+  'decision-trees-from-scratch','sql-masterclass','deit-from-scratch','rlhf-from-scratch','git-github-masterclass','kernel-engineering',
+  'charlie-language-room','charlie-vision-room','charlie-sound-room','charlie-reasoning-room'];
+BOOKS.sort((a,b)=>ORDER.indexOf(a.slug)-ORDER.indexOf(b.slug));
 
 (async ()=>{
   await Promise.all(['semi-condensed 800 80px Archivo','700 13px Archivo','semi-expanded 700 13px Archivo','500 13px "Martian Mono"','700 13px "Martian Mono"','800 20px Archivo']
     .map(f=>document.fonts.load(f).catch(()=>{})));
-  for (const b of BOOKS) await renderCover(b);
+  buildIntro();
+  document.getElementById('markbig2').innerHTML = svgWrap(44,44,mark(4,4,1.1,'#1B463C'));
+  for (const b of BOOKS) await renderCover(b, document.getElementById(b.group));
+  const llm = BOOKS.find(b=>b.slug==='build-llms-from-scratch');
+  const wrap = document.getElementById('wrap'); wrap.innerHTML = wrapSVG(llm, llm._size);
+  const st = wrap.querySelector('.spine-title'), L = st.getComputedTextLength(), maxL = 640;
+  if (L>maxL) st.setAttribute('font-size', (30*maxL/L).toFixed(1));
   document.body.dataset.ready='1';
 })();
 </script>
