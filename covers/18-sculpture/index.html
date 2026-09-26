@@ -109,8 +109,8 @@ float sdCapsule(vec3 p, vec3 a, vec3 b, float r){ vec3 pa=p-a, ba=b-a; float h=c
 float sdCylY(vec3 p, float h, float r){ vec2 d=abs(vec2(length(p.xz),p.y))-vec2(r,h); return min(max(d.x,d.y),0.)+length(max(d,0.)); }
 float sdCylZ(vec3 p, float h, float r){ vec2 d=abs(vec2(length(p.xy),p.z))-vec2(r,h); return min(max(d.x,d.y),0.)+length(max(d,0.)); }
 float sdTorus(vec3 p, vec2 t){ vec2 q=vec2(length(p.xz)-t.x,p.y); return length(q)-t.y; }
-float smin(float a, float b, float k){ float h=clamp(.5+.5*(b-a)/k,0.,1.); return mix(b,a,h)-k*h*(1.-h); }
-float smax(float a, float b, float k){ return -smin(-a,-b,k); }
+float smin(float a, float b, float k){ float h=max(k-abs(a-b),0.)/k; return min(a,b)-h*h*k*0.25; }
+float smax(float a, float b, float k){ float h=max(k-abs(a-b),0.)/k; return max(a,b)+h*h*k*0.25; }
 `;
 
 const MAIN = `
@@ -276,7 +276,9 @@ function zonohedron(gens, scale, yaw, restFace){
   const Y=(v)=>[v[0]*Math.cos(yaw)+v[2]*Math.sin(yaw),v[1],-v[0]*Math.sin(yaw)+v[2]*Math.cos(yaw)];
   N=N.map(n=>Y(R(n)));
   const f=(x)=>x.toFixed(6);
-  return { glsl:`const vec3 ZN[${N.length}]=vec3[${N.length}](${N.map(n=>`vec3(${n.map(f).join(',')})`).join(',')});\nconst float ZH[${N.length}]=float[${N.length}](${Hh.map(f).join(',')});\nconst float ZC=${f(Hh[restFace])};\n`, n:N.length, rest:Hh[restFace] };
+  const pl=N.map((n,i)=>`abs(dot(p,vec3(${n.map(f).join(',')})))-${f(Hh[i])}`);
+  const body='  float d='+pl[0]+';\n'+pl.slice(1).map(e=>`  d=smax(d,${e},0.012);`).join('\n')+'\n';
+  return { glsl:`const float ZC=${f(Hh[restFace])};\n`, body, n:N.length, rest:Hh[restFace] };
 }
 const PHI=(1+Math.sqrt(5))/2;
 const ZONO=zonohedron([[0,1,PHI],[0,-1,PHI],[1,PHI,0],[-1,PHI,0],[PHI,0,1]],0.78,0.5,3);
@@ -289,9 +291,7 @@ book({ slug:'5d-parallelism', key:2, no:'05',
   glsl: ZONO.glsl+`
 vec2 scene(vec3 p){
   p.y-=ZC;
-  float d=abs(dot(p,ZN[0]))-ZH[0];
-  for(int i=1;i<${ZONO.n};i++){ d=smax(d,abs(dot(p,ZN[i]))-ZH[i],0.012); }
-  return vec2(d,1.);
+${ZONO.body}  return vec2(d,1.);
 }
 Mat material(float id, vec3 p, vec3 n){
   vec3 q=p*1.4+vec3(3.1,0.,1.7);
@@ -339,29 +339,31 @@ Mat material(float id, vec3 p, vec3 n){
 }`});
 
 /* ============ AI CONTEXT ENGINEERING ============ */
+const CTX_ROWS=[ // [yCenter, halfH, [[x,halfW],...]]
+  [0.46,0.26,[[-0.49,0.31],[0.08,0.26],[0.57,0.23]]],
+  [0.92,0.20,[[-0.60,0.20],[-0.01,0.39],[0.59,0.21]]],
+  [1.26,0.14,[[-0.325,0.475],[0.35,0.20]]],
+  [1.51,0.11,[[-0.525,0.275]]]];
+let CTX_CODE='', CTX_ID=2;
+CTX_ROWS.forEach(([y,h,bs])=>{ CTX_CODE+=`  if(abs(p.y-${y.toFixed(3)})-${h.toFixed(3)}<r.x){\n`;
+  bs.forEach(([x,w])=>{ CTX_CODE+=`    d=sdRBox(p-vec3(${x.toFixed(3)},${y.toFixed(3)},0.),vec3(${(w-0.008).toFixed(3)},${(h-0.008).toFixed(3)},0.17),0.012); if(d<r.x) r=vec2(d,${CTX_ID++}.);\n`; });
+  CTX_CODE+='  }\n'; });
 book({ slug:'ai-context-engineering', key:1,
   title:'AI Context<br>Engineering',
   obj:'Window, packed by hand; one block left out', med:'Travertine, slate, marble, terracotta', dim:'43 capsules · 10 hours',
   cam:{ look:[0.3,1.15,0], dist:18.5, el:9, yaw:-16, frame:[0.5,0.64] }, bound:[0.3,1.2,0,2.25], box:[[-1.05,0,-0.62],[2.1,2.43,0.25]], steps:130,
   light:{ keyPos:[-8,8,-6] },
   glsl:`
-// frame: outer half (1.0,1.2,0.2); opening half (0.8,1.0)
-const vec4 BL[9]=vec4[9](
-  vec4(-0.49,0.46,0.31,0.26), vec4(0.08,0.46,0.26,0.26), vec4(0.57,0.46,0.23,0.26),
-  vec4(-0.60,0.92,0.20,0.20), vec4(-0.01,0.92,0.39,0.20), vec4(0.59,0.92,0.21,0.20),
-  vec4(-0.325,1.26,0.475,0.14), vec4(0.35,1.26,0.20,0.14),
-  vec4(-0.525,1.51,0.275,0.11));
 vec2 scene(vec3 p){
-  vec3 q=p; q.xz=rot(0.0)*q.xz; q.y-=1.2;
+  vec3 q=p; q.y-=1.2;
   float fr=max(sdRBox(q,vec3(1.0,1.2,0.2),0.02),-sdBox(q,vec3(0.8,1.0,0.5)));
-  vec2 r=vec2(fr,1.);
-  vec3 b=p; b.y-=0.0;
-  if(sdBox(q-vec3(0,-0.1,0),vec3(0.82,0.9,0.22))<r.x){
-    int i0=b.y<0.9?0:(b.y<1.2?3:6); int i1=b.y<0.6?3:(b.y<1.05?6:(b.y<1.35?8:9));
-    for(int i=i0;i<i1;i++){ float d=sdRBox(b-vec3(BL[i].x,BL[i].y,0.),vec3(BL[i].z-0.008,BL[i].w-0.008,0.17),0.012); if(d<r.x) r=vec2(d,2.+float(i)); }
+  vec2 r=vec2(fr,1.); float d;
+  if(abs(p.z)<0.2+r.x && abs(p.x)<0.8+r.x){
+${CTX_CODE}  }
+  if(p.x>1.2){
+    vec3 o=p-vec3(1.72,0.17,-0.35); o.xz=rot(0.5)*o.xz;
+    d=sdRBox(o,vec3(0.26,0.17,0.17),0.012); if(d<r.x) r=vec2(d,11.);
   }
-  vec3 o=p-vec3(1.72,0.17,-0.35); o.xz=rot(0.5)*o.xz;
-  float dout=sdRBox(o,vec3(0.26,0.17,0.17),0.012); if(dout<r.x) r=vec2(dout,11.);
   return r;
 }
 Mat material(float id, vec3 p, vec3 n){
@@ -485,10 +487,10 @@ Mat material(float id, vec3 p, vec3 n){
 book({ slug:'prompt-engineering', key:0,
   title:'Prompt<br>Engineering',
   obj:'Slab, raised by a wedge', med:'Slate and red lacquer', dim:'31 capsules · 7 hours',
-  cam:{ look:[0,0.35,0], dist:20, el:12, yaw:-18, frame:[0.5,0.66] }, bound:[0,0.4,0,1.85], box:[[-1.4,0,-0.8],[1.4,0.85,0.8]], steps:130,
+  cam:{ look:[0,0.4,0], dist:16.5, el:13, yaw:-20, frame:[0.5,0.655] }, bound:[0,0.4,0,1.85], box:[[-1.4,0,-0.8],[1.4,0.85,0.8]], steps:130,
   light:{ keyPos:[-8,9,-6] },
   glsl:`
-const float TA=0.16;
+const float TA=0.19;
 vec2 scene(vec3 p){
   // slab pivots on its left lower edge at x=-1.35
   vec3 q=p-vec3(-1.35,0.,0.); q.xy=rot(TA)*q.xy; q-=vec3(1.35,0.16,0.);
@@ -505,7 +507,7 @@ vec2 scene(vec3 p){
 Mat material(float id, vec3 p, vec3 n){
   Mat m; m.metal=0.; m.wrap=0.;
   if(id<1.5){ float f=fbm(p*vec3(3.,14.,3.)); float g=fbm(p*25.);
-    m.alb=vec3(0.19,0.205,0.225)*(0.8+0.35*f)*(0.92+0.12*g); m.rough=0.6; m.coat=0.15; }
+    m.alb=vec3(0.085,0.09,0.10)*(0.8+0.35*f)*(0.92+0.12*g); m.rough=0.55; m.coat=0.3; }
   else { m.alb=vec3(0.62,0.07,0.045); m.rough=0.12; m.coat=1.; }
   return m;
 }`});
@@ -561,9 +563,10 @@ const CHARLIE_MAT=`
 Mat material(float id, vec3 p, vec3 n){
   Mat m; m.wrap=0.3;
   if(id<1.5){ float f=fbm(p*8.); m.alb=vec3(0.84,0.83,0.80)*(0.97+0.04*f); m.rough=0.1; m.metal=0.; m.coat=0.85; }
-  else { float g=noise(p*60.); m.alb=vec3(0.98,0.76,0.38)*(0.95+0.06*g); m.rough=0.24; m.metal=1.; m.coat=0.; m.wrap=0.; }
+  else { float g=noise(p*60.); m.alb=vec3(0.92,0.68,0.28)*(0.93+0.1*g); m.rough=0.3; m.metal=0.45; m.coat=0.; m.wrap=0.; }
   return m;
 }`;
+const CHARLIE_LIGHT={ keyPos:[-5.5,8,-9] };
 const CHARLIE_CAM={ look:[0,0.72,0], dist:18, el:17, yaw:-10, frame:[0.5,0.655] };
 const CUBE=`const float S=0.72;
 vec3 cubeP(vec3 p){ p.y-=S; p.xz=rot(0.42)*p.xz; return p; }
@@ -571,7 +574,7 @@ vec3 cubeP(vec3 p){ p.y-=S; p.xz=rot(0.42)*p.xz; return p; }
 book({ slug:'charlie-language-room', key:2, series:'Charlie and the Intelligence Factory · I',
   title:'Charlie and the<br>Language Room', tag:'Language — Inference Engineering',
   obj:'Room I: a cube with a mouth', med:'Porcelain, gilded interior', dim:'22 capsules · 5 hours',
-  cam:CHARLIE_CAM, bound:[0,0.72,0,1.35], box:[[-1.0,0,-1.0],[1.0,1.46,1.0]], steps:120,
+  cam:CHARLIE_CAM, light:CHARLIE_LIGHT, bound:[0,0.72,0,1.35], box:[[-1.0,0,-1.0],[1.0,1.46,1.0]], steps:120,
   glsl: CUBE+`
 vec2 scene(vec3 p){ vec3 q=cubeP(p);
   float d=sdRBox(q,vec3(S),0.03);
@@ -582,7 +585,7 @@ vec2 scene(vec3 p){ vec3 q=cubeP(p);
 book({ slug:'charlie-vision-room', key:1, series:'Charlie and the Intelligence Factory · II',
   title:'Charlie and the<br>Vision Room', tag:'Vision — Vision Transformers',
   obj:'Room II: a cube with an eye', med:'Porcelain, gilded interior', dim:'20 capsules · 6 hours',
-  cam:CHARLIE_CAM, bound:[0,0.72,0,1.35], box:[[-1.0,0,-1.0],[1.0,1.46,1.0]], steps:120,
+  cam:CHARLIE_CAM, light:CHARLIE_LIGHT, bound:[0,0.72,0,1.35], box:[[-1.0,0,-1.0],[1.0,1.46,1.0]], steps:120,
   glsl: CUBE+`
 vec2 scene(vec3 p){ vec3 q=cubeP(p);
   float d=sdRBox(q,vec3(S),0.03);
@@ -593,7 +596,7 @@ vec2 scene(vec3 p){ vec3 q=cubeP(p);
 book({ slug:'charlie-sound-room', key:1, series:'Charlie and the Intelligence Factory · III',
   title:'Charlie and the<br>Sound Room', tag:'Audio — Voice Agents',
   obj:'Room III: a cube with an ear', med:'Porcelain, gilded interior', dim:'20 capsules · 6 hours',
-  cam:CHARLIE_CAM, bound:[0,0.72,0,1.35], box:[[-1.0,0,-1.0],[1.0,1.46,1.0]], steps:130,
+  cam:CHARLIE_CAM, light:CHARLIE_LIGHT, bound:[0,0.72,0,1.35], box:[[-1.0,0,-1.0],[1.0,1.46,1.0]], steps:130,
   glsl: CUBE+`
 vec2 scene(vec3 p){ vec3 q=cubeP(p);
   float d=sdRBox(q,vec3(S),0.03);
@@ -610,26 +613,24 @@ vec2 scene(vec3 p){ vec3 q=cubeP(p);
 }`+CHARLIE_MAT });
 book({ slug:'charlie-reasoning-room', key:2, series:'Charlie and the Intelligence Factory · IV',
   title:'Charlie and the<br>Reasoning Room', tag:'Reason — Reinforcement Learning, from bandits to reasoning models', tagSmall:true,
-  obj:'Room IV: a cube with a stair, one step at a time', med:'Porcelain, gilded treads', dim:'21 capsules · 6 hours',
-  cam:CHARLIE_CAM, bound:[0,0.72,0,1.35], box:[[-1.0,0,-1.0],[1.0,1.46,1.0]], steps:130,
+  obj:'Room IV: a cube with a stair', med:'Porcelain, gilded treads', dim:'21 capsules · 6 hours',
+  cam:CHARLIE_CAM, light:CHARLIE_LIGHT, bound:[0,0.72,0,1.35], box:[[-1.0,0,-1.0],[1.0,1.46,1.0]], steps:130,
   glsl: CUBE+`
 vec2 scene(vec3 p){ vec3 q=cubeP(p);
   float d=sdRBox(q,vec3(S),0.03);
-  float u=q.z+S; float run=0.18; float rise=0.18;
-  float k=clamp(floor(u/run),0.,3.);
-  float ytop=(k+1.)*rise-0.0;
-  float cut=max(u-4.*run+0.0, ytop-q.y);
-  cut=max(cut,-u-1.);
-  float dd=max(d,-cut);
-  float tread=abs(q.y-ytop);
-  return vec2(dd, (tread<0.01 && u<4.*run-0.01 && u>-0.01)?2.:1.);
+  float st=1e9;
+  for(int k=0;k<5;k++){ float fk=float(k); float cx=-0.4+0.2*fk; float top=-0.44+0.176*(fk+1.);
+    st=min(st,sdBox2(q.xy-vec2(cx,0.5*(top-0.46)),vec2(0.1+(k==4?0.:0.001),0.5*(top+0.46)))); }
+  float rec=max(st,abs(q.z+S)-0.13);
+  float dd=max(d,-rec);
+  return vec2(dd, abs(rec)<0.008?2.:1.);
 }`+CHARLIE_MAT });
 
 /* ============ KERNEL ENGINEERING (forthcoming) ============ */
 book({ slug:'kernel-engineering', key:2, forthcoming:true,
   title:'Kernel<br>Engineering', tag:'From silicon to speculative decoding — GPU kernels for modern LLMs.',
   obj:'Maquette for a tiled block, one tile lifted', med:'Plaster maquette · to be cast in silicon bronze', dim:'Forthcoming',
-  cam:{ look:[0,0.3,0], dist:16.5, el:24, yaw:-20, frame:[0.5,0.67] }, bound:[0,0.35,0,1.75], box:[[-1.05,0,-1.05],[1.05,0.95,1.05]], steps:130,
+  cam:{ look:[0,0.35,0], dist:14, el:25, yaw:-20, frame:[0.5,0.655] }, bound:[0,0.35,0,1.75], box:[[-1.05,0,-1.05],[1.05,0.95,1.05]], steps:130,
   glsl:`
 const float TS=0.36; const float TH=0.3;
 vec2 scene(vec3 p){

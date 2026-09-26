@@ -17,7 +17,7 @@ body{font-family:'Martian Mono',monospace;font-variation-settings:'wdth' 75}
 .field{position:absolute;inset:0;font-size:10px;font-variation-settings:'wdth' 75}
 .field .r{position:absolute;left:0;height:var(--ch);line-height:var(--ch);white-space:pre}
 .field span{display:inline-block;vertical-align:top;height:var(--ch);line-height:var(--ch)}
-.field .t9,.field .s9{height:calc(var(--ch) + .7px)}
+.field .bg{position:absolute}
 .cap,.foot,.tl,.pr,.lab{position:absolute;white-space:pre}
 .tl{font-variation-settings:'wdth' 75,'wght' 800;color:var(--ink);word-spacing:-.28em}
 .tl.sub{font-variation-settings:'wdth' 75,'wght' 700;word-spacing:-.2em}
@@ -96,12 +96,12 @@ figcaption code{color:var(--sig);font-family:inherit}
       <div><span style="background:#2B3BD9"></span><b class="sig">Selection</b> #2B3BD9<br>the colour of selected text: the one datum that matters, the prompt, the cursor</div>
     </div>
     <div class="ramp" id="ramp"></div>
-    <p style="margin-top:14px">Tone is made the way a line printer made it: with how much ink a glyph lays down. Ten steps mix carbon into paper (16–100%) while the variable weight climbs 300→800; the last step is reverse video. No transparency, no halftone photographs; in greyscale Selection falls to a 35% grey that stays apart from Carbon.</p>
+    <p style="margin-top:14px">Tone is made the way a line printer made it: with how much ink a glyph lays down. Ten steps mix carbon into paper (16–100%) while the variable weight climbs from 300 to 800; the last step is reverse video. No transparency, no halftone photographs; in greyscale Selection falls to a 35% grey that stays apart from Carbon.</p>
   </div>
   <h2>TYPE</h2>
   <div class="b"><p><b>Martian Mono</b> (Google Fonts, variable width + weight) and nothing else. Field: 10 px (7.5 pt), width 75, weight 300–800 as a tone control. Titles: 50 or 60 px, weight 800, set on 5× or 6× character cells. Subtitles 30 px. Imprint: width 112.5, weight 800, tracked.</p></div>
   <h2>GRID</h2>
-  <div class="b"><p>120 columns × 80 rows; a cell is 6 × 11.1 px (1/16 in × 0.116 in at trim). Rows 0–50 are the printout and bleed on three sides; row 52 is a one-line caption — the expression that produced the picture; the title starts on row 56 with the prompt hanging in the margin; the imprint sits on row 76. All critical text is ≥ 24 px from the trim.</p></div>
+  <div class="b"><p>120 columns × 80 rows; a cell is 6 × 11.1 px (1/16 in × 0.116 in at trim). Rows 0–50 are the printout and bleed on three sides; row 52 is a one-line caption — the expression that produced the picture; the title starts on row 56 with the prompt hanging in the margin; the imprint sits on row 76. All critical text sits at least 24 px inside the trim.</p></div>
   <h2>LEVELS</h2>
   <div class="b"><div class="lv">
     <b class="g">&gt;</b><span><b>beginner</b> — a REPL prompt, the first thing you ever typed into</span>
@@ -131,8 +131,8 @@ const mix=(a,b,t)=>'rgb('+a.map((v,i)=>Math.round(v+(b[i]-v)*t)).join(',')+')';
     css.push(`.t${i}{color:${mix(PAPER,INK,ink[i])};font-variation-settings:'wdth' 75,'wght' ${wts[i]}}`);
     css.push(`.s${i}{color:${mix(PAPER,SIG,Math.max(.4,ink[i]))};font-variation-settings:'wdth' 75,'wght' ${wts[i]}}`);
   }
-  css.push(`.t9{background:${mix(PAPER,INK,1)};color:${mix(PAPER,PAPER,0)};font-variation-settings:'wdth' 75,'wght' 560}`);
-  css.push(`.s9{background:${mix(PAPER,SIG,1)};color:${mix(PAPER,PAPER,0)};font-variation-settings:'wdth' 75,'wght' 560}`);
+  css.push(`.t9,.s9{color:${mix(PAPER,PAPER,0)};font-variation-settings:'wdth' 75,'wght' 560}`);
+  css.push(`.ramp .t9,.bg{background:${mix(PAPER,INK,1)}}.ramp .s9,.bg.s{background:${mix(PAPER,SIG,1)}}`);
   const st=document.createElement('style'); st.textContent=css.join('\n'); document.head.appendChild(st);
 })();
 function Grid(){
@@ -150,18 +150,26 @@ Grid.prototype.cls=function(q){
 const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 Grid.prototype.html=function(){
   let out='';
+  const rects=[]; let open=new Map();
   for(let r=0;r<ROWS;r++){
-    let row='',run='',cls=null,any=false;
-    for(let c=0;c<COLS;c++){
-      const q=this.c[r][c], k=this.cls(q);
-      if(k!=='x') any=true;
-      if(k!==cls){ if(run) row+=`<span class="${cls}">${esc(run)}</span>`; run=''; cls=k; }
-      run+=q.ch;
+    let row='',run='',cls=null,any=false; const next=new Map();
+    for(let c=0;c<=COLS;c++){
+      const q=c<COLS?this.c[r][c]:null, k=q?this.cls(q):'end';
+      if(q&&k!=='x') any=true;
+      if(k!==cls){
+        if(run){ row+=`<span class="${cls}">${esc(run)}</span>`;
+          if(cls==='t9'||cls==='s9'){ const key=(c-run.length)+','+run.length+','+cls;
+            const o=open.get(key); if(o){ o.r1=r; next.set(key,o); } else { const n={c0:c-run.length,n:run.length,cls,r0:r,r1:r}; rects.push(n); next.set(key,n); } } }
+        run=''; cls=k; }
+      if(q) run+=q.ch;
     }
-    if(run) row+=`<span class="${cls}">${esc(run)}</span>`;
+    open=next;
     if(any) out+=`<div class="r" style="top:${(r*CH).toFixed(2)}px">${row}</div>`;
   }
-  return out;
+  // reverse video: one rectangle per vertical run of identical spans, overlapping its neighbours by 1px
+  const bg=rects.map(o=>{ const y0=Math.round(o.r0*CH), y1=Math.round((o.r1+1)*CH);
+    return `<div class="bg${o.cls==='s9'?' s':''}" style="left:${o.c0*CW}px;top:${y0}px;width:${o.n*CW}px;height:${y1-y0+1}px"></div>`; }).join('');
+  return bg+out;
 };
 // ─── helpers ─────────────────────────────────────────────────────────────
 function rng(seed){ let s=seed>>>0||1; return ()=>{ s^=s<<13; s>>>=0; s^=s>>17; s^=s<<5; s>>>=0; return s/4294967296; }; }
@@ -608,7 +616,7 @@ function build(b){
   const line=(txt,kk,cls)=>{ parts.push(`<div class="tl ${cls||''}" data-k="${kk}" style="left:${TX*CW}px;top:${(r*CH).toFixed(1)}px;font-size:${kk*10}px;line-height:${(kk*CH).toFixed(1)}px">${esc(txt)}</div>`); r+=kk; };
   lines.forEach(ln=>line(ln,k));
   if(sub){ r+=1; sub.forEach(ln=>line(ln,sk,'sub')); }
-  parts.push(`<div class="pr" style="left:${M*CW}px;top:${(T0*CH).toFixed(1)}px;font-size:${k*10}px;line-height:${(k*CH).toFixed(1)}px">${esc(PROMPT[b.level])}</div>`);
+  parts.push(`<div class="pr" style="left:${M*CW}px;top:${(T0*CH).toFixed(1)}px;font-size:50px;line-height:${(k*CH).toFixed(1)}px">${esc(PROMPT[b.level])}</div>`);
   // cursor: measured after fonts load
   parts.push(`<div class="cur${b.soon?' soon':''}"></div>`);
   if(info.cap) parts.push(`<div class="cap" style="left:${M*CW}px;top:${(52.5*CH).toFixed(1)}px"><b>${esc(info.cap[0])}</b> ${esc(info.cap[1])}</div>`);

@@ -46,5 +46,17 @@
   "16-wit": {
     "name": "Double Take",
     "pitch": "One idea per book: a single flat-shape pun, metaphor or figure–ground trick you get in a second, and each has to be technically true. Context engineering is the mark that reads B across and 13 down; a spider spins a neural net; a retriever fetches a document for RAG; trees are drawn upside down, the way computer scientists draw them. One typeface, and three grounds (newsprint, red, black) that give level."
+  },
+  "21-wildcard2": {
+    "name": "Some Assembly Required II",
+    "pitch": "A second designer, told nothing about direction 10, independently arrived at the same idea: every Vizuara book builds a model, so every cover is a model kit. This take is more pictorial. The book's real components are moulded as pictograms on a sprue, numbered in build order, and laid on a cutting mat ruled in true inches. Plastic colour names the field, Skill 1/2/3 squares give level, and the Charlie books are a gold-plated Factory Edition."
+  },
+  "22-open": {
+    "name": "Textmode (open brief)",
+    "pitch": "This designer was told only who Vizuara is and that the current covers are disliked. It chose to draw every cover in text: each picture is set in a monospaced font on a strict 120 × 74 character grid, like line-printer computer art, showing the real mechanism with real numbers (the causal attention matrix, 32 GPUs labelled with their mesh coordinates, the iris decision tree). A big Fraunces title leads. Colour family marks the subject and lightness marks the level."
+  },
+  "11-kolam": {
+    "name": "Pulli",
+    "pitch": "Every book gets a Tamil sikku kolam computed from the book itself. There is one dot (pulli) per capsule, laid out in the shape of the subject, and a single line weaves around them under the real kolam rules (45° runs, turns at the borders, never touching a dot, always closing). A real mirror-curve engine finds the turns: 5D Parallelism closes as five lines, Pi vs Hermes vs Codex as three. The ground gives level: ink on notebook paper, rice flour on red-oxide kaavi, rice flour on dark earth."
   }
 }

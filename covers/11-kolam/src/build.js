@@ -216,6 +216,8 @@ body{margin:0;color:${C.ink};font-family:'Anek Latin',sans-serif;font-stretch:10
 .section-h{max-width:1488px;margin:40px auto 0;padding:0;font:600 13px/1 'Anek Latin',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:${C.kaavi};display:flex;justify-content:space-between;border-top:2px solid ${C.ink};padding-top:14px}
 .section-h span:last-child{color:${C.ink};letter-spacing:.06em;text-transform:none;font-weight:500;font-size:15px}
 .covers{display:flex;flex-wrap:wrap;gap:56px 40px;padding:36px 0 24px;max-width:1520px;margin:0 auto;justify-content:center}
+.covers .cover{box-shadow:0 1px 2px rgba(40,30,20,.14),0 10px 28px rgba(40,30,20,.12)}
+.wrap{box-shadow:0 1px 2px rgba(40,30,20,.14),0 10px 28px rgba(40,30,20,.12)}
 .cap{width:720px;font-size:14px;line-height:1.45;margin-top:12px;color:#3b362f}
 .cap b{font-weight:600;color:${C.ink}}
 figure{margin:0}
@@ -265,6 +267,7 @@ figure{margin:0}
 .spine-pips .pips{flex-direction:column}
 .notes-foot{max-width:1488px;margin:24px auto 80px;padding:18px 0 0;font-size:14px;line-height:1.55;color:#3b362f}
 .notes-foot p{max-width:70em;margin:0 0 8px}
+@media print{.covers .cover,.wrap{box-shadow:none!important}}
 @media (max-width:900px){.intro{grid-template-columns:1fr}.intro h1{font-size:88px}}
 `;
 

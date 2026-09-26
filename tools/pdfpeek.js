@@ -3,8 +3,8 @@
 // and compare it with the cover's JPG render (renders/<slug>.jpg next to renders/pdf/<slug>.pdf).
 //   node tools/pdfpeek.js <file.pdf> [more.pdf ...] [--out-dir dir] [--scale 1]
 // Previews go to tools/.peek/<direction>/ unless --out-dir is given.
-// Prints the mean per-channel difference (0-255) against the JPG; above ~6 means the PDF
-// doesn't match what the screen render shows.
+// Prints the mean per-channel difference (0-255) against the JPG: ok (<6), ?? (6-12, look at the
+// preview; usually dense hairlines drawn heavier by pdf.js) or !! (>12, the PDF doesn't match).
 const { chromium } = require('/opt/node22/lib/node_modules/playwright');
 const { execFileSync } = require('child_process');
 const fs = require('fs');
@@ -63,9 +63,12 @@ function lib(name) {
     const out = path.join(dest, path.basename(f, '.pdf') + '.pdfpeek.png');
     await (await page.$('#c')).screenshot({ path: out });
     const sizeOk = Math.abs(info.w - 540) < 0.5 && Math.abs(info.h - 666) < 0.5;
-    const diffOk = info.diff === null || info.diff < 6;
+    // under 6: matches. 6-12: usually pdf.js drawing dense hairlines a touch heavier; look at the
+    // preview. Over 12: the PDF doesn't match the render (layout, missing or rasterised content).
+    const band = info.diff === null ? 'ok ' : info.diff < 6 ? 'ok ' : info.diff < 12 ? '?? ' : '!! ';
     const d = info.diff === null ? 'no jpg' : `diff ${info.diff.toFixed(1)}`;
-    console.log(`${sizeOk && diffOk && info.pages === 1 ? 'ok ' : '!! '} ${path.basename(f)}  ${info.pages} page(s)  ${(info.w / 72).toFixed(3)} x ${(info.h / 72).toFixed(3)} in  ${d}  -> ${out}`);
+    const status = !sizeOk || info.pages !== 1 ? '!! ' : band;
+    console.log(`${status} ${path.basename(f)}  ${info.pages} page(s)  ${(info.w / 72).toFixed(3)} x ${(info.h / 72).toFixed(3)} in  ${d}  -> ${out}`);
   }
   await browser.close();
 })().catch((e) => { console.error(e); process.exit(1); });

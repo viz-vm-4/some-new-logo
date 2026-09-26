@@ -31,7 +31,7 @@ body{font-family:'Anek Latin',system-ui,sans-serif;font-stretch:100%;font-size:1
 .sw span{display:block;font-size:12.5px;line-height:1.25;margin-top:5px;font-stretch:75%;font-weight:700;letter-spacing:.04em}
 .sw em{font-style:normal;font-weight:500;opacity:.8}
 .specimen{background:var(--paper);border:2px solid var(--coal);padding:14px 16px;margin-top:8px}
-.specimen .yt{font-family:Yellowtail;font-size:40px;line-height:1;color:var(--red)}
+.specimen .yt{font-family:Yellowtail;font-size:33px;line-height:1.1;color:var(--red);white-space:nowrap}
 .specimen .an{font-stretch:75%;font-weight:800;letter-spacing:.16em;font-size:15px}
 .specimen .dv{font-family:'Anek Devanagari';font-weight:600;font-size:24px;line-height:1.2}
 .legend{display:flex;gap:18px;align-items:center;margin-top:8px}
@@ -56,7 +56,7 @@ figcaption span:last-child{font-weight:500;letter-spacing:.02em;text-transform:n
     <div>
       <p class="kicker">Direction 14 · Vizuara Books cover system</p>
       <p class="lede"><b>Signboard.</b> Every Vizuara book is lettered like a Bombay shop board and labelled like a Sivakasi matchbox: one bespoke, hand-built display letter — outline, inline, split-colour fill and block shadow — painted on a flat enamel ground, with a printed label that carries the one object the book is about.</p>
-      <p class="lede">The street supplies the craft, the publisher supplies the discipline. The board colour tells you the shelf, the perforated stamp tells you the level, the label tells you the idea, and the imprint signs off quietly at the foot — in Latin and Devanagari at equal size, the way Maharashtra's shop-sign rule asks Marathi to stand beside English.</p>
+      <p class="lede">The street supplies the craft, the publisher supplies the discipline. The board colour tells you the shelf, the perforated stamp tells you the level, the label tells you the idea, and the imprint signs off quietly at the foot — in Latin and Devanagari at equal size, borrowing the Maharashtra shop-sign rule that Devanagari may never be smaller than English.</p>
       <div class="legend" id="legend"></div>
     </div>
   </div>
@@ -74,7 +74,7 @@ figcaption span:last-child{font-weight:500;letter-spacing:.02em;text-transform:n
       <h3>Level = the stamp</h3>
       <p>A perforated stamp pasted on the label's corner. It heats up with difficulty: <b>1</b> Chrome (Beginner), <b>2</b> Signal Red (Intermediate), <b>3</b> Coal (Advanced). Legible at 180px; survives greyscale because the three fields are light, mid and dark.</p>
       <h3 style="margin-top:18px">Grid</h3>
-      <p>24px safe edge, painted double rule at 16/25px, title board 58–436, label 96–624 × 470–788, imprint baseline 842.</p>
+      <p>24px safe edge, painted double rule at 16/25px, title board 58–428, label 96–624 × 470–788, stamp on the label's corner, imprint baseline 846.</p>
     </div>
     <div>
       <h3>Type</h3>
@@ -99,7 +99,406 @@ figcaption span:last-child{font-weight:500;letter-spacing:.02em;text-transform:n
   <p><b>Credits &amp; production.</b> Board Block is a code-drawn homage to the working method of Mumbai's sign painters, not a copy of any painter's hand. A production run should commission a working signboard painter to paint each series lockup (and the Vizuara imprint) by hand for the special editions and launch boards, credited on the copyright page by name and shop; and a Sivakasi label printer for a limited run of litho labels.</p>
 </section>
 
-<script src="board.js"></script>
+<script>
+/* ==========================================================================
+   BOARD BLOCK — a skeleton display alphabet for painted signboard lettering.
+   Every letter is a set of centre-lines (the painter's "skeleton"). Weight,
+   outline, inline and block shadow are all strokes of that same skeleton,
+   so the layered sign-painter treatment is exact vector at any size, and the
+   letter WIDTH can stretch or condense to fill a board, as painters do.
+   ========================================================================== */
+(function (root) {
+  const f = (n) => Math.round(n * 100) / 100;
+
+  // Polyline with per-vertex fillet radius -> SVG path data.
+  function poly(pts, closed) {
+    const P = pts.map((p) => ({ x: p[0], y: p[1], r: p[2] || 0 }));
+    const n = P.length;
+    let d = '';
+    const corner = (prev, c, next) => {
+      if (!c.r) return `L${f(c.x)} ${f(c.y)}`;
+      let ax = c.x - prev.x, ay = c.y - prev.y, bx = next.x - c.x, by = next.y - c.y;
+      const la = Math.hypot(ax, ay), lb = Math.hypot(bx, by);
+      ax /= la; ay /= la; bx /= lb; by /= lb;
+      const cos = Math.max(-1, Math.min(1, ax * bx + ay * by));
+      const D = Math.acos(cos);
+      if (D < 1e-3) return `L${f(c.x)} ${f(c.y)}`;
+      const t = Math.min(c.r * Math.tan(D / 2), la * 0.999, lb * 0.999);
+      const rr = t / Math.tan(D / 2);
+      const s = ax * by - ay * bx > 0 ? 1 : 0;
+      return `L${f(c.x - ax * t)} ${f(c.y - ay * t)}A${f(rr)} ${f(rr)} 0 0 ${s} ${f(c.x + bx * t)} ${f(c.y + by * t)}`;
+    };
+    if (!closed) {
+      d = `M${f(P[0].x)} ${f(P[0].y)}`;
+      for (let i = 1; i < n - 1; i++) d += corner(P[i - 1], P[i], P[i + 1]);
+      d += `L${f(P[n - 1].x)} ${f(P[n - 1].y)}`;
+    } else {
+      const a = P[n - 1], b = P[0];
+      const m = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+      d = `M${f(m.x)} ${f(m.y)}`;
+      for (let i = 0; i < n; i++) d += corner(P[(i - 1 + n) % n], P[i], P[(i + 1) % n]);
+      d += `L${f(m.x)} ${f(m.y)}Z`;
+    }
+    return d;
+  }
+  // shorten free ends (for the inline, which must stop short of terminals)
+  function trim(pts, fs, fe, k) {
+    const P = pts.map((p) => p.slice());
+    const cut = (a, b) => {
+      const dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy);
+      const kk = Math.min(k, l * 0.45);
+      a[0] += (dx / l) * kk; a[1] += (dy / l) * kk;
+    };
+    if (fs) cut(P[0], P[1]);
+    if (fe) cut(P[P.length - 1], P[P.length - 2]);
+    return P;
+  }
+
+  // relative widths (x base letter width u)
+  const W = {
+    A: 1.04, B: 1, C: 0.96, D: 1, E: 0.84, F: 0.82, G: 1, H: 1, I: 0, J: 0.9, K: 1.02, L: 0.82,
+    M: 1.36, N: 1.04, O: 1, P: 0.98, Q: 1, R: 1.0, S: 0.96, T: 0.92, U: 1, V: 1.04, W: 1.42,
+    X: 1.02, Y: 1.02, Z: 0.9, '0': 1, '1': 0.8, '2': 0.96, '3': 0.94, '4': 1.04, '5': 0.96,
+    '6': 0.98, '7': 0.9, '8': 1, '9': 0.98, '-': 0.62, '.': 0, ':': 0, "'": 0, '/': 0.8,
+  };
+
+  // Build one glyph. Returns {w, subs:[{pts,closed,fs,fe}]}
+  function glyph(ch, u, H, S) {
+    let w = W[ch] === 0 ? S : (W[ch] || 1) * u;
+    const L = S / 2, T = S / 2, B = H - S / 2;
+    let R = w - S / 2, C = w / 2;
+    const r = Math.max(0, Math.min(0.9 * S, (R - L) / 2 - 0.5));
+    const hwOf = (run) => (S / 2) * Math.hypot(run, H) / H;
+    const ext = S * 2;
+    const dg = (xt, xb) => { // diagonal from (xt,0) to (xb,H), extended past the band
+      const k = (xb - xt) / H;
+      return [[xt - k * ext, -ext], [xb + k * ext, H + ext]];
+    };
+    const subs = [];
+    const o = (pts, fs = true, fe = true) => subs.push({ pts, fs, fe });
+    const z = (pts) => subs.push({ pts, closed: true });
+    const ys = Math.max(T + r + S * 0.25, H * 0.3); // spur end for C, G, S, J, 2
+    switch (ch) {
+      case 'A': {
+        const d = u * 0.13; // half-width of the flat top
+        let hw = hwOf(C - d);
+        for (let i = 0; i < 3; i++) hw = hwOf(C - d - hw);
+        o(dg(C - d, hw)); o(dg(C + d, w - hw));
+        const yc = H * 0.66;
+        const xl = hw + (C - d - hw) * (1 - yc / H);
+        o([[xl, yc], [w - xl, yc]], false, false);
+        break;
+      }
+      case 'B': {
+        const Mb = H * 0.47, Rt = R - w * 0.07;
+        const r1 = Math.min(r, (Mb - T) / 2), r2 = Math.min(r, (B - Mb) / 2);
+        o([[L, Mb], [Rt, Mb, r1], [Rt, T, r1], [L, T], [L, B], [R, B, r2], [R, Mb, r2], [L, Mb]], false, false);
+        break;
+      }
+      case 'C':
+        o([[R, ys], [R, T, r], [L, T, r], [L, B, r], [R, B, r], [R, H - ys]]);
+        break;
+      case 'D':
+        z([[L, T], [R, T, r * 1.25], [R, B, r * 1.25], [L, B]]);
+        break;
+      case 'E':
+        o([[w, T], [L, T], [L, B], [w, B]]);
+        o([[L, H * 0.5], [w - u * 0.08, H * 0.5]], false, true);
+        break;
+      case 'F':
+        o([[w, T], [L, T], [L, H]]);
+        o([[L, H * 0.52], [w - u * 0.1, H * 0.52]], false, true);
+        break;
+      case 'G': {
+        const Mg = H * 0.54;
+        o([[R, ys], [R, T, r], [L, T, r], [L, B, r], [R, B, r], [R, Mg], [C - u * 0.02, Mg]]);
+        break;
+      }
+      case 'H':
+        o([[L, 0], [L, H]]); o([[R, 0], [R, H]]); o([[L, H * 0.5], [R, H * 0.5]], false, false);
+        break;
+      case 'I':
+        o([[C, 0], [C, H]]);
+        break;
+      case 'J':
+        o([[R, 0], [R, B, r], [L, B, r], [L, H - ys]]);
+        break;
+      case 'K': {
+        const ya = H * 0.64;
+        let hw = hwOf((w - L) * H / ya);
+        const xa = w - hw, ka = (xa - L) / ya;       // arm: stem (L,ya) -> top-right
+        o([[L, ya], [xa + ka * ext, -ext]], false, true);
+        const p = 0.42, xs = L + (xa - L) * p, yst = ya * (1 - p);
+        let hl = hwOf((w - xs) * H / (H - yst));
+        const kl = (w - hl - xs) / (H - yst);
+        o([[xs, yst], [w - hl + kl * ext, H + ext]], false, true);
+        o([[L, 0], [L, H]]);
+        break;
+      }
+      case 'L':
+        o([[L, 0], [L, B], [w, B]]);
+        break;
+      case 'M': {
+        const Vm = H * 0.5;
+        o([[L, H], [L, 0]]); o([[R, H], [R, 0]]);
+        const k = (C - L) / Vm;
+        o([[L - k * ext, -ext], [C, Vm], [R + k * ext, -ext]]);
+        break;
+      }
+      case 'N': {
+        let hw = hwOf(w - S);
+        for (let i = 0; i < 3; i++) hw = hwOf(w - 2 * hw);
+        o([[L, H], [L, 0]]); o([[R, 0], [R, H]]); o(dg(hw, w - hw));
+        break;
+      }
+      case 'O': case '0':
+        z([[L, T, r * 1.25], [R, T, r * 1.25], [R, B, r * 1.25], [L, B, r * 1.25]]);
+        break;
+      case 'P': {
+        const Mp = H * 0.56;
+        o([[L, H], [L, T], [R, T, r], [R, Mp, r], [L, Mp]], true, false);
+        break;
+      }
+      case 'Q':
+        z([[L, T, r * 1.25], [R, T, r * 1.25], [R, B, r * 1.25], [L, B, r * 1.25]]);
+        o([[C + u * 0.04, H * 0.66], [w + u * 0.02 + ext * 0.45, H + ext]], false, true);
+        break;
+      case 'R': {
+        const Mp = H * 0.54;
+        o([[L, H], [L, T], [R, T, r], [R, Mp, r], [L, Mp]], true, false);
+        let hw = hwOf(w - C);
+        o([[C - u * 0.06, Mp], [w - hw + ((w - hw - C) / (H - Mp)) * ext, H + ext]], false, true);
+        break;
+      }
+      case 'S': {
+        const Ms = H * 0.5;
+        const rs = Math.min(r, (Ms - T) / 2);
+        o([[R, ys], [R, T, rs], [L, T, rs], [L, Ms, rs], [R, Ms, rs], [R, B, rs], [L, B, rs], [L, H - ys]]);
+        break;
+      }
+      case 'T':
+        o([[0, T], [w, T]]); o([[C, T], [C, H]], false, true);
+        break;
+      case 'U':
+        o([[L, 0], [L, B, r], [R, B, r], [R, 0]]);
+        break;
+      case 'V': {
+        let hw = hwOf(C);
+        for (let i = 0; i < 3; i++) hw = hwOf(C - hw);
+        o(dg(hw, C)); o(dg(w - hw, C));
+        break;
+      }
+      case 'W': {
+        const Vm = H * 0.5;
+        o([[L, 0], [L, H]]); o([[R, 0], [R, H]]);
+        const k = (C - L) / Vm;
+        o([[L - k * ext, H + ext], [C, H - Vm], [R + k * ext, H + ext]]);
+        break;
+      }
+      case 'X': {
+        let hw = hwOf(w - S);
+        for (let i = 0; i < 3; i++) hw = hwOf(w - 2 * hw);
+        o(dg(hw, w - hw)); o(dg(w - hw, hw));
+        break;
+      }
+      case 'Y': {
+        const Ym = H * 0.52;
+        let hw = hwOf(C);
+        const k = (C - hw) / Ym;
+        o([[hw - k * ext, -ext], [C, Ym], [w - hw + k * ext, -ext]]);
+        o([[C, Ym], [C, H]], false, true);
+        break;
+      }
+      case 'Z': {
+        let hw = hwOf(w - S);
+        for (let i = 0; i < 3; i++) hw = hwOf(w - 2 * hw);
+        o([[0, T], [w, T]]); o([[0, B], [w, B]]); o(dg(w - hw, hw));
+        break;
+      }
+      case '1': {
+        const x1 = C + S * 0.15;
+        o([[x1 - u * 0.36, T + S * 0.15], [x1, T + S * 0.15], [x1, B]], true, false);
+        o([[C - u * 0.34, B], [C + u * 0.34, B]]);
+        break;
+      }
+      case '2': {
+        const M2 = H * 0.52, r2 = Math.min(r, (M2 - T) / 2);
+        o([[L, ys], [L, T, r2], [R, T, r2], [R, M2, r2], [L, M2, r2], [L, B], [w, B]]);
+        break;
+      }
+      case '3': {
+        const M3 = H * 0.47, Rt = R - w * 0.08;
+        const r1 = Math.min(r, (M3 - T) / 2), r2 = Math.min(r, (B - M3) / 2);
+        o([[0, T], [Rt, T, r1], [Rt, M3, r1], [C - u * 0.1, M3]]);
+        o([[C - u * 0.1, M3], [R, M3, r2], [R, B, r2], [0, B]]);
+        break;
+      }
+      case '4': {
+        const Y4 = H * 0.64, R4 = R - u * 0.1;
+        o([[L, 0], [L, Y4], [w, Y4]]);
+        o([[R4, H * 0.3], [R4, H]]);
+        break;
+      }
+      case '5': {
+        const M5 = H * 0.46, r5 = Math.min(r, (B - M5) / 2);
+        o([[w, T], [L, T], [L, M5], [R, M5, r5], [R, B, r5], [0, B]]);
+        break;
+      }
+      case '6': {
+        const M6 = H * 0.47, r6 = Math.min(r, (B - M6) / 2);
+        o([[w, T], [L, T, r], [L, B, r6], [R, B, r6], [R, M6, r6], [L, M6]], true, false);
+        break;
+      }
+      case '7': {
+        let hw = hwOf(w * 0.5);
+        o([[0, T], [w, T]]);
+        o(dg(w - hw, C - u * 0.06));
+        break;
+      }
+      case '8': {
+        const M8 = H * 0.47, d = u * 0.06;
+        const r1 = Math.min(r, (M8 - T) / 2), r2 = Math.min(r, (B - M8) / 2);
+        z([[L + d, T, r1], [R - d, T, r1], [R - d, M8, r1], [L + d, M8, r1]]);
+        z([[L, M8, r2], [R, M8, r2], [R, B, r2], [L, B, r2]]);
+        break;
+      }
+      case '9': {
+        const M9 = H * 0.53, r9 = Math.min(r, (M9 - T) / 2);
+        o([[0, B], [R, B, r], [R, T, r9], [L, T, r9], [L, M9, r9], [R, M9]], true, false);
+        break;
+      }
+      case '-':
+        o([[0, H * 0.56], [w, H * 0.56]]);
+        break;
+      case '.':
+        o([[C, H - S * 1.05], [C, H]]);
+        break;
+      case ':':
+        o([[C, H * 0.3], [C, H * 0.3 + S * 1.05]]); o([[C, H - S * 1.05], [C, H]]);
+        break;
+      case "'":
+        o([[C, 0], [C, S * 1.4]]);
+        break;
+      case '/': {
+        let hw = hwOf(w - S);
+        o(dg(w - hw, hw));
+        break;
+      }
+      default:
+        break;
+    }
+    return { w, subs };
+  }
+
+  // weight rule: heavy, but condensed letters get lighter so counters stay open
+  const weight = (u, H) => Math.min(0.2 * H, 0.33 * u);
+
+  // optical spacing: air each glyph leaves on its right / left side, in three bands
+  // (top, middle, bottom) x u. A pair is kerned by half the narrowest combined band.
+  const OPEN_R = { T: [0, 0.4, 0.4], L: [0.55, 0.55, 0], F: [0, 0.1, 0.55], P: [0, 0, 0.45], Y: [0, 0.3, 0.4],
+    V: [0, 0.15, 0.35], '7': [0, 0.2, 0.35], A: [0.3, 0.12, 0], K: [0, 0.3, 0], E: [0, 0.08, 0], '1': [0.2, 0.2, 0] };
+  const OPEN_L = { T: [0, 0.4, 0.4], A: [0.3, 0.12, 0], J: [0.55, 0.55, 0], V: [0, 0.15, 0.35], Y: [0, 0.3, 0.4], X: [0, 0.2, 0] };
+  const kern = (a, b) => {
+    const r = OPEN_R[a], l = OPEN_L[b];
+    if (!r && !l) return 0;
+    const R = r || [0, 0, 0], Lf = l || [0, 0, 0];
+    return Math.min(0.25, 0.5 * Math.min(R[0] + Lf[0], R[1] + Lf[1], R[2] + Lf[2]));
+  };
+  function layout(text, u, H, opt) {
+    const S = weight(u, H);
+    const gap = (opt.track != null ? opt.track : 0.5) * S + 0.012 * H;
+    let x = 0, prev = null;
+    const pos = [];
+    for (const ch of text) {
+      if (ch === ' ') { x += u * (opt.space || 0.5); prev = null; continue; }
+      if (prev) x += gap - kern(prev, ch) * u;
+      pos.push([ch, x]);
+      x += W[ch] === 0 ? S : (W[ch] || 1) * u;
+      prev = ch;
+    }
+    return { pos, w: x, S };
+  }
+  function lineWidth(text, u, H, opt) { return layout(text, u, H, opt).w; }
+  // Solve base width u so the line fills `measure`, within [rmin,rmax]*H.
+  function fit(text, H, measure, opt = {}) {
+    const rmin = opt.rmin || 0.36, rmax = opt.rmax || 0.72;
+    let lo = rmin * H, hi = rmax * H;
+    if (lineWidth(text, hi, H, opt) <= measure) return { u: hi, H };
+    if (lineWidth(text, lo, H, opt) > measure) {
+      // too long even condensed: drop the cap height
+      let h1 = H;
+      while (h1 > 8 && lineWidth(text, rmin * h1, h1, opt) > measure) h1 *= 0.97;
+      return { u: rmin * h1, H: h1 };
+    }
+    for (let i = 0; i < 40; i++) {
+      const mid = (lo + hi) / 2;
+      if (lineWidth(text, mid, H, opt) > measure) hi = mid; else lo = mid;
+    }
+    return { u: lo, H };
+  }
+
+  let UID = 0;
+  /* Paint a line of Board Block lettering. Returns {svg, w, h}. Origin = top-left of cap box.
+     st: {fillTop, fillBot, split, outline, o, shadow, depth, inline, halo, h}  (colours + sizes) */
+  function paint(text, u, H, st, opt = {}) {
+    const id = 'bb' + (UID++);
+    const L0 = layout(text, u, H, opt), S = L0.S;
+    let geo = '', inl = '';
+    const ins = S * 0.55;
+    for (const [ch, x] of L0.pos) {
+      const g = glyph(ch, u, H, S);
+      let d = '', di = '';
+      for (const s of g.subs) {
+        d += poly(s.pts, s.closed);
+        di += s.closed ? poly(s.pts, true) : poly(trim(s.pts, s.fs, s.fe, ins), false);
+      }
+      geo += `<path transform="translate(${f(x)} 0)" d="${d}"/>`;
+      inl += `<path transform="translate(${f(x)} 0)" d="${di}"/>`;
+    }
+    const w = L0.w;
+    const o = st.o != null ? st.o : Math.max(1.6, S * 0.13);
+    const depth = st.depth != null ? st.depth : S * 0.55;
+    const halo = st.halo ? (st.h != null ? st.h : Math.max(1.4, S * 0.1)) : 0;
+    const t = st.t != null ? st.t : Math.max(1.1, S * 0.1);
+    const dirx = st.dx != null ? st.dx : 1, diry = st.dy != null ? st.dy : 1;
+    const big = 99999;
+    const band = (a, b) => `<rect x="${-big}" y="${f(a)}" width="${2 * big}" height="${f(b - a)}"/>`;
+    let s = `<defs>`;
+    s += `<g id="${id}g">${geo}</g><g id="${id}i">${inl}</g>`;
+    s += `<clipPath id="${id}cf" clipPathUnits="userSpaceOnUse">${band(0, H)}</clipPath>`;
+    s += `<clipPath id="${id}co" clipPathUnits="userSpaceOnUse">${band(-o, H + o)}</clipPath>`;
+    s += `<clipPath id="${id}ch" clipPathUnits="userSpaceOnUse">${band(-o - halo, H + o + halo)}</clipPath>`;
+    s += `<clipPath id="${id}ci" clipPathUnits="userSpaceOnUse">${band(S / 2 - t, H - S / 2 + t)}</clipPath>`;
+    const split = st.split != null ? st.split : 0.5;
+    s += `<linearGradient id="${id}sp" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="${f(H)}">` +
+      `<stop offset="${split}" stop-color="${st.fillTop}"/><stop offset="${split}" stop-color="${st.fillBot || st.fillTop}"/></linearGradient>`;
+    s += `</defs>`;
+    const U = (ref, stroke, sw, clip, tx = 0, ty = 0) =>
+      `<use href="#${ref}" ${tx || ty ? `transform="translate(${f(tx)} ${f(ty)})"` : ''} stroke="${stroke}" stroke-width="${f(sw)}" clip-path="url(#${clip})"/>`;
+    s += `<g fill="none" stroke-linejoin="miter" stroke-miterlimit="12" stroke-linecap="butt">`;
+    const step = Math.max(0.5, depth / Math.ceil(depth / 0.9));
+    // halo around letter + shadow
+    if (halo) {
+      for (let k = 0; k <= depth + 0.01; k += step) s += U(id + 'g', st.halo, S + 2 * o + 2 * halo, id + 'ch', k * dirx, k * diry);
+    }
+    if (depth > 0) {
+      // shadow keyline then shadow body
+      for (let k = step; k <= depth + 0.01; k += step) s += U(id + 'g', st.outline, S + 2 * o, id + 'co', k * dirx, k * diry);
+      if (st.shadow && st.shadow !== st.outline) {
+        for (let k = step; k <= depth - o * 0.7 + 0.01; k += step) s += U(id + 'g', st.shadow, S, id + 'cf', k * dirx, k * diry);
+      }
+    }
+    s += U(id + 'g', st.outline, S + 2 * o, id + 'co');
+    s += U(id + 'g', `url(#${id}sp)`, S, id + 'cf');
+    if (st.inline && S >= 7.5) s += U(id + 'i', st.inline, t, id + 'ci');
+    s += `</g>`;
+    return { svg: s, w, h: H, S, o, depth, halo };
+  }
+
+  root.Board = { glyph, poly, fit, paint, lineWidth, weight, W };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
 <script>
 /* ==========================================================================
    SIGNBOARD — the cover system
@@ -136,7 +535,7 @@ const LEVEL = {
 };
 
 const ctx2d = document.createElement('canvas').getContext('2d');
-const textW = (t, font) => { ctx2d.font = font; return ctx2d.measureText(t).width; };
+const textW = (t, font, stretch='normal') => { ctx2d.font = font; try { ctx2d.fontStretch = stretch; } catch(e) {} const w = ctx2d.measureText(t).width; try { ctx2d.fontStretch = 'normal'; } catch(e) {} return w; };
 const esc = (s) => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
 const F = (n) => Math.round(n*100)/100;
 let SEQ = 0; const uid = (p='u') => p + (SEQ++);
@@ -161,7 +560,7 @@ function tradeStyle(sh, H){
 // an acronym tag: the sign-painter's small cartouche ("Regd.", "Estd.") used for (LLMs), (DeiT) ...
 function tagPiece(txt, H, sh){
   const size = H*0.4, pad = size*0.55;
-  const w = textW(txt, `800 ${size}px "Anek Latin"`) * 0.86 + pad*2, h = size*1.3;
+  const w = textW(txt, `800 ${size}px "Anek Latin"`, 'condensed') + txt.length*size*0.04 + pad*2, h = size*1.3;
   const y0 = H*0.5 - h/2;
   const svg = `<rect x="${F(2)}" y="${F(y0+3)}" width="${F(w)}" height="${F(h)}" rx="${F(h/2)}" fill="${P.coal}"/>
     <rect x="0" y="${F(y0)}" width="${F(w)}" height="${F(h)}" rx="${F(h/2)}" fill="${sh.tag}" stroke="${P.coal}" stroke-width="${F(Math.max(2,H*0.035))}"/>
@@ -253,7 +652,7 @@ function label(book, sh, x, y, w, h){
   const foot = `${book.capsules ? `CONTENTS&#8195;${book.capsules} CAPSULES&#8194;·&#8194;${book.hours} HOUR${book.hours===1?'':'S'}` : 'CONTENTS&#8195;IN PREPARATION'}`;
   return `<g transform="translate(${x} ${y})">
     <defs><clipPath id="${id}"><rect x="${px}" y="${py}" width="${pw}" height="${ph}"/></clipPath></defs>
-    <path d="${notchRect(3,4,w,h,16)}" fill="${P.coal}" opacity=".45"/>
+    <path d="${notchRect(3,4,w,h,16)}" fill="${P.coal}" fill-opacity=".45"/>
     <path d="${notchRect(0,0,w,h,16)}" fill="${P.paper}" stroke="${P.coal}" stroke-width="3"/>
     <path d="${notchRect(5,5,w-10,h-10,12)}" fill="none" stroke="${P.coal}" stroke-width="1.2"/>
     <g transform="translate(${px + 12} ${F((capH-cap.H)/2+2)})">${capP.svg}</g>
@@ -274,16 +673,22 @@ function label(book, sh, x, y, w, h){
 /* ---------- level stamp (perforated) ---------- */
 function stamp(level, x, y){
   const Lv = LEVEL[level], w = 84, h = 104, pr = 4.2, step = 10.5;
-  const id = uid('st');
-  let holes = '';
-  for (let i = step/2; i < w; i += step) holes += `<circle cx="${F(i)}" cy="0" r="${pr}"/><circle cx="${F(i)}" cy="${h}" r="${pr}"/>`;
-  for (let j = step/2; j < h; j += step) holes += `<circle cx="0" cy="${F(j)}" r="${pr}"/><circle cx="${w}" cy="${F(j)}" r="${pr}"/>`;
+  // perforated outline as one vector path: walk the edges, biting a half-hole at each perforation
+  const bites = (len) => { const c = []; for (let i = step/2; i < len; i += step) c.push(i); return c; };
+  let d = 'M0 0';
+  bites(w).forEach((c) => d += `L${F(c-pr)} 0A${pr} ${pr} 0 0 0 ${F(c+pr)} 0`);
+  d += `L${w} 0`;
+  bites(h).forEach((c) => d += `L${w} ${F(c-pr)}A${pr} ${pr} 0 0 0 ${w} ${F(c+pr)}`);
+  d += `L${w} ${h}`;
+  bites(w).reverse().forEach((c) => d += `L${F(c+pr)} ${h}A${pr} ${pr} 0 0 0 ${F(c-pr)} ${h}`);
+  d += `L0 ${h}`;
+  bites(h).reverse().forEach((c) => d += `L0 ${F(c+pr)}A${pr} ${pr} 0 0 0 0 ${F(c-pr)}`);
+  d += 'Z';
   const num = Board.fit(String(level), 48, 60, {rmax:0.72});
   const nP = Board.paint(String(level), num.u, num.H, {fillTop:Lv.num, outline:Lv.field, o:0, depth:0});
   return `<g transform="translate(${x} ${y})">
-    <defs><mask id="${id}" maskUnits="userSpaceOnUse" x="-10" y="-10" width="${w+24}" height="${h+24}"><rect x="-10" y="-10" width="${w+24}" height="${h+24}" fill="#fff"/><g fill="#000">${holes}</g></mask></defs>
-    <rect x="3" y="4" width="${w}" height="${h}" fill="${P.coal}" opacity=".45" mask="url(#${id})"/>
-    <rect width="${w}" height="${h}" fill="${P.paper}" mask="url(#${id})"/>
+    <path d="${d}" transform="translate(3 4)" fill="${P.coal}" fill-opacity=".45"/>
+    <path d="${d}" fill="${P.paper}"/>
     <rect x="8" y="8" width="${w-16}" height="${h-16}" fill="${Lv.field}" stroke="${P.coal}" stroke-width="1.5"/>
     <text x="${w/2}" y="24" text-anchor="middle" ${ANEK} font-weight="800" font-size="11" letter-spacing="2.2" fill="${Lv.num}">LEVEL</text>
     <g transform="translate(${F((w-nP.w)/2)} 31)">${nP.svg}</g>
@@ -344,7 +749,7 @@ const R_ = (x,y,w,h,fill,sw=K,extra='') => `<rect x="${F(x)}" y="${F(y)}" width=
 const C_ = (x,y,r,fill,sw=K) => `<circle cx="${F(x)}" cy="${F(y)}" r="${F(r)}" fill="${fill}" stroke="${P.coal}" stroke-width="${sw}"/>`;
 const Ln = (x1,y1,x2,y2,sw=K,col=P.coal,extra='') => `<line x1="${F(x1)}" y1="${F(y1)}" x2="${F(x2)}" y2="${F(y2)}" stroke="${col}" stroke-width="${sw}" ${extra}/>`;
 const tagT = (x,y,t,anchor='middle',size=14) => {
-  const w = textW(t, `800 ${size}px "Anek Latin"`)*0.8 + 14, h = size + 9;
+  const w = textW(t, `800 ${size}px "Anek Latin"`, 'condensed') + t.length*1.2 + 14, h = size + 9;
   const x0 = anchor==='middle' ? x - w/2 : anchor==='end' ? x - w : x;
   return `<rect x="${F(x0)}" y="${F(y - h/2)}" width="${F(w)}" height="${F(h)}" fill="${P.paper}" stroke="${P.coal}" stroke-width="2.4"/>
     <text x="${F(x0 + w/2)}" y="${F(y + size*0.36)}" text-anchor="middle" ${ANEK} font-weight="800" font-size="${size}" letter-spacing="1.2" fill="${P.coal}">${t}</text>`;
@@ -448,7 +853,7 @@ const EMBLEM = {
     for (let i=0;i<n;i++) for (let j=0;j<n;j++) {
       const x = gx + j*c, y = gy + i*c;
       if (j <= i) s += R_(x, y, c, c, col[wt[i][j]], 2.2);
-      else s += R_(x, y, c, c, P.chuna, 2.2) + Ln(x+7, y+c-7, x+c-7, y+7, 2.4, P.coal, 'opacity=".6"');
+      else s += R_(x, y, c, c, P.chuna, 2.2) + Ln(x+7, y+c-7, x+c-7, y+7, 2.4, P.coal, 'stroke-opacity=".6"');
     }
     for (let i=0;i<n;i++) s += R_(gx - 44, gy + i*c + 3, 24, c-6, i===n-1?P.yellow:P.paper, 2.2);
     const tx = gx + n*c + 70, ty = gy + n*c - 40;
@@ -629,7 +1034,7 @@ const EMBLEM = {
      the value each is believed to pay, and the arm being pulled. */
   bandit(pw, ph){
     let s = '';
-    const n = 3, bw = 96, bh = 128, gap = 50, gx = pw/2 - (n*bw + (n-1)*gap + 26)/2, top = 36, base = top + bh;
+    const n = 3, bw = 96, bh = 128, gap = 50, gx = pw/2 - (n*bw + (n-1)*gap + 26)/2, top = 48, base = top + bh;
     const val = [0.45, 0.85, 0.3], pulled = 1;
     const sym = [[P.red,P.yellow,P.red],[P.yellow,P.yellow,P.yellow],[P.blue,P.red,P.paper]];
     s += R_(gx - 18, base - 4, n*bw + (n-1)*gap + 62, 22, P.coal, 0);
@@ -648,7 +1053,7 @@ const EMBLEM = {
       s += Ln(pxl + 8, pyl, ex, ey, 5) + C_(ex, ey, 9, P.red);
     }
     const px = gx + pulled*(bw+gap) + bw + 26;
-    s += tagT(px + 6, top + 124, 'PULL', 'start', 13);
+    s += tagT(px - 2, base + 34, 'PULL', 'middle', 13) + Ln(px - 2, base + 22, px - 2, base + 18, 3);
     return {svg:s, center:[pw/2, top + 60], rays:44};
   },
 
@@ -750,6 +1155,70 @@ const EMBLEM = {
     s += `<path d="M150 ${my}C 178 ${my}, 166 12, ${dx - 30} 12 S ${dx} 12, ${dx} ${oy - 12}" fill="none" stroke="${P.red}" stroke-width="5" stroke-dasharray="10 6"/>` + arrowHead(dx, oy - 1, Math.PI/2, 15, P.red);
     return {svg:s, center:[tx0 + st, oy + 10], rays:44};
   },
+  /* RAG in Production — retrieval: a query goes to the card catalogue, the top
+     three cards come up, and query and cards travel on together as the prompt. */
+  catalogue(pw, ph){
+    let s = '';
+    const qx = 18, qy = ph/2 - 20;
+    s += R_(qx, qy, 84, 58, P.paper);
+    for (let k=0;k<3;k++) s += Ln(qx + 10, qy + 16 + k*13, qx + 74 - k*14, qy + 16 + k*13, 3);
+    s += tagT(qx + 42, qy - 20, 'QUERY', 'middle', 13);
+    s += arrow(qx + 90, qy + 29, qx + 124, qy + 29, 4.5);
+    // the card catalogue drawer
+    const dx = 150, dw = 186, dy = ph - 96, dh = 72;
+    const n = 11, cw = 12, cg = (dw - 24 - n*cw)/(n-1), top3 = [2, 5, 8];
+    for (let i=0;i<n;i++) {
+      const x = dx + 12 + i*(cw+cg), up = top3.includes(i);
+      const y = up ? dy - 92 : dy - 34;
+      s += R_(x, y, cw, dy + 20 - y, P.paper, 2.4);
+      if (up) s += R_(x - 3, y - 12, cw + 6, 14, P.red, 2.4);
+    }
+    s += R_(dx, dy, dw, dh, P.yellow);
+    s += R_(dx + dw/2 - 26, dy + 18, 52, 22, P.paper, 2.4) + R_(dx + dw/2 - 12, dy + 46, 24, 10, P.coal, 0);
+    s += tagT(dx + dw/2, dy - 116, 'TOP 3', 'middle', 13);
+    s += arrow(dx + dw + 8, ph/2 - 10, dx + dw + 40, ph/2 - 10, 4.5);
+    // query + cards, bundled as the prompt
+    const bx = dx + dw + 50, by = ph/2 - 70;
+    for (let k=2;k>=0;k--) s += R_(bx + 8 + k*10, by + 44 + k*12, 72, 58, P.paper, 2.4) + R_(bx + 8 + k*10 + 60, by + 44 + k*12 - 6, 14, 12, P.red, 2);
+    s += R_(bx, by + 6, 84, 44, P.paper, 2.6);
+    for (let k=0;k<2;k++) s += Ln(bx + 10, by + 20 + k*12, bx + 70 - k*16, by + 20 + k*12, 3);
+    s += tagT(bx + 48, by + 44 + 24 + 58 + 18, 'PROMPT', 'middle', 13);
+    return {svg:s, center:[dx + dw/2, dy - 30], rays:44};
+  },
+
+  /* VLA & World Models — see, read, act: a camera watches, an instruction is given,
+     the arm reaches; the dashed ghost is the world model's guess at the next state. */
+  armWorld(pw, ph){
+    let s = '';
+    const ty = ph - 40;
+    s += R_(96, ty, pw - 150, 12, P.coal, 0);
+    // camera and its view
+    const cx = 44, cy = 116;
+    s += `<path d="M${cx+22} ${cy}L318 ${ty-14}M${cx+22} ${cy}L360 ${ty-40}" stroke="${P.coal}" stroke-width="2.6" stroke-dasharray="5 5"/>`;
+    s += R_(cx - 22, cy - 18, 40, 36, P.coal, 0) + C_(cx + 14, cy, 12, P.blue, 3) + C_(cx + 14, cy, 4, P.paper, 0);
+    s += Ln(cx - 2, cy + 18, cx - 2, ty + 10, 4);
+    // the instruction
+    s += tagT(20, 22, 'PICK UP THE RED BLOCK', 'start', 13);
+    // the block
+    s += R_(322, ty - 34, 34, 34, P.red);
+    const arm = (Sx, Sy, Ex, Ey, Wx, Wy, ghost) => {
+      if (ghost) return `<path d="M${Sx} ${Sy}L${Ex} ${Ey}L${Wx} ${Wy}" fill="none" stroke="${P.paper}" stroke-width="16" stroke-linejoin="round" stroke-dasharray="8 7"/>` + C_(Ex, Ey, 9, 'none', 2.6) ;
+      let a = `<path d="M${Sx} ${Sy}L${Ex} ${Ey}L${Wx} ${Wy}" fill="none" stroke="${P.coal}" stroke-width="26" stroke-linejoin="round" stroke-linecap="round"/>`;
+      a += `<path d="M${Sx} ${Sy}L${Ex} ${Ey}L${Wx} ${Wy}" fill="none" stroke="${P.yellow}" stroke-width="19" stroke-linejoin="round" stroke-linecap="round"/>`;
+      a += C_(Ex, Ey, 11, P.paper) + C_(Wx, Wy, 9, P.paper);
+      // gripper
+      a += R_(Wx - 18, Wy + 10, 36, 10, P.coal, 0) + R_(Wx - 18, Wy + 10, 7, 30, P.coal, 0) + R_(Wx + 11, Wy + 10, 7, 30, P.coal, 0);
+      return a;
+    };
+    const Sx = 170, Sy = ty - 34;
+    s += arm(Sx, Sy, 268, 84, 339, 128, true);
+    s += `<path d="M321 138h36M321 138v26M357 138v26" fill="none" stroke="${P.paper}" stroke-width="6" stroke-dasharray="5 4"/>`;
+    s += tagT(372, 112, 'PREDICTED', 'start', 12);
+    s += `<path d="M${Sx-34} ${ty}L${Sx-22} ${Sy+8}H${Sx+22}L${Sx+34} ${ty}Z" fill="${P.coal}"/>`;
+    s += arm(Sx, Sy, 206, 62, 300, 52, false);
+    s += C_(Sx, Sy, 14, P.red);
+    return {svg:s, center:[250, 110], rays:44};
+  },
 };
 
 /* ==========================================================================
@@ -780,6 +1249,10 @@ const RANGE = [
     title:[{mix:[{t:'CHARLIE', r:0.56},{s:'and the'}], H:54},{t:'REASONING', H:96},{t:'ROOM', H:96, rmax:0.74},{tr:'FROM BANDITS TO REASONING MODELS', H:24, m:450}]},
   {slug:'deit-from-scratch', shelf:'vision', level:3, capsules:42, hours:10, emblem:'distill', cap:'THE DISTILLATION TOKEN',
     title:[{t:'BUILD A DATA-EFFICIENT', H:52},{t:'IMAGE', H:96},{t:'TRANSFORMER', H:96},{mix:[{tag:'DeiT'},{s:'from'},{t:'SCRATCH', r:0.6}], H:46}]},
+  {slug:'rag-in-production', shelf:'language', level:2, capsules:42, hours:10, emblem:'catalogue', cap:'THE CARD CATALOGUE',
+    title:[{t:'RAG', H:196, rmax:0.9},{mix:[{s:'in'},{t:'PRODUCTION', r:0.56}], H:84}]},
+  {slug:'vla-world-models', shelf:'vision', level:3, capsules:42, hours:10, emblem:'armWorld', cap:'THE ARM AND ITS WORLD MODEL',
+    title:[{t:'VISION-LANGUAGE-ACTION', H:60},{mix:[{s:'&'},{t:'WORLD MODELS', r:0.54}], H:92},{mix:[{s:'for'},{tt:'ROBOTICS', r:0.52}], H:44}]},
   {slug:'sql-masterclass', shelf:'foundations', level:1, capsules:36, hours:8, emblem:'join', cap:'THE INNER JOIN',
     title:[{t:'SQL', H:190, rmax:0.9},{t:'MASTERCLASS', H:84}]},
   {slug:'kernel-engineering', shelf:'systems', level:3, soon:true, emblem:'tiledMatmul', cap:'THE TILED MATMUL',
@@ -870,7 +1343,7 @@ function buildWrap(){
     <text x="${W/2}" y="292" text-anchor="middle" font-family="Anek Latin" font-weight="500" font-size="19" fill="${sh.ink}">and the curated window it is packed into, on a token budget.</text>
     ${rate}
     <rect x="${W - 48 - 170}" y="700" width="170" height="96" fill="${P.paper}" stroke="${P.coal}" stroke-width="2.5"/>
-    <text x="${W - 48 - 85}" y="754" text-anchor="middle" ${ANEK} font-weight="700" font-size="13" letter-spacing="2" fill="${P.coal}" opacity=".75">ISBN / BARCODE</text>
+    <text x="${W - 48 - 85}" y="754" text-anchor="middle" ${ANEK} font-weight="700" font-size="13" letter-spacing="2" fill="${P.coal}" fill-opacity=".75">ISBN / BARCODE</text>
     <text x="48" y="740" font-family="Anek Latin" font-weight="700" font-size="17" letter-spacing="1" fill="${sh.ink}">books.vizuara.ai</text>
     <text x="48" y="768" ${ANEK} font-weight="700" font-size="14" letter-spacing="3" fill="${sh.ink}">LETTERED IN BOMBAY BOARD BLOCK · MADE IN INDIA</text>
     ${imprint(sh, 48, 846)}

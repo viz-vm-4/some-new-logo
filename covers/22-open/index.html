@@ -92,7 +92,7 @@
   .wrap .back { width:720px; }
   .wrap .spine { width:var(--sp); border-left:1px dashed color-mix(in srgb, var(--B) 30%, transparent); border-right:1px dashed color-mix(in srgb, var(--B) 30%, transparent); }
   .wrap .fold { position:absolute; width:1px; height:20px; background:var(--pageInk); }
-  .spine .sm { position:absolute; left:50%; top:30px; transform:translateX(-50%); }
+  .spine .sm { position:absolute; left:50%; top:36px; transform:translateX(-50%); }
   .spine .st { position:absolute; left:50%; top:88px; transform:translateX(-50%); writing-mode:vertical-rl; white-space:nowrap;
                font:640 25px/1 'Fraunces', serif; font-variation-settings:'opsz' 72; letter-spacing:-.01em; }
   .spine .st .soft { font-weight:420; font-style:italic; }
@@ -107,7 +107,12 @@
   .back .imprint { position:absolute; left:36px; right:36px; top:30px; display:flex; align-items:center; gap:10px;
                    font:700 11px/1 'JetBrains Mono', monospace; letter-spacing:.14em; text-transform:uppercase; }
   .back .foot { position:absolute; left:36px; right:36px; bottom:30px; display:flex; justify-content:space-between; font:700 11px/1 'JetBrains Mono', monospace; letter-spacing:.14em; text-transform:uppercase; }
-  .wrapcap { font-size:12px; color:var(--muted); }
+  .wrapcap { margin-top:40px; font-size:12px; color:var(--muted); }
+  .back .toks { position:absolute; left:36px; right:36px; top:300px; display:flex; flex-wrap:wrap; gap:6px; font:700 11px/1 'JetBrains Mono', monospace; }
+  .back .toks span { padding:7px 7px; background:var(--faint); }
+  .back .toks span.n { background:var(--B); color:var(--ground); }
+  .back .toks span.p { background:var(--A); color:var(--B); }
+  .back .toks em { font-style:normal; padding:7px 2px; }
 </style>
 </head>
 <body>
@@ -129,7 +134,7 @@
     <div><span class="kick">04 &middot; Level</span><b>Lightness is the level</b><p>Beginner books are printed on the family&rsquo;s paper, intermediate on its vivid, advanced on its deep. The other two inks draw the figure. The level stays visible in greyscale and at thumbnail size, and the meter in the corner spells it out.</p></div>
   </section>
 
-  <h2 class="sec"><span class="n">A</span>Palette<span class="d">Eight families &times; three inks, defined in OKLCH so every family's paper, vivid and deep sit at the same lightness. That is what makes level a lightness.</span></h2>
+  <h2 class="sec"><span class="n">A</span>Palette<span class="d">Eight families &times; three inks, defined in OKLCH so each level's ground sits at nearly the same lightness in every family (paper L&thinsp;.95, vivid L&thinsp;.60&ndash;.71, deep L&thinsp;.26&ndash;.30). That is what makes level a lightness.</span></h2>
   <div class="pal" id="palette"></div>
 
   <h2 class="sec"><span class="n">B</span>Type &amp; mark</h2>
@@ -201,8 +206,8 @@ const FAM = {
   vision:  { label: 'Vision & multimodal',  h: 305, paper: [.955, .020], vivid: [.60, .13],  deep: [.26, .075] },
   sys:     { label: 'Systems & scale',      h: 212, paper: [.955, .015], vivid: [.64, .085], deep: [.27, .045] },
   agents:  { label: 'Agents & context',     h: 152, paper: [.955, .025], vivid: [.67, .12],  deep: [.28, .055] },
-  rl:      { label: 'RL & robotics',        h: 82,  paper: [.96,  .030], vivid: [.74, .135], deep: [.30, .045] },
-  code:    { label: 'Code & data',          h: 122, paper: [.955, .028], vivid: [.70, .085], deep: [.28, .045] },
+  rl:      { label: 'RL & robotics',        h: 82,  paper: [.96,  .030], vivid: [.71, .13], deep: [.30, .045] },
+  code:    { label: 'Code & data',          h: 122, paper: [.955, .028], vivid: [.68, .085], deep: [.28, .045] },
   factory: { label: 'The Intelligence Factory', h: 58, paper: [.95, .025], vivid: [.62, .085], deep: [.26, .04] },
 };
 for (const k in FAM) { const f = FAM[k]; f.P = oklch(f.paper[0], f.paper[1], f.h); f.V = oklch(f.vivid[0], f.vivid[1], f.h); f.D = oklch(f.deep[0], f.deep[1], f.h); }
@@ -806,6 +811,7 @@ function buildWrap(b) {
       `<div class="imprint">${markSVG(K.B, K.ground)}<span>Vizuara Books</span></div>` +
       `<div class="bk">${title.replace(/<[^>]+>/g, '')}</div>` +
       `<p class="q">The model reads one token at a time and writes the next.</p>` +
+      `<div class="toks">${'The model reads one token at a time and writes the'.split(' ').map((t) => `<span>${t}</span>`).join('')}<span class="n">next</span><em>-&gt;</em><span class="p">token</span></div>` +
       `<div class="about"><h4>About the cover</h4><p>The figure is a causal self-attention matrix over a twelve-token sentence. Each row is one token looking back at the tokens before it. The numbers are its attention weights, a softmax, so every row sums to one. The empty triangle is the mask: no token may look ahead. Dark tiles mark the strongest weights, and the last row hands its prediction to the next position.</p>` +
       `<h4>About Textmode</h4><p>Vizuara covers are drawn in text. Every figure is set in a monospaced font on a 120 &times; 74 character grid and shows the mechanism the book teaches, with real numbers. Hue is the subject shelf; lightness is the level.</p></div>` +
       `<svg class="bar" viewBox="0 0 196 112"><rect x=".75" y=".75" width="194.5" height="110.5" fill="${K.A}" stroke="${K.B}" stroke-width="1.5" stroke-dasharray="4 3"/>` +
@@ -813,9 +819,9 @@ function buildWrap(b) {
       `<text x="98" y="70" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="${K.B}">placeholder</text></svg>` +
       `<div class="foot"><span>${b.capsules} capsules · ${b.hours} hours · ${b.level}</span><span>books.vizuara.ai</span></div>` +
     `</div>` +
-    `<div class="spine"><div class="sm">${markSVG(K.B, K.ground, 26)}</div>` +
+    `<div class="spine"><div class="sm">${meterHTML(b.level)}</div>` +
       `<div class="st">${title}<span class="cur" style="margin:.14em 0 0;width:.66em;height:.42em;vertical-align:middle"></span></div>` +
-      `<div class="sb">${meterHTML(b.level)}<span>VB</span></div></div>`;
+      `<div class="sb">${markSVG(K.B, K.ground, 26)}</div></div>`;
   const front = buildCover(b, false); w.appendChild(front);
   for (const x of [720, 768]) for (const y of [-28, 896]) { const f = document.createElement('i'); f.className = 'fold'; f.style.left = x + 'px'; f.style.top = y + 'px'; w.appendChild(f); }
   host.appendChild(w); fitTitle(front, b);

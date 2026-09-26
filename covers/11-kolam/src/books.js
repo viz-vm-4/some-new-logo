@@ -26,13 +26,13 @@ const BOOKS = {
   'mathematical-foundations-for-ml': {
     shape: () => K.fromRows([1, 3, 5, 7, 11, 7, 5, 3, 1], 'ner'), loops: 1, sym: 'D2', density: 0.24,
     spec: 'nēr pulli 1–3–5–7–11–7–5–3–1',
-    why: 'The classic diamond of nēr pulli, pierced by a horizontal axis of eleven dots: the number line running through the square.',
+    why: 'The classic diamond of nēr pulli, pierced by a horizontal axis of eleven dots — a number line through the figure — and drawn as a single closed line.',
   },
   'neural-networks-from-scratch': {
     shape: () => K.fromCols([5, 7, 9, 7, 5], 'ner', 'centre'), loops: 1, sym: 'D2', density: 0.26,
     force: (e) => (e.dir === 'N' ? 'x' : undefined), // each layer is a braid; the line turns back between layers except where a few links carry it across
     spec: 'layers 5–7–9–7–5',
-    why: 'Columns of dots are the layers of a small network (5–7–9–7–5); every step from one layer to the next is a crossing — a fully connected layer.',
+    why: 'Columns of dots are the layers of a small network, 5–7–9–7–5. Inside a layer the line only crosses, so each column reads as its own braid; between layers it mostly turns back, and a few crossings, the weights, carry it across until the whole network is one line.',
   },
   'build-llms-from-scratch': {
     shape: () => K.fromRows([4, 4, 4, 4, 4], 'ner'), loops: 1, sym: 'D2', density: 0.38,
@@ -98,7 +98,7 @@ const BOOKS = {
   'charlie-reasoning-room': {
     shape: () => K.fromRows([1, 2, 3, 4, 5, 6], 'idukku'), loops: 3, sym: 'MX', density: 0.2,
     spec: 'idukku pulli 1–2–3–4–5–6',
-    why: 'Interlaced dots fanning out row by row, a tree of possible moves. Mirror symmetry through the centre forces exactly three lines: bandits, reinforcement learning, reasoning models.',
+    why: 'Interlaced dots fanning out row by row, a tree of possible moves. Mirror symmetry through dots on the centre line means it can never close as fewer than three lines: bandits, reinforcement learning, reasoning models.',
   },
   'prompt-engineering': {
     shape: () => K.fromMask(['ooooooo', 'ooooooo', 'ooooooo', 'ooooooo', '..o....', '.oo....'].join('\n'), 'ner'), loops: 1, sym: 'none', density: 0.22,

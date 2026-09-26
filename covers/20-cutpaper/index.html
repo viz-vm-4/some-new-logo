@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Fraunces:ital,opsz,wght,SOFT,WONK@1,9..144,300..700,0..100,0..1&display=swap" rel="stylesheet">
 <style>
 :root{
-  --ivory:#F4EDDF; --ink:#1B1A22; --ultra:#2A3A92; --leaf:#22704B; --verm:#D93D2B; --saff:#EDB22C;
+  --ivory:#F4EDDF; --ink:#1B1A22; --ultra:#2A3A92; --leaf:#22704B; --verm:#D93D2B; --saff:#E6B422;
   --night:#1D2342; --rose:#EE9C94; --kraft:#BD9061; --lemon:#F5D55A; --blush:#F7CDC2; --mist:#BCCCD8;
   --mint:#9ED0B3; --lilac:#B6A6D6; --cobalt:#4C66C4;
   --mat:#2C423C;
@@ -55,6 +55,10 @@ body{
 .plyrow figure{margin:0;flex:1;font-size:13px;font-weight:600}
 .plyrow svg{display:block;width:100%;height:auto;margin-bottom:8px}
 .card p.small{font-size:14px;line-height:1.5;margin:0 0 8px}
+.vocab{grid-column:1/-1}
+.vocab ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:14px 28px}
+.vocab li{font-size:14px;line-height:1.45}
+.vocab li b{display:block;font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:2px}
 .shelves{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;font-size:13px;margin-top:6px}
 .shelves div{display:flex;align-items:center;gap:8px}
 .shelves i{width:16px;height:16px;flex:none;box-shadow:0 1px 2px rgba(0,0,0,.3)}
@@ -85,7 +89,9 @@ h2.section::after{content:"";flex:1;border-top:1.5px dashed rgba(244,237,223,.45
 .spine .stitle{position:absolute;left:30px;top:150px;transform-origin:0 0;transform:rotate(90deg) translate(0,-50%);white-space:nowrap;z-index:2;
   font-weight:800;font-size:25px;letter-spacing:-.02em;line-height:1}
 .spine .smark{position:absolute;left:17px;bottom:44px;width:26px;height:26px;z-index:2}
-.wrapcap{font-size:15px;line-height:1.5;max-width:1000px;margin:0 0 80px}
+.wrapcap{font-size:15px;line-height:1.5;max-width:1000px;margin:0 0 28px}
+/* on press the stock supplies its own texture and the room its own light: the simulated grain is screen-only */
+@media print{.book svg.grain,.wrap svg.grain{display:none}}
 .slip{position:absolute;left:66px;top:572px;width:588px;height:256px;z-index:2}
 .meta{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;font-weight:700;
   letter-spacing:.14em;text-transform:uppercase;line-height:1;height:16px;font-variation-settings:'opsz' 12}
@@ -93,7 +99,7 @@ h2.section::after{content:"";flex:1;border-top:1.5px dashed rgba(244,237,223,.45
 .meta .lvl svg{width:22px;height:18px;display:block}
 .title{margin:18px 0 0;font-weight:800;letter-spacing:-.028em;line-height:.93;font-size:72px}
 .title span{display:block;width:max-content;white-space:nowrap}
-.sub{margin:12px 0 0;font-family:'Fraunces',serif;font-style:italic;font-weight:400;font-size:25px;line-height:1.15;
+.sub{text-wrap:balance;margin:12px 0 0;font-family:'Fraunces',serif;font-style:italic;font-weight:400;font-size:25px;line-height:1.15;
   font-variation-settings:'SOFT' 100,'WONK' 0;letter-spacing:-.005em}
 .foot{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;align-items:flex-end;line-height:1}
 .imprint{display:flex;align-items:flex-end;gap:9px;font-size:17px;font-weight:500;letter-spacing:-.005em}
@@ -133,7 +139,7 @@ h2.section::after{content:"";flex:1;border-top:1.5px dashed rgba(244,237,223,.45
    card; its elevation z sets the shadow it throws (light from top-left).
    ===================================================================== */
 const C = {
-  ivory:'#F4EDDF', ink:'#1B1A22', ultra:'#2A3A92', leaf:'#22704B', verm:'#D93D2B', saff:'#EDB22C',
+  ivory:'#F4EDDF', ink:'#1B1A22', ultra:'#2A3A92', leaf:'#22704B', verm:'#D93D2B', saff:'#E6B422',
   night:'#1D2342', rose:'#EE9C94', kraft:'#BD9061', lemon:'#F5D55A', blush:'#F7CDC2', mist:'#BCCCD8',
   mint:'#9ED0B3', lilac:'#B6A6D6', cobalt:'#4C66C4', plum:'#55284A'
 };
@@ -306,7 +312,7 @@ ART['mathematical-foundations-for-ml'] = () => {
   for (let y=58+20; y<528; y+=20) gp += `<rect x="70" y="${y}" width="580" height="1" fill="#9DB0D8"/>`;
   s += lift(2, `<g transform="rotate(-2.2 360 293)">${gp}</g>`);
   const base = 468;
-  const gauss = (mu,sig,A) => { const x0 = mu-3.4*sig, x1 = mu+3.4*sig; let d=`M${f(x0)} ${base+3}`; for(let x=x0;x<=x1;x+=3) d+=`L${f(x)} ${f(base - A*Math.exp(-((x-mu)**2)/(2*sig*sig)))}`; return d+`L${f(x1)} ${base+3}Z`; };
+  const gauss = (mu,sig,A) => { const x0 = Math.max(60, mu-3.4*sig), x1 = Math.min(660, mu+3.4*sig); let d=`M${f(x0)} ${base+3}`; for(let x=x0;x<=x1;x+=3) d+=`L${f(x)} ${f(base - A*Math.exp(-((x-mu)**2)/(2*sig*sig)))}`; return d+`L${f(x1)} ${base+3}Z`; };
   s += lift(3, path(gauss(252,72,232), jit(C.lemon)));
   s += lift(4, path(gauss(488,58,184), jit(C.leaf)));
   s += lift(5, path(gauss(352,42,318), jit(C.verm)));
@@ -645,7 +651,7 @@ const BOOKS = [
     note:'A pop-up staircase, the oldest trick in paper engineering, for step-by-step reasoning toward a reward flag.'},
   {slug:'inference-engineering', shelf:'systems', level:'advanced', lines:['Inference','Engineering'], sub:'Serve LLMs fast: batching, KV-cache, paged attention, speculative decoding.', soon:true, ply:[C.lemon, C.verm],
     note:'<b>Coming soon</b> books show the kit before assembly: a punch-out sheet with die lines and registration marks. Here the pieces are numbered KV-cache pages; a few are already pressed out and no longer in order, as in paged attention.'},
-  {slug:'rag-in-production', shelf:'agents', level:'intermediate', lines:['RAG in','Production'], capsules:42, hours:10, ply:[C.ultra],
+  {slug:'rag-in-production', shelf:'agents', level:'intermediate', lines:['RAG','in Production'], capsules:42, hours:10, ply:[C.ultra],
     note:'A card-catalogue drawer: retrieval the way libraries always did it. The top three cards have been pulled up out of the drawer to be read.'},
   {slug:'reinforcement-learning', shelf:'world', level:'intermediate', lines:['Reinforcement','Learning'], capsules:38, hours:8, ply:[C.ink],
     note:'A grid world where each tile is lifted by its value: the nearer the goal, the higher the card stands and the longer its shadow.'}
@@ -726,7 +732,8 @@ function wrapHTML(b, i){
     ${grainSVG(78)}
   </div>`;
   return `<div class="wrap" data-wrap="${b.slug}">${back}${spine}${front}</div>
-  <p class="wrapcap"><b>Back, spine, front</b> for <i>${b.lines.join(' ')}</i>. The back shows the offcuts: the sheets the neurons were punched from. The spine carries the level as ply stripes at its head, so a shelf of Vizuara books sorts itself by depth at a glance. The back slip carries a short colophon explaining the construction, the way every book in the system would.</p>`;
+  <p class="wrapcap"><b>Back, spine, front</b> for <i>${b.lines.join(' ')}</i>. The back shows the offcuts: the sheets the neurons were punched from. The spine carries the level as ply stripes at its head, so a shelf of Vizuara books sorts itself by depth at a glance. The back slip carries a short colophon explaining the construction, the way every book in the system would.</p>
+  <p class="wrapcap"><b>Printing it for real.</b> The premium edition is built, not printed: the board is coloured-through stock, the emblem is two to four plies of die-cut card laminated in place, windows are real apertures, and the ivory slip is a tipped-on label sitting on one, two or three real sheets, so you can feel a book's level with your thumb. Once the depth is real, the printed shadows are switched off (they live on their own layer). The trade edition prints the shadows and turns each elevation into a step of multi-level blind embossing.</p>`;
 }
 
 function build(){
@@ -783,7 +790,7 @@ function tightenFilters(){
 
 function buildSystem(){
   const sw = [
-    ['Ultramarine','ultra','Foundations'],['Leaf','leaf','Neural nets & vision'],['Vermilion','verm','Language models'],['Saffron','saff','Context & agents'],
+    ['Ultramarine','ultra','Foundations'],['Leaf','leaf','Neural nets & vision'],['Vermilion','verm','Language models'],['Mustard','saff','Context & agents'],
     ['Night','night','Systems & scale'],['Rose','rose','Reward & the world'],['Kraft','kraft','Intelligence Factory'],['Ivory','ivory','Title slip'],
     ['Ink','ink','Type'],['Lemon','lemon','Accent'],['Blush','blush','Accent'],['Cobalt','cobalt','Accent']
   ];
@@ -801,7 +808,17 @@ function buildSystem(){
       <p class="small">The deeper the book, the more sheets of card the title is mounted on. The label also names the level beside a small ply icon.</p>
       <h3 style="margin-top:18px">Board colour = shelf</h3>
       <div class="shelves">${Object.values(SHELF).map(s=>`<div><i style="background:${s.board}"></i>${s.name}</div>`).join('')}</div>
-    </div>`;
+    </div>
+    <div class="card vocab"><h3>The paper vocabulary: every operation means one thing</h3><ul>
+      <li><b>Cut</b>split or partition: parallelism, patches, chunks</li>
+      <li><b>Pleat</b>compress without throwing away: compaction, summaries</li>
+      <li><b>Window</b>what the model can see: context, attention span</li>
+      <li><b>Layer</b>depth: network layers, and the ply that marks a book's level</li>
+      <li><b>Pin</b>a weighted connection: neurons, edges, graphs</li>
+      <li><b>Punch out</b>select or remove: retrieval, pruning, paged memory</li>
+      <li><b>Lift</b>a number made physical: height of the card is value or weight</li>
+      <li><b>Loop</b>who attends to whom: attention, recurrence, feedback</li>
+    </ul></div>`;
 }
 
 build();

@@ -217,6 +217,11 @@ const PARTS = {
             + ETX(48,50,'ATTN',12) + ETX(48,134,'FFN',12);
     return {w,h,g,d,gates:[[w/2,0,'up'],[w/2,h,'down']],name:'Transformer block'};
   },
+  encoder() {
+    const w=176,h=62; const g=R(0,0,w,h,10);
+    const d=ENG(`M12 12h62v38h-62zM102 12h62v38h-62z`,1.6)+ENG(`M88 24v14M81 31h14`,2.2)+ETX(43,36,'ATTN',11)+ETX(133,36,'MLP',11);
+    return {w,h,g,d,gates:[[43,0,'up'],[133,h,'down']],name:'Encoder block'};
+  },
   tokens(words=['to','ken','s']) {
     let x=0, g='', d=''; const h=46;
     words.forEach((t,i)=>{ const w=24+t.length*15; g += R(x,0,w,h,7); d += ELT(x+w/2,h/2+8,t,23,{w:700}); if (i<words.length-1) g += R(x+w-1,h/2-3,10,6); x += w+8; });
@@ -501,8 +506,9 @@ const PARTS = {
     return {w:214,h:106,g,d,gates:[[27,20,'up'],[107,106,'down']],name:'Multi-armed bandit'};
   },
   gridworld() {
-    const s=128; let g=R(0,0,s,s,6)+ROD(`M20 108H52V76H84V44H108V22`,6)+HEAD(108,10,-90,14)+R(60,20,8,40,2)+R(20,40,36,8,2);
-    let d=ENG(`M34 6V122M66 6V122M98 6V122M6 34H122M6 66H122M6 98H122`,1.2)+EDOT(20,108,6);
+    const s=128; const g=R(0,0,s,s,6);
+    const d=ENG(`M34 6V122M66 6V122M98 6V122M6 34H122M6 66H122M6 98H122`,1.2)
+      + RELIEF(ROD(`M20 108H52V76H84V44H108V26`,6)+HEAD(108,12,-90,14)+R(60,20,8,40,2)+R(20,40,36,8,2)) + EDOT(20,108,6);
     return {w:s,h:s,g,d,gates:[[s/2,0,'up'],[s/2,s,'down']],name:'Grid world'};
   },
   coin() {
@@ -518,6 +524,7 @@ const PARTS = {
 function sprue(fr, rows, pl, mat, opts={}) {
   const TF=11, TR=9, {x,y,w,h}=fr;
   let geo=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="18" fill="none" stroke-width="${TF}"/>`, deco='', tags='';
+  let sheen='', sheenDefs='', frameGeo=''; const SX1=x-40, SX2=x+w+40;
   const tw=rows.reduce((a,r)=>a+(r.h||1),0);
   const runners=[{y, t:TF, occ:[], block:[]}]; const gates=[]; const parts=[];
   let top=y, num=1;
@@ -534,8 +541,14 @@ function sprue(fr, rows, pl, mat, opts={}) {
     let cx=x+gap;
     items.forEach(q=>{
       const s=sc*(q.s||1), pw=q.p.w*s, ph=q.p.h*s, px=cx+(q.dx||0), py=top+(bh-ph)/2+(q.dy||0);
-      geo  += `<g transform="translate(${n2(px)} ${n2(py)}) scale(${n2(s)})">${q.p.g}</g>`;
-      deco += `<g transform="translate(${n2(px)} ${n2(py)}) scale(${n2(s)})">${q.p.d}</g>`;
+      const tf=`translate(${n2(px)} ${n2(py)}) scale(${n2(s)})`;
+      geo  += `<g transform="${tf}">${q.p.g}</g><!--p-->`;
+      if (opts.sheen) {
+        const gp=uid('gp'), L=v=>n2(v);
+        sheenDefs += `<linearGradient id="${gp}" gradientUnits="userSpaceOnUse" x1="${L((SX1-px)/s)}" y1="${L((y-40-py)/s)}" x2="${L((SX2-px)/s)}" y2="${L((y+h+40-py)/s)}">${SHEEN_STOPS}</linearGradient>`;
+        sheen += `<g transform="${tf}" fill="url(#${gp})" stroke="url(#${gp})">${q.p.g}</g>`;
+        deco += `<g transform="${tf}">${q.p.d.replace(/%BASE%/g,`url(#${gp})`)}</g>`;
+      } else deco += `<g transform="${tf}">${q.p.d}</g>`;
       q.p.gates.forEach(([gx,gy,dir],gi)=>{ const ro=dir==='up'?runners[ri]:runners[ri+1];
         gates.push({X:px+gx*s, Y:py+gy*s, ro, dir, num, first:gi===0}); ro.occ.push([px+gx*s-7, px+gx*s+7]); });
       if (py-top<40) runners[ri].block.push([px-6,px+pw+6]); if (bot-(py+ph)<40) runners[ri+1].block.push([px-6,px+pw+6]);
@@ -573,11 +586,18 @@ function sprue(fr, rows, pl, mat, opts={}) {
   runners.forEach(ro=>{ let k=0; [0.1,0.32,0.5,0.68,0.9].forEach(f=>{ const px=x+w*f; if (k<2 && !ro.occ.some(([p,q])=>px>p-9&&px<q+9)) { k++;
     pins += `<circle cx="${n2(px+.7)}" cy="${n2(ro.y+.7)}" r="4.2" fill="none" stroke="%HI%" stroke-width="1" opacity=".8"/><circle cx="${n2(px)}" cy="${n2(ro.y)}" r="4.2" fill="none" stroke="%LO%" stroke-width="1.3"/>`; } }); });
 
-  return {parts, svg: molded(geo, deco+pins+tags, pl, mat)};
+  let sheenSvg='';
+  if (opts.sheen) {
+    const gG=uid('gg'), nonPart=geo.replace(/<g transform="translate[^"]*">[\s\S]*?<\/g><!--p-->/g,'');
+    sheenSvg = `<defs>${sheenDefs}<linearGradient id="${gG}" gradientUnits="userSpaceOnUse" x1="${SX1}" y1="${y-40}" x2="${SX2}" y2="${y+h+40}">${SHEEN_STOPS}</linearGradient></defs>
+      <g fill="url(#${gG})" stroke="url(#${gG})">${nonPart}</g>${sheen}`;
+  }
+  return {parts, svg: molded(geo, deco+pins+tags, pl, mat, sheenSvg)};
 }
+const SHEEN_STOPS = '<stop offset="0" stop-color="#F6DC8C"/><stop offset=".17" stop-color="#C6963C"/><stop offset=".34" stop-color="#F1D178"/><stop offset=".52" stop-color="#B58632"/><stop offset=".7" stop-color="#EACB6C"/><stop offset=".86" stop-color="#AC7D2B"/><stop offset="1" stop-color="#E0BA5C"/>';
 
 /* the plastic: shadow on the bench, lower-right shade, upper-left light, body, (sheen) */
-function molded(geo, deco, pl, mat) {
+function molded(geo, deco, pl, mat, sheenSvg='') {
   const id=uid('sp');
   const sub=s=>s.replace(/%HI%/g,pl.hi).replace(/%LO%/g,pl.lo).replace(/%BASE%/g,pl.base).replace(/%INK%/g,pl.ink);
   return `<defs><g id="${id}">${geo}</g></defs>
@@ -585,7 +605,7 @@ function molded(geo, deco, pl, mat) {
     <use href="#${id}" x="1.5" y="2" fill="${pl.lo}" stroke="${pl.lo}"/>
     <use href="#${id}" x="-1" y="-1" fill="${pl.hi}" stroke="${pl.hi}"/>
     <use href="#${id}" fill="${pl.base}" stroke="${pl.base}"/>
-    ${pl.sheen?`<use href="#${id}" fill="url(#${pl.sheen})" stroke="url(#${pl.sheen})"/>`:''}
+    ${sheenSvg}
     ${sub(deco)}`;
 }
 
@@ -621,7 +641,7 @@ function coverInner(b, size, o={}) {
   const lastBase=base0+(b.lines.length-1)*lh;
   const subY=lastBase+40, frTop=subY+36, frBot=790;
   const gid=uid('gold');
-  const sp=sprue({x:M,y:frTop,w:W-2*M,h:frBot-frTop}, b.rows(PARTS), {...pl, sheen: pl.sheen && gid}, mat, {letter:b.letter, reserve: b.coming?[W-M-230,W-M]:null});
+  const sp=sprue({x:M,y:frTop,w:W-2*M,h:frBot-frTop}, b.rows(PARTS), pl, mat, {sheen:!!pl.sheen, letter:b.letter, reserve: b.coming?[W-M-230,W-M]:null});
   const right = b.coming ? 'COMING SOON' : `${b.capsules} CAPSULES · ${b.hours} H`;
   const inner = `
     <defs><linearGradient id="${gid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F7DE8E"/><stop offset=".38" stop-color="#C58F35"/><stop offset=".62" stop-color="#F0CF72"/><stop offset="1" stop-color="#A27425"/></linearGradient></defs>
@@ -632,7 +652,7 @@ function coverInner(b, size, o={}) {
     <g class="title" font-family="Archivo" font-weight="800" style="font-stretch:87.5%" font-size="${size}" letter-spacing="-0.012em" word-spacing="0.06em" fill="${mat.text}">
       ${b.lines.map((l,i)=>`<text x="${M-3}" y="${n2(base0+i*lh)}">${l}</text>`).join('')}
     </g>
-    <text x="${M}" y="${n2(subY)}" font-family="Martian Mono" font-weight="500" font-size="13" fill="${mat.dim}">${b.sub}</text>
+    <text class="sub" x="${M}" y="${n2(subY)}" font-family="Martian Mono" font-weight="500" font-size="${o.subSize||13}" fill="${mat.dim}">${b.sub}</text>
     ${sp.svg}
     ${b.coming ? stamp(W-M-118, frTop+8, mat) : ''}
     ${levelRow(M, 828, lv, b.level, mat)}
@@ -660,6 +680,8 @@ async function renderCover(b, host) {
   let size=b.size, out=coverInner(b,size); el.innerHTML=svgWrap(W,H,out.inner);
   const widest=Math.max(...[...el.querySelectorAll('g.title text')].map(t=>t.getComputedTextLength()));
   if (widest>TITLE_MAX) { size=Math.floor(size*TITLE_MAX/widest*10)/10; out=coverInner(b,size); el.innerHTML=svgWrap(W,H,out.inner); }
+  const sub=el.querySelector('text.sub'), sl=sub.getComputedTextLength();
+  if (sl>TITLE_MAX) { b._sub=Math.floor(13*TITLE_MAX/sl*10)/10; out=coverInner(b,size,{subSize:b._sub}); el.innerHTML=svgWrap(W,H,out.inner); }
   b._size=size;
   const cap=document.createElement('figcaption');
   cap.innerHTML=`<b>${b.kitLabel?b.kitLabel.replace('INTELLIGENCE FACTORY','Factory'):'Nº '+String(b.kit).padStart(2,'0')}</b> · ${b.lines.join(' ')}<br><span>Parts — ${out.parts.map(p=>`${p.num} ${p.name}`).join(' · ')}</span>`;
@@ -688,7 +710,7 @@ function assembled(pl, mat) {
 }
 function wrapSVG(b, size) {
   const mat=MATS.bench, pl=PLASTIC[b.plastic], SP=72, WW=2*W+SP;
-  const front=coverInner(b,size,{noBench:true});
+  const front=coverInner(b,size,{noBench:true, subSize:b._sub});
   const title=b.lines.join(' ');
   const back = `
     ${mark(M,38,0.84,mat.text)}
@@ -763,7 +785,7 @@ const BOOKS = [
     rows:P=>[ {h:1.2, parts:[P.bubble(200,138,{dots:true,name:'Generation'}), P.kvCache()]}, {h:.9, parts:[P.stopwatch(), P.die(), P.tokens(['next','?'])]} ] },
   { slug:'charlie-vision-room', group:'factory', kitLabel:'INTELLIGENCE FACTORY · II', level:'intermediate', capsules:20, hours:6, plastic:'gold', mat:'factory', letter:'II',
     lines:['Charlie and the','Vision Room'], size:84, sub:'Book II · Vision — Vision Transformers',
-    rows:P=>[ {h:1.1, parts:[P.eye(), P.patchGrid()]}, {h:.8, parts:[P.patchSeq(), P.wave(130,14)]} ] },
+    rows:P=>[ {h:1.1, parts:[P.eye(), P.patchGrid()]}, {h:.8, parts:[P.patchSeq(), P.encoder()]} ] },
   { slug:'charlie-sound-room', group:'factory', kitLabel:'INTELLIGENCE FACTORY · III', level:'intermediate', capsules:20, hours:6, plastic:'gold', mat:'factory', letter:'III',
     lines:['Charlie and the','Sound Room'], size:84, sub:'Book III · Audio — Voice Agents',
     rows:P=>[ {h:1.1, max:1.45, parts:[P.waveform()]}, {h:1, parts:[P.mic(), P.bubble(84,60), P.bubble(70,52), P.speaker()]} ] },
