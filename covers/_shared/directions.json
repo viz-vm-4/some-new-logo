@@ -86,5 +86,9 @@
   "18-sculpture": {
     "name": "Maquette",
     "pitch": "Every book is one sculpted object, made in code and photographed on seamless paper under a museum-catalogue title. Each form embodies the subject: 5D Parallelism is a Carrara-marble rhombic icosahedron (the real 3D shadow of a five-dimensional cube), AI Context Engineering a travertine window packed block by block. A gallery label gives material and “dimensions” in capsules × hours. Level is lighting: high-key chalk, mid-key stone, low-key soot. Ray-marched live in WebGL2 and printed at 300 dpi."
+  },
+  "23-wildcard3": {
+    "name": "Blazon",
+    "pitch": "Every book is granted a coat of arms whose divisions and charges are the mechanism it teaches, and next to the shield sits its blazon: heraldry's 800-year-old formal language that specifies exactly one picture, set like source code beside its output. “Per bend grady of eight Argent and Gules” is the causal mask; parallelism is quartering; a SQL join is impalement. A shared lexicon gives each charge one meaning across the library. Ground colour gives level, tincture gives subject."
   }
 }

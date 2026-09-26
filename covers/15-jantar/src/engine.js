@@ -275,7 +275,7 @@
       }
       return false;
     };
-    const out = []; const sw = opts.seam == null ? 0.42 : opts.seam, ssw = opts.shadowSeam || 0.7;
+    const out = [], cuts = []; const sw = opts.seam == null ? 0.42 : opts.seam, ssw = opts.shadowSeam || 0.7;
     for (const f of order) {
       const k = dot(f.n, L);
       let lit = k > 1e-6 && !(f.mat.flat && !f.mat.sh);
@@ -287,6 +287,7 @@
         if (pts.every(p => inShadow(p, f.sid))) lit = false;
       }
       const col = tone(f.mat, f.n, L, lit);
+      if (f.mat.cut) cuts.push(P2);
       out.push(`<path d="${pathD(P2)}" fill="${col}" stroke="${col}" stroke-width="${sw}" stroke-linejoin="round"/>`);
       if (lit && f.recv !== false) {
       const d0 = dot(f.n, f.pts[0]); const shCol = tone(f.mat, f.n, L, false);
@@ -314,6 +315,13 @@
         }
         if (segs.length) out.push(`<path d="${segs.join('')}" stroke="${f.mat.courseCol || '#3a0d05'}" stroke-opacity="${f.mat.courseOp || 0.16}" stroke-width="${f.mat.courseW || 0.7}" fill="none"/>`);
       }
+    }
+    // section cut line: faces on the cutting plane are nearest the viewer, so they can be redrawn
+    // last — first as a marble halo (half of it shows outside the poché), then as poché on top.
+    if (cuts.length && opts.cutLine) {
+      const d = cuts.map(pathD).join(''), w = (opts.cutW || 2.5) * 2, fill = opts.cutFill;
+      out.push(`<path d="${d}" fill="${opts.cutLine}" stroke="${opts.cutLine}" stroke-width="${w}" stroke-linejoin="miter"/>`);
+      out.push(`<path d="${d}" fill="${fill}" stroke="${fill}" stroke-width="${sw}" stroke-linejoin="round"/>`);
     }
     return out.join('');
   }
