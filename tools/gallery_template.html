@@ -1,0 +1,324 @@
+<title>Vizuara Cover Proofs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  /* A print proofing booth: covers are judged against a neutral grey surround (≈ Munsell N8),
+     so the page itself carries no hue and the covers bring all the colour. */
+  :root {
+    --bg: #C9C9C5;
+    --panel: #D6D6D2;
+    --ink: #161615;
+    --ink-2: #44443F;
+    --rule: #9A9A94;
+    --mark: #2A2A27;
+    --chip-on-bg: #161615;
+    --chip-on-ink: #EDEDE8;
+    --shadow: 0 1px 2px rgba(0,0,0,.18), 0 8px 24px rgba(0,0,0,.12);
+    --display: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    --w: 260px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #2C2C2A; --panel: #363633; --ink: #ECECE7; --ink-2: #B0B0AA; --rule: #5C5C57;
+      --mark: #C8C8C2; --chip-on-bg: #ECECE7; --chip-on-ink: #1B1B1A;
+      --shadow: 0 1px 2px rgba(0,0,0,.5), 0 10px 28px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #2C2C2A; --panel: #363633; --ink: #ECECE7; --ink-2: #B0B0AA; --rule: #5C5C57;
+    --mark: #C8C8C2; --chip-on-bg: #ECECE7; --chip-on-ink: #1B1B1A;
+    --shadow: 0 1px 2px rgba(0,0,0,.5), 0 10px 28px rgba(0,0,0,.35);
+  }
+
+  body { background: var(--bg); color: var(--ink); font: 400 15px/1.55 var(--display); }
+  .wrap { max-width: 1480px; margin: 0 auto; padding-inline: clamp(16px, 4vw, 48px); padding-block: 0 96px; }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+  /* Masthead */
+  .mast { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px 48px; align-items: end;
+          padding-block: 56px 32px; border-bottom: 2px solid var(--ink); }
+  .eyebrow { font: 500 12px/1.4 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); margin: 0 0 14px; }
+  h1 { font: 800 clamp(40px, 7vw, 88px)/.92 var(--display); letter-spacing: -.035em; margin: 0; text-wrap: balance; }
+  .lede { max-width: 62ch; margin: 18px 0 0; font-size: 17px; color: var(--ink-2); text-wrap: pretty; }
+  .facts { display: grid; grid-template-columns: repeat(3, auto); gap: 4px 28px; margin: 0; }
+  .facts dt { font: 500 11px/1.3 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+  .facts dd { margin: 0; font: 700 36px/1 var(--display); font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+  .facts div { display: flex; flex-direction: column-reverse; gap: 6px; }
+
+  /* Control bar */
+  .bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg);
+         display: flex; flex-wrap: wrap; gap: 12px 28px; align-items: center; padding-block: 14px; border-bottom: 1px solid var(--rule); }
+  .seg { display: inline-flex; border: 1.5px solid var(--ink); border-radius: 999px; overflow: hidden; }
+  .seg button { font: 500 13px/1 var(--display); padding: 9px 14px; border: 0; background: transparent; color: var(--ink); cursor: pointer; white-space: nowrap; }
+  .seg button + button { border-left: 1.5px solid var(--ink); }
+  .seg button[aria-pressed="true"] { background: var(--chip-on-bg); color: var(--chip-on-ink); }
+  .bar .label { font: 500 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); margin-right: 8px; }
+  .bar .group { display: flex; align-items: center; }
+  .jump { display: flex; flex-wrap: wrap; gap: 6px 14px; padding-block: 14px 0; font: 500 13px/1.3 var(--display); }
+  .jump a { text-decoration: none; color: var(--ink-2); }
+  .jump a:hover { color: var(--ink); text-decoration: underline; }
+  .jump b { font: 500 11px var(--mono); margin-right: 5px; color: var(--ink-2); }
+
+  /* Current covers strip */
+  .before { display: grid; grid-template-columns: minmax(0, 220px) minmax(0, 1fr); gap: 24px; padding-block: 36px; border-bottom: 1px solid var(--rule); align-items: start; }
+  .before h2 { font: 700 20px/1.2 var(--display); margin: 0 0 8px; }
+  .before p { margin: 0; color: var(--ink-2); font-size: 14px; }
+  .before ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 14px; }
+  .before img { width: 118px; height: auto; aspect-ratio: 720 / 888; object-fit: cover; display: block; border-radius: 6px; }
+
+  /* Direction sections */
+  .dir { padding-block: 56px 8px; border-bottom: 1px solid var(--rule); scroll-margin-top: 72px; }
+  .dir-head { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px 22px; align-items: start; margin-bottom: 28px; }
+  .num { font: 500 13px/1 var(--mono); border: 1.5px solid var(--ink); border-radius: 999px; padding: 7px 10px; margin-top: 6px; font-variant-numeric: tabular-nums; }
+  .dir h2 { font: 800 clamp(26px, 3.4vw, 40px)/1.02 var(--display); letter-spacing: -.025em; margin: 0; text-wrap: balance; }
+  .dir .pitch { max-width: 70ch; margin: 10px 0 0; color: var(--ink-2); text-wrap: pretty; }
+  .dir .side { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
+  .swatches { display: flex; gap: 0; border: 1px solid var(--rule); }
+  .swatches span { width: 22px; height: 22px; display: block; }
+  .open { font: 500 13px/1.2 var(--display); text-decoration: none; border-bottom: 1.5px solid currentColor; padding-bottom: 2px; white-space: nowrap; }
+  .open:hover { opacity: .7; }
+
+  /* Proof grid with printer's crop marks */
+  .grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(var(--w), 100%), var(--w))); gap: 30px 26px; justify-content: start; }
+  .proof { margin: 0; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+  .crop { --m: 11px; --c: var(--mark); padding: var(--m); display: block; width: 100%; border: 0; cursor: zoom-in; background-color: transparent;
+    background-image:
+      linear-gradient(var(--c),var(--c)), linear-gradient(var(--c),var(--c)),
+      linear-gradient(var(--c),var(--c)), linear-gradient(var(--c),var(--c)),
+      linear-gradient(var(--c),var(--c)), linear-gradient(var(--c),var(--c)),
+      linear-gradient(var(--c),var(--c)), linear-gradient(var(--c),var(--c));
+    background-repeat: no-repeat;
+    background-size: 1px calc(var(--m) - 3px), calc(var(--m) - 3px) 1px, 1px calc(var(--m) - 3px), calc(var(--m) - 3px) 1px,
+                     1px calc(var(--m) - 3px), calc(var(--m) - 3px) 1px, 1px calc(var(--m) - 3px), calc(var(--m) - 3px) 1px;
+    background-position: left var(--m) top 0, left 0 top var(--m), right var(--m) top 0, right 0 top var(--m),
+                         left var(--m) bottom 0, left 0 bottom var(--m), right var(--m) bottom 0, right 0 bottom var(--m); }
+  .crop img { display: block; width: 100%; height: auto; aspect-ratio: 720 / 888; box-shadow: var(--shadow); background: var(--panel); }
+  .cap { padding-inline: 11px; font: 400 13px/1.35 var(--display); color: var(--ink); text-wrap: balance; }
+  .cap small { display: block; font: 400 11px/1.4 var(--mono); letter-spacing: .04em; color: var(--ink-2); margin-top: 2px; }
+  :root[data-size="180"] .cap { font-size: 12px; }
+
+  /* By-book view */
+  .picker { display: flex; flex-wrap: wrap; gap: 8px; padding-block: 28px 8px; }
+  .picker button { font: 500 13px/1.2 var(--display); padding: 8px 12px; border-radius: 999px; border: 1.5px solid var(--rule); background: transparent; color: var(--ink); cursor: pointer; text-align: left; }
+  .picker button:hover { border-color: var(--ink); }
+  .picker button[aria-pressed="true"] { background: var(--chip-on-bg); color: var(--chip-on-ink); border-color: var(--chip-on-bg); }
+  .picker button b { font: 500 11px var(--mono); opacity: .7; margin-left: 6px; }
+  .picker .sep { flex-basis: 100%; height: 0; }
+  .book-title { font: 800 clamp(28px, 4vw, 52px)/1 var(--display); letter-spacing: -.03em; margin: 24px 0 6px; text-wrap: balance; }
+  .book-sub { font: 500 12px/1.4 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); margin: 0 0 28px; }
+
+  /* Lightbox */
+  dialog { border: 0; padding: 0; background: transparent; max-width: 100vw; max-height: 100vh; width: 100vw; height: 100vh; }
+  dialog::backdrop { background: rgba(20,20,19,.86); }
+  .lb { height: 100%; display: grid; grid-template-rows: minmax(0, 1fr) auto; gap: 14px; padding: 24px 16px 20px; box-sizing: border-box; }
+  .lb figure { margin: 0; display: grid; place-items: center; min-height: 0; }
+  .lb img { max-height: 100%; max-width: 100%; height: auto; width: auto; aspect-ratio: 720 / 888; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+  .lb-bar { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; justify-content: center; color: #ECECE7; font: 400 14px/1.3 var(--display); text-align: center; }
+  .lb-bar button, .lb-bar a { font: 500 13px/1 var(--display); color: #ECECE7; background: transparent; border: 1.5px solid #ECECE7; border-radius: 999px; padding: 9px 14px; cursor: pointer; text-decoration: none; }
+  .lb-bar button:hover, .lb-bar a:hover { background: #ECECE7; color: #161615; }
+  .lb-cap small { display: block; font: 400 12px var(--mono); opacity: .75; margin-top: 3px; }
+
+  footer { padding-block: 40px 0; color: var(--ink-2); font-size: 13px; max-width: 80ch; }
+  footer code { font: 400 12px var(--mono); }
+
+  @media (max-width: 760px) {
+    .mast { grid-template-columns: minmax(0, 1fr); padding-block: 36px 24px; }
+    .facts dd { font-size: 28px; }
+    .before { grid-template-columns: minmax(0, 1fr); }
+    .before img { width: 88px; }
+    .dir-head { grid-template-columns: auto minmax(0, 1fr); }
+    .dir .side { grid-column: 1 / -1; flex-direction: row; align-items: center; justify-content: space-between; }
+    .bar { gap: 10px 16px; }
+    .seg button { padding: 8px 11px; font-size: 12px; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .crop img { transition: transform .18s ease; }
+    .crop:hover img { transform: translateY(-3px); }
+  }
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div>
+      <p class="eyebrow">Proof set · 26 September 2026 · trim 7.5 × 9.25 in</p>
+      <h1>Vizuara cover proofs</h1>
+      <p class="lede">Ten designers each built a complete cover system for Vizuara Books, working independently from one brief. Every cover is drawn in code (HTML and SVG, no AI images), so it stays sharp at any print size and exports to a PDF at exact trim. Look through each direction, or pick one book and compare all ten versions side by side.</p>
+    </div>
+    <dl class="facts" id="facts"></dl>
+  </header>
+
+  <nav class="bar" aria-label="View controls">
+    <div class="group"><span class="label">View</span>
+      <div class="seg" role="group" aria-label="View">
+        <button type="button" id="v-dir" data-view="dir" aria-pressed="true">By direction</button>
+        <button type="button" id="v-book" data-view="book" aria-pressed="false">Same book, every direction</button>
+      </div>
+    </div>
+    <div class="group"><span class="label">Size</span>
+      <div class="seg" role="group" aria-label="Cover size">
+        <button type="button" id="s-180" data-size="180" aria-pressed="false">Thumbnail</button>
+        <button type="button" id="s-260" data-size="260" aria-pressed="true">Shelf</button>
+        <button type="button" id="s-420" data-size="420" aria-pressed="false">Proof</button>
+      </div>
+    </div>
+  </nav>
+
+  <section class="before" aria-labelledby="before-h">
+    <div>
+      <h2 id="before-h">Covers in use today</h2>
+      <p>The template these proposals replace, shown for reference.</p>
+    </div>
+    <ul id="before"></ul>
+  </section>
+
+  <main id="view"></main>
+
+  <footer>
+    Each direction folder holds the designer's own presentation page, 2× PNG renders, vector PDFs at trim, and a NOTES.md with palette, type and the reasoning behind every emblem. Rebuild this page with <code>python3 tools/build_gallery.py</code>.
+  </footer>
+</div>
+
+<dialog id="lb" aria-label="Cover preview">
+  <div class="lb">
+    <figure><img id="lb-img" alt="" width="720" height="888"></figure>
+    <div class="lb-bar">
+      <button type="button" id="lb-prev" aria-label="Previous cover">← Prev</button>
+      <div class="lb-cap" id="lb-cap"></div>
+      <button type="button" id="lb-next" aria-label="Next cover">Next →</button>
+      <a id="lb-open" href="#">Designer's page</a>
+      <button type="button" id="lb-close">Close</button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+const DATA = /*__DATA__*/null;
+const $ = (s, el = document) => el.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const store = {
+  get(k, d) { try { return localStorage.getItem(k) ?? d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+};
+const LEVEL = { beginner: "Beginner", intermediate: "Intermediate", advanced: "Advanced" };
+const bookTitle = (slug) => DATA.books[slug]?.title || slug.replace(/-/g, " ");
+const bookLevel = (slug) => LEVEL[DATA.books[slug]?.level] || "";
+
+const state = {
+  view: store.get("vcp.view", "dir"),
+  size: store.get("vcp.size", "260"),
+  book: store.get("vcp.book", DATA.core[0]),
+};
+let current = []; // list the lightbox steps through
+
+// Facts
+const totalCovers = DATA.directions.reduce((n, d) => n + d.covers.length, 0);
+const booksCovered = new Set(DATA.directions.flatMap((d) => d.covers.map((c) => c.slug))).size;
+$("#facts").innerHTML = [["Directions", DATA.directions.length], ["Covers", totalCovers], ["Titles", booksCovered]]
+  .map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join("");
+
+// Current covers
+$("#before").innerHTML = DATA.before.map((b) =>
+  `<li><img src="${esc(b.src)}" alt="Current cover: ${esc(bookTitle(b.slug))}" width="720" height="888" loading="lazy"></li>`).join("");
+
+function proof(item, i, caption, sub) {
+  return `<li class="proof">
+    <button type="button" class="crop" data-i="${i}" aria-label="Enlarge ${esc(caption)}">
+      <img src="${esc(item.src)}" alt="${esc(caption)}" width="720" height="888" loading="lazy" decoding="async">
+    </button>
+    <div class="cap">${esc(caption)}<small>${esc(sub)}</small></div>
+  </li>`;
+}
+
+function renderByDirection() {
+  current = [];
+  const jump = `<div class="jump">${DATA.directions.map((d) => `<a href="#d-${esc(d.id)}"><b>${esc(d.num)}</b>${esc(d.name)}</a>`).join("")}</div>`;
+  const sections = DATA.directions.map((d) => {
+    const items = d.covers.map((c) => {
+      const i = current.push({ ...c, dir: d, caption: bookTitle(c.slug), sub: bookLevel(c.slug) }) - 1;
+      return proof(c, i, bookTitle(c.slug), bookLevel(c.slug));
+    }).join("");
+    const sw = d.palette.length ? `<div class="swatches" aria-label="Palette">${d.palette.map((h) => `<span style="background:${esc(h)}" title="${esc(h)}"></span>`).join("")}</div>` : "";
+    return `<section class="dir" id="d-${esc(d.id)}" aria-labelledby="h-${esc(d.id)}">
+      <header class="dir-head">
+        <span class="num">${esc(d.num)}</span>
+        <div><h2 id="h-${esc(d.id)}">${esc(d.name)}</h2>${d.pitch ? `<p class="pitch">${esc(d.pitch)}</p>` : ""}</div>
+        <div class="side">${sw}<a class="open" href="${esc(d.page)}">Designer's page ↗</a></div>
+      </header>
+      <ul class="grid">${items}</ul>
+    </section>`;
+  }).join("");
+  $("#view").innerHTML = jump + sections;
+}
+
+function renderByBook() {
+  const counts = {};
+  DATA.directions.forEach((d) => d.covers.forEach((c) => { counts[c.slug] = (counts[c.slug] || 0) + 1; }));
+  const core = DATA.core.filter((s) => counts[s]);
+  const extra = Object.keys(counts).filter((s) => !DATA.core.includes(s) && counts[s] >= 2)
+    .sort((a, b) => counts[b] - counts[a] || bookTitle(a).localeCompare(bookTitle(b)));
+  if (!counts[state.book]) state.book = core[0] || extra[0];
+  const chip = (s) => `<button type="button" data-book="${esc(s)}" aria-pressed="${s === state.book}">${esc(bookTitle(s))}<b>${counts[s]}</b></button>`;
+  current = [];
+  const items = DATA.directions.map((d) => {
+    const c = d.covers.find((x) => x.slug === state.book);
+    if (!c) return "";
+    const cap = `${d.num} · ${d.name}`;
+    const i = current.push({ ...c, dir: d, caption: cap, sub: bookTitle(c.slug) }) - 1;
+    return proof(c, i, cap, "");
+  }).join("");
+  const b = DATA.books[state.book] || {};
+  $("#view").innerHTML = `
+    <div class="picker" role="group" aria-label="Choose a book">${core.map(chip).join("")}${extra.length ? `<span class="sep"></span>${extra.map(chip).join("")}` : ""}</div>
+    <h2 class="book-title">${esc(bookTitle(state.book))}</h2>
+    <p class="book-sub">${esc(LEVEL[b.level] || "")}${b.series ? " · " + esc(b.series) : ""} · ${counts[state.book]} version${counts[state.book] === 1 ? "" : "s"}</p>
+    <ul class="grid">${items}</ul>`;
+}
+
+function render() {
+  document.documentElement.style.setProperty("--w", state.size + "px");
+  document.documentElement.dataset.size = state.size;
+  document.querySelectorAll("[data-view]").forEach((b) => b.setAttribute("aria-pressed", b.dataset.view === state.view));
+  document.querySelectorAll("[data-size]").forEach((b) => b.setAttribute("aria-pressed", b.dataset.size === state.size));
+  state.view === "book" ? renderByBook() : renderByDirection();
+}
+
+document.addEventListener("click", (e) => {
+  const v = e.target.closest("[data-view]");
+  if (v) { state.view = v.dataset.view; store.set("vcp.view", state.view); render(); window.scrollTo({ top: $(".bar").offsetTop }); return; }
+  const s = e.target.closest("button[data-size]");
+  if (s) { state.size = s.dataset.size; store.set("vcp.size", state.size); render(); return; }
+  const bk = e.target.closest("[data-book]");
+  if (bk) { state.book = bk.dataset.book; store.set("vcp.book", state.book); render(); return; }
+  const c = e.target.closest(".crop");
+  if (c) openLb(+c.dataset.i);
+});
+
+// Lightbox
+const lb = $("#lb");
+let idx = 0;
+function openLb(i) {
+  idx = (i + current.length) % current.length;
+  const it = current[idx];
+  $("#lb-img").src = it.src;
+  $("#lb-img").alt = `${it.caption}${it.sub ? " — " + it.sub : ""}`;
+  $("#lb-cap").innerHTML = `${esc(it.dir.num)} · ${esc(it.dir.name)}<small>${esc(bookTitle(it.slug))} · ${idx + 1} of ${current.length}</small>`;
+  $("#lb-open").href = it.dir.page;
+  if (!lb.open) lb.showModal();
+}
+$("#lb-prev").onclick = () => openLb(idx - 1);
+$("#lb-next").onclick = () => openLb(idx + 1);
+$("#lb-close").onclick = () => lb.close();
+lb.addEventListener("click", (e) => { if (e.target === lb || e.target.classList.contains("lb") || e.target.tagName === "FIGURE") lb.close(); });
+document.addEventListener("keydown", (e) => {
+  if (!lb.open) return;
+  if (e.key === "ArrowLeft") openLb(idx - 1);
+  if (e.key === "ArrowRight") openLb(idx + 1);
+});
+
+render();
+</script>
