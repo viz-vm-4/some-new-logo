@@ -320,7 +320,7 @@
     // last — first as a marble halo (half of it shows outside the poché), then as poché on top.
     if (cuts.length && opts.cutLine) {
       const d = cuts.map(pathD).join(''), w = (opts.cutW || 2.5) * 2, fill = opts.cutFill;
-      out.push(`<path d="${d}" fill="${opts.cutLine}" stroke="${opts.cutLine}" stroke-width="${w}" stroke-linejoin="miter"/>`);
+      out.push(`<path d="${d}" fill="${opts.cutLine}" stroke="${opts.cutLine}" stroke-width="${w}" stroke-linejoin="miter" stroke-miterlimit="3"/>`);
       out.push(`<path d="${d}" fill="${fill}" stroke="${fill}" stroke-width="${sw}" stroke-linejoin="round"/>`);
     }
     return out.join('');

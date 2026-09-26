@@ -2,6 +2,7 @@
 (function () {
   const { Scene, camera, render, nrm, mix, add, sub, mul, dot, cross, D } = J;
   const W = 720, H = 888, PL = 748; // plinth (section) line
+  const CUTLINE = '#F4EADC';          // marble line drawn along every section cut
 
   // ---------- the three hours ----------
   const STONE = { hi: '#F8D2B6', lo: '#E08763', sh: '#8A3124', shUp: '#99392B', g: 0.9, course: 22 };
@@ -13,7 +14,7 @@
       ground: { flat: '#EFE6D7', sh: '#BE9B85', shUp: '#BE9B85' },
       marble: { hi: '#FFFBF4', lo: '#F5EDE2', sh: '#C39A8A', shUp: '#CBA596' },
       water: { flat: '#6F8580', sh: '#4E625E' },
-      cut: { flat: '#5B1D18' },
+      cut: { flat: '#5B1D18', cut: true },
     },
     intermediate: {
       label: 'Intermediate', hour: 'Noon', n: 2, light: [16, 38],
@@ -22,7 +23,7 @@
       ground: { flat: '#D9A546', sh: '#A26C27', shUp: '#A26C27' },
       marble: { hi: '#FFFBF5', lo: '#F2E8DB', sh: '#BF9A86', shUp: '#C8A492' },
       water: { flat: '#35423E', sh: '#2A3431' },
-      cut: { flat: '#5B1D18' },
+      cut: { flat: '#5B1D18', cut: true },
     },
     advanced: {
       label: 'Advanced', hour: 'Evening', n: 3, light: [-36, 15],
@@ -31,7 +32,7 @@
       ground: { flat: '#1E2046', sh: '#0B0C22', shUp: '#0B0C22' },
       marble: { hi: '#FFE6CE', lo: '#F4C5A3', sh: '#7B4A55', shUp: '#86525C' },
       water: { flat: '#141633', sh: '#0E0F24' },
-      cut: { flat: '#5B1D18' },
+      cut: { flat: '#5B1D18', cut: true },
     },
   };
 
@@ -123,36 +124,59 @@
     return { S, cam, L: sunRel(cam, 152, 46) };
   };
 
-  // Stepwell in section (after Chand Baori, Abhaneri): the section plane cuts the pit open;
-  // terraces (layers) step down, every one joined to the next by pairs of flights (connections).
+  // Stepwell block (after Chand Baori, Abhaneri): a stepped pit sunk in a stone block that stands on
+  // the ground, sectioned at its near face so the stepped V shows in poché. Terraces are layers, each
+  // edged in marble; paired flights on every riser join each layer to the next.
   SCENES.baori = (hr) => {
-    const cam = CAM({ az: 0, s: 1, ox: 360, el: 38 });
-    const S = new Scene(); S.E = frame(cam, 0);
-    const n = 8, h = 42, g = 34, X = 340, Y = 800, Zb = -1500;
-    pitGround(S, hr, [{ x0: -X, x1: X, y1: Y, cols: [] }]);
-    const sm = cutOr(S, hr, hr.stone), wm = cutOr(S, hr, hr.water);
+    const cam = CAM({ az: 0, s: 0.9, ox: 344, el: 28 });
+    const S = new Scene(); ground(S, hr, cam); S.E = frame(cam, 20);
+    const cutL = (m) => (n, pts) => (dot(n, S.E[1]) < -0.99 && pts.every(p => Math.abs(dot(p, S.E[1]) - Y0) < 1e-6)) ? hr.cut : m;
+    const Y0 = 60, X = 300, D = 470, Hp = 300, n = 5, h = 56, g = 42, Zw = 20;
+    const sm = cutL(hr.stone);
+    // outer block ring (level 0 = rim) and terraces
+    const lv = (i) => ({ a0: -X + i * g, a1: X - i * g, b1: Y0 + D - i * g, zt: Hp - i * h });
     for (let i = 0; i < n; i++) {
-      const zt = -i * h, a0 = -X + i * g, a1 = X - i * g, b1 = Y - i * g;
-      S.box(a0, b1 - g, Zb, a1, b1, zt, { mat: sm });
-      S.box(a0, 0, Zb, a0 + g, b1 - g, zt, { mat: sm });
-      S.box(a1 - g, 0, Zb, a1, b1 - g, zt, { mat: sm });
-    }
-    const a0 = -X + n * g, a1 = X - n * g, b1 = Y - n * g;
-    S.box(a0, 0, Zb, a1, b1, -n * h - 12, { mat: sm });
-    S.box(a0, 0, -n * h - 12, a1, b1, -n * h + 6, { mat: wm, cast: false });
-    // flights on each back riser: pairs of stairs meeting at a landing, offset level to level
-    const m = 6, rs = h / m, run = 8, pd = 20, span = 2 * m * run + 10;
-    for (let i = 1; i < n; i++) {
-      const zt = -i * h, ry = Y - i * g, xa = -X + i * g + 6, xb = X - i * g - 6, off = (i % 2) * span / 2;
-      for (let x = xa + off; x + 2 * m * run + 10 <= xb; x += span) {
-        for (let j = 0; j < m; j++) {
-          S.box(x + j * run, ry - pd, zt, x + (j + 1) * run, ry, zt + (j + 1) * rs, { mat: hr.stone });
-          S.box(x + 10 + (2 * m - 1 - j) * run, ry - pd, zt, x + 10 + (2 * m - j) * run, ry, zt + (j + 1) * rs, { mat: hr.stone });
-        }
-        S.box(x + m * run, ry - pd, zt, x + m * run + 10, ry, zt + h, { mat: hr.stone });
+      const A = lv(i);
+      S.box(A.a0, A.b1 - g, 0, A.a1, A.b1, A.zt, { mat: sm });
+      S.box(A.a0, Y0, 0, A.a0 + g, A.b1 - g, A.zt, { mat: sm });
+      S.box(A.a1 - g, Y0, 0, A.a1, A.b1 - g, A.zt, { mat: sm });
+      if (i > 0) { // marble nosing on the terrace lip
+        const c = 3;
+        S.box(A.a0 + g - c, Y0, A.zt, A.a1 - g + c, A.b1 - g + c, A.zt + 2.5, { mat: (nn) => nn, hide: true });
       }
     }
-    return { S, cam, L: sunRel(cam, -72, 56) };
+    const B = lv(n);
+    S.box(B.a0, Y0, 0, B.a1, B.b1, Zw - 6, { mat: sm });
+    S.box(B.a0, Y0, Zw - 6, B.a1, B.b1, Zw, { mat: cutL(hr.water), cast: false });
+    // marble lips: thin strips along the inner edge of every terrace (back and both sides)
+    for (let i = 1; i <= n; i++) {
+      const A = lv(i), z = Hp - (i - 1) * h, P = lv(i - 1), w = 5;
+      S.box(A.a0 - 0.5, A.b1 - 0.01, z, A.a1 + 0.5, A.b1 + w, z + 2.5, { mat: hr.marble, cast: false });
+      S.box(A.a0 - w, Y0 + 0.01, z, A.a0 + 0.01, A.b1 + w, z + 2.5, { mat: hr.marble, cast: false });
+      S.box(A.a1 - 0.01, Y0 + 0.01, z, A.a1 + w, A.b1 + w, z + 2.5, { mat: hr.marble, cast: false });
+    }
+    // flights: pairs of stairs meeting at a landing on every riser (back and sides), offset level to level
+    const m = 5, rs = h / m, run = 9, pd = 18, span = 2 * m * run + 12;
+    for (let i = 1; i < n; i++) {
+      const A = lv(i), zb = A.zt, off = (i % 2) * span / 2;
+      // back riser (faces -y), flights run along x
+      for (let x = A.a0 + 10 + off; x + span - 10 <= A.a1 - 10; x += span) {
+        for (let j = 0; j < m; j++) {
+          S.box(x + j * run, A.b1 - pd, zb, x + (j + 1) * run, A.b1, zb + (j + 1) * rs, { mat: hr.stone });
+          S.box(x + 12 + (2 * m - 1 - j) * run, A.b1 - pd, zb, x + 12 + (2 * m - j) * run, A.b1, zb + (j + 1) * rs, { mat: hr.stone });
+        }
+        S.box(x + m * run, A.b1 - pd, zb, x + m * run + 12, A.b1, zb + h, { mat: hr.stone });
+      }
+      // left riser (faces +x), flights run along y
+      for (let y = Y0 + 16 + off; y + span - 10 <= A.b1 - 16; y += span) {
+        for (let j = 0; j < m; j++) {
+          S.box(A.a0, y + j * run, zb, A.a0 + pd, y + (j + 1) * run, zb + (j + 1) * rs, { mat: hr.stone });
+          S.box(A.a0, y + 12 + (2 * m - 1 - j) * run, zb, A.a0 + pd, y + 12 + (2 * m - j) * run, zb + (j + 1) * rs, { mat: hr.stone });
+        }
+        S.box(A.a0, y + m * run, zb, A.a0 + pd, y + m * run + 12, zb + h, { mat: hr.stone });
+      }
+    }
+    return { S, cam, L: sunRel(cam, 118, 50) };
   };
 
   // A wall with one window — the context window. Sun behind the wall; light falls through onto a row of tokens.
@@ -419,9 +443,9 @@
     const r = [[0, 26], [4.5, 18], [9, 10], [13.5, 2]];
     return `<svg class="mk" width="26" height="18" viewBox="0 0 26 18"><path fill="${col}" d="${r.map(([y, w]) => `M${(26 - w) / 2} ${y}h${w}v4.5h-${w}z`).join('')}"/></svg>`;
   }
-  function levelGlyph(n, col) {
-    let s = ''; for (let i = 0; i < 3; i++) { const h = 5 + i * 4.5, x = i * 9; s += i < n ? `<rect x="${x}" y="1" width="7.5" height="${h}" fill="${col}"/>` : `<rect x="${x + 0.6}" y="1.6" width="6.3" height="${h - 1.2}" fill="none" stroke="${col}" stroke-width="1.2"/>`; }
-    return `<svg class="lv" width="26" height="16" viewBox="0 0 26 16">${s}</svg>`;
+  function levelGlyph(n, col, dim) { // the mark's stepped-well profile; one, two or three terraces lit
+    const rows = [[0, 30], [7, 20], [14, 10]];
+    return `<svg class="lv" width="30" height="19" viewBox="0 0 30 19">${rows.map(([y, w], i) => `<rect x="${(30 - w) / 2}" y="${y}" width="${w}" height="4.6" fill="${i < n ? col : (dim || '#8C4A3E')}"/>`).join('')}</svg>`;
   }
 
   function build(b) {
@@ -429,7 +453,7 @@
     const t0 = performance.now();
     const sc = SCENES[b.scene](hr);
     const L = sc.L || sunRel(sc.cam, hr.light[0], hr.light[1]);
-    const art = render(sc.S, sc.cam, L);
+    const art = render(sc.S, sc.cam, L, { cutLine: CUTLINE, cutFill: hr.cut.flat });
     const extra = sc.extra ? sc.extra(sc.cam) : '';
     const el = document.createElement('div');
     el.className = 'cover lv-' + b.level; el.dataset.slug = b.slug;
@@ -454,7 +478,7 @@
     const sc = SCENES[b.scene](hr);
     const L = sc.L || sunRel(sc.cam, hr.light[0], hr.light[1]);
     const cam = Object.assign({}, sc.cam, { P: (p) => { const q = sc.cam.P(p); return [q[0] + off, q[1]]; } });
-    const art = render(sc.S, cam, L);
+    const art = render(sc.S, cam, L, { cutLine: CUTLINE, cutFill: hr.cut.flat });
     const extra = sc.extra ? sc.extra(cam) : '';
     const el = document.createElement('div');
     el.className = 'wrap lv-' + b.level; el.dataset.slug = b.slug + '-wrap';
@@ -466,7 +490,7 @@
         <div class="kicker">${mark(hr.ink)}<span><b>Vizuara</b> Books · ${hr.label}</span></div>
         ${back}
       </div>
-      <div class="spine" style="left:${W}px;width:${spine}px"><span class="sp-lv">${levelGlyph(hr.n, hr.ink)}</span><span class="sp-t">${b.title.join(' ')}</span><span class="sp-mk">${mark('#F4EADC')}</span></div>
+      <div class="spine" style="left:${W}px;width:${spine}px"><span class="sp-lv">${levelGlyph(hr.n, hr.ink, mix(hr.sky, hr.ink, 0.28))}</span><span class="sp-t">${b.title.join(' ')}</span><span class="sp-mk">${mark('#F4EADC')}</span></div>
       <div class="front" style="left:${off}px">
         <div class="head"><h2 class="title" style="font-size:${b.size || (b.title.length >= 3 ? 68 : 80)}px">${b.title.join('<br>')}</h2></div>
         <div class="band">
