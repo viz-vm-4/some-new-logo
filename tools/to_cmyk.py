@@ -8,11 +8,12 @@ Reads <name>-rgb.pdf and <name>.json and writes:
   <name>-cmyk.tif      the same pixels as an LZW TIFF with the output profile embedded
   <name>-softproof.jpg what the CMYK will roughly look like, converted back to sRGB
   <name>-guides.jpg    the soft proof at 100 dpi with trim/fold, safe and hinge lines drawn on
-  <name>-gamut.png     where the soft proof moved more than dE 6 from the screen colour (red)
+  <name>-gamut.png     where the printed hue/saturation moves more than 6 (a*b*) from the screen colour (red)
 and prints a preflight report: size, resolution, total ink coverage, colour shift.
 
-The RGB -> CMYK conversion is Ghostscript's (sRGB in, relative colorimetric with black point
-compensation). The default output profile is ISO Coated v2 300% (FOGRA39, 300% ink limit),
+The RGB -> CMYK conversion is Ghostscript's (sRGB in, relative colorimetric). Black point
+compensation is off: it lifted and greyed deep colours such as madder and indigo by dE 7-9,
+where plain relative colorimetric holds them within about 2 and only clips the very darkest ink. The default output profile is ISO Coated v2 300% (FOGRA39, 300% ink limit),
 a safe general-purpose target for coated cover stock on digital or offset presses.
 Needs ghostscript, Pillow (with ImageCms) and numpy.
 """
@@ -47,11 +48,11 @@ def to_lab(img, src_profile):
     lab = ImageCms.createProfile("LAB", 6500)
     t = ImageCms.buildTransform(src_profile, lab, img.mode, "LAB", ImageCms.Intent.RELATIVE_COLORIMETRIC)
     a = np.asarray(ImageCms.applyTransform(img, t)).astype(np.float32)
-    # Pillow's LAB: L 0..255 -> 0..100, a/b stored as signed bytes in unsigned form
-    L = a[..., 0] * 100 / 255
+    # Pillow's LAB as an array: L 0..255 -> 0..100; a/b are signed bytes read as unsigned
+    # (getpixel() instead reports them offset by 128)
     ab = a[..., 1:].copy()
     ab[ab > 127] -= 256
-    return np.dstack([L, ab])
+    return np.dstack([a[..., 0] * 100 / 255, ab])
 
 
 def main():
@@ -72,7 +73,7 @@ def main():
     with tempfile.TemporaryDirectory() as tmp:
         tif, png = Path(tmp) / "c.tif", Path(tmp) / "r.png"
         common = [f"-r{o.dpi}", "-dTextAlphaBits=4", "-dGraphicsAlphaBits=4", "-dInterpolateControl=1"]
-        gs("-sDEVICE=tiff32nc", *common, f"-sOutputICCProfile={prof}", "-dRenderIntent=1", "-dBlackPtComp=1",
+        gs("-sDEVICE=tiff32nc", *common, f"-sOutputICCProfile={prof}", "-dRenderIntent=1", "-dBlackPtComp=0",
            "-o", str(tif), str(rgb_pdf))
         gs("-sDEVICE=png16m", *common, "-o", str(png), str(rgb_pdf))
         cmyk = Image.open(tif).convert("CMYK")
@@ -103,8 +104,11 @@ def main():
     small = (round(W * 100), round(H * 100))
     la, lb = to_lab(rgb.resize(small, Image.BILINEAR), srgb), to_lab(proof.resize(small, Image.BILINEAR), srgb)
     de = np.sqrt(((la - lb) ** 2).sum(axis=2))
+    # Ink on paper can't get as dark as a screen, so dark colours always lift a little in lightness.
+    # The part worth watching is the colour itself (a*, b*): a hue or saturation change.
+    dab = np.sqrt(((la[..., 1:] - lb[..., 1:]) ** 2).sum(axis=2))
     heat = np.asarray(proof.resize(small, Image.BILINEAR)).astype(np.float32) * 0.35 + 255 * 0.65
-    heat[de > 6] = [220, 30, 30]
+    heat[dab > 6] = [220, 30, 30]
     Image.fromarray(heat.astype(np.uint8)).save(f"{base}-gamut.png")
 
     # re-read the PDF to make sure what we upload is what we checked
@@ -120,7 +124,8 @@ def main():
     print(f"{base.name}: {meta['binding']}cover, {meta['pages']} pages, spine {meta['spine_in']:.3f} in")
     print(f"  size      {W:.3f} x {H:.3f} in = {cmyk.size[0]} x {cmyk.size[1]} px at {o.dpi} dpi, CMYK ({prof.name})")
     print(f"  ink       max {tac.max():.0f}%, {100 * (tac > 300.5).mean():.3f}% of area over 300%")
-    print(f"  shift     dE mean {de.mean():.1f}, 95th pct {np.percentile(de, 95):.1f}, {100 * (de > 6).mean():.1f}% of area over dE 6")
+    print(f"  shift     dE mean {de.mean():.1f} (95th pct {np.percentile(de, 95):.1f}); hue/saturation only: mean {dab.mean():.1f}, "
+          f"{100 * (dab > 6).mean():.1f}% of area over 6 (red in -gamut.png)")
     print(f"  pdf       {size_pdf:.1f} MB, round-trip diff {rt:.2f}/255 {'ok' if rt < 2 else '!! check'}")
 
 

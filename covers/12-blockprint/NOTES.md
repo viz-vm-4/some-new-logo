@@ -101,3 +101,11 @@ Charlie and the Intelligence Factory (woven double-ikat sub-series):
 - **Making print PDFs flat vector (texture only on screen).** The ink texture is the design, so a flat print would be a different cover. Instead the weave and the dye mottle went vector, which brought the set from 55 MB to about 39 MB with no loss.
 
 **pdfpeek:** 14 of 15 are `ok` or `??`. The `??` results are dense-grain fields where pdf.js and Chrome antialias the rasterised ink differently. `neural-networks-from-scratch` shows `!!` (about 13). I checked it with a diff heatmap: the difference sits only on edges (including vector text edges), the mean colour of PDF and JPG is identical to within 0.6/255, and the content matches mark for mark. It is the most edge-dense field in the set (a full 4×4 mesh of 1.6px lines), not a mismatch. Inking the mesh more solidly made the number worse, so I reverted that.
+
+## Print edition: AI Context Engineering (Pothi.com)
+
+- `print/ai-context-engineering.html` is a standalone full wrap, one `.printwrap` sized in inches. Its query params are `binding=soft|hard`, `pages` (default 400), `extw`/`exth` (hardcover board allowance, defaults 0.276/0.394 in until Pothi confirms), `bleed` (0.2) and `guides=1` (proofing overlay only, never for the print file).
+- The front reproduces the library cover's block geometry, registration jitter and type exactly, plus the author byline. The fine ink-void speckle is re-sampled by the browser on the wider wrap, which is not a visible difference.
+- The back's pallu (3.4 in) can't hold the facts, tagline, blurb, about note, imprint and a 2 × 1.2 in barcode at readable sizes. So "About the cover" sits in the field as a reserved kora label (the printer's chit), with the block drawn flat and a credit line to the Ajrakh tradition of the Khatri printers.
+- The spine title is two lines reading top to bottom, followed by the author and the V mark. It auto-fits to 8 pt minimum and was checked at 250, 400 and 550 pages, soft and hard.
+- `isbn=none|box|<ISBN-13>` (default `none`): nothing, a plain white box for the printer's own barcode, or a real EAN-13 drawn from the ISBN (check digit verified, bars snapped to the 300 dpi grid; decoded back from the CMYK file with zbarimg).

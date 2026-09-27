@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Context Engineering — print wrap (Pothi)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anek+Latin:wdth,wght@75..125,300..800&family=Eczar:wght@400..800&display=swap" rel="stylesheet">
+<!--
+  Chhaap · Vizuara Books — full cover wrap for print on demand (Pothi.com, India).
+  Query params (all optional):
+    binding = soft | hard         (default soft)
+    pages   = interior page count (default 400)
+    extw    = hardcover board width  over trim, in  (default 0.276, Pothi to confirm)
+    exth    = hardcover board height over trim, in  (default 0.394, Pothi to confirm)
+    bleed   = softcover bleed, in                   (default 0.2)
+    guides  = 1 to overlay trim / fold / safe-zone guides for proofing (never for the print file)
+    isbn    = none | box | <ISBN-13>       (default none)
+              none: nothing printed there (a copy without an ISBN); box: a plain white 2 × 1.2 in box for
+              the printer to place its own barcode; an ISBN such as 978-93-12345-67-8 draws the EAN-13
+              barcode (check digit verified) with the ISBN printed above it.
+  Softcover: W = bleed + 7.5 + spine + 7.5 + bleed, H = bleed + 9.25 + bleed, spine = 0.001968 × pages.
+  Hardcover: W = wrap + board + spine + board + wrap, H = wrap + board + wrap, wrap = 0.787,
+             board = trim + (extw, exth), spine = 0.157 + 0.001968 × pages.
+  Everything is in CSS px at 96 px = 1 in; the wrap element itself is sized in inches.
+  The front reproduces the approved library cover exactly (same stamps, same ink noise).
+-->
+<style>
+:root{ --kora:#EAE1CC; --indigo:#1C2A4A; --madder:#9B2F25; --iron:#201B19; --ink:#201B19; }
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#6b655d}
+body{font-family:'Anek Latin',system-ui,sans-serif;font-variation-settings:'wdth' 100;}
+.printwrap{position:relative;overflow:hidden;background:var(--kora);color:var(--ink)}
+.printwrap svg.cloth{position:absolute;left:0;top:0;display:block}
+
+/* front panel: identical to the library cover */
+.panel{position:absolute;width:720px;height:328px;padding:34px 48px 0;color:var(--ink)}
+.title{font-family:'Eczar';font-weight:700;line-height:.98;letter-spacing:-.012em;margin:0;color:var(--ink);font-feature-settings:'kern' 1,'liga' 1}
+.title span{display:block;white-space:nowrap;width:max-content}
+.byline{font-family:'Eczar';font-weight:500;font-size:23px;line-height:1.1;margin:18px 0 0;letter-spacing:.005em}
+.foot{position:absolute;left:48px;right:48px;bottom:32px;display:flex;align-items:center;justify-content:space-between;
+  font-weight:650;font-size:13px;letter-spacing:.16em;text-transform:uppercase;line-height:1}
+.imprint{display:flex;align-items:center;gap:11px}
+.imprint svg{display:block}
+.imprint span{font-variation-settings:'wdth' 112;font-weight:700;letter-spacing:.2em}
+.meta{display:flex;align-items:center;gap:10px;text-align:right}
+.dye{display:block;width:13px;height:13px;border:1.5px solid var(--ink)}
+
+/* back panel */
+.back{position:absolute;width:720px;height:328px;padding:30px 48px 0;color:var(--ink)}
+.back .facts{font-weight:650;font-size:12.5px;letter-spacing:.2em;text-transform:uppercase;margin:0 0 11px;line-height:1}
+.back .tag{font-family:'Eczar';font-weight:700;font-size:25px;line-height:1.08;letter-spacing:-.005em;margin:0 0 9px}
+.back .blurb{font-family:'Eczar';font-weight:500;font-size:16px;line-height:1.34;margin:0;max-width:624px}
+.back .foot{right:auto}
+.back .imprint span.url{font-variation-settings:'wdth' 100;font-weight:600;letter-spacing:.14em;font-size:11.5px;margin-left:8px}
+/* the printer's chit: a label reserved from the dye in the back's field, with the block drawn flat */
+.chit{position:absolute;width:336px;padding:17px 20px 18px;background:var(--kora);color:var(--ink);
+  border:2.5px solid var(--iron);box-shadow:inset 0 0 0 3px var(--kora),inset 0 0 0 4.2px var(--iron)}
+.chit h4{margin:0 0 11px;font-weight:700;font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;font-variation-settings:'wdth' 112;line-height:1}
+.chit svg{display:block;margin:0 0 12px}
+.chit .about{font-size:12.5px;line-height:1.42;margin:0 0 7px}
+.chit .credit{font-size:11.5px;line-height:1.38;margin:0;font-style:italic}
+.isbn{position:absolute;right:48px;bottom:32px;width:192px;height:115.2px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.isbn.box,.isbn.code{background:#fff}
+.isbn.none{visibility:hidden}
+.isbn .isbnno{font-weight:600;font-size:10.5px;letter-spacing:.06em;color:#000;margin:0 0 3px;line-height:1}
+.isbn svg{display:block}
+.isbn.bad{background:#fff;outline:3px solid #e00;color:#e00;font-weight:700;font-size:12px;text-align:center;padding:8px}
+.guides-on .isbn{visibility:visible;outline:1px dashed rgba(32,27,25,.55);outline-offset:-1px}
+.guides-on .isbn.none::after,.guides-on .isbn.box::after{content:'ISBN barcode area';font-weight:650;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:rgba(32,27,25,.7)}
+
+/* spine: reads top to bottom (English convention) */
+.spine{position:absolute;display:flex;writing-mode:vertical-rl;align-items:center;color:var(--ink)}
+.spine .st{font-family:'Eczar';font-weight:700;line-height:1.0;letter-spacing:-.005em;white-space:nowrap}
+.spine .sa{font-family:'Eczar';font-weight:500;line-height:1;white-space:nowrap}
+.spine .sm{margin-top:auto;display:block}
+
+/* proofing guides (?guides=1) */
+.guides{position:absolute;inset:0;pointer-events:none}
+.guides i{position:absolute;display:block}
+.guides .trim{border:1px solid #00a0ff}
+.guides .safe{border:1px dashed #ff00b4}
+.guides .fold{border-left:1px solid #00a0ff;top:0;bottom:0;width:0}
+.guides .lbl{position:absolute;font:600 10px/1 'Anek Latin';letter-spacing:.08em;color:#fff;background:#ff00b4;padding:3px 5px;white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="printwrap" id="pw"></div>
+<script>
+/* ---------------- parameters ---------------- */
+const Q = new URLSearchParams(location.search);
+const num = (k,d)=>{ const v=parseFloat(Q.get(k)); return isFinite(v)?v:d; };
+const BINDING = (Q.get('binding')||'soft').toLowerCase()==='hard' ? 'hard' : 'soft';
+const PAGES = Math.max(1, Math.round(num('pages',400)));
+const IN = 96;                                   // CSS px per inch
+const TRIM_W = 7.5, TRIM_H = 9.25;
+const SPINE_IN = BINDING==='hard' ? 0.157 + 0.001968*PAGES : 0.001968*PAGES;
+const MARGIN_IN = BINDING==='hard' ? 0.787 : num('bleed',0.2);          // wrap turn-in, or bleed
+const BOARD_W_IN = TRIM_W + (BINDING==='hard' ? num('extw',0.276) : 0);
+const BOARD_H_IN = TRIM_H + (BINDING==='hard' ? num('exth',0.394) : 0);
+const TOTAL_W_IN = 2*MARGIN_IN + 2*BOARD_W_IN + SPINE_IN;
+const TOTAL_H_IN = 2*MARGIN_IN + BOARD_H_IN;
+const SAFE = 0.25*IN;
+
+const m = MARGIN_IN*IN, bw = BOARD_W_IN*IN, bh = BOARD_H_IN*IN, sp = SPINE_IN*IN;
+const W = TOTAL_W_IN*IN, H = TOTAL_H_IN*IN;
+const dx = (bw-720)/2, dy = (bh-888)/2;           // the 720×888 cover design sits centred on each board
+const backBoardX = m, spineX = m+bw, frontBoardX = m+bw+sp, boardY = m;
+const FX = frontBoardX+dx, FY = boardY+dy;        // front design origin
+const BX = backBoardX+dx;                         // back design origin
+
+/* ---------------- shared vocabulary (verbatim from the Chhaap system) ---------------- */
+const P = {kora:'#EAE1CC', indigo:'#1C2A4A', madder:'#9B2F25', iron:'#201B19', haldi:'#C8962C'};
+const LV = { intermediate: {ground:P.madder, main:P.kora, accent:P.indigo, line:P.iron, label:'Intermediate'} };
+const FIELD_H = 528, KINAR_Y = 528, KINAR_H = 32, PANEL_Y = 560;
+function hash(s){let h=2166136261;for(const ch of s){h^=ch.charCodeAt(0);h=Math.imul(h,16777619);}return h>>>0;}
+function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;}}
+const f = (n)=>+n.toFixed(2);
+const R = (x,y,w,h,extra='')=>`<rect x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${f(h)}" ${extra}/>`;
+const C = (x,y,r)=>`<circle cx="${f(x)}" cy="${f(y)}" r="${f(r)}"/>`;
+const PG = (pts)=>`<polygon points="${pts.map(p=>p.map(f).join(',')).join(' ')}"/>`;
+const lozenge=(cx,cy,rx,ry)=>PG([[cx-rx,cy],[cx,cy-ry],[cx+rx,cy],[cx,cy+ry]]);
+
+/* The packed window: one context window of fixed budget, packed with system
+   instructions (solid), memory (chevrons), retrieved chunks (dots), tool output
+   (stripes) and the query last. Brick repeat; each course packs from the other end. */
+function contextBlock(){
+  let main='',accent='',line='';
+  line+=`<rect x="4" y="8" width="232" height="64" fill="none" stroke="currentColor" stroke-width="3.4"/>`;
+  const y0=15, h=50;
+  main+=R(11,y0,34,h);
+  for(let r=0;r<4;r++)for(let c=0;c<3;c++){ const x=51+c*12, y=y0+2+r*12.4;
+    main+=`<polyline points="${x},${y} ${x+7},${f(y+4.6)} ${x},${f(y+9.2)}" fill="none" stroke="currentColor" stroke-width="2.8"/>`; }
+  for(let r=0;r<4;r++)for(let c=0;c<5;c++) main+=C(95+c*11.5,y0+6+r*12.6,3.4);
+  for(let k=0;k<8;k++) main+=R(155,y0+1+k*6.3,52,3.2);
+  accent+=R(213,y0,17,h);
+  return {w:240,h:80,layers:{line,main,accent},order:['line','main','accent'],
+    arr:(c,r)=>(r%2?'translate(360 0) scale(-1 1)':'')};
+}
+function inkFilter(id,seed,rough=2.6,voids=.66){
+  return `<filter id="${id}" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+    <feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="3" seed="${seed}" result="w"/>
+    <feDisplacementMap in="SourceGraphic" in2="w" scale="${rough}" xChannelSelector="R" yChannelSelector="G" result="d"/>
+    <feTurbulence type="fractalNoise" baseFrequency="0.42 0.5" numOctaves="3" seed="${seed+7}" result="n"/>
+    <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="${seed+3}" result="m"/>
+    <feComposite in="n" in2="m" operator="arithmetic" k2="0.8" k3="0.35" k4="-0.1" result="nm"/>
+    <feColorMatrix in="nm" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -4.2 0 0 0 ${(voids*4.2).toFixed(3)}" result="mask"/>
+    <feComposite in="d" in2="mask" operator="in"/>
+  </filter>`;
+}
+function mark(size=24,col=P.iron,bg=P.kora,cls=''){
+  const V=['##....##','##....##','.##..##.','.##..##.','..####..','..####..','...##...','...##...'];
+  const u=size/10; let cells='';
+  V.forEach((row,y)=>[...row].forEach((ch,x)=>{ if(ch==='#') cells+=R((x+1)*u,(y+1)*u,u+.03,u+.03); }));
+  return `<svg class="${cls}" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" aria-label="Vizuara"><rect width="${size}" height="${size}" fill="${col}"/><g fill="${bg}">${cells}</g></svg>`;
+}
+/* woven cotton over a rectangle, as vector threads (same recipe as the library covers) */
+function weaveRect(x0,y0,w,h,rand){
+  let dk='', lt='';
+  const thread=(horiz,pos)=>{ const a=(rand()*rand()*.11+.012).toFixed(3), wd=(.7+rand()*.5).toFixed(2);
+    const r= horiz? `<rect x="${f(x0)}" y="${pos}" width="${f(w)}" height="${wd}" opacity="${a}"/>` : `<rect x="${pos}" y="${f(y0)}" width="${wd}" height="${f(h)}" opacity="${a}"/>`;
+    if(rand()<.55) dk+=r; else lt+=r; };
+  for(let y=y0;y<y0+h;y+=1.8) thread(true, y.toFixed(1));
+  for(let x=x0;x<x0+w;x+=1.8) thread(false, x.toFixed(1));
+  for(let i=0;i<w*.4;i++){ const horiz=rand()<.6, L=6+rand()*26, x=x0+rand()*w, y=y0+rand()*h, a=(.045+rand()*.075).toFixed(3);
+    const r= horiz? `<rect x="${f(x)}" y="${f(y)}" width="${f(L)}" height="1.3" opacity="${a}"/>` : `<rect x="${f(x)}" y="${f(y)}" width="1.3" height="${f(L)}" opacity="${a}"/>`;
+    if(rand()<.5) dk+=r; else lt+=r; }
+  return `<g fill="#1a120c">${dk}</g><g fill="#fffaf0">${lt}</g>`;
+}
+
+/* ---------------- the book ---------------- */
+const BOOK = {
+  slug:'ai-context-engineering', lines:['AI Context','Engineering'], level:'intermediate', capsules:43,
+  author:'Dr. Raj Dandekar',
+  tagline:'Engineer the context window like a system.',
+  blurb:'Move past prompt engineering to treat everything an LLM sees — instructions, tools, retrieved knowledge, and memory — as one engineered system. Learn the four strategies (write, select, compress, isolate), then build RAG, MCP tools, memory, and agents from scratch.',
+  facts:'Intermediate · 43 capsules · 200 figures · about 10 hours',
+};
+
+/* ---------------- the cloth: one continuous length, front · spine · back ----------------
+   Everything below is drawn in the FRONT's design coordinates (the approved 720×888
+   cover sits at 0,0), so the front reproduces the library cover exactly: the same
+   ink-noise field, and the same random stream for every stamp the cover had. Stamps
+   that exist only on the wrap (spine, back, bleed) draw from a second stream. */
+function buildCloth(){
+  const lv=LV[BOOK.level], id='c'+hash(BOOK.slug).toString(36);
+  const L=-FX, Rt=W-FX, T=-FY, Bt=H-FY;             // wrap extents in front-design coords
+  let defs='', body='';
+  defs+=inkFilter(`${id}-ink-k`,11,1.8,.72);
+  defs+=`<clipPath id="fieldclip"><rect x="${f(L)}" y="${f(T)}" width="${f(Rt-L)}" height="${f(KINAR_Y+2-T)}"/></clipPath>`;
+  defs+=`<clipPath id="fronttrim"><rect x="0" y="0" width="720" height="888"/></clipPath>`;
+  defs+=`<clipPath id="notfront"><path clip-rule="evenodd" d="M${f(L)} ${f(T)}H${f(Rt)}V${f(Bt)}H${f(L)}Z M0 0V888H720V0Z"/></clipPath>`;
+  body+=`<rect x="${f(L)}" y="${f(T)}" width="${f(Rt-L)}" height="${f(Bt-T)}" fill="${lv.ground}"/>`;
+  { // dye mottle: the front's blooms exactly as on the cover, more blooms for spine and back
+    defs+=`<radialGradient id="${id}-mg"><stop offset="0" stop-color="#1b0f08" stop-opacity=".55"/><stop offset=".55" stop-color="#1b0f08" stop-opacity=".22"/><stop offset="1" stop-color="#1b0f08" stop-opacity="0"/></radialGradient>`;
+    const mr=mulberry(hash(BOOK.slug)+17); let e='';
+    for(let i=0;i<720/40;i++) e+=`<ellipse cx="${f(mr()*720)}" cy="${f(mr()*FIELD_H)}" rx="${f(90+mr()*170)}" ry="${f(60+mr()*110)}" opacity="${f(.25+mr()*.75)}"/>`;
+    const mx=mulberry(hash(BOOK.slug)+71), wBack=-L;
+    for(let i=0;i<wBack/40;i++) e+=`<ellipse cx="${f(L+mx()*wBack)}" cy="${f(T+mx()*(FIELD_H-T))}" rx="${f(90+mx()*170)}" ry="${f(60+mx()*110)}" opacity="${f(.25+mx()*.75)}"/>`;
+    body+=`<g fill="url(#${id}-mg)" opacity=".26">${e}</g>`;
+  }
+  { // the field
+    const B=contextBlock(), k=1, BW=B.w*k, BH=B.h*k;
+    const ox=(720-Math.floor(720/BW)*BW)/2, oy=KINAR_Y-Math.ceil(FIELD_H/BH)*BH;
+    // the cover's own stamp range, and the wrap's
+    const cMin=Math.floor((-BW-ox)/BW), cMax=Math.ceil((720-ox)/BW)+1, rMin=-1, rMax=Math.ceil(FIELD_H/BH)+1;
+    const wcMin=Math.floor((L-ox)/BW)-2, wcMax=Math.ceil((Rt-ox)/BW)+1, wrMin=Math.min(rMin,Math.floor((T-oy)/BH)-1);
+    const front=mulberry(hash(BOOK.slug)), extra=mulberry(hash(BOOK.slug)^0x9e3779b9);
+    const keyed=['accent'];
+    let out='';
+    B.order.forEach((role,li)=>{
+      const keyline=keyed.includes(role);
+      defs+=`<g id="${id}-${role}" fill="currentColor" stroke="currentColor" stroke-width="0">${B.layers[role]}</g>`;
+      if(keyline) defs+=`<g id="${id}-${role}K" fill="${P.kora}" stroke="${P.kora}" stroke-width="3.4" stroke-linejoin="round">${
+        B.layers[role].replace(/stroke-width="([\d.]+)"/g,(mm,w)=>`stroke-width="${(+w+3.4).toFixed(2)}"`).replace(/currentColor/g,P.kora)}</g>`;
+      defs+=inkFilter(`${id}-ink-${role}`, (hash(id)%500)+li*31, role==='line'?2.2:2.8, .68);
+      let g='', nF=0, nX=0;
+      for(let r=wrMin;r<rMax;r++)for(let c=wcMin;c<wcMax;c++){
+        const onCover = r>=rMin && c>=cMin && c<cMax;
+        const rand = onCover?front:extra;
+        const x=ox+c*BW, y=oy+r*BH;
+        const ddx=(rand()-.5)*2.2, ddy=(rand()-.5)*2.2, rot=(rand()-.5)*.8;
+        const op=[1,.94,.88][(onCover?nF++:nX++)%3]-rand()*.04;
+        const tf=`translate(${f(x+ddx)} ${f(y+ddy)}) rotate(${f(rot)} ${BW/2} ${BH/2}) scale(${k}) ${B.arr?B.arr(c,r):''}`;
+        if(keyline) g+=`<use href="#${id}-${role}K" transform="${tf}"/>`;
+        g+=`<use href="#${id}-${role}" transform="${tf}" opacity="${f(op)}"/>`;
+      }
+      out+=`<g color="${lv[role]}" filter="url(#${id}-ink-${role})">${g}</g>`;
+    });
+    body+=`<g clip-path="url(#fieldclip)">${out}</g>`;
+  }
+  body+=`<rect x="${f(L)}" y="${PANEL_Y}" width="${f(Rt-L)}" height="${f(Bt-PANEL_Y)}" fill="${P.kora}"/>`;
+  // woven cotton: the front exactly as the cover's, fresh cloth everywhere else
+  body+=`<g clip-path="url(#fronttrim)">${weaveRect(0,0,720,888,mulberry(hash(BOOK.slug)+720))}</g>`;
+  body+=`<g clip-path="url(#notfront)">${weaveRect(L,T,Rt-L,Bt-T,mulberry(hash(BOOK.slug)+4242))}</g>`;
+  body+=`<rect x="${f(L)}" y="${PANEL_Y}" width="${f(Rt-L)}" height="${f(Bt-PANEL_Y)}" fill="${P.kora}" opacity=".56"/>`;
+  { // the kinar crosses back, spine and front at one height
+    let w='';
+    const cy=KINAR_Y+KINAR_H/2;
+    for(let kk=Math.floor((L-12)/24)-1; 12+kk*24<Rt+24; kk++){ const cx=12+kk*24; w+=lozenge(cx,cy,7.2,7.2); w+=C(cx+12,cy,1.9); }
+    w+=R(L-4,KINAR_Y+4,Rt-L+8,1.6)+R(L-4,KINAR_Y+KINAR_H-5.6,Rt-L+8,1.6);
+    body+=`<g filter="url(#${id}-ink-k)"><rect x="${f(L-6)}" y="${KINAR_Y}" width="${f(Rt-L+12)}" height="${KINAR_H}" fill="${P.iron}"/><g fill="${P.kora}">${w}</g></g>`;
+  }
+  return `<svg class="cloth" width="${f(W)}" height="${f(H)}" viewBox="0 0 ${f(W)} ${f(H)}" xmlns="http://www.w3.org/2000/svg"><defs>${defs}</defs><g transform="translate(${f(FX)} ${f(FY)})">${body}</g></svg>`;
+}
+
+/* ---------------- panels ---------------- */
+function frontHTML(){
+  const lv=LV[BOOK.level];
+  return `<div class="panel" id="front" style="left:${f(FX)}px;top:${f(FY+PANEL_Y)}px">
+    <h2 class="title">${BOOK.lines.map(t=>`<span>${t}</span>`).join('')}</h2>
+    <p class="byline">${BOOK.author}</p>
+    <div class="foot"><div class="imprint">${mark(25)}<span>Vizuara Books</span></div>
+      <div class="meta"><i class="dye" style="background:${lv.ground}"></i><span>${lv.label} · ${BOOK.capsules} capsules</span></div></div>
+  </div>`;
+}
+function blockDrawing(scale){
+  const B=contextBlock(), lv=LV[BOOK.level], w=B.w*scale, h=B.h*scale;
+  const layers=B.order.map(r=>`<g fill="${lv[r]}" stroke="${lv[r]}" stroke-width="0" color="${lv[r]}">${B.layers[r]}</g>`).join('');
+  const reserve=`<g fill="${P.kora}" stroke="${P.kora}" stroke-width="3.4" stroke-linejoin="round">${B.layers.accent}</g>`;
+  return `<svg width="${f(w)}" height="${f(h)}" viewBox="0 0 ${B.w} ${B.h}" aria-label="The block, drawn flat"><rect width="${B.w}" height="${B.h}" fill="${lv.ground}"/>${layers.replace(`<g fill="${lv.accent}"`, reserve+`<g fill="${lv.accent}"`)}</svg>`;
+}
+function backHTML(){
+  return `<div class="chit" id="chit" style="left:${f(BX+48)}px">
+      <h4>About the cover</h4>
+      ${blockDrawing(1.2)}
+      <p class="about">The block is this book's subject, carved: one context window of fixed budget, packed with system instructions (solid), memory (chevrons), retrieved chunks (dots) and tool output (stripes), with the query last. Stamped in repeat, it becomes the cloth.</p>
+      <p class="credit">In the manner of Ajrakh, the resist block-printing tradition of the Khatri printers of Kutch, Gujarat, and of Sindh.</p>
+    </div>
+    <div class="back" id="back" style="left:${f(BX)}px;top:${f(FY+PANEL_Y)}px">
+    <p class="facts">${BOOK.facts}</p>
+    <p class="tag">${BOOK.tagline}</p>
+    <p class="blurb">${BOOK.blurb}</p>
+    <div class="foot"><div class="imprint">${mark(25)}<span>Vizuara Books</span><span class="url">books.vizuara.ai</span></div></div>
+    ${isbnHTML()}
+  </div>`;
+}
+/* EAN-13 for the ISBN. One module is 4 device pixels at 300 dpi (0.339 mm, about 103% of nominal
+   size); the bars are snapped to that grid after layout, so the rasterised print file has crisp bars. */
+const MODULE = 4/300*IN;
+function ean13(d){
+  const L=['0001101','0011001','0010011','0111101','0100011','0110001','0101111','0111011','0110111','0001011'];
+  const R=L.map(c=>c.replace(/./g,b=>b==='0'?'1':'0')), G=R.map(c=>[...c].reverse().join(''));
+  const PAR=['LLLLLL','LLGLGG','LLGGLG','LLGGGL','LGLLGG','LGGLLG','LGGGLL','LGLGLG','LGLGGL','LGGLGL'];
+  let bits='101';
+  for(let i=1;i<=6;i++) bits+=(PAR[d[0]][i-1]==='L'?L:G)[d[i]];
+  bits+='01010';
+  for(let i=7;i<=12;i++) bits+=R[d[i]];
+  return bits+'101';
+}
+function isbnHTML(){
+  const raw=(Q.get('isbn')||'none').trim();
+  if(raw==='none'||raw==='box') return `<div class="isbn ${raw}"></div>`;
+  const d=raw.replace(/[^0-9]/g,'').split('').map(Number);
+  const sum=d.slice(0,12).reduce((a,v,i)=>a+v*(i%2?3:1),0);
+  if(d.length!==13||(10-sum%10)%10!==d[12]){
+    console.error('isbn: '+raw+' is not a valid ISBN-13');
+    return `<div class="isbn bad">invalid ISBN-13: ${raw}</div>`;
+  }
+  const bits=ean13(d), mw=MODULE, qz=11, h=74, guard=h+7, W=(qz+95+7)*mw, x0=qz*mw;
+  let bars='';
+  for(let i=0;i<95;){
+    if(bits[i]!=='1'){ i++; continue; }
+    let j=i; while(bits[j]==='1') j++;
+    const isGuard=i<3||(i>=45&&i<50)||i>=92;
+    bars+=`<rect x="${f(x0+i*mw)}" y="0" width="${f((j-i)*mw)}" height="${isGuard?guard:h}"/>`;
+    i=j;
+  }
+  const digit=(ch,x)=>`<text x="${f(x)}" y="${guard+3}" text-anchor="middle">${ch}</text>`;
+  let nums=digit(d[0],x0-4*mw);
+  for(let i=1;i<=6;i++) nums+=digit(d[i],x0+(3+7*(i-1)+3.5)*mw);
+  for(let i=7;i<=12;i++) nums+=digit(d[i],x0+(50+7*(i-7)+3.5)*mw);
+  const label=/^[0-9-]+$/.test(raw)&&raw.includes('-')?raw:d.join('');
+  return `<div class="isbn code"><p class="isbnno">ISBN ${label}</p>
+    <svg class="ean" width="${f(W)}" height="${guard+14}" viewBox="0 0 ${f(W)} ${guard+14}" fill="#000"
+      font-family="Anek Latin" font-weight="500" font-size="12" dominant-baseline="hanging">${bars}${nums}</svg></div>`;
+}
+function snapBarcode(){
+  // move the barcode so its bars start on the 300-dpi pixel grid of the whole wrap
+  const svg=document.querySelector('.isbn svg.ean'); if(!svg) return;
+  const pwx=document.getElementById('pw').getBoundingClientRect(), r=svg.getBoundingClientRect();
+  const px=1/300*IN, dx=(r.left-pwx.left)%px, dy=(r.top-pwx.top)%px;
+  svg.style.transform=`translate(${-dx}px,${-dy}px)`;
+}
+function spineHTML(){
+  const inset=0.0625*IN;                           // keep spine type 1/16 in off each fold
+  const top=FY+PANEL_Y+20, bottom=boardY+bh-SAFE;
+  return `<div class="spine" id="spine" style="left:${f(spineX+inset)}px;width:${f(sp-2*inset)}px;top:${f(top)}px;height:${f(bottom-top)}px">
+    <div class="st">${BOOK.lines.join('<br>')}</div>
+    <div class="sa">${BOOK.author}</div>
+    ${mark(24,P.iron,P.kora,'sm')}
+  </div>`;
+}
+function guidesHTML(){
+  if(Q.get('guides')!=='1') return '';
+  const box=(x,y,w,h,cls)=>`<i class="${cls}" style="left:${f(x)}px;top:${f(y)}px;width:${f(w)}px;height:${f(h)}px"></i>`;
+  let g='';
+  g+=box(backBoardX,boardY,bw,bh,'trim')+box(frontBoardX,boardY,bw,bh,'trim');
+  g+=box(backBoardX+SAFE,boardY+SAFE,bw-2*SAFE,bh-2*SAFE,'safe')+box(frontBoardX+SAFE,boardY+SAFE,bw-2*SAFE,bh-2*SAFE,'safe');
+  g+=`<i class="fold" style="left:${f(spineX)}px"></i><i class="fold" style="left:${f(spineX+sp)}px"></i>`;
+  g+=`<span class="lbl" style="left:${f(spineX+4)}px;top:${f(m+6)}px">spine ${SPINE_IN.toFixed(3)} in · ${PAGES} pp</span>`;
+  g+=`<span class="lbl" style="left:${f(backBoardX+SAFE)}px;top:${f(m+6)}px">${BINDING} · ${TOTAL_W_IN.toFixed(3)} × ${TOTAL_H_IN.toFixed(3)} in</span>`;
+  return `<div class="guides">${g}</div>`;
+}
+
+const pw=document.getElementById('pw');
+pw.style.width=TOTAL_W_IN+'in'; pw.style.height=TOTAL_H_IN+'in';
+pw.dataset.binding=BINDING; pw.dataset.pages=PAGES; pw.dataset.spineIn=SPINE_IN.toFixed(4);
+pw.dataset.sizeIn=`${TOTAL_W_IN.toFixed(4)} x ${TOTAL_H_IN.toFixed(4)}`;
+pw.innerHTML = buildCloth() + backHTML() + spineHTML() + frontHTML() + guidesHTML();
+if(Q.get('guides')==='1') pw.classList.add('guides-on');
+
+/* ---------------- fitting ---------------- */
+function fitFront(){
+  const panel=document.getElementById('front'), t=panel.querySelector('.title'), spans=[...t.querySelectorAll('span')];
+  t.style.fontSize='100px';
+  const widest=Math.max(...spans.map(s=>s.getBoundingClientRect().width));
+  t.style.fontSize=Math.min(76, 100*624/widest).toFixed(1)+'px';     // the library cover's rule
+}
+function fitBack(){
+  const back=document.getElementById('back'), blurb=back.querySelector('.blurb'), isbn=back.querySelector('.isbn');
+  let fs=16, guard=0;
+  while(blurb.getBoundingClientRect().bottom>isbn.getBoundingClientRect().top-14 && fs>14 && guard++<20){ fs-=.25; blurb.style.fontSize=fs+'px'; }
+  back.dataset.blurbPx=fs;
+  const chit=document.getElementById('chit');
+  chit.style.top=f(FY+KINAR_Y-40-chit.getBoundingClientRect().height)+'px';
+}
+function fitSpine(){
+  const s=document.getElementById('spine'), st=s.querySelector('.st'), sa=s.querySelector('.sa'), sm=s.querySelector('.sm');
+  const across=s.getBoundingClientRect().width, avail=s.getBoundingClientRect().height;
+  const MIN=8*96/72;                               // 8 pt
+  let fsT=Math.min(22, across/2.08), fsA=Math.min(13.5, Math.max(MIN, across*.3)), showMark=true, gap=Math.max(12,Math.min(20,across*.3));
+  const apply=()=>{ st.style.fontSize=fsT.toFixed(2)+'px'; sa.style.fontSize=fsA.toFixed(2)+'px';
+    sa.style.marginTop=gap+'px'; sm.style.display=showMark?'block':'none'; };
+  const used=()=>st.getBoundingClientRect().height+gap+sa.getBoundingClientRect().height+(showMark?gap+sm.getBoundingClientRect().height:0);
+  apply(); let guard=0;
+  while(used()>avail && guard++<200){
+    if(fsT>15) fsT-=.25; else if(fsA>MIN) fsA=Math.max(MIN,fsA-.25); else if(gap>10) gap-=1; else if(showMark) showMark=false;
+    else if(fsT>MIN) fsT-=.25; else break;
+    apply();
+  }
+  s.dataset.fit=`title ${fsT.toFixed(1)}px, author ${fsA.toFixed(1)}px, mark ${showMark?'on':'off'}, used ${used().toFixed(0)} of ${avail.toFixed(0)}px, across ${across.toFixed(0)}px`;
+}
+document.fonts.ready.then(()=>{ fitFront(); fitBack(); snapBarcode(); fitSpine(); document.body.dataset.ready='1'; });
+</script>
+</body>
+</html>

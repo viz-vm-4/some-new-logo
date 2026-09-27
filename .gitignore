@@ -5,3 +5,4 @@ covers/*/renders/*.png
 tools/.peek/
 # contact.js scratch page (created and deleted during a run)
 ._contact.html
+/out/
